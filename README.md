@@ -17,6 +17,17 @@ yet.
 - TypeScript
 - ESLint
 
+## Prerequisites
+
+- **Node.js**: `^22.22.2 || ^24.15.0 || >=26.0.0` (see `engines` in `package.json`
+  and `.nvmrc`). This range is not arbitrary — it is the intersection of the
+  Node requirements declared by this project's own dependencies (notably
+  `jsdom`, the narrowest). `npm install`/`npm ci` will fail fast with a clear
+  error on an incompatible Node version (`engine-strict=true` in `.npmrc`)
+  rather than silently warning. If you use `nvm`, running `nvm use` in the
+  repo root picks up the correct version automatically.
+- **npm**: ships with the Node versions above; no separate install needed.
+
 ## Getting Started
 
 Install dependencies:
