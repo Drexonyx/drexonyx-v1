@@ -5,9 +5,11 @@ Drexonyx V1 application repository.
 ## Foundation State
 
 This repository currently contains the Phase 01 foundation: a minimal Next.js
-application skeleton (Step 01) plus CI and environment/secrets conventions
-(Step 02). No database, authentication, payments, third-party integrations,
-or business logic have been implemented yet.
+application skeleton (Step 01), CI and environment/secrets conventions
+(Step 02), and the architecture/security/testing boundary baseline (Step 03,
+see `ARCHITECTURE.md` and `CLAUDE.md`). No database, authentication,
+payments, third-party integrations, or business logic have been implemented
+yet.
 
 ## Stack
 
