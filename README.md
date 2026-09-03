@@ -65,8 +65,14 @@ until the corresponding application code exists (see `ARCHITECTURE.md`).
 ## Continuous Integration
 
 Every push and pull request runs the CI workflow defined in
-`.github/workflows/ci.yml`: `npm ci`, lint, type-check, test, and production
-build. A pull request cannot be considered green unless all five steps pass.
+`.github/workflows/ci.yml`: `npm ci`, lint, type-check, test, a dependency
+security audit (`npm audit --audit-level=high`), and production build. A
+pull request cannot be considered green unless all six steps pass.
+
+## Dependency Updates
+
+`.github/dependabot.yml` opens weekly update pull requests for npm packages
+and GitHub Actions used by this repository.
 
 ## Environments & Secrets
 
