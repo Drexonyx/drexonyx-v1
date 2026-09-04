@@ -1,0 +1,472 @@
+.shell {
+  display: flex;
+  min-height: calc(100vh - var(--nav-h, 0px));
+  background: var(--drex-bg);
+}
+
+/* ── Sidebar ──────────────────────────────────────────────────────────────── */
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--drex-surface);
+  border-right: 1px solid var(--drex-border);
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebarHeader {
+  padding: 0 1.25rem 1.25rem;
+  border-bottom: 1px solid var(--drex-border);
+  margin-bottom: 0.75rem;
+}
+
+.adminLabel {
+  font-size: 0.625rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--drex-accent);
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.orgName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--drex-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.roleLabel {
+  font-size: 0.75rem;
+  color: var(--drex-text-secondary);
+  margin-top: 0.125rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding: 0 0.75rem;
+  flex: 1;
+}
+
+.navSection {
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--drex-text-muted);
+  font-weight: 600;
+  padding: 0.75rem 0.5rem 0.25rem;
+}
+
+.navLink {
+  display: block;
+  padding: 0.5rem 0.625rem;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  color: var(--drex-text-secondary);
+  transition: color var(--drex-duration) var(--drex-ease),
+    background var(--drex-duration) var(--drex-ease);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navLink:hover {
+  color: var(--drex-text);
+  background: var(--drex-elevated);
+}
+
+.navLinkActive {
+  color: var(--drex-accent);
+  background: var(--drex-accent-subtle);
+}
+
+.sidebarFooter {
+  padding: 1rem 1.25rem 0;
+  border-top: 1px solid var(--drex-border);
+  margin-top: auto;
+}
+
+.signOutBtn {
+  font-size: 0.75rem;
+  color: var(--drex-text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color var(--drex-duration) var(--drex-ease);
+}
+
+.signOutBtn:hover {
+  color: var(--drex-text-secondary);
+}
+
+/* ── Content area ─────────────────────────────────────────────────────────── */
+.content {
+  flex: 1;
+  min-width: 0;
+  padding: 2rem;
+  overflow-x: hidden;
+}
+
+/* ── Page common ──────────────────────────────────────────────────────────── */
+.pageHeader {
+  margin-bottom: 2rem;
+}
+
+.pageTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--drex-text);
+  letter-spacing: -0.02em;
+}
+
+.pageSubtitle {
+  font-size: 0.875rem;
+  color: var(--drex-text-secondary);
+  margin-top: 0.25rem;
+}
+
+/* ── Stat cards ───────────────────────────────────────────────────────────── */
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.statCard {
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+
+.statLabel {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--drex-text-muted);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.statValue {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--drex-text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.statValueAccent {
+  color: var(--drex-accent);
+}
+
+/* ── Data table ───────────────────────────────────────────────────────────── */
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--drex-border);
+  border-radius: 8px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.table th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--drex-text-muted);
+  font-weight: 600;
+  background: var(--drex-surface);
+  border-bottom: 1px solid var(--drex-border);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 0.875rem 1rem;
+  color: var(--drex-text-secondary);
+  border-bottom: 1px solid var(--drex-border-subtle);
+  vertical-align: middle;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tr:hover td {
+  background: var(--drex-elevated);
+}
+
+.cellPrimary {
+  color: var(--drex-text);
+  font-weight: 500;
+}
+
+.cellMono {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.75rem;
+}
+
+/* ── Status badges ────────────────────────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.badgeNeutral {
+  background: var(--drex-elevated);
+  color: var(--drex-text-secondary);
+}
+
+.badgeAccent {
+  background: var(--drex-accent-subtle);
+  color: var(--drex-accent);
+}
+
+.badgeSuccess {
+  background: rgba(34, 197, 94, 0.12);
+  color: #4ade80;
+}
+
+.badgeWarning {
+  background: rgba(234, 179, 8, 0.12);
+  color: #facc15;
+}
+
+.badgeDanger {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+}
+
+/* ── Empty / error states ─────────────────────────────────────────────────── */
+.emptyState {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--drex-text-muted);
+}
+
+.emptyTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--drex-text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.emptyBody {
+  font-size: 0.875rem;
+}
+
+.errorState {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 8px;
+  padding: 1.25rem;
+  color: #f87171;
+  font-size: 0.875rem;
+}
+
+/* ── Info card (org overview, system) ─────────────────────────────────────── */
+.infoGrid {
+  display: grid;
+  gap: 1rem;
+  max-width: 680px;
+}
+
+.infoCard {
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+
+.infoCardLabel {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--drex-accent);
+  font-weight: 600;
+  margin-bottom: 0.625rem;
+}
+
+.infoCardValue {
+  font-size: 0.9375rem;
+  color: var(--drex-text);
+  line-height: 1.6;
+}
+
+.infoCardEmpty {
+  font-size: 0.875rem;
+  color: var(--drex-text-muted);
+  font-style: italic;
+}
+
+/* ── Login page ───────────────────────────────────────────────────────────── */
+.loginWrap {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+}
+
+.loginCard {
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: 12px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.loginTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--drex-text);
+  margin-bottom: 0.25rem;
+}
+
+.loginSubtitle {
+  font-size: 0.875rem;
+  color: var(--drex-text-secondary);
+  margin-bottom: 2rem;
+}
+
+.field {
+  margin-bottom: 1rem;
+}
+
+.label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--drex-text-secondary);
+  margin-bottom: 0.375rem;
+}
+
+.input {
+  width: 100%;
+  background: var(--drex-elevated);
+  border: 1px solid var(--drex-border);
+  border-radius: 6px;
+  padding: 0.625rem 0.875rem;
+  color: var(--drex-text);
+  font-size: 0.9375rem;
+  font-family: inherit;
+  transition: border-color var(--drex-duration) var(--drex-ease);
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--drex-accent);
+}
+
+.loginError {
+  font-size: 0.8125rem;
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 6px;
+  padding: 0.625rem 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.loginBtn {
+  width: 100%;
+  background: var(--drex-accent);
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity var(--drex-duration) var(--drex-ease);
+  font-family: inherit;
+}
+
+.loginBtn:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.loginBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Notice (read-only, deferred) ────────────────────────────────────────── */
+.notice {
+  background: rgba(234, 179, 8, 0.08);
+  border: 1px solid rgba(234, 179, 8, 0.2);
+  border-radius: 8px;
+  padding: 0.875rem 1.25rem;
+  font-size: 0.8125rem;
+  color: #facc15;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .shell {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 0.75rem;
+    border-right: none;
+    border-bottom: 1px solid var(--drex-border);
+    overflow-x: auto;
+  }
+
+  .sidebarHeader {
+    display: none;
+  }
+
+  .nav {
+    flex-direction: row;
+    gap: 0.25rem;
+    padding: 0;
+    flex-wrap: wrap;
+  }
+
+  .navSection {
+    display: none;
+  }
+
+  .sidebarFooter {
+    border-top: none;
+    margin-top: 0;
+    padding: 0 0.25rem;
+  }
+
+  .content {
+    padding: 1.25rem;
+  }
+}
