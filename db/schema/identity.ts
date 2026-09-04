@@ -18,6 +18,10 @@ export const users = identitySchema.table('users', {
   id: uuid('id').primaryKey().$defaultFn(() => uuidv7()),
   email: text('email').notNull().unique(),
   display_name: text('display_name').notNull(),
+  // DR 0039: password hash for Credentials authentication. Nullable — users
+  // without a hash cannot authenticate via Credentials provider.
+  // Must never be returned in client-facing query results.
+  password_hash: text('password_hash'),
   archived_at: timestamp('archived_at', { withTimezone: true }),
   created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updated_at: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
