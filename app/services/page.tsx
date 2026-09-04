@@ -28,7 +28,7 @@ const SERVICES = [
     number: "02",
     title: "Static Ad Creative",
     summary:
-      "High-conversion static and carousel ad creative. Scroll-stopping design built around your performance objectives.",
+      "Static and carousel ad creative designed around your performance objectives. Built to hold attention and support your campaign goals.",
     details: [
       "Thumb-stopping visual hierarchy for feed and story placements",
       "A/B variant sets for testing creative hypotheses",
@@ -56,7 +56,7 @@ const SERVICES = [
     number: "04",
     title: "Campaign QC",
     summary:
-      "Rigorous quality control review before every deliverable leaves our studio. Brand safety and platform compliance guaranteed.",
+      "Rigorous quality control review before every deliverable leaves our studio. Every asset is reviewed against brand guidelines and platform specifications before delivery.",
     details: [
       "Brand guideline compliance check",
       "Platform policy and ad spec verification",

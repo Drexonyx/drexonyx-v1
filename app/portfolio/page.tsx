@@ -61,8 +61,8 @@ export default function PortfolioPage() {
             Performance Creative Work
           </h1>
           <p className={styles.heroSub}>
-            A selection of UGC video, static creative, and strategic work produced for brands
-            across performance marketing channels.
+            Performance UGC creative across categories — work samples will be featured here as
+            client-approved pieces become available for public display.
           </p>
         </div>
       </section>

@@ -59,7 +59,7 @@ export default function HomePage() {
               <h3 className={styles.pillarHeading}>AI-Accelerated Production</h3>
               <p className={styles.pillarBody}>
                 Our AI-assisted production pipeline compresses timelines without compromising
-                brand integrity. From brief to deliverable, faster than traditional agencies.
+                brand integrity. From brief to deliverable, through a single coordinated studio pipeline.
               </p>
             </article>
             <article className={styles.pillar}>
@@ -93,7 +93,7 @@ export default function HomePage() {
               },
               {
                 title: "Static Ad Creative",
-                desc: "High-conversion static assets built to stop the scroll.",
+                desc: "Static ad creative built around your campaign brief and platform specifications.",
               },
               {
                 title: "Creative Strategy",
