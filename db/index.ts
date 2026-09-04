@@ -1,0 +1,49 @@
+import postgres from 'postgres';
+import { drizzle } from 'drizzle-orm/postgres-js';
+
+import * as coreSchema from './schema/core';
+import * as identitySchema from './schema/identity';
+import * as commercialSchema from './schema/commercial';
+import * as productionSchema from './schema/production';
+import * as financialSchema from './schema/financial';
+import * as systemSchema from './schema/system';
+
+const schema = {
+  ...coreSchema,
+  ...identitySchema,
+  ...commercialSchema,
+  ...productionSchema,
+  ...financialSchema,
+  ...systemSchema,
+};
+
+export type DbSchema = typeof schema;
+
+let _db: ReturnType<typeof drizzle<DbSchema>> | undefined;
+
+function getDb() {
+  if (!_db) {
+    const connectionString = process.env.DATABASE_URL;
+    if (!connectionString) {
+      throw new Error('DATABASE_URL environment variable is not set');
+    }
+    const client = postgres(connectionString);
+    _db = drizzle(client, { schema });
+  }
+  return _db;
+}
+
+export const db = new Proxy({} as ReturnType<typeof drizzle<DbSchema>>, {
+  get(_target, prop) {
+    return getDb()[prop as keyof ReturnType<typeof drizzle<DbSchema>>];
+  },
+});
+
+export {
+  coreSchema,
+  identitySchema,
+  commercialSchema,
+  productionSchema,
+  financialSchema,
+  systemSchema,
+};
