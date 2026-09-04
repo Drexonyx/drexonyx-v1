@@ -1,17 +1,46 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand palette — dark premium */
+  --drex-bg: #060606;
+  --drex-surface: #0f0f0f;
+  --drex-elevated: #161616;
+  --drex-border: #1e1e1e;
+  --drex-border-subtle: #141414;
+
+  /* Typography */
+  --drex-text: #f4f4f5;
+  --drex-text-secondary: #a1a1aa;
+  --drex-text-muted: #52525b;
+
+  /* Accent */
+  --drex-accent: #f97316;
+  --drex-accent-dim: #c2410c;
+  --drex-accent-subtle: rgba(249, 115, 22, 0.12);
+
+  /* Layout */
+  --drex-container: 1200px;
+  --drex-pad: 1.5rem;
+
+  /* Motion */
+  --drex-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --drex-duration: 220ms;
+
+  /* Legacy compat */
+  --background: var(--drex-bg);
+  --foreground: var(--drex-text);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
 }
 
 html {
   height: 100%;
+  color-scheme: dark;
+  scroll-behavior: smooth;
 }
 
 html,
@@ -24,17 +53,13 @@ body {
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--drex-text);
+  background: var(--drex-bg);
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
 }
 
 a {
@@ -42,8 +67,81 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+img,
+video {
+  max-width: 100%;
+  display: block;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+p {
+  max-width: 68ch;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+  background: none;
+}
+
+/* Focus visible for keyboard accessibility */
+:focus-visible {
+  outline: 2px solid var(--drex-accent);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* Skip link for screen readers */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 1rem;
+  z-index: 9999;
+  padding: 0.5rem 1rem;
+  background: var(--drex-accent);
+  color: #fff;
+  border-radius: 0 0 4px 4px;
+  font-weight: 600;
+  transition: top var(--drex-duration) var(--drex-ease);
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Utility: visually hidden but accessible */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Shared container */
+.container {
+  width: 100%;
+  max-width: var(--drex-container);
+  margin: 0 auto;
+  padding: 0 var(--drex-pad);
+}
+
+/* Main content grows to fill viewport */
+main {
+  flex: 1;
 }

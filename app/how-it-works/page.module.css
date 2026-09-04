@@ -1,0 +1,244 @@
+.hero {
+  padding: 5rem 0 4rem;
+  border-bottom: 1px solid var(--drex-border);
+  background: radial-gradient(ellipse 60% 40% at 50% -5%, rgba(249, 115, 22, 0.07) 0%, transparent 70%);
+}
+
+.heroBadge {
+  display: inline-block;
+  margin-bottom: 1.25rem;
+  padding: 0.3rem 0.875rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--drex-accent);
+  background: var(--drex-accent-subtle);
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  border-radius: 100px;
+}
+
+.heroHeading {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: var(--drex-text);
+  margin-bottom: 1.25rem;
+}
+
+.heroSub {
+  font-size: 1.125rem;
+  color: var(--drex-text-secondary);
+  max-width: 56ch;
+  line-height: 1.7;
+}
+
+/* Steps */
+.stepsSection {
+  padding: 5rem 0;
+  border-bottom: 1px solid var(--drex-border);
+}
+
+.stepsList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 2rem;
+  position: relative;
+}
+
+.stepMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stepNumber {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--drex-accent);
+  font-family: var(--font-geist-mono), monospace;
+  background: var(--drex-accent-subtle);
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.stepConnector {
+  flex: 1;
+  width: 2px;
+  background: var(--drex-border);
+  margin: 8px 0;
+  min-height: 40px;
+}
+
+.stepContent {
+  padding: 0.5rem 0 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.stepTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--drex-text);
+}
+
+.stepDescription {
+  font-size: 1rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.7;
+  max-width: 60ch;
+}
+
+/* Principles */
+.principlesSection {
+  padding: 5rem 0;
+  border-bottom: 1px solid var(--drex-border);
+}
+
+.sectionHeading {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 700;
+  color: var(--drex-text);
+  margin-bottom: 2.5rem;
+}
+
+.principlesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.principle {
+  padding: 2rem;
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.principleTitle {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--drex-text);
+}
+
+.principleDesc {
+  font-size: 0.9375rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.65;
+}
+
+/* CTA band */
+.ctaBand {
+  padding: 5rem 0;
+  background: var(--drex-surface);
+}
+
+.ctaBand .container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.25rem;
+}
+
+.ctaBandHeading {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  color: var(--drex-text);
+}
+
+.ctaBandSub {
+  font-size: 1.0625rem;
+  color: var(--drex-text-secondary);
+}
+
+.ctaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.25rem;
+}
+
+.ctaPrimary {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.75rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--drex-accent);
+  border-radius: 8px;
+  transition: background var(--drex-duration) var(--drex-ease),
+    transform var(--drex-duration) var(--drex-ease),
+    box-shadow var(--drex-duration) var(--drex-ease);
+}
+
+.ctaPrimary:hover {
+  background: var(--drex-accent-dim);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(249, 115, 22, 0.3);
+}
+
+.ctaSecondary {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.75rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--drex-text-secondary);
+  background: transparent;
+  border: 1px solid var(--drex-border);
+  border-radius: 8px;
+  transition: color var(--drex-duration) var(--drex-ease),
+    border-color var(--drex-duration) var(--drex-ease),
+    background var(--drex-duration) var(--drex-ease);
+}
+
+.ctaSecondary:hover {
+  color: var(--drex-text);
+  border-color: var(--drex-text-muted);
+  background: var(--drex-elevated);
+}
+
+@media (max-width: 900px) {
+  .principlesGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .step {
+    grid-template-columns: 1fr;
+  }
+
+  .stepMeta {
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .stepConnector {
+    display: none;
+  }
+
+  .stepContent {
+    padding-bottom: 2rem;
+  }
+}
