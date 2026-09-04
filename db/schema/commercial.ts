@@ -86,6 +86,8 @@ export const quotes = commercialSchema.table(
     // Nullable until set. Required for Cost Check and Margin Check to pass.
     estimated_cost: numeric('estimated_cost', { precision: 19, scale: 4 }),
     currency: text('currency').notNull().default('USD'),
+    // DR 0046 §5: set to now() on SENT→ACCEPTED transition by CLIENT.
+    accepted_at: timestamp('accepted_at', { withTimezone: true }),
     archived_at: timestamp('archived_at', { withTimezone: true }),
     created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updated_at: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),

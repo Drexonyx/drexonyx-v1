@@ -8,9 +8,10 @@ export const metadata = { title: 'Payments — Client Portal' };
 const PAYMENT_BADGE: Record<string, string> = {
   PENDING: s.badgeWarning,
   PROCESSING: s.badgeAccent,
-  COMPLETED: s.badgeSuccess,
+  PAID: s.badgeSuccess,
   FAILED: s.badgeDanger,
   REFUNDED: s.badgeNeutral,
+  CHARGEBACK: s.badgeDanger,
 };
 
 export default async function PaymentsPage() {

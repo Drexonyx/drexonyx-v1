@@ -1,6 +1,7 @@
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import { getQuotes } from '@/lib/portal/queries';
+import { AcceptQuoteButton } from './AcceptQuoteButton';
 import s from '../portal.module.css';
 
 export const metadata = { title: 'Quotes — Client Portal' };
@@ -40,6 +41,7 @@ export default async function QuotesPage() {
                 <th>Status</th>
                 <th>Total</th>
                 <th>Created</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -60,6 +62,11 @@ export default async function QuotesPage() {
                       : '—'}
                   </td>
                   <td className={s.cellMono}>{new Date(q.created_at).toLocaleDateString()}</td>
+                  <td>
+                    {q.status === 'SENT' && (
+                      <AcceptQuoteButton quoteId={q.id} />
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>

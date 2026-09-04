@@ -416,6 +416,37 @@
   cursor: not-allowed;
 }
 
+/* ── Action buttons ───────────────────────────────────────────────────────── */
+.btnPrimary {
+  background: var(--drex-accent);
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity var(--drex-duration) var(--drex-ease);
+  white-space: nowrap;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.btnPrimary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.errorInline {
+  display: inline-block;
+  margin-left: 0.625rem;
+  font-size: 0.75rem;
+  color: #f87171;
+}
+
 /* ── Responsive ───────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .shell {

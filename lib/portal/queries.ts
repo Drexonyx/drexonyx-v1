@@ -1,4 +1,4 @@
-import { and, desc, eq, isNull } from 'drizzle-orm';
+import { and, desc, eq, isNull, inArray } from 'drizzle-orm';
 import { db } from '@/db/index';
 import { organizations, brandDna } from '@/db/schema/core';
 import { campaigns, quotes, orders } from '@/db/schema/commercial';
@@ -91,6 +91,7 @@ export async function getQuotes(organizationId: string) {
       campaign_id: quotes.campaign_id,
       status: quotes.status,
       total_amount: quotes.total_amount,
+      accepted_at: quotes.accepted_at,
       created_at: quotes.created_at,
       updated_at: quotes.updated_at,
     })
@@ -125,6 +126,62 @@ export async function getOrders(organizationId: string) {
       ),
     )
     .orderBy(desc(orders.created_at));
+}
+
+// Returns orders with their most recent payment status for the Pay Now button.
+// Only ACTIVE orders with no PAID/PROCESSING payment show Pay Now.
+export async function getOrdersWithPaymentStatus(organizationId: string) {
+  const orderRows = await db
+    .select({
+      id: orders.id,
+      campaign_id: orders.campaign_id,
+      quote_id: orders.quote_id,
+      status: orders.status,
+      created_at: orders.created_at,
+      updated_at: orders.updated_at,
+    })
+    .from(orders)
+    .where(
+      and(
+        eq(orders.organization_id, organizationId),
+        isNull(orders.archived_at),
+      ),
+    )
+    .orderBy(desc(orders.created_at));
+
+  if (orderRows.length === 0) return [];
+
+  const orderIds = orderRows.map((o) => o.id);
+
+  const paymentRows = await db
+    .select({
+      order_id: payments.order_id,
+      status: payments.status,
+      amount: payments.amount,
+      currency: payments.currency,
+      created_at: payments.created_at,
+    })
+    .from(payments)
+    .where(
+      and(
+        eq(payments.organization_id, organizationId),
+        inArray(payments.order_id, orderIds),
+      ),
+    )
+    .orderBy(desc(payments.created_at));
+
+  // Index payments by order_id — most recent first (already ordered)
+  const paymentByOrder = new Map<string, typeof paymentRows[0]>();
+  for (const p of paymentRows) {
+    if (!paymentByOrder.has(p.order_id)) {
+      paymentByOrder.set(p.order_id, p);
+    }
+  }
+
+  return orderRows.map((o) => ({
+    ...o,
+    latestPayment: paymentByOrder.get(o.id) ?? null,
+  }));
 }
 
 // Returns only CLIENT-safe asset statuses (CLIENT_PREVIEW, REVISION_REQUIRED).

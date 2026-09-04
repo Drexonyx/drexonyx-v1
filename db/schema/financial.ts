@@ -4,6 +4,7 @@ import {
   text,
   timestamp,
   numeric,
+  jsonb,
   check,
   foreignKey,
   index,
@@ -48,6 +49,8 @@ export const financialLedger = financialSchema.table(
 // ─── Payments ─────────────────────────────────────────────────────────────────
 // Records client payment events. Append-only history.
 // DR 0001 §6: CLIENT PAYMENT → PAYMENT LEDGER.
+// DR 0047: status PENDING|PROCESSING|PAID|FAILED|REFUNDED|CHARGEBACK.
+// DR 0048: partial unique index (order_id) WHERE status='PAID' enforced in migration.
 
 export const payments = financialSchema.table(
   'payments',
@@ -59,12 +62,20 @@ export const payments = financialSchema.table(
     currency: text('currency').notNull().default('USD'),
     status: text('status').notNull(),
     idempotency_key: text('idempotency_key').unique(),
+    // DR 0044 §3.2: provider-agnostic field names.
+    provider_name: text('provider_name'),
+    provider_payment_id: text('provider_payment_id'),
+    payment_method_type: text('payment_method_type'),
+    failure_reason: text('failure_reason'),
+    paid_at: timestamp('paid_at', { withTimezone: true }),
+    refunded_at: timestamp('refunded_at', { withTimezone: true }),
+    metadata: jsonb('metadata'),
     created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [
     check(
       'payments_status_check',
-      sql`${t.status} IN ('PENDING','PAID','FAILED','REFUNDED','CHARGEBACK')`,
+      sql`${t.status} IN ('PENDING','PROCESSING','PAID','FAILED','REFUNDED','CHARGEBACK')`,
     ),
     foreignKey({
       columns: [t.order_id, t.organization_id],
@@ -74,6 +85,7 @@ export const payments = financialSchema.table(
     index('payments_order_idx').on(t.order_id),
     index('payments_org_idx').on(t.organization_id),
     index('payments_status_idx').on(t.status),
+    index('payments_provider_payment_id_idx').on(t.provider_payment_id),
   ],
 );
 
