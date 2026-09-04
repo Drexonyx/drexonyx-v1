@@ -2,7 +2,7 @@ import { and, desc, eq, isNull } from 'drizzle-orm';
 import { db } from '@/db/index';
 import { organizations } from '@/db/schema/core';
 import { users, orgMemberships } from '@/db/schema/identity';
-import { campaigns, quotes, orders, orderBudgets } from '@/db/schema/commercial';
+import { campaigns, quotes, orders, orderBudgets, pricingConfigs } from '@/db/schema/commercial';
 import { payments, financialLedger, expenses } from '@/db/schema/financial';
 import { assets, qcReviews, approvals, deliveries } from '@/db/schema/production';
 import { auditEvents } from '@/db/schema/system';
@@ -60,6 +60,7 @@ export async function getAdminCampaigns(organizationId: string) {
 }
 
 // Admin sees ALL quote statuses including DRAFT (portal CLIENT view excludes DRAFT).
+// DR 0043: includes estimated_cost and currency for cost/margin check display.
 export async function getAdminQuotes(organizationId: string) {
   return db
     .select({
@@ -67,6 +68,8 @@ export async function getAdminQuotes(organizationId: string) {
       campaign_id: quotes.campaign_id,
       status: quotes.status,
       total_amount: quotes.total_amount,
+      estimated_cost: quotes.estimated_cost,
+      currency: quotes.currency,
       archived_at: quotes.archived_at,
       created_at: quotes.created_at,
       updated_at: quotes.updated_at,
@@ -79,6 +82,19 @@ export async function getAdminQuotes(organizationId: string) {
       ),
     )
     .orderBy(desc(quotes.created_at));
+}
+
+// DR 0043 §6.5: Fetch org-level pricing config for margin threshold display.
+export async function getAdminPricingConfig(organizationId: string) {
+  const rows = await db
+    .select({
+      minimum_acceptable_margin_rate: pricingConfigs.minimum_acceptable_margin_rate,
+      target_margin_rate: pricingConfigs.target_margin_rate,
+    })
+    .from(pricingConfigs)
+    .where(eq(pricingConfigs.organization_id, organizationId))
+    .limit(1);
+  return rows[0] ?? null;
 }
 
 export async function getAdminOrders(organizationId: string) {

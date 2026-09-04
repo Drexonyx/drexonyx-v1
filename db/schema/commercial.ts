@@ -82,6 +82,10 @@ export const quotes = commercialSchema.table(
     organization_id: uuid('organization_id').notNull(),
     status: text('status').notNull().default('DRAFT'),
     total_amount: numeric('total_amount', { precision: 19, scale: 4 }).notNull(),
+    // DR 0043: estimated_cost entered by OWNER or ADMIN_OPERATIONS while DRAFT.
+    // Nullable until set. Required for Cost Check and Margin Check to pass.
+    estimated_cost: numeric('estimated_cost', { precision: 19, scale: 4 }),
+    currency: text('currency').notNull().default('USD'),
     archived_at: timestamp('archived_at', { withTimezone: true }),
     created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updated_at: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
@@ -100,6 +104,35 @@ export const quotes = commercialSchema.table(
     index('quotes_campaign_idx').on(t.campaign_id),
     index('quotes_org_idx').on(t.organization_id),
     index('quotes_status_idx').on(t.status),
+  ],
+);
+
+// ─── Pricing Configs ─────────────────────────────────────────────────────────
+// DR 0043 §6.5: One config per organization. minimum_acceptable_margin_rate is
+// the binding PASS/FAIL threshold. target_margin_rate is informational only.
+
+export const pricingConfigs = commercialSchema.table(
+  'pricing_configs',
+  {
+    id: uuid('id').primaryKey().$defaultFn(() => uuidv7()),
+    organization_id: uuid('organization_id').notNull(),
+    minimum_acceptable_margin_rate: numeric('minimum_acceptable_margin_rate', { precision: 5, scale: 4 }).notNull(),
+    target_margin_rate: numeric('target_margin_rate', { precision: 5, scale: 4 }),
+    created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updated_at: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    check(
+      'pricing_configs_minimum_margin_check',
+      sql`${t.minimum_acceptable_margin_rate} > 0 AND ${t.minimum_acceptable_margin_rate} < 1`,
+    ),
+    foreignKey({
+      columns: [t.organization_id],
+      foreignColumns: [organizations.id],
+      name: 'pricing_configs_organization_id_fk',
+    }),
+    unique('pricing_configs_org_unique').on(t.organization_id),
+    index('pricing_configs_org_idx').on(t.organization_id),
   ],
 );
 

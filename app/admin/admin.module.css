@@ -427,6 +427,39 @@
   margin-bottom: 1.5rem;
 }
 
+/* ── Action buttons ──────────────────────────────────────────────────────── */
+.btnPrimary {
+  background: var(--drex-accent);
+  color: #000;
+  border: none;
+  border-radius: 5px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity var(--drex-duration) var(--drex-ease);
+  font-family: inherit;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.btnPrimary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.errorInline {
+  font-size: 0.7rem;
+  color: #f87171;
+  margin-top: 0.375rem;
+  max-width: 200px;
+  line-height: 1.4;
+}
+
 /* ── Responsive ───────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .shell {
