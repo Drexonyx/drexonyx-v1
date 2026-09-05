@@ -1,6 +1,7 @@
 // DR 0045, DR 0047, DR 0048: Create a Stripe Checkout Session and payment record.
 // organizationId is always caller-supplied from the server-side JWT — never from client input.
-// Payment status PROCESSING is set at Stripe Checkout Session creation time (DR 0047 §3.4).
+// DR 0047 lifecycle: Payment is inserted as PENDING, then transitioned PENDING→PROCESSING
+// atomically on successful Stripe Checkout Session creation (server-side only).
 // Client redirects do NOT set or confirm payment status (DR 0045 §3.3).
 
 import { db } from '@/db/index';
@@ -94,48 +95,7 @@ export async function createCheckoutSession(params: {
   const amountCents = Math.round(parseFloat(quote.total_amount) * 100);
   const currency = (quote.currency ?? 'USD').toLowerCase();
 
-  // Step 4: Create Stripe Checkout Session (server-side only, DR 0045 §3.1, §5.1)
-  // Return URLs are server-constructed — never client-controlled (DR 0045 §4.3).
-  const session = await stripe.checkout.sessions.create({
-    mode: 'payment',
-    payment_method_types: ['card'],
-    line_items: [
-      {
-        price_data: {
-          currency,
-          unit_amount: amountCents,
-          product_data: {
-            name: 'DREXONYX Production Order',
-            description: `Order ${orderId.slice(0, 8)}`,
-          },
-        },
-        quantity: 1,
-      },
-    ],
-    // Server-constructed return URLs (DR 0045 §4.3)
-    success_url: `${baseUrl}/portal/payments/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${baseUrl}/portal/payments/cancel`,
-    // Metadata on session for checkout events
-    metadata: {
-      payment_id: paymentId,
-      order_id: orderId,
-      organization_id: organizationId,
-    },
-    // Metadata on payment intent so charges carry it (for refund/chargeback webhooks)
-    payment_intent_data: {
-      metadata: {
-        payment_id: paymentId,
-        order_id: orderId,
-        organization_id: organizationId,
-      },
-    },
-  });
-
-  if (!session.url) {
-    return { ok: false, reason: 'Stripe did not return a checkout URL' };
-  }
-
-  // Step 5: Atomic transaction — record payment as PROCESSING (DR 0047 §3.4)
+  // Step 4: Insert payment as PENDING — DR 0047 approved initial state
   await db.transaction(async (tx) => {
     await tx.insert(payments).values({
       id: paymentId,
@@ -143,12 +103,9 @@ export async function createCheckoutSession(params: {
       organization_id: organizationId,
       amount: quote.total_amount,
       currency: quote.currency ?? 'USD',
-      // PROCESSING: checkout session created, awaiting webhook (DR 0047 §3.3)
-      status: 'PROCESSING',
+      status: 'PENDING',
       idempotency_key: `checkout:${paymentId}`,
       provider_name: 'stripe',
-      // Store checkout session ID for webhook reconciliation
-      provider_payment_id: session.id,
       created_at: now,
     });
 
@@ -160,6 +117,89 @@ export async function createCheckoutSession(params: {
       actor_id: actorId,
       actor_role: 'CLIENT',
       action: 'PAYMENT_CHECKOUT_CREATED',
+      payload: {
+        payment_id: paymentId,
+        order_id: orderId,
+        amount: quote.total_amount,
+        currency: quote.currency,
+        provider: 'stripe',
+        status: 'PENDING',
+      },
+    });
+  });
+
+  // Step 5: Create Stripe Checkout Session (server-side only, DR 0045 §3.1, §5.1)
+  // Return URLs are server-constructed — never client-controlled (DR 0045 §4.3).
+  let session: Awaited<ReturnType<typeof stripe.checkout.sessions.create>>;
+  try {
+    session = await stripe.checkout.sessions.create({
+      mode: 'payment',
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency,
+            unit_amount: amountCents,
+            product_data: {
+              name: 'DREXONYX Production Order',
+              description: `Order ${orderId.slice(0, 8)}`,
+            },
+          },
+          quantity: 1,
+        },
+      ],
+      // Server-constructed return URLs (DR 0045 §4.3)
+      success_url: `${baseUrl}/portal/payments/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/portal/payments/cancel`,
+      // Metadata on session for checkout events
+      metadata: {
+        payment_id: paymentId,
+        order_id: orderId,
+        organization_id: organizationId,
+      },
+      // Metadata on payment intent so charges carry it (for refund/chargeback webhooks)
+      payment_intent_data: {
+        metadata: {
+          payment_id: paymentId,
+          order_id: orderId,
+          organization_id: organizationId,
+        },
+      },
+    });
+  } catch (err) {
+    // Stripe call failed — payment stays PENDING (stranded); caller may retry.
+    const reason = err instanceof Error ? err.message : 'Stripe session creation failed';
+    return { ok: false, reason };
+  }
+
+  if (!session.url) {
+    return { ok: false, reason: 'Stripe did not return a checkout URL' };
+  }
+
+  // Step 6: Atomic transition PENDING → PROCESSING (DR 0047 §3.3)
+  // provider_payment_id set here — only known after Stripe call succeeds.
+  await db.transaction(async (tx) => {
+    await tx
+      .update(payments)
+      .set({
+        status: 'PROCESSING',
+        provider_payment_id: session.id,
+      })
+      .where(
+        and(
+          eq(payments.id, paymentId),
+          eq(payments.organization_id, organizationId),
+        ),
+      );
+
+    await tx.insert(auditEvents).values({
+      id: uuidv7(),
+      organization_id: organizationId,
+      entity_type: 'payment',
+      entity_id: paymentId,
+      actor_id: actorId,
+      actor_role: 'CLIENT',
+      action: 'PENDING_TO_PROCESSING',
       payload: {
         payment_id: paymentId,
         order_id: orderId,

@@ -2,9 +2,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ─── Hoisted mocks ────────────────────────────────────────────────────────────
 
-const { mockSelect, mockInsert, mockTransaction, mockSessionCreate } = vi.hoisted(() => ({
+const { mockSelect, mockInsert, mockUpdate, mockTransaction, mockSessionCreate } = vi.hoisted(() => ({
   mockSelect: vi.fn(),
   mockInsert: vi.fn(),
+  mockUpdate: vi.fn(),
   mockTransaction: vi.fn(),
   mockSessionCreate: vi.fn(),
 }));
@@ -13,6 +14,7 @@ vi.mock('@/db/index', () => ({
   db: {
     select: mockSelect,
     insert: mockInsert,
+    update: mockUpdate,
     transaction: mockTransaction,
   },
 }));
@@ -41,13 +43,48 @@ function selectSequence(results: unknown[][]) {
   });
 }
 
-function txMock() {
-  mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
-    const tx = {
-      insert: vi.fn().mockReturnValue({ values: vi.fn().mockResolvedValue(undefined) }),
-    };
+function makePendingTx() {
+  return {
+    insert: vi.fn().mockReturnValue({ values: vi.fn().mockResolvedValue(undefined) }),
+  };
+}
+
+function makeProcessingTx() {
+  return {
+    update: vi.fn().mockReturnValue({
+      set: vi.fn().mockReturnValue({
+        where: vi.fn().mockResolvedValue(undefined),
+      }),
+    }),
+    insert: vi.fn().mockReturnValue({ values: vi.fn().mockResolvedValue(undefined) }),
+  };
+}
+
+// Sets up one transaction call (PENDING insert only — used when Stripe fails or no URL)
+function oneTxMock(capture?: { tx: ReturnType<typeof makePendingTx> | null }) {
+  mockTransaction.mockImplementationOnce(async (fn: (tx: unknown) => Promise<void>) => {
+    const tx = makePendingTx();
+    if (capture) capture.tx = tx;
     await fn(tx);
   });
+}
+
+// Sets up two transaction calls: first PENDING insert, then PROCESSING update
+function twoTxMock(captures?: {
+  pendingTx: ReturnType<typeof makePendingTx> | null;
+  processingTx: ReturnType<typeof makeProcessingTx> | null;
+}) {
+  mockTransaction
+    .mockImplementationOnce(async (fn: (tx: unknown) => Promise<void>) => {
+      const tx = makePendingTx();
+      if (captures) captures.pendingTx = tx;
+      await fn(tx);
+    })
+    .mockImplementationOnce(async (fn: (tx: unknown) => Promise<void>) => {
+      const tx = makeProcessingTx();
+      if (captures) captures.processingTx = tx;
+      await fn(tx);
+    });
 }
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
@@ -88,16 +125,75 @@ describe('createCheckoutSession', () => {
     expect(result).toEqual({ ok: false, reason: 'This order already has a completed payment' });
   });
 
-  it('returns ok:false when Stripe returns no URL', async () => {
+  it('returns ok:false when Stripe throws, after inserting PENDING', async () => {
     selectSequence([
       [{ id: 'o1', quote_id: 'q1', status: 'ACTIVE' }],
       [{ total_amount: '1000.0000', currency: 'USD' }],
       [],
     ]);
+    const capture: { tx: ReturnType<typeof makePendingTx> | null } = { tx: null };
+    oneTxMock(capture);
+    mockSessionCreate.mockRejectedValue(new Error('Stripe network error'));
+
+    const result = await createCheckoutSession(params);
+
+    expect(result).toEqual({ ok: false, reason: 'Stripe network error' });
+    // First transaction (PENDING insert) must have been called
+    expect(mockTransaction).toHaveBeenCalledTimes(1);
+    // No second transaction (payment stays PENDING)
+  });
+
+  it('returns ok:false when Stripe returns no URL, after inserting PENDING', async () => {
+    selectSequence([
+      [{ id: 'o1', quote_id: 'q1', status: 'ACTIVE' }],
+      [{ total_amount: '1000.0000', currency: 'USD' }],
+      [],
+    ]);
+    oneTxMock();
     mockSessionCreate.mockResolvedValue({ id: 'cs_test', url: null });
 
     const result = await createCheckoutSession(params);
+
     expect(result).toEqual({ ok: false, reason: 'Stripe did not return a checkout URL' });
+    expect(mockTransaction).toHaveBeenCalledTimes(1);
+  });
+
+  it('inserts payment as PENDING in the first transaction', async () => {
+    selectSequence([
+      [{ id: 'o1', quote_id: 'q1', status: 'ACTIVE' }],
+      [{ total_amount: '1500.0000', currency: 'USD' }],
+      [],
+    ]);
+    mockSessionCreate.mockResolvedValue({ id: 'cs_ok', url: 'https://checkout.stripe.com/pay/cs_ok' });
+    const captures = { pendingTx: null as ReturnType<typeof makePendingTx> | null, processingTx: null as ReturnType<typeof makeProcessingTx> | null };
+    twoTxMock(captures);
+
+    await createCheckoutSession(params);
+
+    expect(captures.pendingTx).not.toBeNull();
+    const insertValues = (captures.pendingTx!.insert.mock.results[0]?.value as { values: ReturnType<typeof vi.fn> }).values;
+    expect(insertValues).toHaveBeenCalledWith(
+      expect.objectContaining({ status: 'PENDING', id: 'pay-uuid' }),
+    );
+  });
+
+  it('transitions payment to PROCESSING in the second transaction', async () => {
+    selectSequence([
+      [{ id: 'o1', quote_id: 'q1', status: 'ACTIVE' }],
+      [{ total_amount: '1500.0000', currency: 'USD' }],
+      [],
+    ]);
+    mockSessionCreate.mockResolvedValue({ id: 'cs_ok', url: 'https://checkout.stripe.com/pay/cs_ok' });
+    const captures = { pendingTx: null as ReturnType<typeof makePendingTx> | null, processingTx: null as ReturnType<typeof makeProcessingTx> | null };
+    twoTxMock(captures);
+
+    await createCheckoutSession(params);
+
+    expect(captures.processingTx).not.toBeNull();
+    const setFn = (captures.processingTx!.update.mock.results[0]?.value as { set: ReturnType<typeof vi.fn> }).set;
+    expect(setFn).toHaveBeenCalledWith(
+      expect.objectContaining({ status: 'PROCESSING', provider_payment_id: 'cs_ok' }),
+    );
   });
 
   it('returns ok:true with checkoutUrl on success', async () => {
@@ -107,7 +203,7 @@ describe('createCheckoutSession', () => {
       [],
     ]);
     mockSessionCreate.mockResolvedValue({ id: 'cs_test_123', url: 'https://checkout.stripe.com/pay/cs_test_123' });
-    txMock();
+    twoTxMock();
 
     const result = await createCheckoutSession(params);
     expect(result).toEqual({
@@ -115,6 +211,7 @@ describe('createCheckoutSession', () => {
       checkoutUrl: 'https://checkout.stripe.com/pay/cs_test_123',
       paymentId: 'pay-uuid',
     });
+    expect(mockTransaction).toHaveBeenCalledTimes(2);
   });
 
   it('passes correct amount in cents to Stripe', async () => {
@@ -124,7 +221,7 @@ describe('createCheckoutSession', () => {
       [],
     ]);
     mockSessionCreate.mockResolvedValue({ id: 'cs_x', url: 'https://checkout.stripe.com/x' });
-    txMock();
+    twoTxMock();
 
     await createCheckoutSession(params);
 

@@ -56,7 +56,8 @@ export default async function OrdersPage() {
                 const canPay =
                   o.status === 'ACTIVE' &&
                   (o.latestPayment === null ||
-                    o.latestPayment.status === 'FAILED');
+                    o.latestPayment.status === 'FAILED' ||
+                    o.latestPayment.status === 'PENDING');
 
                 return (
                   <tr key={o.id}>

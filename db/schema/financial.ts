@@ -69,6 +69,7 @@ export const payments = financialSchema.table(
     failure_reason: text('failure_reason'),
     paid_at: timestamp('paid_at', { withTimezone: true }),
     refunded_at: timestamp('refunded_at', { withTimezone: true }),
+    provider_event_id: text('provider_event_id'),
     metadata: jsonb('metadata'),
     created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },

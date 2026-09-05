@@ -27,6 +27,8 @@ ALTER TABLE "financial"."payments" ADD COLUMN "refunded_at" timestamp with time 
 --> statement-breakpoint
 ALTER TABLE "financial"."payments" ADD COLUMN "metadata" jsonb;
 --> statement-breakpoint
+ALTER TABLE "financial"."payments" ADD COLUMN "provider_event_id" text;
+--> statement-breakpoint
 
 -- G4: Partial unique index — at most one PAID payment per Order (DR 0048 §3.4)
 CREATE UNIQUE INDEX "payments_order_one_paid"
