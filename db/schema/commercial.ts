@@ -24,6 +24,9 @@ export const campaigns = commercialSchema.table(
     organization_id: uuid('organization_id').notNull(),
     name: text('name').notNull(),
     status: text('status').notNull().default('DRAFT'),
+    // DR 0070 §2.2: campaign content fields — consumed read-only by Phase 10 Skills
+    objective: text('objective'),
+    description: text('description'),
     archived_at: timestamp('archived_at', { withTimezone: true }),
     created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updated_at: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
@@ -53,6 +56,12 @@ export const briefs = commercialSchema.table(
     campaign_id: uuid('campaign_id').notNull(),
     organization_id: uuid('organization_id').notNull(),
     status: text('status').notNull().default('DRAFT'),
+    // DR 0070 §2.1: brief content fields — consumed read-only by Phase 10 Skills
+    brief_text: text('brief_text'),
+    deliverables: text('deliverables'),
+    target_audience: text('target_audience'),
+    timeline_notes: text('timeline_notes'),
+    additional_notes: text('additional_notes'),
     archived_at: timestamp('archived_at', { withTimezone: true }),
     created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updated_at: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),

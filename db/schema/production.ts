@@ -286,6 +286,50 @@ export const deliveries = productionSchema.table(
   ],
 );
 
+// ─── Skill Outputs ───────────────────────────────────────────────────────────
+// DR 0071 §2.1: Persists Phase 10 Skill invocation lifecycle and structured output.
+// actor_id is polymorphic: identity.users.id (USER) or production.production_jobs.id (AGENT).
+// No FK declared on actor_id due to the polymorphic reference (DR 0071 §2.2).
+
+export const skillOutputs = productionSchema.table(
+  'skill_outputs',
+  {
+    id: uuid('id').primaryKey().$defaultFn(() => uuidv7()),
+    organization_id: uuid('organization_id').notNull(),
+    skill_id: text('skill_id').notNull(),
+    skill_version: text('skill_version').notNull(),
+    entity_type: text('entity_type').notNull(),
+    entity_id: uuid('entity_id').notNull(),
+    actor_id: uuid('actor_id').notNull(),
+    actor_type: text('actor_type').notNull(),
+    actor_role: text('actor_role').notNull(),
+    status: text('status').notNull().default('PENDING'),
+    output: jsonb('output'),
+    error: text('error'),
+    created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updated_at: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    check(
+      'skill_outputs_status_check',
+      sql`${t.status} IN ('PENDING','RUNNING','SUCCEEDED','FAILED')`,
+    ),
+    check(
+      'skill_outputs_actor_type_check',
+      sql`${t.actor_type} IN ('USER','AGENT')`,
+    ),
+    foreignKey({
+      columns: [t.organization_id],
+      foreignColumns: [organizations.id],
+      name: 'skill_outputs_organization_id_fk',
+    }),
+    index('skill_outputs_org_idx').on(t.organization_id),
+    index('skill_outputs_org_entity_idx').on(t.organization_id, t.entity_type, t.entity_id),
+    index('skill_outputs_org_skill_idx').on(t.organization_id, t.skill_id),
+    index('skill_outputs_status_idx').on(t.status),
+  ],
+);
+
 // ─── Delivery ↔ Asset (many-to-many) ─────────────────────────────────────────
 // DR 0037 §2: A Delivery references one or more Assets via this join table.
 
