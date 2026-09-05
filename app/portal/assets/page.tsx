@@ -30,7 +30,9 @@ export default async function AssetsPage() {
             <thead>
               <tr>
                 <th>Asset ID</th>
+                <th>Name</th>
                 <th>Status</th>
+                <th>Preview</th>
                 <th>Updated</th>
               </tr>
             </thead>
@@ -38,12 +40,18 @@ export default async function AssetsPage() {
               {assets.map((a) => (
                 <tr key={a.id}>
                   <td className={`${s.cellPrimary} ${s.cellMono}`}>{a.id.slice(0, 8)}…</td>
+                  <td>{a.name ?? <span style={{ color: 'var(--drex-text-muted)', fontStyle: 'italic' }}>—</span>}</td>
                   <td>
                     <span
                       className={`${s.badge} ${a.status === 'CLIENT_PREVIEW' ? s.badgeAccent : s.badgeWarning}`}
                     >
                       {mapClientAssetStatus(a.status)}
                     </span>
+                  </td>
+                  <td>
+                    {a.content_url
+                      ? <span style={{ fontSize: '0.75rem', color: 'var(--drex-text-muted)' }}>Available</span>
+                      : <span style={{ color: 'var(--drex-text-muted)', fontStyle: 'italic' }}>—</span>}
                   </td>
                   <td className={s.cellMono}>{new Date(a.updated_at).toLocaleDateString()}</td>
                 </tr>

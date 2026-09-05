@@ -9,6 +9,7 @@ import { productionJobs } from '../schema/production';
 import { aiGenerations } from '../schema/production';
 import { approvals } from '../schema/production';
 import { deliveries } from '../schema/production';
+import { deliveryAssets } from '../schema/production';
 import { qcReviews } from '../schema/production';
 import { orgMemberships } from '../schema/identity';
 
@@ -59,6 +60,7 @@ function getCheckConstraintSql(tableName: string, checkName: string): string | u
     aiGenerations: getTableConfig(aiGenerations),
     approvals: getTableConfig(approvals),
     deliveries: getTableConfig(deliveries),
+    deliveryAssets: getTableConfig(deliveryAssets),
     qcReviews: getTableConfig(qcReviews),
     orgMemberships: getTableConfig(orgMemberships),
   };
@@ -355,5 +357,83 @@ describe('RBAC roles (DR 0029, Gate 0)', () => {
     for (const role of RBAC_ROLES) {
       expect(sql).toContain(role);
     }
+  });
+});
+
+// ─── Phase 08 new CHECK constraints ───────────────────────────────────────────
+
+const PRODUCTION_JOB_TYPES = ['AI_GENERATION', 'MANUAL_UPLOAD'] as const;
+const APPROVAL_TARGET_TYPES = ['ASSET', 'QUOTE'] as const;
+
+describe('Phase 08: ProductionJob job_type CHECK (DR 0053 §2.1)', () => {
+  it('has exactly 2 approved job types', () => {
+    expect(PRODUCTION_JOB_TYPES).toHaveLength(2);
+  });
+
+  it('includes AI_GENERATION and MANUAL_UPLOAD', () => {
+    expect(PRODUCTION_JOB_TYPES).toContain('AI_GENERATION');
+    expect(PRODUCTION_JOB_TYPES).toContain('MANUAL_UPLOAD');
+  });
+
+  it('does not include provider-specific or deprecated types', () => {
+    expect(PRODUCTION_JOB_TYPES).not.toContain('HIGGSFIELD');
+    expect(PRODUCTION_JOB_TYPES).not.toContain('OPENAI');
+    expect(PRODUCTION_JOB_TYPES).not.toContain('UPLOAD');
+  });
+
+  it('production_jobs table has job_type CHECK constraint covering both types', () => {
+    const sql = getCheckConstraintSql('productionJobs', 'production_jobs_job_type_check');
+    expect(sql).toBeDefined();
+    for (const type of PRODUCTION_JOB_TYPES) {
+      expect(sql).toContain(type);
+    }
+  });
+});
+
+describe('Phase 08: Approval target_type CHECK (DR 0028 §2)', () => {
+  it('has exactly 2 approved target types', () => {
+    expect(APPROVAL_TARGET_TYPES).toHaveLength(2);
+  });
+
+  it('includes ASSET and QUOTE', () => {
+    expect(APPROVAL_TARGET_TYPES).toContain('ASSET');
+    expect(APPROVAL_TARGET_TYPES).toContain('QUOTE');
+  });
+
+  it('does not include DELIVERY or ORDER as approval targets', () => {
+    expect(APPROVAL_TARGET_TYPES).not.toContain('DELIVERY');
+    expect(APPROVAL_TARGET_TYPES).not.toContain('ORDER');
+  });
+
+  it('approvals table has target_type CHECK constraint covering both types', () => {
+    const sql = getCheckConstraintSql('approvals', 'approvals_target_type_check');
+    expect(sql).toBeDefined();
+    for (const type of APPROVAL_TARGET_TYPES) {
+      expect(sql).toContain(type);
+    }
+  });
+});
+
+describe('Phase 08: deliveryAssets table structure (DR 0037 §2)', () => {
+  it('deliveryAssets table has composite primary key on (delivery_id, asset_id)', () => {
+    const config = getTableConfig(deliveryAssets);
+    const pk = config.primaryKeys;
+    expect(pk).toHaveLength(1);
+    const pkCols = pk[0].columns.map((c) => c.name);
+    expect(pkCols).toContain('delivery_id');
+    expect(pkCols).toContain('asset_id');
+  });
+
+  it('deliveryAssets table has organization_id column for tenant isolation', () => {
+    const config = getTableConfig(deliveryAssets);
+    const cols = config.columns.map((c) => c.name);
+    expect(cols).toContain('organization_id');
+  });
+
+  it('deliveryAssets table has composite FKs to deliveries and assets', () => {
+    const config = getTableConfig(deliveryAssets);
+    const fkNames = config.foreignKeys.map((fk) => fk.getName());
+    expect(fkNames).toContain('delivery_assets_delivery_id_fk');
+    expect(fkNames).toContain('delivery_assets_asset_id_fk');
   });
 });

@@ -460,6 +460,154 @@
   line-height: 1.4;
 }
 
+/* ── Form / action UI ────────────────────────────────────────────────────── */
+.actionBar {
+  margin-bottom: 1.5rem;
+}
+
+.btn {
+  background: var(--drex-accent);
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity var(--drex-duration) var(--drex-ease);
+  white-space: nowrap;
+}
+
+.btn:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnSecondary {
+  background: var(--drex-elevated);
+  color: var(--drex-text-secondary);
+  border: 1px solid var(--drex-border);
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background var(--drex-duration) var(--drex-ease);
+  white-space: nowrap;
+}
+
+.btnSecondary:hover:not(:disabled) {
+  background: var(--drex-border);
+}
+
+.btnSmall {
+  background: var(--drex-elevated);
+  color: var(--drex-text-secondary);
+  border: 1px solid var(--drex-border);
+  border-radius: 4px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background var(--drex-duration) var(--drex-ease);
+  white-space: nowrap;
+}
+
+.btnSmall:hover:not(:disabled) {
+  background: var(--drex-border);
+}
+
+.btnSmall:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnDanger {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.btnDanger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.select {
+  width: 100%;
+  background: var(--drex-elevated);
+  border: 1px solid var(--drex-border);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  color: var(--drex-text);
+  font-size: 0.875rem;
+  font-family: inherit;
+  outline: none;
+}
+
+.select:focus {
+  border-color: var(--drex-accent);
+}
+
+.textarea {
+  width: 100%;
+  background: var(--drex-elevated);
+  border: 1px solid var(--drex-border);
+  border-radius: 6px;
+  padding: 0.625rem 0.875rem;
+  color: var(--drex-text);
+  font-size: 0.875rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+  outline: none;
+}
+
+.textarea:focus {
+  border-color: var(--drex-accent);
+}
+
+.formCard {
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: 8px;
+  padding: 1.25rem;
+  max-width: 520px;
+}
+
+.formTitle {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--drex-text);
+  margin-bottom: 1rem;
+}
+
+.formRow {
+  margin-bottom: 0.875rem;
+}
+
+.formActions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.formError {
+  font-size: 0.8125rem;
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.875rem;
+}
+
 /* ── Responsive ───────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .shell {

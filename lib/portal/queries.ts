@@ -190,6 +190,8 @@ export async function getClientAssets(organizationId: string) {
     .select({
       id: assets.id,
       order_id: assets.order_id,
+      name: assets.name,
+      content_url: assets.content_url,
       status: assets.status,
       created_at: assets.created_at,
       updated_at: assets.updated_at,
@@ -226,13 +228,16 @@ export async function getPayments(organizationId: string) {
     .orderBy(desc(payments.created_at));
 }
 
-// Approvals — CLIENT may see approval status (read-only).
+// Approvals — CLIENT may see approval status and target info for decide action.
 // qc_reviews.notes and other internal QC data are not returned.
+// DR 0029 §2.6: CLIENT may only decide ASSET-type Approvals; target_type exposed for filtering.
 export async function getApprovals(organizationId: string) {
   return db
     .select({
       id: approvals.id,
       order_id: approvals.order_id,
+      target_type: approvals.target_type,
+      target_id: approvals.target_id,
       status: approvals.status,
       expires_at: approvals.expires_at,
       created_at: approvals.created_at,

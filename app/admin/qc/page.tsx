@@ -1,8 +1,9 @@
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import { getAdminQcReviews } from '@/lib/admin/queries';
+import { getAdminQcReviews, getAdminAssets } from '@/lib/admin/queries';
 import { isAdminRole } from '@/lib/admin/types';
 import s from '../admin.module.css';
+import { QcForm } from './QcForm';
 
 export const metadata = { title: 'QC Reviews — Admin' };
 
@@ -16,14 +17,26 @@ export default async function AdminQcPage() {
   const session = await auth();
   if (!session || !isAdminRole(session.user.role)) redirect('/admin/login');
 
-  const reviews = await getAdminQcReviews(session.user.organizationId);
+  const { organizationId, role } = session.user;
+  const canSubmit = role === 'OWNER' || role === 'ADMIN_OPERATIONS' || role === 'QC';
+
+  const [reviews, assets] = await Promise.all([
+    getAdminQcReviews(organizationId),
+    getAdminAssets(organizationId),
+  ]);
 
   return (
     <>
       <div className={s.pageHeader}>
         <h1 className={s.pageTitle}>QC Reviews</h1>
-        <p className={s.pageSubtitle}>Quality control verdicts — read-only</p>
+        <p className={s.pageSubtitle}>PASS → CLIENT_PREVIEW · FAIL → REVISION_REQUIRED</p>
       </div>
+
+      {canSubmit && (
+        <div className={s.actionBar}>
+          <QcForm assets={assets.map((a) => ({ id: a.id, name: a.name ?? null, status: a.status }))} />
+        </div>
+      )}
 
       {reviews.length === 0 ? (
         <div className={s.emptyState}>
@@ -36,6 +49,7 @@ export default async function AdminQcPage() {
               <tr>
                 <th>ID</th>
                 <th>Asset</th>
+                <th>Reviewer</th>
                 <th>Verdict</th>
                 <th>Notes</th>
                 <th>Created</th>
@@ -46,6 +60,7 @@ export default async function AdminQcPage() {
                 <tr key={r.id}>
                   <td className={`${s.cellMono} ${s.cellPrimary}`}>{r.id.slice(0, 8)}…</td>
                   <td className={s.cellMono}>{r.asset_id.slice(0, 8)}…</td>
+                  <td className={s.cellMono}>{r.reviewer_id ? r.reviewer_id.slice(0, 8) + '…' : '—'}</td>
                   <td>
                     <span className={verdictBadgeClass(r.verdict)}>{r.verdict}</span>
                   </td>

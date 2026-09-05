@@ -6,10 +6,11 @@ import s from '../portal.module.css';
 export const metadata = { title: 'Deliveries — Client Portal' };
 
 const DELIVERY_BADGE: Record<string, string> = {
-  PENDING: s.badgeNeutral,
-  IN_PROGRESS: s.badgeAccent,
+  PREPARING: s.badgeWarning,
+  SENDING: s.badgeAccent,
   COMPLETED: s.badgeSuccess,
   FAILED: s.badgeDanger,
+  CANCELLED: s.badgeNeutral,
 };
 
 export default async function DeliveriesPage() {

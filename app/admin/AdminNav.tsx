@@ -24,6 +24,7 @@ const NAV_SECTIONS = [
   {
     label: 'Production',
     items: [
+      { href: '/admin/production', label: 'Production Jobs' },
       { href: '/admin/assets', label: 'Assets' },
       { href: '/admin/qc', label: 'QC Reviews' },
       { href: '/admin/approvals', label: 'Approvals' },

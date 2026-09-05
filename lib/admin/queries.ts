@@ -4,7 +4,7 @@ import { organizations } from '@/db/schema/core';
 import { users, orgMemberships } from '@/db/schema/identity';
 import { campaigns, quotes, orders, orderBudgets, pricingConfigs } from '@/db/schema/commercial';
 import { payments, financialLedger, expenses } from '@/db/schema/financial';
-import { assets, qcReviews, approvals, deliveries } from '@/db/schema/production';
+import { assets, qcReviews, approvals, deliveries, productionJobs, aiGenerations, deliveryAssets } from '@/db/schema/production';
 import { auditEvents } from '@/db/schema/system';
 
 // All queries are scoped to the authenticated admin's organizationId from the
@@ -125,6 +125,12 @@ export async function getAdminAssets(organizationId: string) {
       id: assets.id,
       order_id: assets.order_id,
       status: assets.status,
+      name: assets.name,
+      file_key: assets.file_key,
+      file_type: assets.file_type,
+      file_size: assets.file_size,
+      // DR 0054 §2.4: content_url is temporary placeholder only — not a stable reference
+      content_url: assets.content_url,
       archived_at: assets.archived_at,
       created_at: assets.created_at,
       updated_at: assets.updated_at,
@@ -139,6 +145,7 @@ export async function getAdminQcReviews(organizationId: string) {
     .select({
       id: qcReviews.id,
       asset_id: qcReviews.asset_id,
+      reviewer_id: qcReviews.reviewer_id,
       verdict: qcReviews.verdict,
       notes: qcReviews.notes,
       created_at: qcReviews.created_at,
@@ -153,6 +160,8 @@ export async function getAdminApprovals(organizationId: string) {
     .select({
       id: approvals.id,
       order_id: approvals.order_id,
+      target_type: approvals.target_type,
+      target_id: approvals.target_id,
       status: approvals.status,
       created_by_user_id: approvals.created_by_user_id,
       decided_by_user_id: approvals.decided_by_user_id,
@@ -177,6 +186,7 @@ export async function getAdminDeliveries(organizationId: string) {
       id: deliveries.id,
       order_id: deliveries.order_id,
       status: deliveries.status,
+      failure_reason: deliveries.failure_reason,
       archived_at: deliveries.archived_at,
       created_at: deliveries.created_at,
       updated_at: deliveries.updated_at,
@@ -189,6 +199,55 @@ export async function getAdminDeliveries(organizationId: string) {
       ),
     )
     .orderBy(desc(deliveries.created_at));
+}
+
+export async function getAdminProductionJobs(organizationId: string) {
+  return db
+    .select({
+      id: productionJobs.id,
+      order_id: productionJobs.order_id,
+      job_type: productionJobs.job_type,
+      description: productionJobs.description,
+      status: productionJobs.status,
+      archived_at: productionJobs.archived_at,
+      created_at: productionJobs.created_at,
+      updated_at: productionJobs.updated_at,
+    })
+    .from(productionJobs)
+    .where(eq(productionJobs.organization_id, organizationId))
+    .orderBy(desc(productionJobs.created_at));
+}
+
+export async function getAdminAiGenerations(organizationId: string) {
+  return db
+    .select({
+      id: aiGenerations.id,
+      production_job_id: aiGenerations.production_job_id,
+      provider: aiGenerations.provider,
+      model: aiGenerations.model,
+      status: aiGenerations.status,
+      created_at: aiGenerations.created_at,
+      updated_at: aiGenerations.updated_at,
+    })
+    .from(aiGenerations)
+    .where(eq(aiGenerations.organization_id, organizationId))
+    .orderBy(desc(aiGenerations.created_at));
+}
+
+export async function getAdminDeliveryAssets(organizationId: string, deliveryId: string) {
+  return db
+    .select({
+      delivery_id: deliveryAssets.delivery_id,
+      asset_id: deliveryAssets.asset_id,
+      created_at: deliveryAssets.created_at,
+    })
+    .from(deliveryAssets)
+    .where(
+      and(
+        eq(deliveryAssets.delivery_id, deliveryId),
+        eq(deliveryAssets.organization_id, organizationId),
+      ),
+    );
 }
 
 // Payments — admin read-only visibility. No mutation.

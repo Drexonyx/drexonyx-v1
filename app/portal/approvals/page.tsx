@@ -2,6 +2,7 @@ import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import { getApprovals } from '@/lib/portal/queries';
 import s from '../portal.module.css';
+import { ApprovalDecide } from './ApprovalDecide';
 
 export const metadata = { title: 'Approvals — Client Portal' };
 
@@ -10,6 +11,7 @@ const APPROVAL_BADGE: Record<string, string> = {
   APPROVED: s.badgeSuccess,
   REJECTED: s.badgeDanger,
   EXPIRED: s.badgeNeutral,
+  CANCELLED: s.badgeNeutral,
 };
 
 export default async function ApprovalsPage() {
@@ -36,15 +38,23 @@ export default async function ApprovalsPage() {
             <thead>
               <tr>
                 <th>Approval ID</th>
+                <th>Target</th>
                 <th>Status</th>
                 <th>Expires</th>
                 <th>Created</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
               {approvals.map((a) => (
                 <tr key={a.id}>
                   <td className={`${s.cellPrimary} ${s.cellMono}`}>{a.id.slice(0, 8)}…</td>
+                  <td className={s.cellMono}>
+                    <span className={`${s.badge} ${s.badgeNeutral}`} style={{ marginRight: '0.25rem' }}>
+                      {a.target_type}
+                    </span>
+                    {a.target_id ? a.target_id.slice(0, 8) + '…' : '—'}
+                  </td>
                   <td>
                     <span className={`${s.badge} ${APPROVAL_BADGE[a.status] ?? s.badgeNeutral}`}>
                       {a.status}
@@ -54,6 +64,11 @@ export default async function ApprovalsPage() {
                     {a.expires_at ? new Date(a.expires_at).toLocaleDateString() : '—'}
                   </td>
                   <td className={s.cellMono}>{new Date(a.created_at).toLocaleDateString()}</td>
+                  <td>
+                    {a.status === 'PENDING' && a.target_type === 'ASSET' ? (
+                      <ApprovalDecide approvalId={a.id} />
+                    ) : null}
+                  </td>
                 </tr>
               ))}
             </tbody>
