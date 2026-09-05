@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { isAdminRole } from '@/lib/admin/types';
 import { createProductionJob, cancelProductionJob } from '@/lib/admin/production-jobs';
+import { runGenerationDriver } from '@/lib/agent/driver';
 import type { AdminRole } from '@/lib/admin/types';
 
 async function getAdminSession() {
@@ -58,4 +59,22 @@ export async function actionCancelProductionJob(
 
   if (result.ok) revalidatePath('/admin/production');
   return result.ok ? { ok: true } : { ok: false, reason: result.reason };
+}
+
+// DR 0058: Trigger the async generation driver for a QUEUED AI_GENERATION ProductionJob.
+// OWNER and ADMIN_OPERATIONS only — same authority as cancel.
+export async function actionRunGenerationDriver(
+  jobId: string,
+): Promise<{ ok: boolean; reason?: string; providerJobId?: string }> {
+  const session = await getAdminSession();
+  const { role, organizationId } = session.user;
+
+  if (role !== 'OWNER' && role !== 'ADMIN_OPERATIONS') {
+    return { ok: false, reason: 'Forbidden: only OWNER or ADMIN_OPERATIONS may trigger generation' };
+  }
+
+  const result = await runGenerationDriver({ productionJobId: jobId, organizationId });
+
+  if (result.ok) revalidatePath('/admin/production');
+  return result.ok ? { ok: true, providerJobId: result.providerJobId } : { ok: false, reason: result.reason };
 }

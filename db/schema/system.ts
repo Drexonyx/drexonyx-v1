@@ -44,6 +44,35 @@ export const auditEvents = systemSchema.table(
   ],
 );
 
+// ─── Service Tokens ───────────────────────────────────────────────────────────
+// DR 0065: Scoped Service Token — opaque, hash-only storage.
+// Raw token is NEVER stored. token_hash is SHA-256 of the raw token.
+// Scope: (organization_id, production_job_id).
+
+export const serviceTokens = systemSchema.table(
+  'service_tokens',
+  {
+    id: uuid('id').primaryKey().$defaultFn(() => uuidv7()),
+    token_hash: text('token_hash').notNull(),
+    organization_id: uuid('organization_id').notNull(),
+    production_job_id: uuid('production_job_id').notNull(),
+    expires_at: timestamp('expires_at', { withTimezone: true }).notNull(),
+    revoked_at: timestamp('revoked_at', { withTimezone: true }),
+    created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    foreignKey({
+      columns: [t.organization_id],
+      foreignColumns: [organizations.id],
+      name: 'service_tokens_organization_id_fk',
+    }),
+    unique('service_tokens_token_hash_unique').on(t.token_hash),
+    index('service_tokens_token_hash_idx').on(t.token_hash),
+    index('service_tokens_org_job_idx').on(t.organization_id, t.production_job_id),
+    index('service_tokens_expires_at_idx').on(t.expires_at),
+  ],
+);
+
 // ─── Idempotency Keys ─────────────────────────────────────────────────────────
 // DR 0002 D4: centralized for payments, AI callbacks, delivery confirmations,
 // financial events.

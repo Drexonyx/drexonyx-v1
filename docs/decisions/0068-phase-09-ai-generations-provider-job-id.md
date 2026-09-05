@@ -94,10 +94,33 @@ misrouted state transitions.
 
 ### 2.3 Assignment Timing
 
-**PROPOSED:** `provider_job_id` is set in the same database operation as the
-`ai_generations.status` transition from REQUESTED to RUNNING, when the provider
-returns a job identifier upon accepting the dispatch. If the provider does not
-return an identifier at dispatch, `provider_job_id` remains NULL.
+**APPROVED — Owner approved 2026-09-05 (amendment resolving Phase 09 Final Audit
+Finding #1):** The ordering of operations is:
+
+1. The driver atomically claims the AiGeneration: `status` transitions from
+   REQUESTED to RUNNING via CAS guard **before** provider dispatch. This atomic
+   claim is a prerequisite for dispatch; it must not be deferred until after the
+   provider responds.
+
+2. Provider dispatch occurs **after** the atomic claim. `provider_job_id` is not
+   known before the provider responds and must not be invented or persisted before
+   the authoritative provider response.
+
+3. When the provider returns a job identifier upon accepting the dispatch, the
+   driver persists `provider_job_id` in the **next database operation** — the
+   first database write after receiving the provider response. No intervening
+   database operation is permitted between provider dispatch and
+   `provider_job_id` persistence.
+
+4. If the provider does not return an identifier at dispatch,
+   `provider_job_id` remains NULL.
+
+All existing concurrency, idempotency, tenant-isolation, and
+webhook-correlation guarantees are preserved. In particular, webhook correlation
+by `(provider, provider_job_id)` remains safe: a callback arriving in the brief
+window between the RUNNING claim (step 1) and `provider_job_id` persistence
+(step 3) will simply find no matching row and acknowledge without mutation,
+consistent with the no-op path in DR 0059 §2.3.
 
 ### 2.4 Uniqueness Constraint — Scoped to (organization_id, provider, provider_job_id)
 

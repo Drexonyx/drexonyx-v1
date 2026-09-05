@@ -6,9 +6,11 @@ import {
   check,
   foreignKey,
   unique,
+  uniqueIndex,
   index,
   primaryKey,
   bigint,
+  integer,
   jsonb,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
@@ -145,6 +147,10 @@ export const aiGenerations = productionSchema.table(
     prompt: text('prompt'),
     params: jsonb('params'),
     result_url: text('result_url'),
+    // DR 0068: external job identifier assigned by the provider at dispatch
+    provider_job_id: text('provider_job_id'),
+    // DR 0069: retry attempt count; 0=first attempt, max=2; NOT NULL, DEFAULT 0
+    retry_count: integer('retry_count').notNull().default(0),
     status: text('status').notNull().default('REQUESTED'),
     archived_at: timestamp('archived_at', { withTimezone: true }),
     created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
@@ -161,6 +167,14 @@ export const aiGenerations = productionSchema.table(
       name: 'ai_generations_production_job_id_fk',
     }),
     unique('ai_generations_id_org_unique').on(t.id, t.organization_id),
+    // DR 0068 §2.4: partial unique constraint — same (org, provider, provider_job_id) may not appear twice
+    uniqueIndex('ai_generations_provider_job_id_unique_idx')
+      .on(t.organization_id, t.provider, t.provider_job_id)
+      .where(sql`${t.provider_job_id} IS NOT NULL`),
+    // DR 0068 §2.5: webhook lookup index — provider + provider_job_id only (org validated after)
+    index('ai_generations_provider_job_id_idx')
+      .on(t.provider, t.provider_job_id)
+      .where(sql`${t.provider_job_id} IS NOT NULL`),
     index('ai_generations_job_idx').on(t.production_job_id),
     index('ai_generations_org_idx').on(t.organization_id),
     index('ai_generations_status_idx').on(t.status),
