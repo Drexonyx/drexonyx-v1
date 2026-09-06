@@ -51,7 +51,7 @@ describe('runGenerationDriver', () => {
 
   const validJob = { id: 'job1', status: 'QUEUED', job_type: 'AI_GENERATION', organization_id: 'org1' };
   const validGen = {
-    id: 'gen1', provider: 'higgsfield', model: 'hf-video-v1', prompt: 'test',
+    id: 'gen1', provider: 'higgsfield', model: 'text2image/soul', prompt: 'test',
     params: {}, status: 'REQUESTED', retry_count: 0,
   };
 
@@ -201,7 +201,7 @@ describe('retryDispatch', () => {
 
   it('creates new AiGeneration with retry_count + 1 when retry eligible', async () => {
     mockSelect.mockReturnValue(makeSelectChain([{
-      id: 'gen-prev', provider: 'higgsfield', model: 'model', prompt: 'p', params: {}, retry_count: 1,
+      id: 'gen-prev', provider: 'higgsfield', model: 'text2image/soul', prompt: 'p', params: {}, retry_count: 1,
     }]));
     mockDispatch.mockResolvedValue({ ok: true, providerJobId: 'hf-retry-456' });
 

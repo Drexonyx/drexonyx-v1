@@ -2,6 +2,7 @@
 // DR 0056: Authorized transitions: ProductionJob QUEUED→RUNNING, AiGeneration REQUESTED→RUNNING.
 // DR 0064: Audit actor_id = production_job_id, actor_role = 'AGENT'. NULL prohibited.
 // DR 0069: retry_count persisted; DB-level guard prevents exceeding max of 2.
+// DR 0084: Deterministic model routing — resolveProviderForModel() replaces PROVIDER_MAP.
 
 import { db } from '@/db/index';
 import { productionJobs, aiGenerations } from '@/db/schema/production';
@@ -9,12 +10,7 @@ import { auditEvents, idempotencyKeys } from '@/db/schema/system';
 import { and, eq } from 'drizzle-orm';
 import { uuidv7 } from 'uuidv7';
 import { issueServiceToken } from './service-tokens';
-import { higgsFieldProvider } from './providers/higgsfield';
-import type { AiProvider } from './providers/interface';
-
-const PROVIDER_MAP: Record<string, AiProvider> = {
-  higgsfield: higgsFieldProvider,
-};
+import { resolveProviderForModel } from './model-routing';
 
 export type RunDriverResult =
   | { ok: true; providerJobId: string }
@@ -88,8 +84,10 @@ export async function runGenerationDriver(params: {
   if (!gen.model) return { ok: false, reason: 'AiGeneration has no model set' };
   if (!gen.prompt) return { ok: false, reason: 'AiGeneration has no prompt set' };
 
-  const provider = PROVIDER_MAP[gen.provider];
-  if (!provider) return { ok: false, reason: `Unknown provider: ${gen.provider}` };
+  // DR 0084: Deterministic model routing — fails closed for unknown (provider, model) combinations.
+  const route = resolveProviderForModel(gen.provider!, gen.model!);
+  if (!route) return { ok: false, reason: `No approved route for provider=${gen.provider} model=${gen.model}` };
+  const provider = route.provider;
 
   // Issue scoped service token for this job (DR 0065)
   const tokenResult = await issueServiceToken({ organizationId, productionJobId });
@@ -323,9 +321,10 @@ export async function retryDispatch(params: {
     },
   });
 
-  // Transition new AiGeneration REQUESTED→RUNNING and dispatch
-  const provider = PROVIDER_MAP[prev.provider ?? ''];
-  if (!provider) return { ok: false, reason: `Unknown provider: ${prev.provider}` };
+  // DR 0084: Deterministic model routing — use approved route for retry dispatch.
+  const route = resolveProviderForModel(prev.provider ?? '', prev.model ?? '');
+  if (!route) return { ok: false, reason: `No approved route for provider=${prev.provider} model=${prev.model}` };
+  const provider = route.provider;
 
   await db
     .update(aiGenerations)

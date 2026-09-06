@@ -1,9 +1,17 @@
 // DR 0081: Cloudflare R2 is the V1 internal object-storage provider (S3-compatible).
 // Only this module reads R2 credentials. Domain code calls putObject() and knows nothing
 // about R2, accounts, buckets, or signing — those details stay here.
+// DR 0086: generateSignedUrl() provides short-lived, object-specific, server-side signed URLs.
+//   R2 credentials never leave this module. No R2 credentials or configuration are exposed
+//   to browser code, API responses, or domain logic.
 
 import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import type { Readable } from 'stream';
+
+// DR 0086 §2.7: Default signed URL expiry — 1 hour (3600 seconds).
+// Short-lived: authorized clients receive a URL valid only for this window.
+const DEFAULT_SIGNED_URL_EXPIRY_SECONDS = 3600;
 
 export interface PutObjectParams {
   key: string;
@@ -54,6 +62,20 @@ export async function getObject(key: string): Promise<Buffer> {
     stream.on('end', () => resolve(Buffer.concat(chunks)));
     stream.on('error', reject);
   });
+}
+
+// DR 0086: Generates a short-lived presigned GET URL for a specific R2 object.
+// The URL is object-specific, expires after expiresInSeconds, and is generated server-side.
+// R2 credentials are never exposed — they remain in createS3Client() within this module.
+// Callers must authorize the request before calling this function.
+// Provider CDN URLs are never used as canonical asset URLs (DR 0081 §2.5, DR 0086).
+export async function generateSignedUrl(
+  key: string,
+  expiresInSeconds: number = DEFAULT_SIGNED_URL_EXPIRY_SECONDS,
+): Promise<string> {
+  const s3 = createS3Client();
+  const command = new GetObjectCommand({ Bucket: getBucketName(), Key: key });
+  return getSignedUrl(s3, command, { expiresIn: expiresInSeconds });
 }
 
 // Uploads an object to R2. Throws on failure — callers must handle and not assume success.
