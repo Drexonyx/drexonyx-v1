@@ -49,6 +49,8 @@ export async function pollGenerationStatus(params: {
     return { ok: false, error: 'AiGeneration missing provider or provider_job_id' };
   }
 
+  // VERIFIED: status URL is derivable from providerJobId — /requests/{id}/status.
+  // No status_url column in ai_generations; constructed URL is authoritative.
   const pollResult = await higgsFieldProvider.pollJobStatus({
     providerJobId: gen.provider_job_id,
   });

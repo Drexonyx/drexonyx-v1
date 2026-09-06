@@ -2,7 +2,8 @@
 // Only this module reads R2 credentials. Domain code calls putObject() and knows nothing
 // about R2, accounts, buckets, or signing — those details stay here.
 
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import type { Readable } from 'stream';
 
 export interface PutObjectParams {
   key: string;
@@ -36,6 +37,23 @@ function getBucketName(): string {
   const bucket = process.env.R2_BUCKET_NAME;
   if (!bucket) throw new Error('R2_BUCKET_NAME environment variable is not set');
   return bucket;
+}
+
+// Downloads an object from R2 and returns its full contents as a Buffer.
+// Throws on failure — callers must handle and not assume success.
+export async function getObject(key: string): Promise<Buffer> {
+  const s3 = createS3Client();
+  const result = await s3.send(
+    new GetObjectCommand({ Bucket: getBucketName(), Key: key }),
+  );
+  if (!result.Body) throw new Error(`R2 object not found: ${key}`);
+  const stream = result.Body as Readable;
+  return new Promise<Buffer>((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    stream.on('data', (chunk: Buffer) => chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)));
+    stream.on('end', () => resolve(Buffer.concat(chunks)));
+    stream.on('error', reject);
+  });
 }
 
 // Uploads an object to R2. Throws on failure — callers must handle and not assume success.

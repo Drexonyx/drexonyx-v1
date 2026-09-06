@@ -16,10 +16,11 @@ vi.mock('@aws-sdk/client-s3', () => ({
   S3Client: MockS3Client,
   // Regular function so it can be called with `new`.
   PutObjectCommand: vi.fn(function (params: unknown) { return { _type: 'PutObjectCommand', ...Object(params) }; }),
+  GetObjectCommand: vi.fn(function (params: unknown) { return { _type: 'GetObjectCommand', ...Object(params) }; }),
 }));
 
 // Import after mocking
-import { putObject } from '../infrastructure/object-storage';
+import { putObject, getObject } from '../infrastructure/object-storage';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -163,5 +164,44 @@ describe('putObject — canonical key convention (DR 0054)', () => {
 
     const cmd = mockSend.mock.calls[0][0] as Record<string, unknown>;
     expect(cmd.Key).toBe(key);
+  });
+});
+
+// ─── getObject ────────────────────────────────────────────────────────────────
+
+describe('getObject — download from R2', () => {
+  beforeEach(() => { vi.clearAllMocks(); setEnv(); });
+  afterEach(() => { clearEnv(); });
+
+  function makeReadableStream(data: string): NodeJS.ReadableStream {
+    const { Readable } = require('stream') as typeof import('stream');
+    const readable = new Readable({ read() {} });
+    readable.push(data);
+    readable.push(null);
+    return readable;
+  }
+
+  it('returns buffer contents from a readable stream body', async () => {
+    const content = 'fake-video-bytes';
+    mockSend.mockResolvedValue({ Body: makeReadableStream(content) });
+
+    const result = await getObject('higgsfield/org1/asset1/generation');
+
+    const cmd = mockSend.mock.calls[0][0] as Record<string, unknown>;
+    expect(cmd._type).toBe('GetObjectCommand');
+    expect(cmd.Bucket).toBe('drexonyx-assets');
+    expect(cmd.Key).toBe('higgsfield/org1/asset1/generation');
+    expect(result.toString()).toBe(content);
+  });
+
+  it('throws when Body is absent', async () => {
+    mockSend.mockResolvedValue({ Body: undefined });
+
+    await expect(getObject('missing-key')).rejects.toThrow('missing-key');
+  });
+
+  it('throws when R2_ACCESS_KEY_ID is missing', async () => {
+    setEnv({ R2_ACCESS_KEY_ID: undefined });
+    await expect(getObject('k')).rejects.toThrow('R2_ACCESS_KEY_ID');
   });
 });

@@ -1,14 +1,28 @@
 // DR 0057: Higgsfield provider adapter (V1 AI generation provider).
 // Credentials are server-side only — never exposed to browser or client.
-// DR 0077: Partially verified against official contract. Remaining items flagged below.
+// DR 0077: Contract repair — evidence-based corrections applied per Phase 11 repair task.
 
 import { createHmac, timingSafeEqual } from 'crypto';
 import type { AiProvider, DispatchParams, DispatchResult, ParsedWebhookPayload } from './interface';
+import { getObject } from '@/lib/infrastructure/object-storage';
 
-function getApiKey(): string {
-  const key = process.env.HIGGSFIELD_API_KEY;
-  if (!key) throw new Error('HIGGSFIELD_API_KEY environment variable is not set');
-  return key;
+// ─── Credential helpers ───────────────────────────────────────────────────────
+
+// VERIFIED: Authorization: Key {ID}:{SECRET} scheme (from official Higgsfield SDK / docs).
+function getApiKeyId(): string {
+  const v = process.env.HIGGSFIELD_API_KEY_ID;
+  if (!v) throw new Error('HIGGSFIELD_API_KEY_ID environment variable is not set');
+  return v;
+}
+
+function getApiKeySecret(): string {
+  const v = process.env.HIGGSFIELD_API_KEY_SECRET;
+  if (!v) throw new Error('HIGGSFIELD_API_KEY_SECRET environment variable is not set');
+  return v;
+}
+
+function authHeader(): string {
+  return `Key ${getApiKeyId()}:${getApiKeySecret()}`;
 }
 
 function getApiBaseUrl(): string {
@@ -23,47 +37,128 @@ function getWebhookSecret(): string {
   return secret;
 }
 
-// DR 0077 §2.3: Terminal status strings. PARTIALLY VERIFIED.
-// 'completed' confirmed as SUCCEEDED terminal status.
-// All other values require external verification against current Higgsfield webhook docs.
-const SUCCEEDED_STATUSES = new Set(['completed', 'succeeded', 'done']);
-const TRANSIENT_FAILED_STATUSES = new Set(['timeout', 'rate_limited', 'server_error', 'unavailable']);
+// ─── Model → endpoint mapping ─────────────────────────────────────────────────
+// Fail closed: only explicitly mapped models are supported.
+// Models are operator-supplied strings; unknown values throw rather than guess.
+// Sources: official Higgsfield SDK types.ts (confirmed model-specific async endpoints).
+const MODEL_ENDPOINT_MAP: Record<string, string> = {
+  'text2image/soul': '/v1/text2image/soul',
+  'image2video/dop': '/v1/image2video/dop',
+  'speak/higgsfield': '/v1/speak/higgsfield',
+};
 
-// DR 0077 §2.1: Dispatch response shape.
-// VERIFIED: response contains request_id (providerJobId) and status_url.
-// UNVERIFIED: other field names; authentication header scheme.
+function getModelEndpoint(model: string): string {
+  const path = MODEL_ENDPOINT_MAP[model];
+  if (!path) {
+    throw new Error(
+      `Higgsfield model not supported: "${model}". Supported models: ${Object.keys(MODEL_ENDPOINT_MAP).join(', ')}`,
+    );
+  }
+  return path;
+}
+
+// ─── Status constants ─────────────────────────────────────────────────────────
+// VERIFIED from official Higgsfield SDK V2 types: terminal values are
+// 'completed', 'failed', 'nsfw'. Unofficial values ('succeeded', 'done',
+// 'timeout', 'rate_limited') have been removed.
+const SUCCEEDED_STATUSES = new Set(['completed']);
+// 'nsfw' is terminal-failed with no retry.
+const NSFW_STATUS = 'nsfw';
+// 'server_error' / 'unavailable' retained as transient-failure indicators
+// per evidence; remaining unconfirmed values removed.
+const TRANSIENT_FAILED_STATUSES = new Set(['server_error', 'unavailable']);
+
+// ─── Response shapes ──────────────────────────────────────────────────────────
+
+// VERIFIED (official SDK V2 types.ts): dispatch response contains
+// request_id, status, status_url, cancel_url.
 interface HiggsFieldDispatchResponse {
-  request_id?: string; // VERIFIED: canonical job correlation identifier
-  status_url?: string; // VERIFIED: polling URL for bounded recovery
-  job_id?: string;     // legacy fallback — kept for safety during verification period
-  id?: string;         // legacy fallback — kept for safety during verification period
-  error?: string;
-  message?: string;
-  retryable?: boolean;
-}
-
-// DR 0077 §2.2: Polling response shape. PARTIALLY VERIFIED.
-interface HiggsFieldStatusResponse {
+  request_id?: string;
   status?: string;
-  output_url?: string;  // ⚠️ REQUIRES EXTERNAL VERIFICATION
-  result_url?: string;  // ⚠️ REQUIRES EXTERNAL VERIFICATION
+  status_url?: string;
+  cancel_url?: string;
+  // Legacy fallback fields kept during transition period.
+  job_id?: string;
+  id?: string;
   error?: string;
   message?: string;
   retryable?: boolean;
 }
 
-// DR 0077 §2.4: Webhook payload shape. PARTIALLY VERIFIED.
-interface HiggsFieldWebhookPayload {
-  request_id?: string; // VERIFIED: canonical correlation identifier
-  job_id?: string;     // legacy fallback
-  id?: string;         // legacy fallback
-  status?: string;     // ⚠️ terminal values require external verification
-  output_url?: string; // ⚠️ REQUIRES EXTERNAL VERIFICATION
-  result_url?: string; // ⚠️ REQUIRES EXTERNAL VERIFICATION
+// VERIFIED (official SDK V2 types.ts): output shape uses
+// video?: { url } and images?: [{ url }][] — NOT output_url / result_url.
+interface V2Output {
+  video?: { url?: string };
+  images?: Array<{ url?: string }>;
+}
+
+interface HiggsFieldStatusResponse extends V2Output {
+  status?: string;
   error?: string;
   message?: string;
   retryable?: boolean;
 }
+
+// VERIFIED (official SDK V2): webhook V2 output uses same video/images shape.
+interface HiggsFieldWebhookPayload extends V2Output {
+  request_id?: string;
+  job_id?: string;
+  id?: string;
+  status?: string;
+  error?: string;
+  message?: string;
+  retryable?: boolean;
+}
+
+// ─── File upload helpers ──────────────────────────────────────────────────────
+
+interface UploadUrlResponse {
+  upload_url?: string;
+  public_url?: string;
+}
+
+// Two-phase Higgsfield file upload:
+//   1. POST /files/generate-upload-url → { upload_url, public_url }
+//   2. PUT upload_url with file bytes
+// Returns public_url for use in generation request body.
+async function uploadFileToHiggsfield(fileKey: string, baseUrl: string): Promise<string> {
+  const bytes = await getObject(fileKey);
+
+  const uploadUrlRes = await fetch(`${baseUrl}/files/generate-upload-url`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': authHeader() },
+    body: JSON.stringify({ file_name: fileKey.split('/').pop() ?? fileKey }),
+  });
+  if (!uploadUrlRes.ok) {
+    const text = await uploadUrlRes.text().catch(() => '');
+    throw new Error(`Higgsfield upload-url request failed (HTTP ${uploadUrlRes.status}): ${text}`);
+  }
+  const uploadUrlBody = (await uploadUrlRes.json()) as UploadUrlResponse;
+  if (!uploadUrlBody.upload_url || !uploadUrlBody.public_url) {
+    throw new Error('Higgsfield upload-url response missing upload_url or public_url');
+  }
+
+  const putRes = await fetch(uploadUrlBody.upload_url, {
+    method: 'PUT',
+    body: new Uint8Array(bytes),
+  });
+  if (!putRes.ok) {
+    throw new Error(`Higgsfield file PUT failed (HTTP ${putRes.status})`);
+  }
+
+  return uploadUrlBody.public_url;
+}
+
+// ─── Output URL extraction ────────────────────────────────────────────────────
+
+// VERIFIED (official SDK V2 types.ts): output fields are video?.url and images?.[0]?.url.
+function extractResultUrl(body: V2Output): string | undefined {
+  if (body.video?.url) return body.video.url;
+  if (body.images?.[0]?.url) return body.images[0].url;
+  return undefined;
+}
+
+// ─── Provider ─────────────────────────────────────────────────────────────────
 
 export interface PollStatusResult {
   status: 'SUCCEEDED' | 'FAILED' | 'RUNNING';
@@ -77,24 +172,47 @@ export class HiggsFieldProvider implements AiProvider {
   async dispatch(params: DispatchParams): Promise<DispatchResult> {
     const { aiGenerationId, model, prompt, params: genParams, fileKey } = params;
 
-    // DR 0077 §2.1: Model-specific asynchronous endpoint. VERIFIED: endpoints are model-specific.
-    // ⚠️ PARTIALLY VERIFIED: exact path pattern requires external verification.
-    // Using /{model} suffix as the best-match for "model-specific asynchronous endpoints".
+    const baseUrl = getApiBaseUrl();
+
+    let endpointPath: string;
+    try {
+      endpointPath = getModelEndpoint(model);
+    } catch (err) {
+      return { ok: false, error: String(err), isTransient: false };
+    }
+
+    // VERIFIED: append ?hf_webhook={url} query param when webhook URL is configured.
+    const webhookUrl = process.env.HIGGSFIELD_WEBHOOK_URL;
+    const endpointUrl = webhookUrl
+      ? `${baseUrl}${endpointPath}?hf_webhook=${encodeURIComponent(webhookUrl)}`
+      : `${baseUrl}${endpointPath}`;
+
+    // Build request body. File input: upload R2 asset to Higgsfield first.
+    // The field name for the returned public_url is model-specific and UNVERIFIED;
+    // we use 'image_url' as the best available evidence from SDK usage.
+    // ⚠️ UNVERIFIED: exact field name for uploaded file in request body.
+    const requestBody: Record<string, unknown> = { prompt, ...genParams };
+    if (fileKey) {
+      let publicUrl: string;
+      try {
+        publicUrl = await uploadFileToHiggsfield(fileKey, baseUrl);
+      } catch (err) {
+        return { ok: false, error: `File upload failed: ${String(err)}`, isTransient: true };
+      }
+      requestBody.image_url = publicUrl;
+    }
+
     let response: Response;
     try {
-      response = await fetch(`${getApiBaseUrl()}/v1/generate/${encodeURIComponent(model)}`, {
+      response = await fetch(endpointUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // ⚠️ UNVERIFIED: authentication header scheme — Bearer is assumed but not confirmed.
-          'Authorization': `Bearer ${getApiKey()}`,
+          // VERIFIED: Authorization: Key {ID}:{SECRET}
+          'Authorization': authHeader(),
           'X-Request-Id': aiGenerationId,
         },
-        body: JSON.stringify({
-          prompt,
-          file_key: fileKey,
-          ...genParams,
-        }),
+        body: JSON.stringify(requestBody),
       });
     } catch (err) {
       return { ok: false, error: String(err), isTransient: true };
@@ -119,34 +237,24 @@ export class HiggsFieldProvider implements AiProvider {
       return { ok: false, error: 'Provider did not return a job identifier (request_id)', isTransient: false };
     }
 
-    // VERIFIED: response contains status_url for polling recovery.
-    // status_url is passed to pollJobStatus when available; stored separately from providerJobId.
-    // NOTE: persisting status_url to DB requires either DR 0057 amendment or schema change —
-    // both are deferred. Recovery polling falls back to constructed URL.
-    if (body.status_url) {
-      this._lastStatusUrl = body.status_url;
-    }
-
+    // status_url is derivable from providerJobId: /requests/{id}/status
+    // No in-memory singleton; no DB persistence needed.
     return { ok: true, providerJobId };
   }
 
-  // In-memory only — survives only the lifetime of this dispatch call chain.
-  // Full status_url persistence requires a schema change (deferred).
-  private _lastStatusUrl: string | undefined;
-
   // DR 0077 §2.2: Bounded polling recovery — Higgsfield-specific, NOT on AiProvider interface.
-  // statusUrl: use if available (from dispatch response); falls back to constructed URL.
-  // ⚠️ PARTIALLY VERIFIED: constructed polling URL pattern needs external verification.
+  // VERIFIED: polling endpoint is /requests/{request_id}/status (official SDK).
+  // statusUrl param accepted for forward-compat but constructed URL is used by default.
   async pollJobStatus(params: { providerJobId: string; statusUrl?: string }): Promise<PollStatusResult | null> {
-    // Use explicit statusUrl if provided; otherwise construct from providerJobId.
-    // ⚠️ Constructed pattern `GET /v1/status/{request_id}` is an assumption — verify.
-    const url = params.statusUrl ?? `${getApiBaseUrl()}/v1/status/${params.providerJobId}`;
+    const baseUrl = getApiBaseUrl();
+    // VERIFIED: official status endpoint pattern is /requests/{id}/status.
+    const url = params.statusUrl ?? `${baseUrl}/requests/${params.providerJobId}/status`;
 
     let response: Response;
     try {
       response = await fetch(url, {
         method: 'GET',
-        headers: { 'Authorization': `Bearer ${getApiKey()}` },
+        headers: { 'Authorization': authHeader() },
       });
     } catch {
       return null;
@@ -164,11 +272,11 @@ export class HiggsFieldProvider implements AiProvider {
     const status = body.status.toLowerCase();
 
     if (SUCCEEDED_STATUSES.has(status)) {
-      const resultUrl = body.output_url ?? body.result_url;
-      return {
-        status: 'SUCCEEDED',
-        resultUrl: typeof resultUrl === 'string' ? resultUrl : undefined,
-      };
+      return { status: 'SUCCEEDED', resultUrl: extractResultUrl(body) };
+    }
+
+    if (status === NSFW_STATUS) {
+      return { status: 'FAILED', error: 'nsfw' };
     }
 
     if (TRANSIENT_FAILED_STATUSES.has(status) || body.retryable === true) {
@@ -183,9 +291,9 @@ export class HiggsFieldProvider implements AiProvider {
   }
 
   verifyWebhookSignature(rawBody: Buffer, signature: string): boolean {
-    // DR 0077 §2.5: HMAC-SHA256 constant-time comparison.
-    // ⚠️ UNVERIFIED: signature header name (x-higgsfield-signature) and HMAC algorithm
-    // need external verification against current Higgsfield webhook documentation.
+    // DR 0077 §2.5: HMAC-SHA256 constant-time comparison. PRESERVED AS-IS.
+    // ⚠️ UNVERIFIED: signature header name (x-higgsfield-signature) and HMAC algorithm.
+    // DO NOT modify without authoritative evidence.
     const secret = getWebhookSecret();
     const expected = createHmac('sha256', secret).update(rawBody).digest('hex');
     const expectedBuf = Buffer.from(expected, 'utf8');
@@ -208,13 +316,17 @@ export class HiggsFieldProvider implements AiProvider {
     const status = statusRaw.toLowerCase();
 
     if (SUCCEEDED_STATUSES.has(status)) {
-      const resultUrl = p.output_url ?? p.result_url;
+      // VERIFIED (official SDK V2): extract from video?.url or images?.[0]?.url.
       return {
         provider: this.name,
         providerJobId,
         status: 'SUCCEEDED',
-        resultUrl: typeof resultUrl === 'string' ? resultUrl : undefined,
+        resultUrl: extractResultUrl(p),
       };
+    }
+
+    if (status === NSFW_STATUS) {
+      return { provider: this.name, providerJobId, status: 'FAILED', isTransient: false, error: 'nsfw' };
     }
 
     const isTransient = TRANSIENT_FAILED_STATUSES.has(status) || p.retryable === true;
