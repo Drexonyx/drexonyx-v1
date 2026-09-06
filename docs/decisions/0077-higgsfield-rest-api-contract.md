@@ -1,73 +1,128 @@
-# DR 0077 — Higgsfield REST API Contract (Phase 11 Interim)
+# DR 0077 — Higgsfield REST API Contract (Phase 11)
 
-**Status:** APPROVED  
+**Status:** APPROVED (PARTIALLY VERIFIED)  
 **Date:** 2026-09-06  
 **Phase:** 11 — Higgsfield AI Provider Integration
 
 ## 1. Context
 
-Phase 09 implemented the Higgsfield provider adapter (`lib/agent/providers/higgsfield.ts`)
-using specific endpoint paths and status string conventions. The exact Higgsfield REST API
-contract was not formally verified at approval time (DR 0057 §2.1 comment noted this).
-Phase 11 adopts the Phase 09 implementation as the current approved contract and documents
-what requires external verification before production traffic.
+Phase 09 implemented the Higgsfield provider adapter. Phase 11 corrects field names based
+on the official Higgsfield API contract and documents the verification status of each
+element. Items marked ✅ VERIFIED are confirmed from official Higgsfield documentation or
+authoritative guidance. Items marked ⚠️ UNVERIFIED require external verification (live
+authenticated request or current API documentation) before production traffic is enabled.
 
-## 2. Current Approved Contract
+## 2. Base URL
 
-### 2.1 — Dispatch endpoint
+`https://api.higgsfield.ai`
 
-`POST {HIGGSFIELD_API_BASE_URL}/v1/generate`  
-Authentication: `Authorization: Bearer {HIGGSFIELD_API_KEY}`
+✅ VERIFIED: Base API URL confirmed.
 
-**Request body fields (Phase 09 implementation):**
-- `model` — provider model identifier
-- `prompt` — generation prompt
-- `file_key` — input file reference (may be empty string; adapter passes through)
-- `...params` — spread of provider-specific params from `AiGeneration.params`
+## 3. Dispatch endpoint
 
-**Response:** JSON containing `job_id` or `id` as the `providerJobId`.
+### 3.1 — Endpoint path
 
-> ⚠️ REQUIRES EXTERNAL VERIFICATION: Endpoint path, request body shape, and response
-> field names must be verified against current Higgsfield API documentation before
-> production traffic is enabled.
+`POST {HIGGSFIELD_API_BASE_URL}/v1/generate/{model}`
 
-### 2.2 — Polling status endpoint (bounded recovery)
+✅ VERIFIED: Endpoints are model-specific (asynchronous, per-model).  
+⚠️ PARTIALLY VERIFIED: The exact URL path pattern `…/v1/generate/{model}` is a best-match
+interpretation of "model-specific asynchronous endpoints." The precise path structure
+requires verification against current Higgsfield API documentation.
 
-`GET {HIGGSFIELD_API_BASE_URL}/v1/generate/{job_id}`  
-Authentication: `Authorization: Bearer {HIGGSFIELD_API_KEY}`
+### 3.2 — Authentication
 
-**Response:** JSON containing `status` field using the same string conventions as webhook.
+`Authorization: Bearer {HIGGSFIELD_API_KEY}`
 
-> ⚠️ REQUIRES EXTERNAL VERIFICATION: Polling endpoint path and response shape must be
-> verified against current Higgsfield API documentation.
+⚠️ UNVERIFIED: The authentication header scheme is assumed to be Bearer but has not been
+confirmed against current Higgsfield documentation. If the API uses API key ID/secret
+pair authentication or a different header, update this and `lib/agent/providers/higgsfield.ts`.
 
-### 2.3 — Webhook status strings
+### 3.3 — Request body
 
-Phase 09 implementation maps provider status strings as follows:
+```json
+{
+  "prompt": "...",
+  "file_key": "...",
+  "...params": "provider-specific params from AiGeneration.params"
+}
+```
+
+Note: `model` is in the URL path, not the request body (per model-specific endpoint design).
+
+⚠️ UNVERIFIED: Request body field names require external verification.
+
+### 3.4 — Dispatch response
+
+✅ VERIFIED: Response contains:
+- `request_id` — canonical asynchronous job correlation identifier
+- `status_url` — polling URL for bounded recovery
+
+```json
+{
+  "request_id": "...",
+  "status_url": "..."
+}
+```
+
+The adapter reads `request_id` as `providerJobId`. `status_url` is stored in-memory
+for immediate use; persisting it to the DB for recovery polling requires a schema change
+(deferred — see §6 Non-decisions).
+
+Fallback fields `job_id` and `id` are accepted during the transition period.
+
+## 4. Polling endpoint (bounded recovery)
+
+`GET {status_url}`
+
+✅ VERIFIED: `status_url` is the authoritative polling URL from the dispatch response.  
+⚠️ PARTIALLY VERIFIED: When `status_url` is unavailable (recovery path from DB),
+the adapter falls back to `GET {HIGGSFIELD_API_BASE_URL}/v1/status/{request_id}`.
+This fallback URL pattern requires external verification.
+
+## 5. Webhook
+
+### 5.1 — Webhook payload
+
+```json
+{
+  "request_id": "...",
+  "status": "...",
+  "output_url": "...",
+  "..."
+}
+```
+
+✅ VERIFIED: Webhook carries `request_id` as the correlation identifier.  
+⚠️ UNVERIFIED: Status string values, output URL field name (`output_url` vs `result_url`),
+and any additional envelope fields require external verification.
+
+Implemented terminal status mapping:
 
 | Provider string | Domain status |
 |---|---|
 | `completed`, `succeeded`, `done` | `SUCCEEDED` |
 | `timeout`, `rate_limited`, `server_error`, `unavailable` | `FAILED` (transient) |
-| any other | `FAILED` (permanent) |
+| `failed`, `error`, `cancelled` | `FAILED` (permanent) |
 
-**Result URL field:** `output_url` falling back to `result_url`.
+All mappings ⚠️ UNVERIFIED against current Higgsfield documentation.
 
-> ⚠️ REQUIRES EXTERNAL VERIFICATION: Status string values must be verified against
-> current Higgsfield webhook documentation.
+### 5.2 — Webhook signature
 
-### 2.4 — Webhook signature verification
+HMAC-SHA256 of raw request body, compared constant-time against the `x-higgsfield-signature` header.
 
-HMAC-SHA256 of raw request body using `HIGGSFIELD_WEBHOOK_SECRET`, compared
-constant-time against `x-higgsfield-signature` header.
+⚠️ UNVERIFIED: Both the HMAC algorithm and the signature header name require external
+verification against current Higgsfield webhook documentation.
 
-> ⚠️ REQUIRES EXTERNAL VERIFICATION: Signature header name and HMAC algorithm must be
-> verified against current Higgsfield webhook documentation.
+## 6. Non-decisions
 
-## 3. Non-decisions
-
-- MCP model IDs exposed by the Higgsfield MCP server are NOT assumed to be valid
-  REST API model IDs. Model selection is separate from this DR.
-- Financial/credit accounting for Higgsfield API calls remains DEFERRED (DR 0060,
-  DR 0066, DR 0067).
-- Provider fallback architecture is NOT introduced in Phase 11.
+- **`status_url` persistence:** Persisting `status_url` from the dispatch response to the
+  database for full recovery-polling correctness requires either adding `statusUrl` to
+  `DispatchResult` (DR 0057 amendment) or a new column on `ai_generations` (schema change).
+  Both are deferred. Recovery polling falls back to the constructed URL pattern (§4).
+- **MCP model IDs** are NOT assumed to be valid REST API model identifiers. Model selection
+  is separate from this DR.
+- **Financial/credit accounting** for Higgsfield API calls remains DEFERRED.
+- **Provider fallback architecture** is NOT introduced.
+- **Live authenticated verification** has not been performed — no real credentials were
+  available during Phase 11 implementation. The items marked ⚠️ UNVERIFIED above must be
+  confirmed before production traffic is enabled.

@@ -1,18 +1,49 @@
 // DR 0078: Materializes an AI generation result into an internal Asset record.
-// DR 0079: Emits AI_GENERATION_ASSET_CREATED audit event after insert.
-// DR 0054: file_key uses convention {provider}/{org}/{assetId}/generation; content_url is temporary.
+// DR 0079: Emits AI_GENERATION_ASSET_CREATED audit event after successful storage.
+// DR 0054: file_key = {provider}/{org}/{assetId}/generation; content_url is nullable.
 // DR 0064: actor_id = production_job_id, actor_role = 'AGENT'.
+// DR 0081: Generated output is downloaded server-side and stored in Cloudflare R2.
+//          Asset is created ONLY after successful R2 upload.
 
 import { db } from '@/db/index';
-import { assets, assetAiGenerations, aiGenerations, productionJobs } from '@/db/schema/production';
+import { assets, assetAiGenerations, productionJobs } from '@/db/schema/production';
 import { auditEvents, idempotencyKeys } from '@/db/schema/system';
 import { and, eq } from 'drizzle-orm';
 import { uuidv7 } from 'uuidv7';
 import { transitionAssetToReadyForQc } from './terminal';
+import { putObject } from '@/lib/infrastructure/object-storage';
 
 export type MaterializationResult =
   | { ok: true; assetId: string }
   | { ok: false; error: string };
+
+// Downloads the generated output from the provider URL and returns raw bytes.
+// Returns null on any network or HTTP error — callers treat null as a transient failure.
+async function downloadProviderOutput(
+  resultUrl: string,
+): Promise<{ body: Buffer; contentType: string } | null> {
+  let response: Response;
+  try {
+    response = await fetch(resultUrl);
+  } catch (err) {
+    return null;
+  }
+
+  if (!response.ok) {
+    return null;
+  }
+
+  const contentType = response.headers.get('content-type') ?? 'application/octet-stream';
+
+  let buffer: Buffer;
+  try {
+    buffer = Buffer.from(await response.arrayBuffer());
+  } catch {
+    return null;
+  }
+
+  return { body: buffer, contentType };
+}
 
 export async function materializeGenerationAsset(params: {
   aiGenerationId: string;
@@ -22,6 +53,11 @@ export async function materializeGenerationAsset(params: {
   resultUrl?: string;
 }): Promise<MaterializationResult> {
   const { aiGenerationId, productionJobId, organizationId, provider, resultUrl } = params;
+
+  // DR 0081: A provider output URL is required to download and store the asset.
+  if (!resultUrl) {
+    return { ok: false, error: 'No provider output URL available for materialization' };
+  }
 
   // DR 0078 §2.4: Primary idempotency — check for existing link
   const existingLink = await db
@@ -43,7 +79,6 @@ export async function materializeGenerationAsset(params: {
     .limit(1);
 
   if (existingIdemp.length > 0 && existingIdemp[0].status === 'COMPLETED') {
-    // Idempotency key present but link not found — inconsistent state; treat as already done
     const retryLink = await db
       .select({ asset_id: assetAiGenerations.asset_id })
       .from(assetAiGenerations)
@@ -65,11 +100,32 @@ export async function materializeGenerationAsset(params: {
 
   const orderId = jobRows[0].order_id;
 
-  try {
-    const assetId = uuidv7();
-    // DR 0054 §2.2: file_key convention — no actual storage backend yet (DEFERRED)
-    const fileKey = `${provider}/${organizationId}/${assetId}/generation`;
+  // DR 0081 §2.4: Download the generated output from the provider URL server-side.
+  // Asset creation does NOT proceed if download fails.
+  const download = await downloadProviderOutput(resultUrl);
+  if (!download) {
+    return { ok: false, error: `Failed to download provider output from: ${resultUrl}` };
+  }
 
+  const assetId = uuidv7();
+  // DR 0054 §2.2: canonical file_key convention
+  const fileKey = `${provider}/${organizationId}/${assetId}/generation`;
+
+  // DR 0081: Upload to R2 before inserting the Asset row.
+  // Asset creation does NOT proceed if R2 upload fails.
+  try {
+    await putObject({
+      key: fileKey,
+      body: download.body,
+      contentType: download.contentType,
+      contentLength: download.body.length,
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return { ok: false, error: `R2 upload failed: ${msg}` };
+  }
+
+  try {
     await db.transaction(async (tx) => {
       await tx
         .insert(idempotencyKeys)
@@ -83,14 +139,15 @@ export async function materializeGenerationAsset(params: {
         })
         .onConflictDoNothing();
 
+      // DR 0054 §2.4: content_url is nullable — file_key is the canonical reference.
+      // DR 0081 §2.5: content_url = null after R2 materialization; signed URLs are deferred.
       await tx.insert(assets).values({
         id: assetId,
         organization_id: organizationId,
         order_id: orderId,
         status: 'PROCESSING',
         file_key: fileKey,
-        // DR 0054 §2.4: content_url is a temporary placeholder only — never the canonical reference
-        content_url: resultUrl ?? null,
+        content_url: null,
       });
 
       await tx.insert(assetAiGenerations).values({
@@ -99,7 +156,7 @@ export async function materializeGenerationAsset(params: {
         organization_id: organizationId,
       });
 
-      // DR 0079: emit AI_GENERATION_ASSET_CREATED before transitioning to READY_FOR_QC
+      // DR 0079: emit AI_GENERATION_ASSET_CREATED only after successful storage
       await tx.insert(auditEvents).values({
         id: uuidv7(),
         organization_id: organizationId,
@@ -114,7 +171,6 @@ export async function materializeGenerationAsset(params: {
           production_job_id: productionJobId,
           organization_id: organizationId,
           file_key: fileKey,
-          content_url: resultUrl ?? null,
         },
       });
 
@@ -123,21 +179,21 @@ export async function materializeGenerationAsset(params: {
         .set({ status: 'COMPLETED', updated_at: new Date() })
         .where(and(eq(idempotencyKeys.key, idempKey), eq(idempotencyKeys.organization_id, organizationId)));
     });
-
-    // Transition PROCESSING→READY_FOR_QC outside the creation transaction (DR 0056 transition #6)
-    const qcResult = await transitionAssetToReadyForQc({
-      assetId,
-      organizationId,
-      productionJobId,
-    });
-
-    if (!qcResult.ok) {
-      return { ok: false, error: `Asset created but READY_FOR_QC transition failed: ${qcResult.reason}` };
-    }
-
-    return { ok: true, assetId };
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     return { ok: false, error: `Materialization failed: ${msg}` };
   }
+
+  // Transition PROCESSING→READY_FOR_QC outside the creation transaction (DR 0056 transition #6)
+  const qcResult = await transitionAssetToReadyForQc({
+    assetId,
+    organizationId,
+    productionJobId,
+  });
+
+  if (!qcResult.ok) {
+    return { ok: false, error: `Asset created but READY_FOR_QC transition failed: ${qcResult.reason}` };
+  }
+
+  return { ok: true, assetId };
 }

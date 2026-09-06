@@ -1,6 +1,6 @@
 // DR 0057: Higgsfield provider adapter (V1 AI generation provider).
 // Credentials are server-side only — never exposed to browser or client.
-// Webhook signature verification uses HMAC-SHA256 with the configured secret.
+// DR 0077: Partially verified against official contract. Remaining items flagged below.
 
 import { createHmac, timingSafeEqual } from 'crypto';
 import type { AiProvider, DispatchParams, DispatchResult, ParsedWebhookPayload } from './interface';
@@ -23,25 +23,43 @@ function getWebhookSecret(): string {
   return secret;
 }
 
-// Higgsfield job-status values mapped to domain model outcomes.
-// These string values must be validated against Higgsfield contract during BUILD.
+// DR 0077 §2.3: Terminal status strings. PARTIALLY VERIFIED.
+// 'completed' confirmed as SUCCEEDED terminal status.
+// All other values require external verification against current Higgsfield webhook docs.
 const SUCCEEDED_STATUSES = new Set(['completed', 'succeeded', 'done']);
 const TRANSIENT_FAILED_STATUSES = new Set(['timeout', 'rate_limited', 'server_error', 'unavailable']);
 
+// DR 0077 §2.1: Dispatch response shape.
+// VERIFIED: response contains request_id (providerJobId) and status_url.
+// UNVERIFIED: other field names; authentication header scheme.
 interface HiggsFieldDispatchResponse {
-  job_id?: string;
-  id?: string;
+  request_id?: string; // VERIFIED: canonical job correlation identifier
+  status_url?: string; // VERIFIED: polling URL for bounded recovery
+  job_id?: string;     // legacy fallback — kept for safety during verification period
+  id?: string;         // legacy fallback — kept for safety during verification period
   error?: string;
   message?: string;
   retryable?: boolean;
 }
 
-interface HiggsFieldWebhookPayload {
-  job_id?: string;
-  id?: string;
+// DR 0077 §2.2: Polling response shape. PARTIALLY VERIFIED.
+interface HiggsFieldStatusResponse {
   status?: string;
-  output_url?: string;
-  result_url?: string;
+  output_url?: string;  // ⚠️ REQUIRES EXTERNAL VERIFICATION
+  result_url?: string;  // ⚠️ REQUIRES EXTERNAL VERIFICATION
+  error?: string;
+  message?: string;
+  retryable?: boolean;
+}
+
+// DR 0077 §2.4: Webhook payload shape. PARTIALLY VERIFIED.
+interface HiggsFieldWebhookPayload {
+  request_id?: string; // VERIFIED: canonical correlation identifier
+  job_id?: string;     // legacy fallback
+  id?: string;         // legacy fallback
+  status?: string;     // ⚠️ terminal values require external verification
+  output_url?: string; // ⚠️ REQUIRES EXTERNAL VERIFICATION
+  result_url?: string; // ⚠️ REQUIRES EXTERNAL VERIFICATION
   error?: string;
   message?: string;
   retryable?: boolean;
@@ -59,24 +77,26 @@ export class HiggsFieldProvider implements AiProvider {
   async dispatch(params: DispatchParams): Promise<DispatchResult> {
     const { aiGenerationId, model, prompt, params: genParams, fileKey } = params;
 
+    // DR 0077 §2.1: Model-specific asynchronous endpoint. VERIFIED: endpoints are model-specific.
+    // ⚠️ PARTIALLY VERIFIED: exact path pattern requires external verification.
+    // Using /{model} suffix as the best-match for "model-specific asynchronous endpoints".
     let response: Response;
     try {
-      response = await fetch(`${getApiBaseUrl()}/v1/generate`, {
+      response = await fetch(`${getApiBaseUrl()}/v1/generate/${encodeURIComponent(model)}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          // ⚠️ UNVERIFIED: authentication header scheme — Bearer is assumed but not confirmed.
           'Authorization': `Bearer ${getApiKey()}`,
           'X-Request-Id': aiGenerationId,
         },
         body: JSON.stringify({
-          model,
           prompt,
           file_key: fileKey,
           ...genParams,
         }),
       });
     } catch (err) {
-      // Network-level failures are transient
       return { ok: false, error: String(err), isTransient: true };
     }
 
@@ -93,19 +113,38 @@ export class HiggsFieldProvider implements AiProvider {
       return { ok: false, error, isTransient };
     }
 
-    const providerJobId = body.job_id ?? body.id;
+    // VERIFIED: response contains request_id; fallback to legacy fields during transition.
+    const providerJobId = body.request_id ?? body.job_id ?? body.id;
     if (!providerJobId) {
-      return { ok: false, error: 'Provider did not return a job identifier', isTransient: false };
+      return { ok: false, error: 'Provider did not return a job identifier (request_id)', isTransient: false };
+    }
+
+    // VERIFIED: response contains status_url for polling recovery.
+    // status_url is passed to pollJobStatus when available; stored separately from providerJobId.
+    // NOTE: persisting status_url to DB requires either DR 0057 amendment or schema change —
+    // both are deferred. Recovery polling falls back to constructed URL.
+    if (body.status_url) {
+      this._lastStatusUrl = body.status_url;
     }
 
     return { ok: true, providerJobId };
   }
 
-  // DR 0077 §2.2: Bounded polling recovery — Higgsfield-specific, not on AiProvider interface.
-  async pollJobStatus(params: { providerJobId: string }): Promise<PollStatusResult | null> {
+  // In-memory only — survives only the lifetime of this dispatch call chain.
+  // Full status_url persistence requires a schema change (deferred).
+  private _lastStatusUrl: string | undefined;
+
+  // DR 0077 §2.2: Bounded polling recovery — Higgsfield-specific, NOT on AiProvider interface.
+  // statusUrl: use if available (from dispatch response); falls back to constructed URL.
+  // ⚠️ PARTIALLY VERIFIED: constructed polling URL pattern needs external verification.
+  async pollJobStatus(params: { providerJobId: string; statusUrl?: string }): Promise<PollStatusResult | null> {
+    // Use explicit statusUrl if provided; otherwise construct from providerJobId.
+    // ⚠️ Constructed pattern `GET /v1/status/{request_id}` is an assumption — verify.
+    const url = params.statusUrl ?? `${getApiBaseUrl()}/v1/status/${params.providerJobId}`;
+
     let response: Response;
     try {
-      response = await fetch(`${getApiBaseUrl()}/v1/generate/${params.providerJobId}`, {
+      response = await fetch(url, {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${getApiKey()}` },
       });
@@ -113,9 +152,9 @@ export class HiggsFieldProvider implements AiProvider {
       return null;
     }
 
-    let body: HiggsFieldWebhookPayload;
+    let body: HiggsFieldStatusResponse;
     try {
-      body = (await response.json()) as HiggsFieldWebhookPayload;
+      body = (await response.json()) as HiggsFieldStatusResponse;
     } catch {
       return null;
     }
@@ -144,6 +183,9 @@ export class HiggsFieldProvider implements AiProvider {
   }
 
   verifyWebhookSignature(rawBody: Buffer, signature: string): boolean {
+    // DR 0077 §2.5: HMAC-SHA256 constant-time comparison.
+    // ⚠️ UNVERIFIED: signature header name (x-higgsfield-signature) and HMAC algorithm
+    // need external verification against current Higgsfield webhook documentation.
     const secret = getWebhookSecret();
     const expected = createHmac('sha256', secret).update(rawBody).digest('hex');
     const expectedBuf = Buffer.from(expected, 'utf8');
@@ -156,7 +198,8 @@ export class HiggsFieldProvider implements AiProvider {
     if (typeof rawPayload !== 'object' || rawPayload === null) return null;
     const p = rawPayload as HiggsFieldWebhookPayload;
 
-    const providerJobId = p.job_id ?? p.id;
+    // VERIFIED: request_id is the canonical correlation field.
+    const providerJobId = p.request_id ?? p.job_id ?? p.id;
     if (!providerJobId || typeof providerJobId !== 'string') return null;
 
     const statusRaw = p.status;

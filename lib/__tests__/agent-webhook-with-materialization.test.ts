@@ -10,6 +10,7 @@ const {
   mockRetryDispatch,
   mockAttemptProductionJobCompletion, mockFailProductionJob,
   mockMaterializeGenerationAsset,
+  mockPutObject,
 } = vi.hoisted(() => ({
   mockSelect: vi.fn(),
   mockInsert: vi.fn(),
@@ -21,6 +22,7 @@ const {
   mockAttemptProductionJobCompletion: vi.fn(),
   mockFailProductionJob: vi.fn(),
   mockMaterializeGenerationAsset: vi.fn(),
+  mockPutObject: vi.fn(),
 }));
 
 vi.mock('@/db/index', () => ({
@@ -49,6 +51,10 @@ vi.mock('@/lib/agent/terminal', () => ({
 
 vi.mock('@/lib/agent/materialization', () => ({
   materializeGenerationAsset: mockMaterializeGenerationAsset,
+}));
+
+vi.mock('@/lib/infrastructure/object-storage', () => ({
+  putObject: mockPutObject,
 }));
 
 import { type NextRequest } from 'next/server';
