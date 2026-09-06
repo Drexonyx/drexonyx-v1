@@ -47,6 +47,12 @@ interface HiggsFieldWebhookPayload {
   retryable?: boolean;
 }
 
+export interface PollStatusResult {
+  status: 'SUCCEEDED' | 'FAILED' | 'RUNNING';
+  resultUrl?: string;
+  error?: string;
+}
+
 export class HiggsFieldProvider implements AiProvider {
   readonly name = 'higgsfield';
 
@@ -93,6 +99,48 @@ export class HiggsFieldProvider implements AiProvider {
     }
 
     return { ok: true, providerJobId };
+  }
+
+  // DR 0077 §2.2: Bounded polling recovery — Higgsfield-specific, not on AiProvider interface.
+  async pollJobStatus(params: { providerJobId: string }): Promise<PollStatusResult | null> {
+    let response: Response;
+    try {
+      response = await fetch(`${getApiBaseUrl()}/v1/generate/${params.providerJobId}`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${getApiKey()}` },
+      });
+    } catch {
+      return null;
+    }
+
+    let body: HiggsFieldWebhookPayload;
+    try {
+      body = (await response.json()) as HiggsFieldWebhookPayload;
+    } catch {
+      return null;
+    }
+
+    if (!response.ok || !body.status) return null;
+
+    const status = body.status.toLowerCase();
+
+    if (SUCCEEDED_STATUSES.has(status)) {
+      const resultUrl = body.output_url ?? body.result_url;
+      return {
+        status: 'SUCCEEDED',
+        resultUrl: typeof resultUrl === 'string' ? resultUrl : undefined,
+      };
+    }
+
+    if (TRANSIENT_FAILED_STATUSES.has(status) || body.retryable === true) {
+      return { status: 'FAILED', error: body.error ?? body.message ?? status };
+    }
+
+    if (['failed', 'error', 'cancelled'].includes(status)) {
+      return { status: 'FAILED', error: body.error ?? body.message ?? status };
+    }
+
+    return { status: 'RUNNING' };
   }
 
   verifyWebhookSignature(rawBody: Buffer, signature: string): boolean {

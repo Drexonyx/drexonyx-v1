@@ -13,6 +13,7 @@ import { uuidv7 } from 'uuidv7';
 import { higgsFieldProvider } from '@/lib/agent/providers/higgsfield';
 import { retryDispatch } from '@/lib/agent/driver';
 import { attemptProductionJobCompletion, failProductionJob } from '@/lib/agent/terminal';
+import { materializeGenerationAsset } from '@/lib/agent/materialization';
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   // Read raw body before any parsing — required for HMAC signature verification
@@ -50,6 +51,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       organization_id: aiGenerations.organization_id,
       status: aiGenerations.status,
       retry_count: aiGenerations.retry_count,
+      provider: aiGenerations.provider,
     })
     .from(aiGenerations)
     .where(
@@ -96,6 +98,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       organizationId,
       idempKey,
       resultUrl,
+      provider,
     });
   } else {
     await handleFailure({
@@ -117,8 +120,9 @@ async function handleSuccess(params: {
   organizationId: string;
   idempKey: string;
   resultUrl?: string;
+  provider: string;
 }) {
-  const { gen, productionJobId, organizationId, idempKey, resultUrl } = params;
+  const { gen, productionJobId, organizationId, idempKey, resultUrl, provider } = params;
 
   if (gen.status !== 'RUNNING') return; // Already transitioned
 
@@ -172,13 +176,29 @@ async function handleSuccess(params: {
           ),
         );
     });
-
-    // Check if ProductionJob can now complete (DR 0063 §2.2)
-    await attemptProductionJobCompletion({ productionJobId, organizationId });
   } catch (e) {
     if (e instanceof Error && e.message === 'CONCURRENT_MODIFICATION') return;
     throw e;
   }
+
+  // DR 0078 §2.5: Materialize Asset BEFORE attemptProductionJobCompletion.
+  // Failure is isolated: log and return without calling completion check.
+  const matResult = await materializeGenerationAsset({
+    aiGenerationId: gen.id,
+    productionJobId,
+    organizationId,
+    provider,
+    resultUrl,
+  });
+
+  if (!matResult.ok) {
+    // DR 0078 §2.1, §2.3: materialization failure leaves job RUNNING; state is recoverable.
+    console.error(`[webhook] Asset materialization failed for ai_generation ${gen.id}: ${matResult.error}`);
+    return;
+  }
+
+  // Check if ProductionJob can now complete (DR 0063 §2.2)
+  await attemptProductionJobCompletion({ productionJobId, organizationId });
 }
 
 async function handleFailure(params: {

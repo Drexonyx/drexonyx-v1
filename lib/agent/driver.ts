@@ -188,7 +188,7 @@ export async function runGenerationDriver(params: {
     model: gen.model!,
     prompt: gen.prompt!,
     params: (gen.params as Record<string, unknown>) ?? {},
-    fileKey: '', // file_key sourced from AiGeneration params at dispatch time
+    fileKey: (gen.params as { input_file_key?: string } | null)?.input_file_key ?? '',
   });
 
   if (!dispatchResult.ok) {
@@ -346,7 +346,7 @@ export async function retryDispatch(params: {
     model: prev.model!,
     prompt: prev.prompt!,
     params: (prev.params as Record<string, unknown>) ?? {},
-    fileKey: '',
+    fileKey: (prev.params as { input_file_key?: string } | null)?.input_file_key ?? '',
   });
 
   if (!dispatchResult.ok) {
