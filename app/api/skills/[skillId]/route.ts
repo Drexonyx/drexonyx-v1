@@ -5,7 +5,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { db } from '@/db/index';
-import { skillOutputs, qcReviews } from '@/db/schema/production';
+import { skillOutputs } from '@/db/schema/production';
 import { eq } from 'drizzle-orm';
 import { uuidv7 } from 'uuidv7';
 import { validateServiceToken } from '@/lib/agent/service-tokens';
@@ -208,22 +208,6 @@ async function executeSkill(params: {
       .update(skillOutputs)
       .set({ status: 'SUCCEEDED', output: result.output as Record<string, unknown>, updated_at: new Date() })
       .where(eq(skillOutputs.id, outputId));
-
-    // QC skills: write PASS/FAIL to qc_reviews if entityType is ASSET
-    if (
-      (skill.id === 'qc.script.review' || skill.id === 'qc.brand.alignment' || skill.id === 'qc.asset.metadata') &&
-      entityType === 'ASSET'
-    ) {
-      const qcOutput = result.output as { verdict: 'PASS' | 'FAIL' };
-      await db.insert(qcReviews).values({
-        id: uuidv7(),
-        asset_id: entityId,
-        organization_id: organizationId,
-        reviewer_id: actorType === 'USER' ? actorId : undefined,
-        verdict: qcOutput.verdict,
-        notes: `Skill: ${skill.id} v${skill.version}`,
-      });
-    }
 
     return NextResponse.json({ outputId, status: 'SUCCEEDED', output: result.output });
   }

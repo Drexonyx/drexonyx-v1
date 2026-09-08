@@ -43,6 +43,18 @@ vi.mock('@/lib/skills/registry', () => ({
       family: 'QC',
       execute: mockSkillExecute,
     },
+    'qc.script.review': {
+      id: 'qc.script.review',
+      version: '1.0.0',
+      family: 'QC',
+      execute: mockSkillExecute,
+    },
+    'qc.brand.alignment': {
+      id: 'qc.brand.alignment',
+      version: '1.0.0',
+      family: 'QC',
+      execute: mockSkillExecute,
+    },
   },
 }));
 
@@ -256,5 +268,80 @@ describe('POST /api/skills/[skillId] — agent path', () => {
       expectedOrganizationId: 'org1',
       expectedProductionJobId: 'job1',
     });
+  });
+});
+
+// ─── QC boundary — DR 0089/0090 ───────────────────────────────────────────────
+
+describe('POST /api/skills/[skillId] — QC boundary (DR 0089/0090)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockInsert.mockReturnValue(makeInsertChain());
+    mockUpdate.mockReturnValue(makeUpdateChain());
+  });
+
+  // Test 9: QC skill success writes skill_outputs record
+  it('QC skill success writes skill_outputs with SUCCEEDED status', async () => {
+    mockAuth.mockResolvedValue({ user: { userId: 'u1', organizationId: 'org1', role: 'OWNER' } });
+    mockSkillExecute.mockResolvedValue({ ok: true, output: { verdict: 'PASS', notes: '' } });
+
+    const req = makeRequest('qc.asset.metadata', { entityType: 'ASSET', entityId: 'asset1', input: {} });
+    const res = await POST(req, makeParams('qc.asset.metadata'));
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.status).toBe('SUCCEEDED');
+    expect(body.outputId).toBe('output-id-test');
+  });
+
+  // Test 10: QC skill success does NOT create qc_reviews — mockInsert called exactly once
+  it('QC skill success does NOT insert into qc_reviews (mockInsert called once)', async () => {
+    mockAuth.mockResolvedValue({ user: { userId: 'u1', organizationId: 'org1', role: 'OWNER' } });
+    mockSkillExecute.mockResolvedValue({ ok: true, output: { verdict: 'PASS', notes: '' } });
+
+    const req = makeRequest('qc.asset.metadata', { entityType: 'ASSET', entityId: 'asset1', input: {} });
+    await POST(req, makeParams('qc.asset.metadata'));
+
+    expect(mockInsert).toHaveBeenCalledTimes(1);
+  });
+
+  // Test 10 (variant): qc.script.review also writes only skill_outputs
+  it('qc.script.review success does NOT insert into qc_reviews', async () => {
+    mockAuth.mockResolvedValue({ user: { userId: 'u1', organizationId: 'org1', role: 'QC' } });
+    mockSkillExecute.mockResolvedValue({ ok: true, output: { verdict: 'PASS' } });
+
+    const req = makeRequest('qc.script.review', { entityType: 'ASSET', entityId: 'asset1', input: {} });
+    await POST(req, makeParams('qc.script.review'));
+
+    expect(mockInsert).toHaveBeenCalledTimes(1);
+  });
+
+  // Test 11: AGENT qc.asset.metadata does NOT create qc_reviews
+  it('AGENT qc.asset.metadata success does NOT insert into qc_reviews', async () => {
+    mockValidateServiceToken.mockResolvedValue({ ok: true, organizationId: 'org1', productionJobId: 'job1' });
+    mockSkillExecute.mockResolvedValue({ ok: true, output: { verdict: 'PASS', notes: '' } });
+
+    const req = makeRequest(
+      'qc.asset.metadata',
+      { organizationId: 'org1', productionJobId: 'job1', entityType: 'ASSET', entityId: 'asset1', input: {} },
+      { authorization: 'Bearer validtoken' },
+    );
+    await POST(req, makeParams('qc.asset.metadata'));
+
+    expect(mockInsert).toHaveBeenCalledTimes(1);
+  });
+
+  // Test 15: Non-QC skill execution is unaffected by the boundary fix
+  it('non-QC skill (brief.analyze) execution is unaffected — still SUCCEEDED, one insert', async () => {
+    mockAuth.mockResolvedValue({ user: { userId: 'u1', organizationId: 'org1', role: 'OWNER' } });
+    mockSkillExecute.mockResolvedValue({ ok: true, output: { summary: 'x' } });
+
+    const req = makeRequest('brief.analyze', { entityType: 'BRIEF', entityId: 'eid', input: {} });
+    const res = await POST(req, makeParams('brief.analyze'));
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.status).toBe('SUCCEEDED');
+    expect(mockInsert).toHaveBeenCalledTimes(1);
   });
 });

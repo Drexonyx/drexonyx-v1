@@ -14,6 +14,69 @@ import type { AdminRole } from './types';
 const CREATE_ROLES: AdminRole[] = ['OWNER', 'ADMIN_OPERATIONS', 'CREATIVE_PRODUCTION'];
 const CANCEL_ROLES: AdminRole[] = ['OWNER', 'ADMIN_OPERATIONS'];
 
+// Extracts the Drizzle transaction type from db.transaction's callback parameter.
+// Used by callers that must include ProductionJob creation in their own outer transaction.
+type DbTx = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+// DR 0088 §2.4: Internal helper — inserts ProductionJob + related rows inside a caller-managed
+// transaction. Caller is responsible for validation (order exists, ACTIVE) and idempotency.
+export async function insertProductionJobInTx(
+  tx: DbTx,
+  params: {
+    jobId: string;
+    orderId: string;
+    organizationId: string;
+    jobType: 'AI_GENERATION' | 'MANUAL_UPLOAD';
+    description?: string;
+    metadata?: Record<string, unknown>;
+    actorId: string;
+    actorRole: AdminRole;
+  },
+): Promise<void> {
+  const { jobId, orderId, organizationId, jobType, description, metadata, actorId, actorRole } = params;
+
+  await tx.insert(productionJobs).values({
+    id: jobId,
+    order_id: orderId,
+    organization_id: organizationId,
+    job_type: jobType,
+    description: description ?? null,
+    metadata: metadata ?? null,
+    status: 'QUEUED',
+  });
+
+  if (jobType === 'AI_GENERATION') {
+    await tx.insert(aiGenerations).values({
+      id: uuidv7(),
+      production_job_id: jobId,
+      organization_id: organizationId,
+      status: 'REQUESTED',
+    });
+
+    await tx.insert(auditEvents).values({
+      id: uuidv7(),
+      organization_id: organizationId,
+      entity_type: 'ai_generation',
+      entity_id: jobId,
+      actor_id: actorId,
+      actor_role: actorRole,
+      action: 'AI_GENERATION_REQUESTED',
+      payload: { production_job_id: jobId, organization_id: organizationId },
+    });
+  }
+
+  await tx.insert(auditEvents).values({
+    id: uuidv7(),
+    organization_id: organizationId,
+    entity_type: 'production_job',
+    entity_id: jobId,
+    actor_id: actorId,
+    actor_role: actorRole,
+    action: 'PRODUCTION_JOB_CREATED',
+    payload: { job_id: jobId, order_id: orderId, job_type: jobType, organization_id: organizationId },
+  });
+}
+
 export type CreateProductionJobResult =
   | { ok: true; jobId: string }
   | { ok: false; reason: string };

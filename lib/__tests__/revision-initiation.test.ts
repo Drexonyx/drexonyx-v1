@@ -38,12 +38,19 @@ function selectSequence(results: unknown[][]) {
   });
 }
 
+// tx.select returns empty array by default (no COMPLETED key found inside transaction).
+function makeTxSelectEmpty() {
+  return vi.fn().mockReturnValue(makeSelectChain([]));
+}
+
+// Standard successful transaction: no concurrent winner detected.
 function makeSuccessfulTx() {
   mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
     const tx = {
       insert: vi.fn().mockReturnValue({
         values: vi.fn().mockReturnValue({ onConflictDoNothing: vi.fn().mockResolvedValue([]) }),
       }),
+      select: makeTxSelectEmpty(),
       update: vi.fn().mockReturnValue({
         set: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([]) }),
       }),
@@ -63,6 +70,14 @@ describe('createRevisionJob', () => {
     actorId: 'actor1',
     actorRole: 'OWNER' as const,
   };
+
+  // db.select call order in the new implementation:
+  //   #1 — asset lookup
+  //   #2 — order lookup
+  //   #3 — idempotency key pre-check
+  const assetRow = { id: 'asset1', status: 'REVISION_REQUIRED', order_id: 'order1' };
+  const orderRow = { id: 'order1', status: 'ACTIVE' };
+  const noKey: unknown[] = [];
 
   beforeEach(() => { vi.clearAllMocks(); });
 
@@ -100,24 +115,17 @@ describe('createRevisionJob', () => {
     expect(result).toMatchObject({ ok: false, reason: expect.stringContaining('order') });
   });
 
-  // Test 23: order not found (propagated from createProductionJob)
+  // Test 23: order not found (now validated directly, not propagated from createProductionJob)
   it('returns ok:false when order not found', async () => {
-    selectSequence([
-      [{ id: 'asset1', status: 'REVISION_REQUIRED', order_id: 'order1' }],
-      [],
-    ]);
+    selectSequence([[assetRow], []]);
     const result = await createRevisionJob(base);
     expect(result).toMatchObject({ ok: false, reason: 'Order not found' });
   });
 
   // Test 24: successful revision job creation with MANUAL_UPLOAD type
   it('creates revision job and writes REVISION_INITIATED audit event', async () => {
-    selectSequence([
-      [{ id: 'asset1', status: 'REVISION_REQUIRED', order_id: 'order1' }],
-      [{ id: 'order1', status: 'ACTIVE' }],
-    ]);
+    selectSequence([[assetRow], [orderRow], noKey]);
     makeSuccessfulTx();
-    const insertMock = vi.fn().mockReturnValue({ values: vi.fn().mockResolvedValue([]) });
     mockInsert.mockReturnValue({ values: vi.fn().mockResolvedValue([]) });
 
     const result = await createRevisionJob(base);
@@ -126,10 +134,7 @@ describe('createRevisionJob', () => {
 
   // Test 25: successful revision job creation with AI_GENERATION type
   it('creates revision job with AI_GENERATION type', async () => {
-    selectSequence([
-      [{ id: 'asset1', status: 'REVISION_REQUIRED', order_id: 'order1' }],
-      [{ id: 'order1', status: 'ACTIVE' }],
-    ]);
+    selectSequence([[assetRow], [orderRow], noKey]);
     makeSuccessfulTx();
     mockInsert.mockReturnValue({ values: vi.fn().mockResolvedValue([]) });
 
@@ -139,10 +144,7 @@ describe('createRevisionJob', () => {
 
   // Test 26: CREATIVE_PRODUCTION is authorized
   it('CREATIVE_PRODUCTION role is authorized', async () => {
-    selectSequence([
-      [{ id: 'asset1', status: 'REVISION_REQUIRED', order_id: 'order1' }],
-      [{ id: 'order1', status: 'ACTIVE' }],
-    ]);
+    selectSequence([[assetRow], [orderRow], noKey]);
     makeSuccessfulTx();
     mockInsert.mockReturnValue({ values: vi.fn().mockResolvedValue([]) });
 
@@ -151,25 +153,107 @@ describe('createRevisionJob', () => {
   });
 
   // Test 27: original asset is NOT modified (it stays REVISION_REQUIRED)
-  it('does not call update on the original asset', async () => {
-    selectSequence([
-      [{ id: 'asset1', status: 'REVISION_REQUIRED', order_id: 'order1' }],
-      [{ id: 'order1', status: 'ACTIVE' }],
-    ]);
+  it('does not call db.update on the original asset', async () => {
+    selectSequence([[assetRow], [orderRow], noKey]);
     makeSuccessfulTx();
     mockInsert.mockReturnValue({ values: vi.fn().mockResolvedValue([]) });
 
     await createRevisionJob(base);
+    // db.update (outside any transaction) must not be called — only tx.update inside the tx
     expect(mockUpdate).not.toHaveBeenCalled();
   });
 
   // Test 28: inactive order is rejected
   it('returns ok:false when order is not ACTIVE', async () => {
-    selectSequence([
-      [{ id: 'asset1', status: 'REVISION_REQUIRED', order_id: 'order1' }],
-      [{ id: 'order1', status: 'COMPLETED' }],
-    ]);
+    selectSequence([[assetRow], [{ id: 'order1', status: 'COMPLETED' }]]);
     const result = await createRevisionJob(base);
     expect(result).toMatchObject({ ok: false, reason: expect.stringContaining('COMPLETED') });
+  });
+
+  // ─── Idempotency tests (DR 0088 §2.4) ──────────────────────────────────────
+
+  // Test 29: COMPLETED idempotency key → return stored jobId without creating another job
+  it('returns stored jobId when idempotency key is already COMPLETED', async () => {
+    selectSequence([
+      [assetRow],
+      [orderRow],
+      [{ status: 'COMPLETED', response_payload: { newProductionJobId: 'existing-job-id' } }],
+    ]);
+
+    const result = await createRevisionJob(base);
+    expect(result).toMatchObject({ ok: true, newProductionJobId: 'existing-job-id' });
+    expect(mockTransaction).not.toHaveBeenCalled();
+  });
+
+  // Test 30: No second ProductionJob or REVISION_INITIATED event on repeated call
+  it('does not create a second ProductionJob when operation already completed', async () => {
+    selectSequence([
+      [assetRow],
+      [orderRow],
+      [{ status: 'COMPLETED', response_payload: { newProductionJobId: 'existing-job-id' } }],
+    ]);
+
+    await createRevisionJob(base);
+    expect(mockTransaction).not.toHaveBeenCalled();
+    expect(mockInsert).not.toHaveBeenCalled();
+  });
+
+  // Test 31: Idempotency record reaches COMPLETED inside transaction
+  it('marks idempotency key COMPLETED inside the transaction', async () => {
+    selectSequence([[assetRow], [orderRow], noKey]);
+
+    const txUpdateMock = vi.fn().mockReturnValue({
+      set: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([]) }),
+    });
+
+    mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
+      const tx = {
+        insert: vi.fn().mockReturnValue({
+          values: vi.fn().mockReturnValue({ onConflictDoNothing: vi.fn().mockResolvedValue([]) }),
+        }),
+        select: makeTxSelectEmpty(),
+        update: txUpdateMock,
+      };
+      await fn(tx);
+    });
+
+    await createRevisionJob(base);
+    expect(txUpdateMock).toHaveBeenCalled();
+  });
+
+  // Test 32: Concurrent winner detected inside transaction → return winner's jobId, no duplicate job
+  it('returns concurrent winner jobId when COMPLETED detected inside transaction', async () => {
+    selectSequence([[assetRow], [orderRow], noKey]);
+
+    mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
+      const tx = {
+        insert: vi.fn().mockReturnValue({
+          values: vi.fn().mockReturnValue({ onConflictDoNothing: vi.fn().mockResolvedValue([]) }),
+        }),
+        select: vi.fn().mockReturnValue({
+          from: vi.fn().mockReturnThis(),
+          where: vi.fn().mockReturnThis(),
+          limit: vi.fn().mockResolvedValue([{
+            status: 'COMPLETED',
+            response_payload: { newProductionJobId: 'winner-job-id' },
+          }]),
+        }),
+        update: vi.fn().mockReturnValue({
+          set: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([]) }),
+        }),
+      };
+      await fn(tx);
+    });
+
+    const result = await createRevisionJob(base);
+    expect(result).toMatchObject({ ok: true, newProductionJobId: 'winner-job-id' });
+  });
+
+  // Test 33: Failed transaction propagates error — no orphaned state
+  it('propagates unexpected transaction errors without swallowing them', async () => {
+    selectSequence([[assetRow], [orderRow], noKey]);
+    mockTransaction.mockRejectedValue(new Error('DB connection failed'));
+
+    await expect(createRevisionJob(base)).rejects.toThrow('DB connection failed');
   });
 });

@@ -53,6 +53,13 @@ describe('createQcReview', () => {
     expect(result).toMatchObject({ ok: false });
   });
 
+  // Test 12: AGENT cannot call the formal createQcReview path (DR 0089/0090)
+  it('returns ok:false for AGENT role — AGENT is excluded from formal QC review', async () => {
+    const result = await createQcReview({ ...base, actorRole: 'AGENT' as never });
+    expect(result).toMatchObject({ ok: false, reason: expect.stringContaining('authority') });
+    expect(mockSelect).not.toHaveBeenCalled();
+  });
+
   it('returns ok:false when asset not found', async () => {
     mockSelect.mockReturnValue(makeSelectChain([]));
     const result = await createQcReview(base);

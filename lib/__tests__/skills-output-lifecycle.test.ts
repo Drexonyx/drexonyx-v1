@@ -155,7 +155,9 @@ describe('skill output lifecycle — PENDING → RUNNING → SUCCEEDED', () => {
   });
 });
 
-describe('skill output lifecycle — QC routing to qc_reviews for ASSET entity', () => {
+// DR 0089/0090: skill invocation writes ONLY to skill_outputs — never to qc_reviews.
+// Human createQcReview is the sole authoritative path for qc_reviews.
+describe('skill output lifecycle — QC skill writes only to skill_outputs (DR 0089/0090)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     capturedInserts.length = 0;
@@ -174,7 +176,7 @@ describe('skill output lifecycle — QC routing to qc_reviews for ASSET entity',
     }));
   });
 
-  it('writes to qc_reviews when QC skill succeeds on ASSET entity', async () => {
+  it('QC skill on ASSET entity writes only skill_outputs — does NOT write to qc_reviews', async () => {
     mockSkillExecute.mockResolvedValue({
       ok: true,
       output: { verdict: 'PASS', issues: [], completeness: 95, recommendations: [] },
@@ -183,11 +185,11 @@ describe('skill output lifecycle — QC routing to qc_reviews for ASSET entity',
     const req = makeRequest('qc.asset.metadata', { entityType: 'ASSET', entityId: 'asset-id', input: { assetName: 'x', assetType: 'VIDEO' } });
     await POST(req, makeParams('qc.asset.metadata'));
 
-    // Two inserts: skill_outputs (PENDING) + qc_reviews
-    expect(capturedInserts.length).toBe(2);
-    const qcInsert = capturedInserts[1] as Record<string, unknown>;
-    expect(qcInsert.verdict).toBe('PASS');
-    expect(qcInsert.asset_id).toBe('asset-id');
+    // Exactly one insert: skill_outputs PENDING record only — no qc_reviews insert
+    expect(capturedInserts.length).toBe(1);
+    const skillOutputInsert = capturedInserts[0] as Record<string, unknown>;
+    expect(skillOutputInsert.skill_id).toBe('qc.asset.metadata');
+    expect(skillOutputInsert.status).toBe('PENDING');
   });
 
   it('does NOT write to qc_reviews when entityType is not ASSET', async () => {
