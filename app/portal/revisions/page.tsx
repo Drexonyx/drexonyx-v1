@@ -1,6 +1,6 @@
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import { getClientAssets } from '@/lib/portal/queries';
+import { getClientAssets, getRevisionInitiatedAssetIds } from '@/lib/portal/queries';
 import s from '../portal.module.css';
 
 export const metadata = { title: 'Revisions — Client Portal' };
@@ -9,7 +9,10 @@ export default async function RevisionsPage() {
   const session = await auth();
   if (!session) redirect('/portal/login');
 
-  const assets = await getClientAssets(session.user.organizationId);
+  const [assets, revisionInitiatedIds] = await Promise.all([
+    getClientAssets(session.user.organizationId),
+    getRevisionInitiatedAssetIds(session.user.organizationId),
+  ]);
   const revisions = assets.filter((a) => a.status === 'REVISION_REQUIRED');
 
   return (
@@ -35,15 +38,22 @@ export default async function RevisionsPage() {
               </tr>
             </thead>
             <tbody>
-              {revisions.map((a) => (
-                <tr key={a.id}>
-                  <td className={`${s.cellPrimary} ${s.cellMono}`}>{a.id.slice(0, 8)}…</td>
-                  <td>
-                    <span className={`${s.badge} ${s.badgeWarning}`}>Revision in Progress</span>
-                  </td>
-                  <td className={s.cellMono}>{new Date(a.updated_at).toLocaleDateString()}</td>
-                </tr>
-              ))}
+              {revisions.map((a) => {
+                const initiated = revisionInitiatedIds.has(a.id);
+                return (
+                  <tr key={a.id}>
+                    <td className={`${s.cellPrimary} ${s.cellMono}`}>{a.id.slice(0, 8)}…</td>
+                    <td>
+                      {initiated ? (
+                        <span className={`${s.badge} ${s.badgeWarning}`}>Revision in Progress</span>
+                      ) : (
+                        <span className={`${s.badge} ${s.badgeNeutral}`}>Revision Pending — Pending Scheduling</span>
+                      )}
+                    </td>
+                    <td className={s.cellMono}>{new Date(a.updated_at).toLocaleDateString()}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

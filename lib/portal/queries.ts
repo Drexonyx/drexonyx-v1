@@ -4,6 +4,7 @@ import { organizations, brandDna } from '@/db/schema/core';
 import { campaigns, quotes, orders } from '@/db/schema/commercial';
 import { payments } from '@/db/schema/financial';
 import { assets, approvals, deliveries } from '@/db/schema/production';
+import { auditEvents } from '@/db/schema/system';
 import { isClientQuoteStatus } from './types';
 
 // All queries are scoped to the authenticated user's organizationId from the
@@ -271,6 +272,29 @@ export async function getDeliveries(organizationId: string) {
       ),
     )
     .orderBy(desc(deliveries.created_at));
+}
+
+// DR 0088 §2.6: Returns the set of asset IDs for which a REVISION_INITIATED audit event exists.
+// Used by the portal revisions page to distinguish "Revision in Progress" from "Revision Pending".
+export async function getRevisionInitiatedAssetIds(organizationId: string): Promise<Set<string>> {
+  const rows = await db
+    .select({ payload: auditEvents.payload })
+    .from(auditEvents)
+    .where(
+      and(
+        eq(auditEvents.organization_id, organizationId),
+        eq(auditEvents.action, 'REVISION_INITIATED'),
+      ),
+    );
+
+  const ids = new Set<string>();
+  for (const row of rows) {
+    const payload = row.payload as Record<string, unknown> | null;
+    if (payload && typeof payload.original_asset_id === 'string') {
+      ids.add(payload.original_asset_id);
+    }
+  }
+  return ids;
 }
 
 // Dashboard summary counts — derived from CLIENT-safe data only.

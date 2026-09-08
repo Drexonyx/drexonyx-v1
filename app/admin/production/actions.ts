@@ -5,6 +5,8 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { isAdminRole } from '@/lib/admin/types';
 import { createProductionJob, cancelProductionJob } from '@/lib/admin/production-jobs';
+import { markManualAssetReadyForQc, completeManualUploadJob } from '@/lib/admin/manual-upload';
+import { createRevisionJob } from '@/lib/admin/revisions';
 import { runGenerationDriver } from '@/lib/agent/driver';
 import type { AdminRole } from '@/lib/admin/types';
 
@@ -59,6 +61,70 @@ export async function actionCancelProductionJob(
 
   if (result.ok) revalidatePath('/admin/production');
   return result.ok ? { ok: true } : { ok: false, reason: result.reason };
+}
+
+// DR 0087: Advance a MANUAL_UPLOAD asset from UPLOADED → READY_FOR_QC, then complete the job.
+export async function actionMarkManualAssetReadyForQc(
+  assetId: string,
+  productionJobId: string,
+): Promise<{ ok: boolean; reason?: string }> {
+  const session = await getAdminSession();
+  const { role, organizationId, userId } = session.user;
+
+  if (role !== 'OWNER' && role !== 'ADMIN_OPERATIONS' && role !== 'CREATIVE_PRODUCTION') {
+    return { ok: false, reason: 'Forbidden: insufficient authority' };
+  }
+
+  const markResult = await markManualAssetReadyForQc({
+    assetId,
+    organizationId,
+    actorId: userId,
+    actorRole: role as AdminRole,
+  });
+
+  if (!markResult.ok) {
+    return { ok: false, reason: markResult.reason };
+  }
+
+  const completeResult = await completeManualUploadJob({
+    productionJobId,
+    organizationId,
+    actorId: userId,
+    actorRole: role as AdminRole,
+  });
+
+  if (markResult.ok) revalidatePath('/admin/production');
+  return completeResult.ok ? { ok: true } : { ok: false, reason: completeResult.reason };
+}
+
+// DR 0088: Initiate a revision job for a REVISION_REQUIRED asset.
+export async function actionCreateRevisionJob(
+  originalAssetId: string,
+  orderId: string,
+  jobType: 'AI_GENERATION' | 'MANUAL_UPLOAD',
+  description?: string,
+): Promise<{ ok: boolean; reason?: string; newProductionJobId?: string }> {
+  const session = await getAdminSession();
+  const { role, organizationId, userId } = session.user;
+
+  if (role !== 'OWNER' && role !== 'ADMIN_OPERATIONS' && role !== 'CREATIVE_PRODUCTION') {
+    return { ok: false, reason: 'Forbidden: insufficient authority' };
+  }
+
+  const result = await createRevisionJob({
+    originalAssetId,
+    orderId,
+    organizationId,
+    jobType,
+    description: description?.trim() || undefined,
+    actorId: userId,
+    actorRole: role as AdminRole,
+  });
+
+  if (result.ok) revalidatePath('/admin/production');
+  return result.ok
+    ? { ok: true, newProductionJobId: result.newProductionJobId }
+    : { ok: false, reason: result.reason };
 }
 
 // DR 0058: Trigger the async generation driver for a QUEUED AI_GENERATION ProductionJob.
