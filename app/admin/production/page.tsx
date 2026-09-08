@@ -1,9 +1,11 @@
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import { getAdminProductionJobs, getAdminOrders } from '@/lib/admin/queries';
+import { getAdminProductionJobs, getAdminOrders, getAdminAssetsForWorkflow } from '@/lib/admin/queries';
 import { isAdminRole } from '@/lib/admin/types';
 import s from '../admin.module.css';
 import { ProductionJobActions } from './ProductionJobActions';
+import { ManualUploadWorkflow } from './ManualUploadWorkflow';
+import { RevisionInitiation } from './RevisionInitiation';
 
 export const metadata = { title: 'Production Jobs — Admin' };
 
@@ -24,10 +26,15 @@ export default async function AdminProductionPage() {
   const canCreate = role === 'OWNER' || role === 'ADMIN_OPERATIONS' || role === 'CREATIVE_PRODUCTION';
   const canCancel = role === 'OWNER' || role === 'ADMIN_OPERATIONS';
 
-  const [jobs, orders] = await Promise.all([
+  const [jobs, orders, workflowAssets] = await Promise.all([
     getAdminProductionJobs(organizationId),
     getAdminOrders(organizationId),
+    getAdminAssetsForWorkflow(organizationId),
   ]);
+
+  const manualQueuedJobs = jobs.filter((j) => j.job_type === 'MANUAL_UPLOAD' && j.status === 'QUEUED');
+  const uploadedAssets = workflowAssets.filter((a) => a.status === 'UPLOADED');
+  const revisionAssets = workflowAssets.filter((a) => a.status === 'REVISION_REQUIRED');
 
   return (
     <>
@@ -43,6 +50,19 @@ export default async function AdminProductionPage() {
             canCancel={false}
           />
         </div>
+      )}
+
+      {canCreate && (
+        <ManualUploadWorkflow
+          jobs={manualQueuedJobs.map((j) => ({ id: j.id, order_id: j.order_id, status: j.status }))}
+          uploadedAssets={uploadedAssets.map((a) => ({ id: a.id, order_id: a.order_id, name: a.name, status: a.status }))}
+        />
+      )}
+
+      {canCreate && (
+        <RevisionInitiation
+          revisionAssets={revisionAssets.map((a) => ({ id: a.id, order_id: a.order_id, name: a.name, status: a.status }))}
+        />
       )}
 
       {jobs.length === 0 ? (

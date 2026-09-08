@@ -1,4 +1,5 @@
 // DR 0087: Manual Upload → READY_FOR_QC transition and MANUAL_UPLOAD job completion.
+// DR 0091: createManualUploadAsset — creates an Asset at UPLOADED status for a MANUAL_UPLOAD job.
 // markManualAssetReadyForQc: UPLOADED → READY_FOR_QC for MANUAL_UPLOAD assets only.
 // completeManualUploadJob: QUEUED → COMPLETED for MANUAL_UPLOAD ProductionJobs.
 // organizationId always from server-side JWT — never from client input.
@@ -11,6 +12,154 @@ import { uuidv7 } from 'uuidv7';
 import type { AdminRole } from './types';
 
 const MANUAL_QC_ROLES: AdminRole[] = ['OWNER', 'ADMIN_OPERATIONS', 'CREATIVE_PRODUCTION'];
+
+// DR 0091: Creates an Asset at UPLOADED status for a MANUAL_UPLOAD ProductionJob.
+// Idempotency key MANUAL_UPLOAD_ASSET_CREATED:{productionJobId} prevents duplicate assets
+// per job on retry. organizationId from server-side JWT only.
+
+export type CreateManualUploadAssetResult =
+  | { ok: true; assetId: string }
+  | { ok: false; reason: string };
+
+export async function createManualUploadAsset(params: {
+  productionJobId: string;
+  organizationId: string;
+  actorId: string;
+  actorRole: AdminRole;
+  name?: string;
+}): Promise<CreateManualUploadAssetResult> {
+  const { productionJobId, organizationId, actorId, actorRole, name } = params;
+
+  if (!MANUAL_QC_ROLES.includes(actorRole)) {
+    return { ok: false, reason: 'Insufficient authority' };
+  }
+
+  const jobRows = await db
+    .select({
+      id: productionJobs.id,
+      status: productionJobs.status,
+      job_type: productionJobs.job_type,
+      order_id: productionJobs.order_id,
+    })
+    .from(productionJobs)
+    .where(
+      and(
+        eq(productionJobs.id, productionJobId),
+        eq(productionJobs.organization_id, organizationId),
+      ),
+    )
+    .limit(1);
+
+  if (jobRows.length === 0) {
+    return { ok: false, reason: 'ProductionJob not found' };
+  }
+
+  const job = jobRows[0];
+
+  if (job.job_type !== 'MANUAL_UPLOAD') {
+    return { ok: false, reason: 'ProductionJob is not a MANUAL_UPLOAD job' };
+  }
+
+  if (job.status !== 'QUEUED') {
+    return { ok: false, reason: `ProductionJob must be in QUEUED status, currently ${job.status}` };
+  }
+
+  const idempKey = `MANUAL_UPLOAD_ASSET_CREATED:${productionJobId}`;
+
+  const existing = await db
+    .select({ status: idempotencyKeys.status, response_payload: idempotencyKeys.response_payload })
+    .from(idempotencyKeys)
+    .where(
+      and(
+        eq(idempotencyKeys.key, idempKey),
+        eq(idempotencyKeys.organization_id, organizationId),
+      ),
+    )
+    .limit(1);
+
+  if (existing.length > 0 && existing[0].status === 'COMPLETED') {
+    const payload = existing[0].response_payload as { assetId: string };
+    return { ok: true, assetId: payload.assetId };
+  }
+
+  const newAssetId = uuidv7();
+
+  try {
+    await db.transaction(async (tx) => {
+      await tx
+        .insert(idempotencyKeys)
+        .values({
+          id: uuidv7(),
+          key: idempKey,
+          organization_id: organizationId,
+          operation_type: 'MANUAL_UPLOAD_ASSET_CREATED',
+          status: 'PROCESSING',
+          response_payload: { assetId: newAssetId },
+          expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        })
+        .onConflictDoNothing();
+
+      const keyRow = await tx
+        .select({ status: idempotencyKeys.status, response_payload: idempotencyKeys.response_payload })
+        .from(idempotencyKeys)
+        .where(
+          and(
+            eq(idempotencyKeys.key, idempKey),
+            eq(idempotencyKeys.organization_id, organizationId),
+          ),
+        )
+        .limit(1);
+
+      if (keyRow.length > 0 && keyRow[0].status === 'COMPLETED') {
+        const payload = keyRow[0].response_payload as { assetId: string };
+        const err = new Error('ALREADY_COMPLETED') as Error & { assetId: string };
+        err.assetId = payload.assetId;
+        throw err;
+      }
+
+      await tx.insert(assets).values({
+        id: newAssetId,
+        organization_id: organizationId,
+        order_id: job.order_id,
+        status: 'UPLOADED',
+        name: name ?? null,
+      });
+
+      await tx.insert(auditEvents).values({
+        id: uuidv7(),
+        organization_id: organizationId,
+        entity_type: 'asset',
+        entity_id: newAssetId,
+        actor_id: actorId,
+        actor_role: actorRole,
+        action: 'MANUAL_UPLOAD_ASSET_CREATED',
+        payload: {
+          asset_id: newAssetId,
+          production_job_id: productionJobId,
+          order_id: job.order_id,
+          organization_id: organizationId,
+        },
+      });
+
+      await tx
+        .update(idempotencyKeys)
+        .set({ status: 'COMPLETED', updated_at: new Date() })
+        .where(
+          and(
+            eq(idempotencyKeys.key, idempKey),
+            eq(idempotencyKeys.organization_id, organizationId),
+          ),
+        );
+    });
+  } catch (e) {
+    if (e instanceof Error && e.message === 'ALREADY_COMPLETED') {
+      return { ok: true, assetId: (e as Error & { assetId: string }).assetId };
+    }
+    throw e;
+  }
+
+  return { ok: true, assetId: newAssetId };
+}
 
 export type MarkManualAssetResult =
   | { ok: true; recorded: boolean; reason?: string }

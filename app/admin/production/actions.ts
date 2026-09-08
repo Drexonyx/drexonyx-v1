@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { isAdminRole } from '@/lib/admin/types';
 import { createProductionJob, cancelProductionJob } from '@/lib/admin/production-jobs';
-import { markManualAssetReadyForQc, completeManualUploadJob } from '@/lib/admin/manual-upload';
+import { createManualUploadAsset, markManualAssetReadyForQc, completeManualUploadJob } from '@/lib/admin/manual-upload';
 import { createRevisionJob } from '@/lib/admin/revisions';
 import { runGenerationDriver } from '@/lib/agent/driver';
 import type { AdminRole } from '@/lib/admin/types';
@@ -63,6 +63,34 @@ export async function actionCancelProductionJob(
   return result.ok ? { ok: true } : { ok: false, reason: result.reason };
 }
 
+// DR 0091: Create an Asset at UPLOADED status for a MANUAL_UPLOAD ProductionJob.
+export async function actionCreateManualUploadAsset(
+  productionJobId: string,
+  name?: string,
+): Promise<{ ok: boolean; reason?: string; assetId?: string }> {
+  const session = await getAdminSession();
+  const { role, organizationId, userId } = session.user;
+
+  if (role !== 'OWNER' && role !== 'ADMIN_OPERATIONS' && role !== 'CREATIVE_PRODUCTION') {
+    return { ok: false, reason: 'Forbidden: insufficient authority to create MANUAL_UPLOAD asset' };
+  }
+
+  const result = await createManualUploadAsset({
+    productionJobId,
+    organizationId,
+    actorId: userId,
+    actorRole: role as AdminRole,
+    name: name?.trim() || undefined,
+  });
+
+  if (result.ok) {
+    revalidatePath('/admin/production');
+    revalidatePath('/admin/assets');
+  }
+
+  return result.ok ? { ok: true, assetId: result.assetId } : { ok: false, reason: result.reason };
+}
+
 // DR 0087: Advance a MANUAL_UPLOAD asset from UPLOADED → READY_FOR_QC, then complete the job.
 export async function actionMarkManualAssetReadyForQc(
   assetId: string,
@@ -93,7 +121,11 @@ export async function actionMarkManualAssetReadyForQc(
     actorRole: role as AdminRole,
   });
 
-  if (markResult.ok) revalidatePath('/admin/production');
+  if (markResult.ok) {
+    revalidatePath('/admin/production');
+    revalidatePath('/admin/qc');
+    revalidatePath('/admin/assets');
+  }
   return completeResult.ok ? { ok: true } : { ok: false, reason: completeResult.reason };
 }
 
@@ -121,7 +153,10 @@ export async function actionCreateRevisionJob(
     actorRole: role as AdminRole,
   });
 
-  if (result.ok) revalidatePath('/admin/production');
+  if (result.ok) {
+    revalidatePath('/admin/production');
+    revalidatePath('/admin/assets');
+  }
   return result.ok
     ? { ok: true, newProductionJobId: result.newProductionJobId }
     : { ok: false, reason: result.reason };

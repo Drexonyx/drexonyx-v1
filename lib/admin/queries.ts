@@ -1,4 +1,4 @@
-import { and, desc, eq, isNull } from 'drizzle-orm';
+import { and, desc, eq, inArray, isNull } from 'drizzle-orm';
 import { db } from '@/db/index';
 import { organizations } from '@/db/schema/core';
 import { users, orgMemberships } from '@/db/schema/identity';
@@ -137,6 +137,30 @@ export async function getAdminAssets(organizationId: string) {
     })
     .from(assets)
     .where(eq(assets.organization_id, organizationId))
+    .orderBy(desc(assets.updated_at));
+}
+
+// DR 0092 §2.9, DR 0093 §2.10: Returns UPLOADED and REVISION_REQUIRED non-archived assets
+// for the MANUAL_UPLOAD workflow and revision initiation UI surfaces.
+export async function getAdminAssetsForWorkflow(organizationId: string) {
+  return db
+    .select({
+      id: assets.id,
+      order_id: assets.order_id,
+      status: assets.status,
+      name: assets.name,
+      archived_at: assets.archived_at,
+      created_at: assets.created_at,
+      updated_at: assets.updated_at,
+    })
+    .from(assets)
+    .where(
+      and(
+        eq(assets.organization_id, organizationId),
+        isNull(assets.archived_at),
+        inArray(assets.status, ['UPLOADED', 'REVISION_REQUIRED']),
+      ),
+    )
     .orderBy(desc(assets.updated_at));
 }
 
