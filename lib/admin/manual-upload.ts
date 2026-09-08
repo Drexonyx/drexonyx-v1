@@ -256,7 +256,7 @@ export async function completeManualUploadJob(params: {
         entity_id: productionJobId,
         actor_id: actorId,
         actor_role: actorRole,
-        action: 'MANUAL_JOB_COMPLETED',
+        action: 'PRODUCTION_JOB_COMPLETED',
         payload: {
           job_type: 'MANUAL_UPLOAD',
           trigger: 'ASSET_READY_FOR_QC',

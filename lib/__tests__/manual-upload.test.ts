@@ -231,17 +231,22 @@ describe('completeManualUploadJob', () => {
     expect(result).toMatchObject({ ok: false, reason: expect.stringContaining('READY_FOR_QC') });
   });
 
-  // Test 16: successful completion
-  it('transitions job QUEUED → COMPLETED and returns ok:true', async () => {
+  // Test 16: successful completion — DR 0087 §2.2 requires action = 'PRODUCTION_JOB_COMPLETED'
+  it('transitions job QUEUED → COMPLETED and emits PRODUCTION_JOB_COMPLETED audit event', async () => {
     selectSequence([
       [],
       [{ id: 'job1', status: 'QUEUED', order_id: 'order1', job_type: 'MANUAL_UPLOAD' }],
       [{ id: 'asset1' }],
     ]);
+
+    const capturedValues: unknown[] = [];
     mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
       const tx = {
         insert: vi.fn().mockReturnValue({
-          values: vi.fn().mockReturnValue({ onConflictDoNothing: vi.fn().mockResolvedValue([]) }),
+          values: vi.fn().mockImplementation((v) => {
+            capturedValues.push(v);
+            return { onConflictDoNothing: vi.fn().mockResolvedValue([]) };
+          }),
         }),
         update: vi.fn().mockReturnValue({
           set: vi.fn().mockReturnValue({
@@ -251,8 +256,13 @@ describe('completeManualUploadJob', () => {
       };
       await fn(tx);
     });
+
     const result = await completeManualUploadJob(base);
     expect(result).toMatchObject({ ok: true });
+
+    const auditInsert = capturedValues.find((v) => (v as Record<string, unknown>).action !== undefined);
+    expect(auditInsert).toBeDefined();
+    expect((auditInsert as Record<string, unknown>).action).toBe('PRODUCTION_JOB_COMPLETED');
   });
 
   // Test 17: idempotency key already COMPLETED
