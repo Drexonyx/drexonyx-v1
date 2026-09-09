@@ -247,8 +247,9 @@
 
 /* CTA band */
 .ctaBand {
-  padding: 5rem 0;
-  background: var(--drex-surface);
+  padding: 6rem 0;
+  background: var(--drex-bg);
+  border-top: 1px solid rgba(200, 152, 10, 0.2);
   text-align: center;
 }
 
@@ -256,11 +257,21 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.25rem;
+  gap: 1.5rem;
+}
+
+.ctaBand .container::before {
+  content: '';
+  display: block;
+  width: 36px;
+  height: 2px;
+  background: #C8980A;
+  margin-bottom: 0.25rem;
 }
 
 .ctaBandHeading {
   font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 900;
   color: var(--drex-text);
   max-width: 20ch;
   text-align: center;
@@ -270,6 +281,17 @@
   font-size: 1.0625rem;
   color: var(--drex-text-secondary);
   text-align: center;
+  max-width: 46ch;
+}
+
+.ctaBand .ctaPrimary {
+  background: #C8980A;
+  color: #000;
+}
+
+.ctaBand .ctaPrimary:hover {
+  background: #b08508;
+  box-shadow: 0 8px 24px rgba(200, 152, 10, 0.3);
 }
 
 @media (max-width: 900px) {
