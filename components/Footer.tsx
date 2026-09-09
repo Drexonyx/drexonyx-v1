@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import styles from "./Footer.module.css";
 
@@ -16,8 +17,7 @@ export default function Footer() {
       <div className={styles.inner}>
         <div className={styles.brand}>
           <Link href="/" className={styles.logo} aria-label="DREXONYX home">
-            <span className={styles.logoPrimary}>DREX</span>
-            <span className={styles.logoAccent}>ONYX</span>
+            <Image src="/brand/drexonyx-logo.png" alt="DREXONYX" width={1866} height={736} className={styles.logoImg} />
           </Link>
           <p className={styles.tagline}>Performance Creative Studio</p>
         </div>
