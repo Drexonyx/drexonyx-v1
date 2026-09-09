@@ -3,7 +3,7 @@ import { db } from '@/db/index';
 import { organizations, brandDna } from '@/db/schema/core';
 import { campaigns, quotes, orders } from '@/db/schema/commercial';
 import { payments } from '@/db/schema/financial';
-import { assets, approvals, deliveries } from '@/db/schema/production';
+import { assets, approvals, deliveries, deliveryAssets } from '@/db/schema/production';
 import { auditEvents } from '@/db/schema/system';
 import { isClientQuoteStatus } from './types';
 
@@ -272,6 +272,52 @@ export async function getDeliveries(organizationId: string) {
       ),
     )
     .orderBy(desc(deliveries.created_at));
+}
+
+// DR 0099 §2.2: Returns asset IDs grouped by delivery ID for the portal deliveries download surface.
+// Only returns rows belonging to the authenticated session's organization.
+export async function getDeliveryAssetIds(organizationId: string): Promise<Map<string, string[]>> {
+  const rows = await db
+    .select({
+      delivery_id: deliveryAssets.delivery_id,
+      asset_id: deliveryAssets.asset_id,
+    })
+    .from(deliveryAssets)
+    .where(eq(deliveryAssets.organization_id, organizationId));
+
+  const map = new Map<string, string[]>();
+  for (const row of rows) {
+    const existing = map.get(row.delivery_id) ?? [];
+    existing.push(row.asset_id);
+    map.set(row.delivery_id, existing);
+  }
+  return map;
+}
+
+// DR 0098 §2.2: Returns a map of asset_id → file_key for use in server-side signed URL generation.
+// Scoped to the authenticated organization; archived assets are excluded.
+export async function getAssetFileKeys(
+  organizationId: string,
+  assetIds: string[],
+): Promise<Map<string, string>> {
+  if (assetIds.length === 0) return new Map();
+
+  const rows = await db
+    .select({ id: assets.id, file_key: assets.file_key })
+    .from(assets)
+    .where(
+      and(
+        eq(assets.organization_id, organizationId),
+        inArray(assets.id, assetIds),
+        isNull(assets.archived_at),
+      ),
+    );
+
+  const map = new Map<string, string>();
+  for (const row of rows) {
+    if (row.file_key) map.set(row.id, row.file_key);
+  }
+  return map;
 }
 
 // DR 0088 §2.6: Returns the set of asset IDs for which a REVISION_INITIATED audit event exists.

@@ -2,11 +2,20 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ─── Hoisted mocks ────────────────────────────────────────────────────────────
 
-const { mockSelect, mockInsert, mockUpdate, mockTransaction } = vi.hoisted(() => ({
+const {
+  mockSelect,
+  mockInsert,
+  mockUpdate,
+  mockTransaction,
+  mockSendDeliveryEmail,
+  mockGenerateSignedUrl,
+} = vi.hoisted(() => ({
   mockSelect: vi.fn(),
   mockInsert: vi.fn(),
   mockUpdate: vi.fn(),
   mockTransaction: vi.fn(),
+  mockSendDeliveryEmail: vi.fn(),
+  mockGenerateSignedUrl: vi.fn(),
 }));
 
 vi.mock('@/db/index', () => ({
@@ -20,6 +29,14 @@ vi.mock('@/db/index', () => ({
 
 vi.mock('uuidv7', () => ({ uuidv7: () => 'test-uuid' }));
 
+vi.mock('@/lib/email/delivery', () => ({
+  sendDeliveryEmail: mockSendDeliveryEmail,
+}));
+
+vi.mock('@/lib/infrastructure/object-storage', () => ({
+  generateSignedUrl: mockGenerateSignedUrl,
+}));
+
 import {
   createDelivery,
   sendDelivery,
@@ -31,37 +48,40 @@ import {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function makeSelectChain(result: unknown[]) {
-  const end = vi.fn().mockResolvedValue(result);
-  return {
-    from: vi.fn().mockReturnThis(),
-    where: vi.fn().mockReturnThis(),
-    limit: end,
-    // For count queries that don't call .limit()
-    then: undefined,
+  const terminal = {
+    limit: vi.fn().mockResolvedValue(result),
+    then: (onFulfilled: (v: unknown[]) => void, onRejected?: (e: unknown) => void) =>
+      Promise.resolve(result).then(onFulfilled, onRejected),
   };
+  const chain: Record<string, ReturnType<typeof vi.fn>> = {
+    from: vi.fn(),
+    innerJoin: vi.fn(),
+    where: vi.fn().mockReturnValue(terminal),
+  };
+  chain.from.mockReturnValue(chain);
+  chain.innerJoin.mockReturnValue(chain);
+  return chain;
 }
 
-// count() queries don't call .limit() — they resolve directly from .where()
-function makeCountSelectChain(result: unknown[]) {
-  const end = vi.fn().mockResolvedValue(result);
-  return { from: vi.fn().mockReturnThis(), where: end };
-}
-
-function selectSequence(results: Array<{ type: 'limit' | 'count'; data: unknown[] }>) {
+function selectSequence(results: unknown[][]) {
   let call = 0;
   mockSelect.mockImplementation(() => {
-    const spec = results[call];
+    const result = results[call] ?? [];
     call++;
-    if (!spec) return makeSelectChain([]);
-    if (spec.type === 'count') return makeCountSelectChain(spec.data);
-    return makeSelectChain(spec.data);
+    return makeSelectChain(result);
   });
 }
 
 function makeTx() {
   return {
-    insert: vi.fn().mockReturnValue({ values: vi.fn().mockReturnValue({ onConflictDoNothing: vi.fn().mockResolvedValue([]) }) }),
-    update: vi.fn().mockReturnValue({ set: vi.fn().mockReturnValue({ where: vi.fn().mockReturnValue({ returning: vi.fn().mockResolvedValue([{ id: 'del1' }]) }) }) }),
+    insert: vi.fn().mockReturnValue({
+      values: vi.fn().mockReturnValue({ onConflictDoNothing: vi.fn().mockResolvedValue([]) }),
+    }),
+    update: vi.fn().mockReturnValue({
+      set: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({ returning: vi.fn().mockResolvedValue([{ id: 'del1' }]) }),
+      }),
+    }),
   };
 }
 
@@ -90,31 +110,22 @@ describe('createDelivery', () => {
   });
 
   it('returns ok:false when order not found', async () => {
-    selectSequence([{ type: 'limit', data: [] }]);
+    selectSequence([[]]);
     const result = await createDelivery(base);
     expect(result).toMatchObject({ ok: false, reason: 'Order not found' });
   });
 
   it('returns ok:false when order not ACTIVE (DR 0034)', async () => {
-    selectSequence([{ type: 'limit', data: [{ id: 'order1', status: 'COMPLETED' }] }]);
+    selectSequence([[{ id: 'order1', status: 'COMPLETED' }]]);
     const result = await createDelivery(base);
     expect(result).toMatchObject({ ok: false, reason: expect.stringContaining('ACTIVE') });
   });
 
   it('blocks and audits when no approvals exist (DR 0034)', async () => {
     selectSequence([
-      { type: 'limit', data: [{ id: 'order1', status: 'ACTIVE' }] },
-      { type: 'limit', data: [] }, // no approvals — getAdminApprovals doesn't use .limit()
+      [{ id: 'order1', status: 'ACTIVE' }],
+      [], // no approvals
     ]);
-    // The approvals query doesn't call .limit() so we need different mocking
-    let call = 0;
-    mockSelect.mockImplementation(() => {
-      call++;
-      if (call === 1) return makeSelectChain([{ id: 'order1', status: 'ACTIVE' }]); // order
-      // approvals — no limit call
-      const noApprovals = vi.fn().mockResolvedValue([]);
-      return { from: vi.fn().mockReturnThis(), where: noApprovals };
-    });
     mockInsert.mockReturnValue({ values: vi.fn().mockResolvedValue([]) });
 
     const result = await createDelivery(base);
@@ -123,13 +134,10 @@ describe('createDelivery', () => {
   });
 
   it('blocks when approvals exist but not all APPROVED (DR 0034)', async () => {
-    let call = 0;
-    mockSelect.mockImplementation(() => {
-      call++;
-      if (call === 1) return makeSelectChain([{ id: 'order1', status: 'ACTIVE' }]);
-      const pendingApproval = vi.fn().mockResolvedValue([{ id: 'a1', status: 'PENDING' }]);
-      return { from: vi.fn().mockReturnThis(), where: pendingApproval };
-    });
+    selectSequence([
+      [{ id: 'order1', status: 'ACTIVE' }],
+      [{ id: 'a1', status: 'PENDING' }],
+    ]);
     mockInsert.mockReturnValue({ values: vi.fn().mockResolvedValue([]) });
 
     const result = await createDelivery(base);
@@ -137,18 +145,11 @@ describe('createDelivery', () => {
   });
 
   it('creates delivery when all gates pass', async () => {
-    let call = 0;
-    mockSelect.mockImplementation(() => {
-      call++;
-      if (call === 1) return makeSelectChain([{ id: 'order1', status: 'ACTIVE' }]);
-      if (call === 2) {
-        const approvedApprovals = vi.fn().mockResolvedValue([{ id: 'a1', status: 'APPROVED' }]);
-        return { from: vi.fn().mockReturnThis(), where: approvedApprovals };
-      }
-      // assets
-      const assetList = vi.fn().mockResolvedValue([{ id: 'asset1', order_id: 'order1' }]);
-      return { from: vi.fn().mockReturnThis(), where: assetList };
-    });
+    selectSequence([
+      [{ id: 'order1', status: 'ACTIVE' }],
+      [{ id: 'a1', status: 'APPROVED' }],
+      [{ id: 'asset1', order_id: 'order1' }],
+    ]);
     mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
       await fn(makeTx());
     });
@@ -194,14 +195,74 @@ describe('sendDelivery', () => {
     expect(result).toMatchObject({ ok: false });
   });
 
-  it('transitions PREPARING→SENDING', async () => {
-    mockSelect.mockReturnValue(makeSelectChain([{ id: 'del1', status: 'PREPARING' }]));
+  it('transitions PREPARING→SENDING and writes DELIVERY_SENT audit', async () => {
+    let selectCall = 0;
+    mockSelect.mockImplementation(() => {
+      selectCall++;
+      if (selectCall === 1) return makeSelectChain([{ id: 'del1', status: 'PREPARING' }]);
+      if (selectCall === 2) return makeSelectChain([]); // assetRows — no file_keys
+      if (selectCall === 3) return makeSelectChain([]); // orgRows
+      return makeSelectChain([]); // memberRows — no recipients
+    });
     mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
       await fn(makeTx());
     });
+    mockInsert.mockReturnValue({ values: vi.fn().mockResolvedValue([]) });
 
     const result = await sendDelivery(base);
     expect(result).toMatchObject({ ok: true });
+    expect(mockInsert).toHaveBeenCalled(); // DELIVERY_SENT audit
+  });
+
+  it('dispatches email when assets have file_keys and CLIENT members exist', async () => {
+    let selectCall = 0;
+    mockSelect.mockImplementation(() => {
+      selectCall++;
+      if (selectCall === 1) return makeSelectChain([{ id: 'del1', status: 'PREPARING' }]);
+      if (selectCall === 2) return makeSelectChain([
+        { asset_id: 'asset1', name: 'Hero Video', file_key: 'files/asset1.mp4' },
+      ]);
+      if (selectCall === 3) return makeSelectChain([{ name: 'Acme Corp' }]);
+      return makeSelectChain([{ email: 'client@example.com' }]);
+    });
+    mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
+      await fn(makeTx());
+    });
+    mockGenerateSignedUrl.mockResolvedValue('https://r2.example.com/signed?token=abc');
+    mockSendDeliveryEmail.mockResolvedValue(undefined);
+    mockInsert.mockReturnValue({ values: vi.fn().mockResolvedValue([]) });
+
+    const result = await sendDelivery(base);
+    expect(result).toMatchObject({ ok: true });
+    expect(mockSendDeliveryEmail).toHaveBeenCalledOnce();
+    const emailArgs = mockSendDeliveryEmail.mock.calls[0][0] as Record<string, unknown>;
+    expect(emailArgs.to).toEqual(['client@example.com']);
+    expect(emailArgs.organizationName).toBe('Acme Corp');
+  });
+
+  it('compensates delivery to PREPARING and returns email_dispatch_failed on email failure', async () => {
+    let selectCall = 0;
+    mockSelect.mockImplementation(() => {
+      selectCall++;
+      if (selectCall === 1) return makeSelectChain([{ id: 'del1', status: 'PREPARING' }]);
+      if (selectCall === 2) return makeSelectChain([
+        { asset_id: 'asset1', name: 'Hero Video', file_key: 'files/asset1.mp4' },
+      ]);
+      if (selectCall === 3) return makeSelectChain([{ name: 'Acme Corp' }]);
+      return makeSelectChain([{ email: 'client@example.com' }]);
+    });
+    mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
+      await fn(makeTx());
+    });
+    mockGenerateSignedUrl.mockResolvedValue('https://r2.example.com/signed?token=abc');
+    mockSendDeliveryEmail.mockRejectedValue(new Error('Resend error: rate limit'));
+    mockUpdate.mockReturnValue({
+      set: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([]) }),
+    });
+
+    const result = await sendDelivery(base);
+    expect(result).toMatchObject({ ok: false, reason: 'email_dispatch_failed' });
+    expect(mockUpdate).toHaveBeenCalled(); // compensating update to PREPARING
   });
 });
 
@@ -241,30 +302,21 @@ describe('completeDelivery', () => {
   });
 
   it('returns ok:false when delivery has no assets (DR 0037 §2.4)', async () => {
-    let call = 0;
-    mockSelect.mockImplementation(() => {
-      call++;
-      if (call === 1) return makeSelectChain([{ id: 'del1', status: 'SENDING' }]);
-      // count query — no .limit()
-      const noAssets = vi.fn().mockResolvedValue([{ count: 0 }]);
-      return { from: vi.fn().mockReturnThis(), where: noAssets };
-    });
+    selectSequence([
+      [{ id: 'del1', status: 'SENDING' }],
+      [{ count: 0 }], // count query for assets
+    ]);
 
     const result = await completeDelivery(base);
     expect(result).toMatchObject({ ok: false, reason: expect.stringContaining('no associated assets') });
   });
 
   it('transitions SENDING→COMPLETED with assets present', async () => {
-    let call = 0;
-    mockSelect.mockImplementation(() => {
-      call++;
-      if (call === 1) return makeSelectChain([{ id: 'del1', status: 'SENDING' }]);
-      if (call === 2) {
-        const assetCount = vi.fn().mockResolvedValue([{ count: 2 }]);
-        return { from: vi.fn().mockReturnThis(), where: assetCount };
-      }
-      return makeSelectChain([]); // idempotency check
-    });
+    selectSequence([
+      [{ id: 'del1', status: 'SENDING' }],
+      [{ count: 2 }], // count
+      [], // idempotency check
+    ]);
     mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
       await fn(makeTx());
     });

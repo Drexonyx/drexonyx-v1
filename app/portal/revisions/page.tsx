@@ -1,6 +1,7 @@
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import { getClientAssets, getRevisionInitiatedAssetIds } from '@/lib/portal/queries';
+import { RevisionRequestButton } from './RevisionRequestButton';
 import s from '../portal.module.css';
 
 export const metadata = { title: 'Revisions — Client Portal' };
@@ -35,6 +36,7 @@ export default async function RevisionsPage() {
                 <th>Asset ID</th>
                 <th>Status</th>
                 <th>Updated</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -47,10 +49,16 @@ export default async function RevisionsPage() {
                       {initiated ? (
                         <span className={`${s.badge} ${s.badgeWarning}`}>Revision in Progress</span>
                       ) : (
-                        <span className={`${s.badge} ${s.badgeNeutral}`}>Revision Pending — Pending Scheduling</span>
+                        <span className={`${s.badge} ${s.badgeNeutral}`}>
+                          Revision Pending — Pending Scheduling
+                        </span>
                       )}
                     </td>
                     <td className={s.cellMono}>{new Date(a.updated_at).toLocaleDateString()}</td>
+                    <td>
+                      {/* DR 0100 §2.6: Show "Request Revision" only for assets with no REVISION_INITIATED event */}
+                      {!initiated ? <RevisionRequestButton assetId={a.id} /> : null}
+                    </td>
                   </tr>
                 );
               })}

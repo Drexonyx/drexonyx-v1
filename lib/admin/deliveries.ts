@@ -8,10 +8,17 @@
 import { db } from '@/db/index';
 import { approvals, assets, deliveries, deliveryAssets } from '@/db/schema/production';
 import { orders } from '@/db/schema/commercial';
+import { organizations } from '@/db/schema/core';
+import { orgMemberships, users } from '@/db/schema/identity';
 import { auditEvents, idempotencyKeys } from '@/db/schema/system';
 import { and, count, eq, isNull } from 'drizzle-orm';
 import { uuidv7 } from 'uuidv7';
 import type { AdminRole } from './types';
+import { generateSignedUrl } from '@/lib/infrastructure/object-storage';
+import { sendDeliveryEmail } from '@/lib/email/delivery';
+
+// DR 0099 §2.4: 7-day signed URL TTL for transactional delivery emails.
+const DELIVERY_EMAIL_URL_EXPIRY_SECONDS = 604800;
 
 const MANAGE_ROLES: AdminRole[] = ['OWNER', 'ADMIN_OPERATIONS'];
 
@@ -283,6 +290,101 @@ export async function sendDelivery(params: {
       return { ok: true };
     }
     throw e;
+  }
+
+  // DR 0099 §2.3: Post-transaction email dispatch at PREPARING→SENDING transition.
+  // Email failure triggers compensating rollback of delivery status to PREPARING.
+  try {
+    const assetRows = await db
+      .select({
+        asset_id: deliveryAssets.asset_id,
+        name: assets.name,
+        file_key: assets.file_key,
+      })
+      .from(deliveryAssets)
+      .innerJoin(assets, eq(assets.id, deliveryAssets.asset_id))
+      .where(
+        and(
+          eq(deliveryAssets.delivery_id, deliveryId),
+          eq(deliveryAssets.organization_id, organizationId),
+        ),
+      );
+
+    const orgRows = await db
+      .select({ name: organizations.name })
+      .from(organizations)
+      .where(eq(organizations.id, organizationId))
+      .limit(1);
+    const organizationName = orgRows[0]?.name ?? organizationId;
+
+    // DR 0099 §2.6: Resolve recipients from identity.org_memberships JOIN identity.users.
+    // Only active CLIENT-role members of the delivery's organization.
+    const memberRows = await db
+      .select({ email: users.email })
+      .from(orgMemberships)
+      .innerJoin(users, eq(users.id, orgMemberships.user_id))
+      .where(
+        and(
+          eq(orgMemberships.organization_id, organizationId),
+          eq(orgMemberships.role, 'CLIENT'),
+          isNull(orgMemberships.archived_at),
+          isNull(users.archived_at),
+        ),
+      );
+
+    const toEmails = memberRows.map((r) => r.email);
+
+    const assetLinks: Array<{ assetId: string; assetName: string; url: string; expiresAt: string }> = [];
+    for (const row of assetRows) {
+      if (row.file_key) {
+        const url = await generateSignedUrl(row.file_key, DELIVERY_EMAIL_URL_EXPIRY_SECONDS);
+        const expiresAt = new Date(Date.now() + DELIVERY_EMAIL_URL_EXPIRY_SECONDS * 1000).toISOString();
+        assetLinks.push({
+          assetId: row.asset_id,
+          assetName: row.name ?? row.asset_id,
+          url,
+          expiresAt,
+        });
+      }
+    }
+
+    const emailDispatched = toEmails.length > 0 && assetLinks.length > 0;
+    if (emailDispatched) {
+      await sendDeliveryEmail({
+        to: toEmails,
+        deliveryId,
+        organizationName,
+        assetLinks,
+      });
+    }
+
+    await db.insert(auditEvents).values({
+      id: uuidv7(),
+      organization_id: organizationId,
+      entity_type: 'delivery',
+      entity_id: deliveryId,
+      actor_id: actorId,
+      actor_role: actorRole,
+      action: 'DELIVERY_SENT',
+      payload: {
+        delivery_id: deliveryId,
+        emailDispatched,
+        recipientCount: toEmails.length,
+        assetCount: assetLinks.length,
+        organization_id: organizationId,
+      },
+    });
+  } catch {
+    await db
+      .update(deliveries)
+      .set({ status: 'PREPARING', updated_at: new Date() })
+      .where(
+        and(
+          eq(deliveries.id, deliveryId),
+          eq(deliveries.organization_id, organizationId),
+        ),
+      );
+    return { ok: false, reason: 'email_dispatch_failed' };
   }
 
   return { ok: true };
