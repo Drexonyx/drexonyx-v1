@@ -37,77 +37,30 @@ export default function HomePage() {
 
           {/* Cinematic right-side visual */}
           <div className={styles.heroVisual} aria-hidden="true">
-            <div className={styles.heroMarkWrap}>
-              <svg
-                className={styles.heroSvg}
-                viewBox="0 0 400 330"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <defs>
-                  <radialGradient id="hglow" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stopColor="#C8980A" stopOpacity="0.22" />
-                    <stop offset="100%" stopColor="#C8980A" stopOpacity="0" />
-                  </radialGradient>
-                  <linearGradient id="hgold" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#7A5800" stopOpacity="0.85" />
-                    <stop offset="40%" stopColor="#F5C842" stopOpacity="1" />
-                    <stop offset="100%" stopColor="#7A5800" stopOpacity="0.85" />
-                  </linearGradient>
-                  <linearGradient id="hsilver" x1="100%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor="#F4F4F5" stopOpacity="0.06" />
-                    <stop offset="50%" stopColor="#F4F4F5" stopOpacity="0.10" />
-                    <stop offset="100%" stopColor="#F4F4F5" stopOpacity="0.06" />
-                  </linearGradient>
-                </defs>
-
-                {/* Ambient glow */}
-                <ellipse cx="197" cy="165" rx="175" ry="140" fill="url(#hglow)" />
-
-                {/* Outer angular frame — D-inspired geometry */}
-                <path
-                  d="M 44,28 L 44,302 L 250,302 L 318,266 L 318,64 L 250,28 Z"
-                  stroke="rgba(244,244,245,0.10)"
-                  strokeWidth="1.5"
-                />
-
-                {/* Inner frame — hollow depth */}
-                <path
-                  d="M 86,70 L 86,260 L 210,260 L 268,232 L 268,98 L 210,70 Z"
-                  stroke="rgba(244,244,245,0.06)"
-                  strokeWidth="1"
-                />
-
-                {/* Gold diagonal bar — upper-right to lower-left (X primary accent) */}
-                <path d="M 218,28 L 318,64 L 176,302 L 76,266 Z" fill="url(#hgold)" opacity="0.82" />
-
-                {/* Silver counter-diagonal — upper-left to lower-right */}
-                <path d="M 76,64 L 176,28 L 318,266 L 218,302 Z" fill="url(#hsilver)" />
-
-                {/* Viewfinder corner brackets */}
-                <path d="M 16,50 L 16,16 L 50,16" stroke="#C8980A" strokeWidth="1.75" opacity="0.85" />
-                <path d="M 384,50 L 384,16 L 350,16" stroke="#C8980A" strokeWidth="1.75" opacity="0.85" />
-                <path d="M 16,280 L 16,314 L 50,314" stroke="#C8980A" strokeWidth="1.75" opacity="0.85" />
-                <path d="M 384,280 L 384,314 L 350,314" stroke="#C8980A" strokeWidth="1.75" opacity="0.85" />
-
-                {/* Center crosshair at X intersection */}
-                <circle cx="197" cy="165" r="5" fill="#C8980A" opacity="0.9" />
-                <circle cx="197" cy="165" r="18" stroke="#C8980A" strokeWidth="0.75" opacity="0.45" />
-                <line x1="179" y1="165" x2="148" y2="165" stroke="#C8980A" strokeWidth="0.75" opacity="0.4" />
-                <line x1="215" y1="165" x2="246" y2="165" stroke="#C8980A" strokeWidth="0.75" opacity="0.4" />
-                <line x1="197" y1="147" x2="197" y2="120" stroke="#C8980A" strokeWidth="0.75" opacity="0.4" />
-                <line x1="197" y1="183" x2="197" y2="210" stroke="#C8980A" strokeWidth="0.75" opacity="0.4" />
-
-                {/* Subtle horizontal axis rules */}
-                <line x1="44" y1="165" x2="140" y2="165" stroke="rgba(244,244,245,0.04)" strokeWidth="1" />
-                <line x1="260" y1="165" x2="318" y2="165" stroke="rgba(244,244,245,0.04)" strokeWidth="1" />
-
-                {/* Angular corner accent squares */}
-                <rect x="246" y="24" width="8" height="8" fill="#C8980A" opacity="0.65" />
-                <rect x="314" y="60" width="8" height="8" fill="#C8980A" opacity="0.65" />
-                <rect x="44" y="24" width="8" height="8" fill="rgba(244,244,245,0.18)" />
-                <rect x="44" y="298" width="8" height="8" fill="rgba(244,244,245,0.18)" />
-              </svg>
+            <div className={styles.studioPanel}>
+              <div className={styles.studioBar}>
+                <span className={styles.studioRec}>
+                  <span className={styles.recDot} />
+                  REC
+                </span>
+                <span className={styles.studioName}>DREXONYX STUDIO</span>
+                <span className={styles.studioBadge}>4K</span>
+              </div>
+              <div className={styles.studioScreen}>
+                <div className={styles.screenBg} />
+                <div className={styles.screenGlow} />
+                <div className={styles.shaft1} />
+                <div className={styles.shaft2} />
+                <div className={styles.vignette} />
+                <div className={styles.scanLines} />
+                <div className={styles.letterboxTop} />
+                <div className={styles.letterboxBot} />
+              </div>
+              <div className={`${styles.studioBar} ${styles.studioBarBottom}`}>
+                <span className={styles.timecode}>00:00:00:00</span>
+                <span className={styles.frameTag}>UGC · PERF CREATIVE</span>
+                <span className={styles.aspect}>16:9</span>
+              </div>
             </div>
           </div>
         </div>
