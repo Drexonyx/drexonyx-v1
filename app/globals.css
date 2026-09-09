@@ -12,9 +12,9 @@
   --drex-text-muted: #52525b;
 
   /* Accent */
-  --drex-accent: #f97316;
-  --drex-accent-dim: #c2410c;
-  --drex-accent-subtle: rgba(249, 115, 22, 0.12);
+  --drex-accent: #C8980A;
+  --drex-accent-dim: #b08508;
+  --drex-accent-subtle: rgba(200, 152, 10, 0.12);
 
   /* Layout */
   --drex-container: 1200px;

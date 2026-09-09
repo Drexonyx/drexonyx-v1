@@ -1,7 +1,7 @@
 .hero {
   padding: 5rem 0 4rem;
   border-bottom: 1px solid var(--drex-border);
-  background: radial-gradient(ellipse 60% 40% at 50% -5%, rgba(249, 115, 22, 0.07) 0%, transparent 70%);
+  background: radial-gradient(ellipse 60% 40% at 50% -5%, rgba(200, 152, 10, 0.07) 0%, transparent 70%);
 }
 
 .heroBadge {
@@ -14,7 +14,7 @@
   text-transform: uppercase;
   color: var(--drex-accent);
   background: var(--drex-accent-subtle);
-  border: 1px solid rgba(249, 115, 22, 0.25);
+  border: 1px solid rgba(200, 152, 10, 0.25);
   border-radius: 100px;
 }
 
@@ -66,7 +66,7 @@
 
 .filterBtnActive {
   color: var(--drex-accent);
-  border-color: rgba(249, 115, 22, 0.4);
+  border-color: rgba(200, 152, 10, 0.4);
   background: var(--drex-accent-subtle);
 }
 
@@ -89,7 +89,7 @@
 }
 
 .portfolioCard:hover {
-  border-color: rgba(249, 115, 22, 0.25);
+  border-color: rgba(200, 152, 10, 0.25);
   transform: translateY(-2px);
 }
 
@@ -189,7 +189,7 @@
 .ctaPrimary:hover {
   background: var(--drex-accent-dim);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(249, 115, 22, 0.3);
+  box-shadow: 0 8px 24px rgba(200, 152, 10, 0.3);
 }
 
 @media (max-width: 900px) {
