@@ -1,0 +1,258 @@
+/* Hero */
+.hero {
+  padding: 6rem 0 5rem;
+  border-bottom: 1px solid var(--drex-border);
+  background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(249, 115, 22, 0.08) 0%, transparent 70%);
+}
+
+.heroInner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+.heroBadge {
+  display: inline-block;
+  padding: 0.3rem 0.875rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--drex-accent);
+  background: var(--drex-accent-subtle);
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  border-radius: 100px;
+}
+
+.heroHeading {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  color: var(--drex-text);
+}
+
+.heroAccent {
+  color: var(--drex-accent);
+}
+
+.heroSub {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: var(--drex-text-secondary);
+  max-width: 52ch;
+  line-height: 1.7;
+}
+
+.heroCtas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+/* Shared CTA styles */
+.ctaPrimary {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.75rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--drex-accent);
+  border-radius: 8px;
+  transition: background var(--drex-duration) var(--drex-ease),
+    transform var(--drex-duration) var(--drex-ease),
+    box-shadow var(--drex-duration) var(--drex-ease);
+}
+
+.ctaPrimary:hover {
+  background: var(--drex-accent-dim);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(249, 115, 22, 0.3);
+}
+
+.ctaSecondary {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.75rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--drex-text-secondary);
+  background: transparent;
+  border: 1px solid var(--drex-border);
+  border-radius: 8px;
+  transition: color var(--drex-duration) var(--drex-ease),
+    border-color var(--drex-duration) var(--drex-ease),
+    background var(--drex-duration) var(--drex-ease);
+}
+
+.ctaSecondary:hover {
+  color: var(--drex-text);
+  border-color: var(--drex-text-muted);
+  background: var(--drex-elevated);
+}
+
+/* Section labels */
+.sectionLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--drex-accent);
+  margin-bottom: 2.5rem;
+}
+
+.sectionHeading {
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  color: var(--drex-text);
+  margin-bottom: 1rem;
+}
+
+.sectionSub {
+  font-size: 1.0625rem;
+  color: var(--drex-text-secondary);
+  margin-bottom: 3rem;
+}
+
+/* Pillars */
+.pillars {
+  padding: 5rem 0;
+  border-bottom: 1px solid var(--drex-border);
+}
+
+.pillarsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.pillar {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 2rem;
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: 12px;
+  transition: border-color var(--drex-duration) var(--drex-ease);
+}
+
+.pillar:hover {
+  border-color: rgba(249, 115, 22, 0.3);
+}
+
+.pillarIcon {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--drex-accent);
+  font-family: var(--font-geist-mono), monospace;
+}
+
+.pillarHeading {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--drex-text);
+}
+
+.pillarBody {
+  font-size: 0.9375rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.65;
+}
+
+/* Services teaser */
+.serviceTeaser {
+  padding: 5rem 0;
+  border-bottom: 1px solid var(--drex-border);
+}
+
+.serviceTeaserGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.serviceTeaserCard {
+  padding: 1.75rem;
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: 10px;
+  transition: border-color var(--drex-duration) var(--drex-ease);
+}
+
+.serviceTeaserCard:hover {
+  border-color: rgba(249, 115, 22, 0.25);
+}
+
+.serviceTeaserTitle {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--drex-text);
+  margin-bottom: 0.5rem;
+}
+
+.serviceTeaserDesc {
+  font-size: 0.9375rem;
+  color: var(--drex-text-secondary);
+}
+
+.serviceTeaserCta {
+  display: flex;
+}
+
+/* CTA band */
+.ctaBand {
+  padding: 5rem 0;
+  background: var(--drex-surface);
+  text-align: center;
+}
+
+.ctaBand .container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.ctaBandHeading {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  color: var(--drex-text);
+  max-width: 20ch;
+  text-align: center;
+}
+
+.ctaBandSub {
+  font-size: 1.0625rem;
+  color: var(--drex-text-secondary);
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .pillarsGrid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding: 4rem 0 3.5rem;
+  }
+
+  .serviceTeaserGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .heroCtas {
+    flex-direction: column;
+  }
+
+  .ctaPrimary,
+  .ctaSecondary {
+    width: 100%;
+    justify-content: center;
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1788502184008,
+      "tag": "0000_motionless_lightspeed",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788521544012,
+      "tag": "0001_mixed_shard",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788540015000,
+      "tag": "0002_quote_cost_pricing_configs",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1788545951000,
+      "tag": "0003_phase07_payments",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1788595391000,
+      "tag": "0004_phase08_production_queue",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1788626493000,
+      "tag": "0005_phase09_agent_runtime",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788633419000,
+      "tag": "0006_phase10_skills",
+      "breakpoints": true
+    }
+  ]
+}
