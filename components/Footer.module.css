@@ -20,19 +20,14 @@
 }
 
 .logo {
-  font-size: 1.25rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  line-height: 1;
+  display: flex;
+  align-items: center;
 }
 
-.logoPrimary {
-  color: var(--drex-text);
-}
-
-.logoAccent {
-  color: var(--drex-accent);
+.logoImg {
+  height: 38px;
+  width: auto;
+  display: block;
 }
 
 .tagline {

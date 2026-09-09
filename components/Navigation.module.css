@@ -24,20 +24,15 @@
 
 /* Logo */
 .logo {
-  font-size: 1.25rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   flex-shrink: 0;
-  line-height: 1;
+  display: flex;
+  align-items: center;
 }
 
-.logoPrimary {
-  color: var(--drex-text);
-}
-
-.logoAccent {
-  color: var(--drex-accent);
+.logoImg {
+  height: 32px;
+  width: auto;
+  display: block;
 }
 
 /* Desktop nav links */
