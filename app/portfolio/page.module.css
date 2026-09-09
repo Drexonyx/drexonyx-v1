@@ -158,17 +158,19 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 1.25rem;
+  gap: 0;
 }
 
 .ctaBandHeading {
   font-size: clamp(1.75rem, 4vw, 2.5rem);
   color: var(--drex-text);
+  margin-bottom: 1rem;
 }
 
 .ctaBandSub {
   font-size: 1.0625rem;
   color: var(--drex-text-secondary);
+  margin-bottom: 1.375rem;
 }
 
 .ctaPrimary {
@@ -180,7 +182,6 @@
   color: #fff;
   background: var(--drex-accent);
   border-radius: 8px;
-  margin-top: 0.25rem;
   transition: background var(--drex-duration) var(--drex-ease),
     transform var(--drex-duration) var(--drex-ease),
     box-shadow var(--drex-duration) var(--drex-ease);
