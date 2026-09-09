@@ -14,6 +14,17 @@ export default function HomePage() {
     <>
       {/* Hero */}
       <section className={styles.hero} aria-labelledby="hero-heading">
+        {/* Full-bleed cinematic background */}
+        <div className={styles.heroBg} aria-hidden="true">
+          <Image
+            src="/images/drexonyx-hero-final.webp"
+            alt=""
+            fill
+            className={styles.heroBgImg}
+            priority
+          />
+        </div>
+
         <div className={`container ${styles.heroInner}`}>
           <div className={styles.heroContent}>
             <div className={styles.heroBadge}>Performance Creative Studio</div>
@@ -33,20 +44,6 @@ export default function HomePage() {
               <Link href="/how-it-works" className={styles.ctaSecondary}>
                 See How It Works
               </Link>
-            </div>
-          </div>
-
-          {/* Cinematic right-side visual */}
-          <div className={styles.heroVisual} aria-hidden="true">
-            <div className={styles.heroCinematicWrap}>
-              <Image
-                src="/images/drexonyx-hero.webp"
-                alt=""
-                width={1774}
-                height={887}
-                className={styles.heroCinematicImg}
-                priority
-              />
             </div>
           </div>
         </div>

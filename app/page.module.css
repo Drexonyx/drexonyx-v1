@@ -1,15 +1,39 @@
 /* Hero */
 .hero {
-  padding: 6rem 0 5rem;
+  position: relative;
+  overflow: hidden;
+  min-height: 640px;
+  display: flex;
+  align-items: center;
   border-bottom: 1px solid var(--drex-border);
-  background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(200, 152, 10, 0.07) 0%, transparent 70%);
+}
+
+/* Full-bleed background image */
+.heroBg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.heroBg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to right, rgba(6, 6, 6, 0.90) 0%, rgba(6, 6, 6, 0.65) 40%, rgba(6, 6, 6, 0.10) 75%, transparent 100%),
+    linear-gradient(to top, rgba(6, 6, 6, 0.40) 0%, transparent 30%);
+  z-index: 1;
+}
+
+.heroBgImg {
+  object-fit: cover;
+  object-position: center;
 }
 
 .heroInner {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  gap: 4rem;
+  position: relative;
+  z-index: 1;
+  padding: 6rem 0 5.5rem;
 }
 
 .heroContent {
@@ -17,42 +41,7 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 1.5rem;
-}
-
-/* Cinematic hero image */
-.heroVisual {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.heroCinematicWrap {
-  width: 100%;
-  max-width: 520px;
-  border-radius: 6px;
-  overflow: hidden;
-  box-shadow:
-    0 0 0 1px rgba(200, 152, 10, 0.12),
-    0 32px 80px rgba(0, 0, 0, 0.65),
-    0 0 60px rgba(200, 152, 10, 0.07);
-  animation: heroFloat 10s ease-in-out infinite;
-}
-
-.heroCinematicImg {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-@keyframes heroFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .heroCinematicWrap {
-    animation: none;
-  }
+  max-width: 560px;
 }
 
 .heroBadge {
@@ -284,16 +273,6 @@
 }
 
 @media (max-width: 900px) {
-  .heroInner {
-    grid-template-columns: 1fr;
-    gap: 3rem;
-  }
-
-  .heroVisual {
-    max-width: 420px;
-    margin: 0 auto;
-  }
-
   .pillarsGrid {
     grid-template-columns: 1fr;
     gap: 1.25rem;
@@ -302,7 +281,15 @@
 
 @media (max-width: 640px) {
   .hero {
-    padding: 4rem 0 3.5rem;
+    min-height: 520px;
+  }
+
+  .heroInner {
+    padding: 4rem 0 4.5rem;
+  }
+
+  .heroContent {
+    max-width: 100%;
   }
 
   .serviceTeaserGrid {
