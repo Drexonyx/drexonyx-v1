@@ -17,7 +17,7 @@ export default function Footer() {
       <div className={styles.inner}>
         <div className={styles.brand}>
           <Link href="/" className={styles.logo} aria-label="DREXONYX home">
-            <Image src="/brand/drexonyx-logo.png" alt="DREXONYX" width={1866} height={736} className={styles.logoImg} />
+            <Image src="/brand/drexonyx-web-lockup.png" alt="DREXONYX" width={1866} height={736} className={styles.logoImg} />
           </Link>
           <p className={styles.tagline}>Performance Creative Studio</p>
         </div>

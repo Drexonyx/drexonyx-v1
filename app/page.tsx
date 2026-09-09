@@ -40,12 +40,11 @@ export default function HomePage() {
           <div className={styles.heroVisual} aria-hidden="true">
             <div className={styles.heroCinematicWrap}>
               <Image
-                src="/images/hero-cinematic.svg"
+                src="/images/drexonyx-hero.webp"
                 alt=""
-                width={960}
-                height={600}
+                width={1774}
+                height={887}
                 className={styles.heroCinematicImg}
-                unoptimized
                 priority
               />
             </div>
