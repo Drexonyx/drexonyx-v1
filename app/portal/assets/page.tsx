@@ -2,6 +2,7 @@ import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import { getClientAssets } from '@/lib/portal/queries';
 import { mapClientAssetStatus } from '@/lib/portal/types';
+import { ViewAssetButton } from './ViewAssetButton';
 import s from '../portal.module.css';
 
 export const metadata = { title: 'Assets — Client Portal' };
@@ -49,9 +50,7 @@ export default async function AssetsPage() {
                     </span>
                   </td>
                   <td>
-                    {a.content_url
-                      ? <span style={{ fontSize: '0.75rem', color: 'var(--drex-text-muted)' }}>Available</span>
-                      : <span style={{ color: 'var(--drex-text-muted)', fontStyle: 'italic' }}>—</span>}
+                    <ViewAssetButton assetId={a.id} />
                   </td>
                   <td className={s.cellMono}>{new Date(a.updated_at).toLocaleDateString()}</td>
                 </tr>
