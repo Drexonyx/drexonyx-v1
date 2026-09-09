@@ -11,6 +11,7 @@ const NAV_SECTIONS = [
       { href: '/admin/dashboard', label: 'Dashboard' },
       { href: '/admin/organizations', label: 'Organization' },
       { href: '/admin/members', label: 'Members' },
+      { href: '/admin/clients/new', label: 'Clients' },
     ],
   },
   {
