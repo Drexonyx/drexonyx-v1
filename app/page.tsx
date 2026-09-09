@@ -14,23 +14,54 @@ export default function HomePage() {
       {/* Hero */}
       <section className={styles.hero} aria-labelledby="hero-heading">
         <div className={`container ${styles.heroInner}`}>
-          <div className={styles.heroBadge}>Performance Creative Studio</div>
-          <h1 id="hero-heading" className={styles.heroHeading}>
-            UGC Advertising
-            <br />
-            <span className={styles.heroAccent}>Built to Perform</span>
-          </h1>
-          <p className={styles.heroSub}>
-            DREXONYX delivers AI-powered user-generated content advertising for modern brands.
-            Creative at scale. Performance at the core.
-          </p>
-          <div className={styles.heroCtas}>
-            <Link href="/start-campaign" className={styles.ctaPrimary}>
-              Start Your Campaign
-            </Link>
-            <Link href="/how-it-works" className={styles.ctaSecondary}>
-              See How It Works
-            </Link>
+          <div className={styles.heroContent}>
+            <div className={styles.heroBadge}>Performance Creative Studio</div>
+            <h1 id="hero-heading" className={styles.heroHeading}>
+              UGC Advertising
+              <br />
+              <span className={styles.heroAccent}>Built to Perform</span>
+            </h1>
+            <p className={styles.heroSub}>
+              DREXONYX delivers AI-powered user-generated content advertising for modern brands.
+              Creative at scale. Performance at the core.
+            </p>
+            <div className={styles.heroCtas}>
+              <Link href="/start-campaign" className={styles.ctaPrimary}>
+                Start Your Campaign
+              </Link>
+              <Link href="/how-it-works" className={styles.ctaSecondary}>
+                See How It Works
+              </Link>
+            </div>
+          </div>
+
+          {/* Cinematic right-side visual */}
+          <div className={styles.heroVisual} aria-hidden="true">
+            <div className={styles.studioPanel}>
+              <div className={styles.studioBar}>
+                <span className={styles.studioRec}>
+                  <span className={styles.recDot} />
+                  REC
+                </span>
+                <span className={styles.studioName}>DREXONYX STUDIO</span>
+                <span className={styles.studioBadge}>4K</span>
+              </div>
+              <div className={styles.studioScreen}>
+                <div className={styles.screenBg} />
+                <div className={styles.screenGlow} />
+                <div className={styles.shaft1} />
+                <div className={styles.shaft2} />
+                <div className={styles.vignette} />
+                <div className={styles.scanLines} />
+                <div className={styles.letterboxTop} />
+                <div className={styles.letterboxBot} />
+              </div>
+              <div className={`${styles.studioBar} ${styles.studioBarBottom}`}>
+                <span className={styles.timecode}>00:00:00:00</span>
+                <span className={styles.frameTag}>UGC · PERF CREATIVE</span>
+                <span className={styles.aspect}>16:9</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
