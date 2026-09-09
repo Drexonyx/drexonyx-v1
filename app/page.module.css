@@ -6,10 +6,48 @@
 }
 
 .heroInner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 4rem;
+}
+
+.heroContent {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 1.5rem;
+}
+
+/* Cinematic right-side visual */
+.heroVisual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heroMarkWrap {
+  width: 100%;
+  max-width: 460px;
+  animation: heroFloat 7s ease-in-out infinite;
+}
+
+.heroSvg {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 0 40px rgba(200, 152, 10, 0.18));
+}
+
+@keyframes heroFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heroMarkWrap {
+    animation: none;
+  }
 }
 
 .heroBadge {
@@ -231,6 +269,16 @@
 }
 
 @media (max-width: 900px) {
+  .heroInner {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .heroVisual {
+    max-width: 380px;
+    margin: 0 auto;
+  }
+
   .pillarsGrid {
     grid-template-columns: 1fr;
     gap: 1.25rem;
@@ -240,6 +288,10 @@
 @media (max-width: 640px) {
   .hero {
     padding: 4rem 0 3.5rem;
+  }
+
+  .heroVisual {
+    display: none;
   }
 
   .serviceTeaserGrid {
