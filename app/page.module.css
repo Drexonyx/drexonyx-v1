@@ -2,7 +2,7 @@
 .hero {
   position: relative;
   overflow: hidden;
-  min-height: 640px;
+  min-height: 580px;
   display: flex;
   align-items: center;
   border-bottom: 1px solid var(--drex-border);
@@ -33,7 +33,7 @@
 .heroInner {
   position: relative;
   z-index: 1;
-  padding: 6rem 0 5.5rem;
+  padding: 4rem 0 4rem;
 }
 
 .heroContent {
@@ -281,11 +281,11 @@
 
 @media (max-width: 640px) {
   .hero {
-    min-height: 520px;
+    min-height: 480px;
   }
 
   .heroInner {
-    padding: 4rem 0 4.5rem;
+    padding: 3rem 0 3rem;
   }
 
   .heroContent {

@@ -30,9 +30,9 @@
 }
 
 .logoImg {
-  height: 40px;
+  height: 32px;
   width: auto;
-  max-width: 260px;
+  max-width: 240px;
   display: block;
 }
 
@@ -71,8 +71,8 @@
   padding: 0.5rem 1.125rem;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #fff;
-  background: var(--drex-accent);
+  color: #000;
+  background: #C8980A;
   border-radius: 6px;
   flex-shrink: 0;
   transition: background var(--drex-duration) var(--drex-ease),
@@ -80,7 +80,7 @@
 }
 
 .cta:hover {
-  background: var(--drex-accent-dim);
+  background: #b08508;
   transform: translateY(-1px);
 }
 
@@ -171,15 +171,15 @@
   padding: 0.75rem 1rem;
   font-size: 1rem;
   font-weight: 600;
-  color: #fff;
-  background: var(--drex-accent);
+  color: #000;
+  background: #C8980A;
   border-radius: 6px;
   text-align: center;
   transition: background var(--drex-duration) var(--drex-ease);
 }
 
 .drawerCta:hover {
-  background: var(--drex-accent-dim);
+  background: #b08508;
 }
 
 @media (max-width: 768px) {
