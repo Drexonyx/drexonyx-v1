@@ -1,0 +1,41 @@
+name: Database Migration
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type MIGRATE to confirm execution against the production database'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  migrate:
+    name: Apply Drizzle migrations (0000–0006)
+    runs-on: ubuntu-latest
+    if: github.event.inputs.confirm == 'MIGRATE'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: claude/drexonyx-v1-baseline-inspection-fb76lg
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.2'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Drizzle migrations
+        run: npm run db:migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Migration complete
+        run: echo "Migration step finished. Verify drizzle.__drizzle_migrations in the Neon console."
