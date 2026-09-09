@@ -30,8 +30,9 @@
 }
 
 .logoImg {
-  height: 40px;
+  height: 60px;
   width: auto;
+  max-width: 260px;
   display: block;
 }
 

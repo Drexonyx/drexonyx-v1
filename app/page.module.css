@@ -19,175 +19,38 @@
   gap: 1.5rem;
 }
 
-/* Studio monitor panel */
+/* Cinematic hero image */
 .heroVisual {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.studioPanel {
+.heroCinematicWrap {
   width: 100%;
-  max-width: 480px;
-  background: #0a0a0a;
-  border: 1px solid #2a2a2a;
-  border-radius: 10px;
+  max-width: 520px;
+  border-radius: 6px;
   overflow: hidden;
   box-shadow:
-    0 0 0 1px #111,
-    0 24px 64px rgba(0, 0, 0, 0.7),
-    0 0 80px rgba(200, 152, 10, 0.08);
-  animation: heroFloat 7s ease-in-out infinite;
+    0 0 0 1px rgba(200, 152, 10, 0.12),
+    0 32px 80px rgba(0, 0, 0, 0.65),
+    0 0 60px rgba(200, 152, 10, 0.07);
+  animation: heroFloat 10s ease-in-out infinite;
 }
 
-.studioBar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.55rem 0.875rem;
-  background: #111;
-  border-bottom: 1px solid #1e1e1e;
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  color: #5a5a5a;
-}
-
-.studioBarBottom {
-  border-top: 1px solid #1e1e1e;
-  border-bottom: none;
-}
-
-.studioRec {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  color: #C8980A;
-}
-
-.recDot {
+.heroCinematicImg {
+  width: 100%;
+  height: auto;
   display: block;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #C8980A;
-  animation: recBlink 2.4s ease-in-out infinite;
-}
-
-.studioName {
-  color: #888;
-  letter-spacing: 0.12em;
-}
-
-.studioBadge {
-  color: #C8980A;
-  border: 1px solid rgba(200, 152, 10, 0.35);
-  padding: 0.1rem 0.35rem;
-  border-radius: 3px;
-}
-
-.studioScreen {
-  position: relative;
-  aspect-ratio: 16 / 10;
-  overflow: hidden;
-  background: #060606;
-}
-
-.screenBg {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse 70% 60% at 50% 45%, #1a1208 0%, #080808 55%, #030303 100%);
-}
-
-.screenGlow {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse 55% 45% at 50% 50%, rgba(200, 152, 10, 0.14) 0%, transparent 70%);
-}
-
-.shaft1 {
-  position: absolute;
-  top: -10%;
-  left: 28%;
-  width: 22%;
-  height: 120%;
-  background: linear-gradient(180deg, rgba(200, 152, 10, 0.18) 0%, rgba(200, 152, 10, 0.04) 60%, transparent 100%);
-  transform: rotate(-18deg);
-  transform-origin: top center;
-  filter: blur(18px);
-}
-
-.shaft2 {
-  position: absolute;
-  top: -10%;
-  right: 22%;
-  width: 14%;
-  height: 120%;
-  background: linear-gradient(180deg, rgba(244, 244, 245, 0.06) 0%, transparent 70%);
-  transform: rotate(12deg);
-  transform-origin: top center;
-  filter: blur(12px);
-}
-
-.vignette {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse 100% 100% at 50% 50%, transparent 40%, rgba(0, 0, 0, 0.7) 100%);
-}
-
-.scanLines {
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 3px,
-    rgba(0, 0, 0, 0.12) 3px,
-    rgba(0, 0, 0, 0.12) 4px
-  );
-}
-
-.letterboxTop,
-.letterboxBot {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 10%;
-  background: #000;
-}
-
-.letterboxTop { top: 0; }
-.letterboxBot { bottom: 0; }
-
-.timecode {
-  font-variant-numeric: tabular-nums;
-}
-
-.frameTag {
-  color: #6a6a6a;
-  letter-spacing: 0.1em;
-}
-
-.aspect {
-  color: #5a5a5a;
 }
 
 @keyframes heroFloat {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
-}
-
-@keyframes recBlink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.25; }
+  50% { transform: translateY(-10px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .studioPanel {
-    animation: none;
-  }
-  .recDot {
+  .heroCinematicWrap {
     animation: none;
   }
 }
