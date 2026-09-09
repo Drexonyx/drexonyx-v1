@@ -1,6 +1,7 @@
 // DR 0081: Cloudflare R2 object-storage abstraction tests.
 // DR 0086: generateSignedUrl — short-lived presigned URL, R2 credentials server-side only.
 // All S3 client calls are mocked — no real R2 or AWS interaction.
+import { Readable } from 'stream';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // ─── Hoisted mocks ────────────────────────────────────────────────────────────
@@ -180,7 +181,6 @@ describe('getObject — download from R2', () => {
   afterEach(() => { clearEnv(); });
 
   function makeReadableStream(data: string): NodeJS.ReadableStream {
-    const { Readable } = require('stream') as typeof import('stream');
     const readable = new Readable({ read() {} });
     readable.push(data);
     readable.push(null);
