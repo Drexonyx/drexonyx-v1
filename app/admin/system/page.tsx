@@ -1,13 +1,12 @@
-import { auth } from '@/auth';
+import { getAdminSession } from '@/lib/admin/session';
 import { redirect } from 'next/navigation';
-import { isAdminRole } from '@/lib/admin/types';
 import s from '../admin.module.css';
 
 export const metadata = { title: 'System — Admin' };
 
 export default async function AdminSystemPage() {
-  const session = await auth();
-  if (!session || !isAdminRole(session.user.role)) redirect('/admin/login');
+  const session = await getAdminSession();
+  if (!session) redirect('/admin/login');
 
   const fields = [
     { label: 'Platform', value: 'Drexonyx V1' },
@@ -16,9 +15,9 @@ export default async function AdminSystemPage() {
     { label: 'Admin Roles', value: 'OWNER, ADMIN_OPERATIONS, CREATIVE_PRODUCTION, QC' },
     { label: 'Database', value: 'PostgreSQL — Drizzle ORM' },
     { label: 'Schema Namespaces', value: 'core, identity, commercial, production, financial, system' },
-    { label: 'Current Role', value: session.user.role },
-    { label: 'User ID', value: session.user.userId },
-    { label: 'Organization ID', value: session.user.organizationId },
+    { label: 'Current Role', value: session.role },
+    { label: 'User ID', value: session.userId },
+    { label: 'Organization ID', value: session.organizationId },
   ];
 
   return (

@@ -1,23 +1,35 @@
-import { auth } from '@/auth';
+import { getAdminSession } from '@/lib/admin/session';
 import { redirect } from 'next/navigation';
 import { getAdminCampaigns } from '@/lib/admin/queries';
-import { isAdminRole } from '@/lib/admin/types';
+import { CreateCampaignForm } from './CreateCampaignForm';
 import s from '../admin.module.css';
 
 export const metadata = { title: 'Campaigns — Admin' };
 
 export default async function AdminCampaignsPage() {
-  const session = await auth();
-  if (!session || !isAdminRole(session.user.role)) redirect('/admin/login');
+  const session = await getAdminSession();
+  if (!session) redirect('/admin/login');
 
-  const campaigns = await getAdminCampaigns(session.user.organizationId);
+  const canCreate =
+    session.role === 'OWNER' || session.role === 'ADMIN_OPERATIONS';
+
+  const campaigns = await getAdminCampaigns(session.organizationId);
 
   return (
     <>
       <div className={s.pageHeader}>
         <h1 className={s.pageTitle}>Campaigns</h1>
-        <p className={s.pageSubtitle}>All campaigns — read-only</p>
+        <p className={s.pageSubtitle}>All campaigns in the production organization</p>
       </div>
+
+      {canCreate && (
+        <div style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ fontSize: '0.875rem', fontWeight: 700, marginBottom: '1rem', color: 'var(--drex-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            New Campaign
+          </h2>
+          <CreateCampaignForm />
+        </div>
+      )}
 
       {campaigns.length === 0 ? (
         <div className={s.emptyState}>

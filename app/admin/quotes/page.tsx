@@ -1,10 +1,10 @@
-import { auth } from '@/auth';
+import { getAdminSession } from '@/lib/admin/session';
 import { redirect } from 'next/navigation';
-import { getAdminQuotes, getAdminPricingConfig } from '@/lib/admin/queries';
-import { isAdminRole } from '@/lib/admin/types';
+import { getAdminQuotes, getAdminPricingConfig, getAdminCampaigns } from '@/lib/admin/queries';
 import { runCostCheck } from '@/lib/admin/cost-check';
 import { runMarginCheck } from '@/lib/admin/margin-check';
 import { SendQuoteButton } from './SendQuoteButton';
+import { CreateQuoteForm } from './CreateQuoteForm';
 import s from '../admin.module.css';
 
 export const metadata = { title: 'Quotes — Admin' };
@@ -27,15 +27,17 @@ function checkBadgeClass(
 }
 
 export default async function AdminQuotesPage() {
-  const session = await auth();
-  if (!session || !isAdminRole(session.user.role)) redirect('/admin/login');
+  const session = await getAdminSession();
+  if (!session) redirect('/admin/login');
 
-  const canSend =
-    session.user.role === 'OWNER' || session.user.role === 'ADMIN_OPERATIONS';
+  const canCreate =
+    session.role === 'OWNER' || session.role === 'ADMIN_OPERATIONS';
+  const canSend = canCreate;
 
-  const [quotes, pricingConfig] = await Promise.all([
-    getAdminQuotes(session.user.organizationId),
-    getAdminPricingConfig(session.user.organizationId),
+  const [quotes, pricingConfig, campaigns] = await Promise.all([
+    getAdminQuotes(session.organizationId),
+    getAdminPricingConfig(session.organizationId),
+    canCreate ? getAdminCampaigns(session.organizationId) : Promise.resolve([]),
   ]);
 
   return (
@@ -46,6 +48,15 @@ export default async function AdminQuotesPage() {
           All statuses including DRAFT — Cost Check and Margin Check shown for DRAFT quotes
         </p>
       </div>
+
+      {canCreate && (
+        <div style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ fontSize: '0.875rem', fontWeight: 700, marginBottom: '1rem', color: 'var(--drex-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            New Quote
+          </h2>
+          <CreateQuoteForm campaigns={campaigns.filter((c) => !c.archived_at).map((c) => ({ id: c.id, name: c.name }))} />
+        </div>
+      )}
 
       {!pricingConfig && (
         <div className={s.notice}>

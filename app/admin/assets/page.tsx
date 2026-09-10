@@ -1,7 +1,6 @@
-import { auth } from '@/auth';
+import { getAdminSession } from '@/lib/admin/session';
 import { redirect } from 'next/navigation';
 import { getAdminAssets } from '@/lib/admin/queries';
-import { isAdminRole } from '@/lib/admin/types';
 import s from '../admin.module.css';
 
 export const metadata = { title: 'Assets — Admin' };
@@ -19,10 +18,10 @@ function assetBadgeClass(status: string) {
 }
 
 export default async function AdminAssetsPage() {
-  const session = await auth();
-  if (!session || !isAdminRole(session.user.role)) redirect('/admin/login');
+  const session = await getAdminSession();
+  if (!session) redirect('/admin/login');
 
-  const assets = await getAdminAssets(session.user.organizationId);
+  const assets = await getAdminAssets(session.organizationId);
 
   return (
     <>

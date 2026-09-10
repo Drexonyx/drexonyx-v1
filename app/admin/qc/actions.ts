@@ -1,9 +1,8 @@
 'use server';
 
-import { auth } from '@/auth';
+import { getAdminSession } from '@/lib/admin/session';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { isAdminRole } from '@/lib/admin/types';
 import { createQcReview } from '@/lib/admin/qc';
 import type { AdminRole } from '@/lib/admin/types';
 
@@ -12,10 +11,10 @@ export async function actionCreateQcReview(
   verdict: 'PASS' | 'FAIL',
   notes: string,
 ): Promise<{ ok: boolean; reason?: string; reviewId?: string }> {
-  const session = await auth();
-  if (!session || !isAdminRole(session.user.role)) redirect('/admin/login');
+  const session = await getAdminSession();
+  if (!session) redirect('/admin/login');
 
-  const { role, organizationId, userId } = session.user;
+  const { role, organizationId, userId } = session;
 
   const result = await createQcReview({
     assetId,

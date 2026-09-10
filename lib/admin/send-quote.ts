@@ -3,13 +3,16 @@
 // client input. No Financial Ledger writes. Idempotent via system.idempotency_keys.
 
 import { db } from '@/db/index';
+import { organizations } from '@/db/schema/core';
 import { quotes, pricingConfigs } from '@/db/schema/commercial';
+import { users, orgMemberships } from '@/db/schema/identity';
 import { auditEvents, idempotencyKeys } from '@/db/schema/system';
 import { and, eq, isNull } from 'drizzle-orm';
 import { uuidv7 } from 'uuidv7';
 import { runCostCheck, type CostCheckResult } from './cost-check';
 import { runMarginCheck, type MarginCheckResult } from './margin-check';
 import type { AdminRole } from './types';
+import { sendQuoteNotificationEmail } from '@/lib/email/quote';
 
 export type SendQuoteResult =
   | { ok: true; quoteId: string }
@@ -195,6 +198,60 @@ export async function sendQuote(params: {
       return { ok: true, quoteId };
     }
     throw e;
+  }
+
+  // DR 0107: Post-transaction quote notification email (best-effort).
+  // Quote remains SENT if email dispatch fails — no compensating rollback.
+  try {
+    const [orgRows, memberRows] = await Promise.all([
+      db
+        .select({ name: organizations.name })
+        .from(organizations)
+        .where(eq(organizations.id, organizationId))
+        .limit(1),
+      db
+        .select({ email: users.email })
+        .from(orgMemberships)
+        .innerJoin(users, eq(users.id, orgMemberships.user_id))
+        .where(
+          and(
+            eq(orgMemberships.organization_id, organizationId),
+            eq(orgMemberships.role, 'CLIENT'),
+            isNull(orgMemberships.archived_at),
+            isNull(users.archived_at),
+          ),
+        ),
+    ]);
+
+    const organizationName = orgRows[0]?.name ?? organizationId;
+    const toEmails = memberRows.map((r) => r.email);
+
+    if (toEmails.length > 0) {
+      await sendQuoteNotificationEmail({
+        to: toEmails,
+        quoteId,
+        organizationName,
+        totalAmount: quote.total_amount,
+        currency: quote.currency,
+      });
+    }
+
+    await db.insert(auditEvents).values({
+      id: uuidv7(),
+      organization_id: organizationId,
+      entity_type: 'quote',
+      entity_id: quoteId,
+      actor_id: actorId,
+      actor_role: actorRole,
+      action: 'QUOTE_NOTIFICATION_DISPATCHED',
+      payload: {
+        quote_id: quoteId,
+        emailDispatched: toEmails.length > 0,
+        recipientCount: toEmails.length,
+      },
+    });
+  } catch {
+    // Best-effort: quote is already SENT; notification failure does not affect result.
   }
 
   return { ok: true, quoteId };

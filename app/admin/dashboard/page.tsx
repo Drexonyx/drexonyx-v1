@@ -1,16 +1,15 @@
-import { auth } from '@/auth';
+import { getAdminSession } from '@/lib/admin/session';
 import { redirect } from 'next/navigation';
 import { getAdminDashboardCounts } from '@/lib/admin/queries';
-import { isAdminRole } from '@/lib/admin/types';
 import s from '../admin.module.css';
 
 export const metadata = { title: 'Dashboard — Admin' };
 
 export default async function AdminDashboardPage() {
-  const session = await auth();
-  if (!session || !isAdminRole(session.user.role)) redirect('/admin/login');
+  const session = await getAdminSession();
+  if (!session) redirect('/admin/login');
 
-  const counts = await getAdminDashboardCounts(session.user.organizationId);
+  const counts = await getAdminDashboardCounts(session.organizationId);
 
   const stats = [
     { label: 'Campaigns', value: counts.campaigns },

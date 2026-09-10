@@ -1,0 +1,142 @@
+// DR 0042 / Phase 24: Custom admin login route — email + bcrypt password.
+//
+// Deployment model:
+//   Public site  — ENABLE_ADMIN_ROUTES unset:   /admin/* returns 404 in middleware.
+//   Admin deployment — ENABLE_ADMIN_ROUTES=true: this route is reachable.
+//
+// Security guarantees:
+//   - ADMIN_LOGIN_PASSWORD_HASH required (fail closed if unset): bcrypt hash of the
+//     operator passphrase, generated with:
+//       node -e "require('bcryptjs').hash('yourpassword', 12).then(h => console.log(h))"
+//     Store only the hash in Vercel env vars; never commit or log the plaintext.
+//   - Password checked before any DB query (fail early on wrong credential).
+//   - Looks up the user by email in the database (never trusts email text alone).
+//   - Requires the user to be active (not archived).
+//   - Requires exactly one active Admin-role membership in the DREXONYX production org
+//     (identified by DREXONYX_ORG_ID — fail closed if unset).
+//   - Multi-org fail-closed (DR 0042): 0 or 2+ eligible memberships → rejected.
+//   - organizationId always comes from the resolved membership, never from client input.
+//   - Session token is HMAC-SHA256 signed; cookie is HttpOnly + Secure + SameSite=Lax.
+
+import { NextResponse } from 'next/server';
+import bcrypt from 'bcryptjs';
+import { db } from '@/db/index';
+import { users, orgMemberships } from '@/db/schema/identity';
+import { eq, and, inArray, isNull } from 'drizzle-orm';
+import { ADMIN_ROLES } from '@/lib/admin/types';
+import { createAdminToken, makeSessionCookieHeader } from '@/lib/admin/session';
+import type { AdminRole } from '@/lib/admin/types';
+
+export const runtime = 'nodejs';
+
+export async function POST(request: Request): Promise<NextResponse> {
+  let email: string;
+  let password: string;
+  try {
+    const body = await request.json();
+    email = typeof body?.email === 'string' ? body.email.trim().toLowerCase() : '';
+    password = typeof body?.password === 'string' ? body.password : '';
+  } catch {
+    return NextResponse.json({ error: 'Bad request' }, { status: 400 });
+  }
+
+  if (!email || !password) {
+    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+  }
+
+  // Fail closed if the operator password hash is not configured.
+  const passwordHash = process.env.ADMIN_LOGIN_PASSWORD_HASH?.trim();
+  if (!passwordHash) {
+    return NextResponse.json({ error: 'Configuration error' }, { status: 500 });
+  }
+
+  // Verify password before touching the database.
+  let passwordValid: boolean;
+  try {
+    passwordValid = await bcrypt.compare(password, passwordHash);
+  } catch {
+    return NextResponse.json({ error: 'Service error' }, { status: 503 });
+  }
+  if (!passwordValid) {
+    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+  }
+
+  // Fail closed if the production org ID is not configured.
+  // .trim() guards against invisible whitespace in the env-var value (trailing newline
+  // or space from copy-paste) that would pass the truthiness check but cause PostgreSQL
+  // to reject the uuid cast and throw an unhandled exception.
+  const drexOrgId = process.env.DREXONYX_ORG_ID?.trim();
+  if (!drexOrgId) {
+    return NextResponse.json({ error: 'Configuration error' }, { status: 500 });
+  }
+
+  let userRows: { id: string; email: string; display_name: string; archived_at: Date | null }[];
+  try {
+    userRows = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        display_name: users.display_name,
+        archived_at: users.archived_at,
+      })
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
+  } catch {
+    return NextResponse.json({ error: 'Service error' }, { status: 503 });
+  }
+
+  if (userRows.length === 0) {
+    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+  }
+  const user = userRows[0];
+
+  if (user.archived_at !== null) {
+    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+  }
+
+  // Multi-org fail-closed (DR 0042): exactly 1 active admin membership in the
+  // DREXONYX production organization required. Role must be in ADMIN_ROLES.
+  let membershipRows: { organization_id: string; role: string }[];
+  try {
+    membershipRows = await db
+      .select({
+        organization_id: orgMemberships.organization_id,
+        role: orgMemberships.role,
+      })
+      .from(orgMemberships)
+      .where(
+        and(
+          eq(orgMemberships.user_id, user.id),
+          eq(orgMemberships.organization_id, drexOrgId),
+          inArray(orgMemberships.role, [...ADMIN_ROLES]),
+          isNull(orgMemberships.archived_at),
+        ),
+      );
+  } catch {
+    return NextResponse.json({ error: 'Service error' }, { status: 503 });
+  }
+
+  if (membershipRows.length !== 1) {
+    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+  }
+
+  const membership = membershipRows[0];
+
+  let token: string;
+  try {
+    token = createAdminToken({
+      userId: user.id,
+      organizationId: membership.organization_id,
+      role: membership.role as AdminRole,
+      name: user.display_name,
+      email: user.email,
+    });
+  } catch {
+    return NextResponse.json({ error: 'Service error' }, { status: 503 });
+  }
+
+  const response = NextResponse.json({ ok: true });
+  response.headers.set('Set-Cookie', makeSessionCookieHeader(token));
+  return response;
+}

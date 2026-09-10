@@ -108,6 +108,16 @@ export async function provisionClient(params: {
         role: 'CLIENT',
       });
 
+      // DR 0106: CLIENT membership in DREXONYX's production org so the client
+      // can access production records (campaigns, quotes, orders, deliveries) via the portal.
+      const productionMembershipId = uuidv7();
+      await tx.insert(orgMemberships).values({
+        id: productionMembershipId,
+        organization_id: actorOrganizationId,
+        user_id: newUserId,
+        role: 'CLIENT',
+      });
+
       await tx.insert(auditEvents).values({
         id: uuidv7(),
         organization_id: newOrgId,
@@ -138,6 +148,24 @@ export async function provisionClient(params: {
           membership_id: newMembershipId,
           role: 'CLIENT',
           actor_organization_id: actorOrganizationId,
+        },
+      });
+
+      // DR 0106: Audit the production org membership separately so both orgs have a record.
+      await tx.insert(auditEvents).values({
+        id: uuidv7(),
+        organization_id: actorOrganizationId,
+        entity_type: 'user',
+        entity_id: newUserId,
+        actor_id: actorId,
+        actor_role: actorRole,
+        action: 'CLIENT_PRODUCTION_ORG_MEMBERSHIP_CREATED',
+        payload: {
+          user_id: newUserId,
+          user_email: emailT,
+          production_membership_id: productionMembershipId,
+          role: 'CLIENT',
+          client_organization_id: newOrgId,
         },
       });
     });

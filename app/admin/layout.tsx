@@ -1,7 +1,5 @@
-import { redirect } from 'next/navigation';
-import { auth } from '@/auth';
+import { getAdminSession } from '@/lib/admin/session';
 import { getAdminOrganization } from '@/lib/admin/queries';
-import { isAdminRole } from '@/lib/admin/types';
 import { AdminNav } from './AdminNav';
 import { AdminSignOut } from './AdminSignOut';
 import s from './admin.module.css';
@@ -13,19 +11,14 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
+  const session = await getAdminSession();
 
   // Login page — render without shell
   if (!session) {
     return <>{children}</>;
   }
 
-  // Only staff roles may access the admin surface
-  if (!isAdminRole(session.user.role)) {
-    redirect('/admin/login');
-  }
-
-  const org = await getAdminOrganization(session.user.organizationId);
+  const org = await getAdminOrganization(session.organizationId);
 
   return (
     <div className={s.shell}>
@@ -33,7 +26,7 @@ export default async function AdminLayout({
         <div className={s.sidebarHeader}>
           <div className={s.adminLabel}>Admin</div>
           <div className={s.orgName}>{org?.name ?? '—'}</div>
-          <div className={s.roleLabel}>{session.user.role}</div>
+          <div className={s.roleLabel}>{session.role}</div>
         </div>
 
         <AdminNav />

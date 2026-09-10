@@ -1,7 +1,6 @@
-import { auth } from '@/auth';
+import { getAdminSession } from '@/lib/admin/session';
 import { redirect } from 'next/navigation';
 import { getAdminOrders } from '@/lib/admin/queries';
-import { isAdminRole } from '@/lib/admin/types';
 import s from '../admin.module.css';
 import { OrderActions } from './OrderActions';
 
@@ -15,12 +14,12 @@ function orderBadgeClass(status: string, styles: typeof s) {
 }
 
 export default async function AdminOrdersPage() {
-  const session = await auth();
-  if (!session || !isAdminRole(session.user.role)) redirect('/admin/login');
+  const session = await getAdminSession();
+  if (!session) redirect('/admin/login');
 
-  const orders = await getAdminOrders(session.user.organizationId);
+  const orders = await getAdminOrders(session.organizationId);
   const canManage =
-    session.user.role === 'OWNER' || session.user.role === 'ADMIN_OPERATIONS';
+    session.role === 'OWNER' || session.role === 'ADMIN_OPERATIONS';
 
   return (
     <>
