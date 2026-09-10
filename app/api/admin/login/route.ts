@@ -34,21 +34,29 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   // Fail closed if the production org ID is not configured.
-  const drexOrgId = process.env.DREXONYX_ORG_ID;
+  // .trim() guards against invisible whitespace in the env-var value (trailing newline
+  // or space from copy-paste) that would pass the truthiness check but cause PostgreSQL
+  // to reject the uuid cast and throw an unhandled exception.
+  const drexOrgId = process.env.DREXONYX_ORG_ID?.trim();
   if (!drexOrgId) {
     return NextResponse.json({ error: 'Configuration error' }, { status: 500 });
   }
 
-  const userRows = await db
-    .select({
-      id: users.id,
-      email: users.email,
-      display_name: users.display_name,
-      archived_at: users.archived_at,
-    })
-    .from(users)
-    .where(eq(users.email, email))
-    .limit(1);
+  let userRows: { id: string; email: string; display_name: string; archived_at: Date | null }[];
+  try {
+    userRows = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        display_name: users.display_name,
+        archived_at: users.archived_at,
+      })
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
+  } catch {
+    return NextResponse.json({ error: 'Service error' }, { status: 503 });
+  }
 
   if (userRows.length === 0) {
     return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
@@ -61,33 +69,44 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   // Multi-org fail-closed (DR 0042): exactly 1 active admin membership in the
   // DREXONYX production organization required. Role must be in ADMIN_ROLES.
-  const membershipRows = await db
-    .select({
-      organization_id: orgMemberships.organization_id,
-      role: orgMemberships.role,
-    })
-    .from(orgMemberships)
-    .where(
-      and(
-        eq(orgMemberships.user_id, user.id),
-        eq(orgMemberships.organization_id, drexOrgId),
-        inArray(orgMemberships.role, [...ADMIN_ROLES]),
-        isNull(orgMemberships.archived_at),
-      ),
-    );
+  let membershipRows: { organization_id: string; role: string }[];
+  try {
+    membershipRows = await db
+      .select({
+        organization_id: orgMemberships.organization_id,
+        role: orgMemberships.role,
+      })
+      .from(orgMemberships)
+      .where(
+        and(
+          eq(orgMemberships.user_id, user.id),
+          eq(orgMemberships.organization_id, drexOrgId),
+          inArray(orgMemberships.role, [...ADMIN_ROLES]),
+          isNull(orgMemberships.archived_at),
+        ),
+      );
+  } catch {
+    return NextResponse.json({ error: 'Service error' }, { status: 503 });
+  }
 
   if (membershipRows.length !== 1) {
     return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }
 
   const membership = membershipRows[0];
-  const token = createAdminToken({
-    userId: user.id,
-    organizationId: membership.organization_id,
-    role: membership.role as AdminRole,
-    name: user.display_name,
-    email: user.email,
-  });
+
+  let token: string;
+  try {
+    token = createAdminToken({
+      userId: user.id,
+      organizationId: membership.organization_id,
+      role: membership.role as AdminRole,
+      name: user.display_name,
+      email: user.email,
+    });
+  } catch {
+    return NextResponse.json({ error: 'Service error' }, { status: 503 });
+  }
 
   const response = NextResponse.json({ ok: true });
   response.headers.set('Set-Cookie', makeSessionCookieHeader(token));
