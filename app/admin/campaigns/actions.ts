@@ -3,23 +3,20 @@
 // DR 0106: Server actions for admin campaign creation.
 // organizationId always comes from the server-side JWT.
 
-import { auth } from '@/auth';
+import { getAdminSession } from '@/lib/admin/session';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { isAdminRole } from '@/lib/admin/types';
 import { createCampaign } from '@/lib/admin/create-campaign';
 import type { AdminRole } from '@/lib/admin/types';
 
 export async function actionCreateCampaign(
   formData: FormData,
 ): Promise<{ ok: boolean; reason?: string; campaignId?: string }> {
-  const session = await auth();
+  const session = await getAdminSession();
 
-  if (!session || !isAdminRole(session.user.role)) {
-    redirect('/admin/login');
-  }
+  if (!session) redirect('/admin/login');
 
-  if (session.user.role !== 'OWNER' && session.user.role !== 'ADMIN_OPERATIONS') {
+  if (session.role !== 'OWNER' && session.role !== 'ADMIN_OPERATIONS') {
     return { ok: false, reason: 'Forbidden: only OWNER or ADMIN_OPERATIONS can create campaigns' };
   }
 
@@ -27,9 +24,9 @@ export async function actionCreateCampaign(
 
   const result = await createCampaign({
     name,
-    organizationId: session.user.organizationId,
-    actorId: session.user.userId,
-    actorRole: session.user.role as AdminRole,
+    organizationId: session.organizationId,
+    actorId: session.userId,
+    actorRole: session.role as AdminRole,
   });
 
   if (result.ok) {

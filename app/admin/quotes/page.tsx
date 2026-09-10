@@ -1,7 +1,6 @@
-import { auth } from '@/auth';
+import { getAdminSession } from '@/lib/admin/session';
 import { redirect } from 'next/navigation';
 import { getAdminQuotes, getAdminPricingConfig, getAdminCampaigns } from '@/lib/admin/queries';
-import { isAdminRole } from '@/lib/admin/types';
 import { runCostCheck } from '@/lib/admin/cost-check';
 import { runMarginCheck } from '@/lib/admin/margin-check';
 import { SendQuoteButton } from './SendQuoteButton';
@@ -28,17 +27,17 @@ function checkBadgeClass(
 }
 
 export default async function AdminQuotesPage() {
-  const session = await auth();
-  if (!session || !isAdminRole(session.user.role)) redirect('/admin/login');
+  const session = await getAdminSession();
+  if (!session) redirect('/admin/login');
 
   const canCreate =
-    session.user.role === 'OWNER' || session.user.role === 'ADMIN_OPERATIONS';
+    session.role === 'OWNER' || session.role === 'ADMIN_OPERATIONS';
   const canSend = canCreate;
 
   const [quotes, pricingConfig, campaigns] = await Promise.all([
-    getAdminQuotes(session.user.organizationId),
-    getAdminPricingConfig(session.user.organizationId),
-    canCreate ? getAdminCampaigns(session.user.organizationId) : Promise.resolve([]),
+    getAdminQuotes(session.organizationId),
+    getAdminPricingConfig(session.organizationId),
+    canCreate ? getAdminCampaigns(session.organizationId) : Promise.resolve([]),
   ]);
 
   return (

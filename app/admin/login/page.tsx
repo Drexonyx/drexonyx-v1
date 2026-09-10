@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import s from '../admin.module.css';
 
@@ -17,21 +16,25 @@ export default function AdminLoginPage() {
     setError('');
     setLoading(true);
 
-    const result = await signIn('admin', {
-      email,
-      password,
-      redirect: false,
-    });
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
+      });
 
-    setLoading(false);
+      if (!res.ok) {
+        setError('Invalid credentials or insufficient permissions.');
+        return;
+      }
 
-    if (!result || result.error) {
-      setError('Invalid credentials or insufficient permissions.');
-      return;
+      router.push('/admin/dashboard');
+      router.refresh();
+    } catch {
+      setError('A network error occurred. Please try again.');
+    } finally {
+      setLoading(false);
     }
-
-    router.push('/admin/dashboard');
-    router.refresh();
   }
 
   return (

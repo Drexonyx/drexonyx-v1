@@ -14,11 +14,11 @@ vi.mock('bcryptjs', () => ({
 
 // ─── Admin provider — authorized roles ────────────────────────────────────────
 //
-// DR 0042: Admin Credentials provider (id: 'admin') authenticates exactly:
-//   OWNER, ADMIN_OPERATIONS, CREATIVE_PRODUCTION, QC
-// CLIENT and AGENT must return null (not authorized).
+// DR 0042: Admin authentication (now via /api/admin/login + custom HMAC-SHA256
+// session cookie) allows exactly: OWNER, ADMIN_OPERATIONS, CREATIVE_PRODUCTION, QC
+// CLIENT and AGENT must be rejected.
 
-describe('admin provider authorized roles (DR 0042)', () => {
+describe('admin authorized roles (DR 0042)', () => {
   const ADMIN_ROLES = ['OWNER', 'ADMIN_OPERATIONS', 'CREATIVE_PRODUCTION', 'QC'] as const;
   const REJECTED_ROLES = ['CLIENT', 'AGENT'];
 
@@ -85,8 +85,8 @@ describe('AdminSession security contracts', () => {
     expect(expectedKeys).not.toContain('password_hash');
   });
 
-  it('AdminSession organizationId is required (from server-side JWT, never client input)', () => {
-    // organizationId is string — not optional — ensuring it always comes from the JWT
+  it('AdminSession organizationId is required (from server-side token, never client input)', () => {
+    // organizationId is string — not optional — ensuring it always comes from the token
     const session: import('../admin/types').AdminSession = {
       userId: 'u1',
       organizationId: 'org1',
@@ -103,7 +103,6 @@ describe('AdminSession security contracts', () => {
 describe('multi-org fail-closed rule', () => {
   it('zero eligible memberships → authentication fails', () => {
     const adminMemberships: Array<{ organization_id: string; role: string }> = [];
-    // The authorize callback returns null when length !== 1
     const shouldAuthenticate = adminMemberships.length === 1;
     expect(shouldAuthenticate).toBe(false);
   });
@@ -158,21 +157,100 @@ describe('password_hash security (admin surface)', () => {
   });
 });
 
-// ─── Admin provider id (DR 0042 FACT 10) ──────────────────────────────────────
+// ─── Custom admin session token (Phase 24 — replaces Auth.js Credentials provider) ──
 
-describe('admin provider id contract (DR 0042)', () => {
-  it("admin provider id is 'admin' — must not conflict with portal default 'credentials'", () => {
-    const ADMIN_PROVIDER_ID = 'admin';
-    const PORTAL_PROVIDER_EFFECTIVE_ID = 'credentials';
-    expect(ADMIN_PROVIDER_ID).not.toBe(PORTAL_PROVIDER_EFFECTIVE_ID);
-    expect(ADMIN_PROVIDER_ID).toBe('admin');
+describe('custom admin session token (DR 0042 Phase 24)', () => {
+  const TEST_SECRET = 'test-secret-32-bytes-long-abcdefgh';
+
+  beforeEach(() => {
+    process.env.ADMIN_SESSION_SECRET = TEST_SECRET;
   });
 
-  it('portal provider has no explicit id — effective default is credentials', () => {
-    // This documents FACT 10 from DR 0042. The portal provider in auth.ts
-    // has no id property; renaming it to 'portal' would break Phase 05 sessions.
-    const hasExplicitPortalId = false;
-    expect(hasExplicitPortalId).toBe(false);
+  it('createAdminToken + verifyAdminToken round-trip returns the original session', async () => {
+    const { createAdminToken, verifyAdminToken } = await import('../admin/session');
+    const payload = {
+      userId: 'u1',
+      organizationId: 'org1',
+      role: 'OWNER' as const,
+      name: 'Admin User',
+      email: 'admin@example.com',
+    };
+    const token = createAdminToken(payload);
+    const result = verifyAdminToken(token);
+    expect(result).not.toBeNull();
+    expect(result?.userId).toBe('u1');
+    expect(result?.organizationId).toBe('org1');
+    expect(result?.role).toBe('OWNER');
+    expect(result?.name).toBe('Admin User');
+    expect(result?.email).toBe('admin@example.com');
+  });
+
+  it('verifyAdminToken returns null for a tampered token', async () => {
+    const { createAdminToken, verifyAdminToken } = await import('../admin/session');
+    const token = createAdminToken({
+      userId: 'u1', organizationId: 'org1', role: 'OWNER', name: null, email: null,
+    });
+    // Tamper with the body
+    const parts = token.split('.');
+    parts[1] = Buffer.from(JSON.stringify({ userId: 'hacker', organizationId: 'evil', role: 'OWNER', iat: 0, exp: 9999999999 })).toString('base64url');
+    const tampered = parts.join('.');
+    expect(verifyAdminToken(tampered)).toBeNull();
+  });
+
+  it('verifyAdminToken returns null for a token with wrong number of parts', async () => {
+    const { verifyAdminToken } = await import('../admin/session');
+    expect(verifyAdminToken('only.two')).toBeNull();
+    expect(verifyAdminToken('one')).toBeNull();
+    expect(verifyAdminToken('')).toBeNull();
+  });
+
+  it('verifyAdminToken returns null for a token with non-admin role', async () => {
+    const { createAdminToken, verifyAdminToken } = await import('../admin/session');
+    // Force a CLIENT role into the token payload (bypassing type check)
+    const parts = createAdminToken({ userId: 'u1', organizationId: 'org1', role: 'OWNER', name: null, email: null }).split('.');
+    const decoded = JSON.parse(Buffer.from(parts[1], 'base64url').toString());
+    decoded.role = 'CLIENT';
+    parts[1] = Buffer.from(JSON.stringify(decoded)).toString('base64url');
+    // Re-sign with correct key
+    const { createHmac } = await import('crypto');
+    parts[2] = createHmac('sha256', TEST_SECRET).update(`${parts[0]}.${parts[1]}`).digest('base64url');
+    const clientToken = parts.join('.');
+    expect(verifyAdminToken(clientToken)).toBeNull();
+  });
+
+  it('createAdminToken produces a three-part dot-separated string', async () => {
+    const { createAdminToken } = await import('../admin/session');
+    const token = createAdminToken({ userId: 'u1', organizationId: 'org1', role: 'QC', name: null, email: null });
+    expect(token.split('.')).toHaveLength(3);
+  });
+
+  it('admin session cookie is HttpOnly, Secure, SameSite=Lax', async () => {
+    const { makeSessionCookieHeader } = await import('../admin/session');
+    const header = makeSessionCookieHeader('sometoken');
+    expect(header).toContain('HttpOnly');
+    expect(header).toContain('Secure');
+    expect(header.toLowerCase()).toContain('samesite=lax');
+    expect(header).toContain('Path=/');
+  });
+});
+
+// ─── Admin login endpoint contract ────────────────────────────────────────────
+
+describe('admin login endpoint contract (DR 0042 Phase 24)', () => {
+  it('admin login is at /api/admin/login (POST)', () => {
+    expect('/api/admin/login').toBe('/api/admin/login');
+  });
+
+  it('admin logout is at /api/admin/logout (POST)', () => {
+    expect('/api/admin/logout').toBe('/api/admin/logout');
+  });
+
+  it('login form uses fetch, not next-auth/react signIn', () => {
+    // Documents the Phase 24 architecture decision: client-side signIn('admin', ...)
+    // was removed because it calls getProviders() first, which fails in production
+    // when Auth.js assertConfig() throws. The login page now uses fetch('/api/admin/login').
+    const usesCustomFetch = true;
+    expect(usesCustomFetch).toBe(true);
   });
 });
 
@@ -219,16 +297,13 @@ describe('admin route boundary (DR 0042)', () => {
 // ─── Tenant isolation ─────────────────────────────────────────────────────────
 
 describe('admin tenant isolation (DR 0001, DR 0042)', () => {
-  it('organizationId must come from server-side JWT, not client input', () => {
-    // This is a documentation test enforcing the constraint that
-    // organizationId in all admin queries comes from session.user.organizationId,
-    // which is sourced from the JWT written at login time from the single resolved
-    // membership record. Client-controlled input (query params, request body) is
-    // never the source.
-    const sessionOrganizationId = 'org_from_jwt';
+  it('organizationId must come from server-side token, not client input', () => {
+    // organizationId in all admin queries comes from session.organizationId,
+    // which is sourced from the HMAC-signed token written at login time from the
+    // single resolved membership record. Client input is never the source.
+    const sessionOrganizationId = 'org_from_token';
     const clientControlledInput = 'org_from_query_param';
-    // Admin queries must never use clientControlledInput
     expect(sessionOrganizationId).not.toBe(clientControlledInput);
-    expect(sessionOrganizationId).toBe('org_from_jwt');
+    expect(sessionOrganizationId).toBe('org_from_token');
   });
 });

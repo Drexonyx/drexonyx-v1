@@ -1,18 +1,17 @@
-import { auth } from '@/auth';
+import { getAdminSession } from '@/lib/admin/session';
 import { redirect } from 'next/navigation';
 import { getAdminFinancialLedger, getAdminExpenses } from '@/lib/admin/queries';
-import { isAdminRole } from '@/lib/admin/types';
 import s from '../admin.module.css';
 
 export const metadata = { title: 'Ledger & Expenses — Admin' };
 
 export default async function AdminFinancialPage() {
-  const session = await auth();
-  if (!session || !isAdminRole(session.user.role)) redirect('/admin/login');
+  const session = await getAdminSession();
+  if (!session) redirect('/admin/login');
 
   const [ledger, expenses] = await Promise.all([
-    getAdminFinancialLedger(session.user.organizationId),
-    getAdminExpenses(session.user.organizationId),
+    getAdminFinancialLedger(session.organizationId),
+    getAdminExpenses(session.organizationId),
   ]);
 
   return (

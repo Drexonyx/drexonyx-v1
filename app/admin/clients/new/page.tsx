@@ -1,16 +1,15 @@
-import { auth } from '@/auth';
+import { getAdminSession } from '@/lib/admin/session';
 import { redirect } from 'next/navigation';
-import { isAdminRole } from '@/lib/admin/types';
 import s from '../../admin.module.css';
 import { ProvisionClientForm } from './ProvisionClientForm';
 
 export const metadata = { title: 'New Client — Admin' };
 
 export default async function NewClientPage() {
-  const session = await auth();
-  if (!session || !isAdminRole(session.user.role)) redirect('/admin/login');
+  const session = await getAdminSession();
+  if (!session) redirect('/admin/login');
 
-  const { role } = session.user;
+  const { role } = session;
   if (role !== 'OWNER' && role !== 'ADMIN_OPERATIONS') {
     redirect('/admin/dashboard');
   }

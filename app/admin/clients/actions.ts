@@ -1,16 +1,9 @@
 'use server';
 
-import { auth } from '@/auth';
+import { getAdminSession } from '@/lib/admin/session';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { isAdminRole } from '@/lib/admin/types';
 import { provisionClient } from '@/lib/admin/provisioning';
-
-async function getAdminSession() {
-  const session = await auth();
-  if (!session || !isAdminRole(session.user.role)) redirect('/admin/login');
-  return session;
-}
 
 export type ProvisionClientActionResult =
   | { ok: true; organizationId: string; userId: string; temporaryPassword: string }
@@ -20,7 +13,8 @@ export async function actionProvisionClient(
   formData: FormData,
 ): Promise<ProvisionClientActionResult> {
   const session = await getAdminSession();
-  const { role, organizationId: actorOrganizationId, userId: actorId } = session.user;
+  if (!session) redirect('/admin/login');
+  const { role, organizationId: actorOrganizationId, userId: actorId } = session;
 
   if (role !== 'OWNER' && role !== 'ADMIN_OPERATIONS') {
     return { ok: false, reason: 'Only OWNER or ADMIN_OPERATIONS may provision clients' };

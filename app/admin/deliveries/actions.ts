@@ -1,9 +1,8 @@
 'use server';
 
-import { auth } from '@/auth';
+import { getAdminSession } from '@/lib/admin/session';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { isAdminRole } from '@/lib/admin/types';
 import {
   createDelivery,
   sendDelivery,
@@ -13,18 +12,13 @@ import {
 } from '@/lib/admin/deliveries';
 import type { AdminRole } from '@/lib/admin/types';
 
-async function getAdminSession() {
-  const session = await auth();
-  if (!session || !isAdminRole(session.user.role)) redirect('/admin/login');
-  return session;
-}
-
 export async function actionCreateDelivery(
   orderId: string,
   assetIds: string[],
 ): Promise<{ ok: boolean; reason?: string; deliveryId?: string }> {
   const session = await getAdminSession();
-  const { role, organizationId, userId } = session.user;
+  if (!session) redirect('/admin/login');
+  const { role, organizationId, userId } = session;
 
   if (role !== 'OWNER' && role !== 'ADMIN_OPERATIONS') {
     return { ok: false, reason: 'Forbidden: only OWNER or ADMIN_OPERATIONS can create Deliveries' };
@@ -46,7 +40,8 @@ export async function actionSendDelivery(
   deliveryId: string,
 ): Promise<{ ok: boolean; reason?: string }> {
   const session = await getAdminSession();
-  const { role, organizationId, userId } = session.user;
+  if (!session) redirect('/admin/login');
+  const { role, organizationId, userId } = session;
 
   if (role !== 'OWNER' && role !== 'ADMIN_OPERATIONS') {
     return { ok: false, reason: 'Forbidden: only OWNER or ADMIN_OPERATIONS can send Deliveries' };
@@ -67,7 +62,8 @@ export async function actionCompleteDelivery(
   deliveryId: string,
 ): Promise<{ ok: boolean; reason?: string }> {
   const session = await getAdminSession();
-  const { role, organizationId, userId } = session.user;
+  if (!session) redirect('/admin/login');
+  const { role, organizationId, userId } = session;
 
   if (role !== 'OWNER' && role !== 'ADMIN_OPERATIONS') {
     return { ok: false, reason: 'Forbidden: only OWNER or ADMIN_OPERATIONS can complete Deliveries' };
@@ -89,7 +85,8 @@ export async function actionFailDelivery(
   failureReason: string,
 ): Promise<{ ok: boolean; reason?: string }> {
   const session = await getAdminSession();
-  const { role, organizationId, userId } = session.user;
+  if (!session) redirect('/admin/login');
+  const { role, organizationId, userId } = session;
 
   if (role !== 'OWNER' && role !== 'ADMIN_OPERATIONS') {
     return { ok: false, reason: 'Forbidden: only OWNER or ADMIN_OPERATIONS can fail Deliveries' };
@@ -111,7 +108,8 @@ export async function actionCancelDelivery(
   deliveryId: string,
 ): Promise<{ ok: boolean; reason?: string }> {
   const session = await getAdminSession();
-  const { role, organizationId, userId } = session.user;
+  if (!session) redirect('/admin/login');
+  const { role, organizationId, userId } = session;
 
   if (role !== 'OWNER' && role !== 'ADMIN_OPERATIONS') {
     return { ok: false, reason: 'Forbidden: only OWNER or ADMIN_OPERATIONS can cancel Deliveries' };

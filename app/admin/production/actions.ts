@@ -1,20 +1,13 @@
 'use server';
 
-import { auth } from '@/auth';
+import { getAdminSession } from '@/lib/admin/session';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { isAdminRole } from '@/lib/admin/types';
 import { createProductionJob, cancelProductionJob } from '@/lib/admin/production-jobs';
 import { createManualUploadAsset, markManualAssetReadyForQc, completeManualUploadJob } from '@/lib/admin/manual-upload';
 import { createRevisionJob } from '@/lib/admin/revisions';
 import { runGenerationDriver } from '@/lib/agent/driver';
 import type { AdminRole } from '@/lib/admin/types';
-
-async function getAdminSession() {
-  const session = await auth();
-  if (!session || !isAdminRole(session.user.role)) redirect('/admin/login');
-  return session;
-}
 
 export async function actionCreateProductionJob(
   orderId: string,
@@ -22,7 +15,8 @@ export async function actionCreateProductionJob(
   description: string,
 ): Promise<{ ok: boolean; reason?: string; jobId?: string }> {
   const session = await getAdminSession();
-  const { role, organizationId, userId } = session.user;
+  if (!session) redirect('/admin/login');
+  const { role, organizationId, userId } = session;
 
   // DR 0053 §5: OWNER, ADMIN_OPERATIONS, CREATIVE_PRODUCTION may create
   if (role !== 'OWNER' && role !== 'ADMIN_OPERATIONS' && role !== 'CREATIVE_PRODUCTION') {
@@ -46,7 +40,8 @@ export async function actionCancelProductionJob(
   jobId: string,
 ): Promise<{ ok: boolean; reason?: string }> {
   const session = await getAdminSession();
-  const { role, organizationId, userId } = session.user;
+  if (!session) redirect('/admin/login');
+  const { role, organizationId, userId } = session;
 
   if (role !== 'OWNER' && role !== 'ADMIN_OPERATIONS') {
     return { ok: false, reason: 'Forbidden: only OWNER or ADMIN_OPERATIONS can cancel ProductionJobs' };
@@ -69,7 +64,8 @@ export async function actionCreateManualUploadAsset(
   name?: string,
 ): Promise<{ ok: boolean; reason?: string; assetId?: string }> {
   const session = await getAdminSession();
-  const { role, organizationId, userId } = session.user;
+  if (!session) redirect('/admin/login');
+  const { role, organizationId, userId } = session;
 
   if (role !== 'OWNER' && role !== 'ADMIN_OPERATIONS' && role !== 'CREATIVE_PRODUCTION') {
     return { ok: false, reason: 'Forbidden: insufficient authority to create MANUAL_UPLOAD asset' };
@@ -97,7 +93,8 @@ export async function actionMarkManualAssetReadyForQc(
   productionJobId: string,
 ): Promise<{ ok: boolean; reason?: string }> {
   const session = await getAdminSession();
-  const { role, organizationId, userId } = session.user;
+  if (!session) redirect('/admin/login');
+  const { role, organizationId, userId } = session;
 
   if (role !== 'OWNER' && role !== 'ADMIN_OPERATIONS' && role !== 'CREATIVE_PRODUCTION') {
     return { ok: false, reason: 'Forbidden: insufficient authority' };
@@ -137,7 +134,8 @@ export async function actionCreateRevisionJob(
   description?: string,
 ): Promise<{ ok: boolean; reason?: string; newProductionJobId?: string }> {
   const session = await getAdminSession();
-  const { role, organizationId, userId } = session.user;
+  if (!session) redirect('/admin/login');
+  const { role, organizationId, userId } = session;
 
   if (role !== 'OWNER' && role !== 'ADMIN_OPERATIONS' && role !== 'CREATIVE_PRODUCTION') {
     return { ok: false, reason: 'Forbidden: insufficient authority' };
@@ -168,7 +166,8 @@ export async function actionRunGenerationDriver(
   jobId: string,
 ): Promise<{ ok: boolean; reason?: string; providerJobId?: string }> {
   const session = await getAdminSession();
-  const { role, organizationId } = session.user;
+  if (!session) redirect('/admin/login');
+  const { role, organizationId } = session;
 
   if (role !== 'OWNER' && role !== 'ADMIN_OPERATIONS') {
     return { ok: false, reason: 'Forbidden: only OWNER or ADMIN_OPERATIONS may trigger generation' };

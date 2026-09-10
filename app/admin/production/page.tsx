@@ -1,7 +1,6 @@
-import { auth } from '@/auth';
+import { getAdminSession } from '@/lib/admin/session';
 import { redirect } from 'next/navigation';
 import { getAdminProductionJobs, getAdminOrders, getAdminAssetsForWorkflow } from '@/lib/admin/queries';
-import { isAdminRole } from '@/lib/admin/types';
 import s from '../admin.module.css';
 import { ProductionJobActions } from './ProductionJobActions';
 import { ManualUploadWorkflow } from './ManualUploadWorkflow';
@@ -19,10 +18,10 @@ function jobStatusBadgeClass(status: string) {
 }
 
 export default async function AdminProductionPage() {
-  const session = await auth();
-  if (!session || !isAdminRole(session.user.role)) redirect('/admin/login');
+  const session = await getAdminSession();
+  if (!session) redirect('/admin/login');
 
-  const { organizationId, role } = session.user;
+  const { organizationId, role } = session;
   const canCreate = role === 'OWNER' || role === 'ADMIN_OPERATIONS' || role === 'CREATIVE_PRODUCTION';
   const canCancel = role === 'OWNER' || role === 'ADMIN_OPERATIONS';
 
