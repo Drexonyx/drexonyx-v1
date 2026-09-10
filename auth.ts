@@ -72,17 +72,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               eq(orgMemberships.role, 'CLIENT'),
               isNull(orgMemberships.archived_at),
             ),
-          )
-          .limit(1);
+          );
 
         if (membershipRows.length === 0) return null;
+
+        // DR 0106: Prefer the DREXONYX production org membership so the client's session
+        // organizationId resolves to the production workspace. Falls back to any CLIENT
+        // membership when DREXONYX_ORG_ID is not set (development mode).
+        const productionOrgId = process.env.DREXONYX_ORG_ID;
+        const membership = productionOrgId
+          ? (membershipRows.find((m) => m.organization_id === productionOrgId) ?? membershipRows[0])
+          : membershipRows[0];
 
         return {
           id: user.id,
           email: user.email,
           name: user.display_name,
-          organizationId: membershipRows[0].organization_id,
-          role: membershipRows[0].role,
+          organizationId: membership.organization_id,
+          role: membership.role,
         };
       },
     }),

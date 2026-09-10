@@ -188,6 +188,87 @@ describe('provisionClient', () => {
     await expect(provisionClient(base)).rejects.toThrow('connection timeout');
   });
 
+  // DR 0106: verifies that provisionClient inserts a second CLIENT membership
+  // in the DREXONYX production organization (actorOrganizationId).
+  it('inserts a second CLIENT membership in the production org (DR 0106)', async () => {
+    const membershipInserts: Record<string, unknown>[] = [];
+    const tx = {
+      insert: vi.fn().mockReturnValue({
+        values: vi.fn().mockImplementation((data: unknown) => {
+          const row = data as Record<string, unknown>;
+          // Collect orgMemberships inserts by presence of role field
+          if ('role' in row) {
+            membershipInserts.push(row);
+          }
+          return Promise.resolve([]);
+        }),
+      }),
+    };
+    mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
+      await fn(tx);
+    });
+
+    await provisionClient(base);
+
+    // Should have two membership inserts: client org + production org
+    expect(membershipInserts.length).toBeGreaterThanOrEqual(2);
+    const clientOrgMembership = membershipInserts.find(
+      (m) => m.organization_id !== base.actorOrganizationId,
+    );
+    const productionOrgMembership = membershipInserts.find(
+      (m) => m.organization_id === base.actorOrganizationId,
+    );
+    expect(clientOrgMembership).toMatchObject({ role: 'CLIENT' });
+    expect(productionOrgMembership).toMatchObject({
+      organization_id: base.actorOrganizationId,
+      role: 'CLIENT',
+    });
+  });
+
+  it('emits CLIENT_PRODUCTION_ORG_MEMBERSHIP_CREATED audit event (DR 0106)', async () => {
+    const auditInserts: Record<string, unknown>[] = [];
+    const tx = {
+      insert: vi.fn().mockReturnValue({
+        values: vi.fn().mockImplementation((data: unknown) => {
+          const row = data as Record<string, unknown>;
+          if ('action' in row) {
+            auditInserts.push(row);
+          }
+          return Promise.resolve([]);
+        }),
+      }),
+    };
+    mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
+      await fn(tx);
+    });
+
+    await provisionClient(base);
+
+    const productionAudit = auditInserts.find(
+      (a) => a.action === 'CLIENT_PRODUCTION_ORG_MEMBERSHIP_CREATED',
+    );
+    expect(productionAudit).toBeDefined();
+    expect(productionAudit).toMatchObject({
+      organization_id: base.actorOrganizationId,
+      entity_type: 'user',
+      actor_id: base.actorId,
+      actor_role: base.actorRole,
+    });
+    const payload = productionAudit?.payload as Record<string, unknown>;
+    expect(payload).toMatchObject({ role: 'CLIENT' });
+    expect(payload).not.toHaveProperty('password_hash');
+    expect(payload).not.toHaveProperty('temporaryPassword');
+  });
+
+  it('maps production org membership UNIQUE violation to MEMBERSHIP_EXISTS', async () => {
+    mockTransaction.mockImplementation(() => {
+      throw new Error('duplicate key value violates unique constraint "org_memberships_org_user_unique"');
+    });
+
+    const result = await provisionClient(base);
+    expect(result).toMatchObject({ ok: false, reason: 'MEMBERSHIP_EXISTS' });
+  });
+
   it('normalizes email to lowercase', async () => {
     const tx = {
       insert: vi.fn().mockImplementation(() => ({
