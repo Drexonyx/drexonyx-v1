@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import { db } from '@/db/index';
 import { users, orgMemberships } from '@/db/schema/identity';
 import { eq, and, isNull, inArray } from 'drizzle-orm';
+import { selectPreferredMembership } from '@/lib/portal/types';
 
 declare module 'next-auth' {
   interface User {
@@ -79,10 +80,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         // DR 0106: Prefer the DREXONYX production org membership so the client's session
         // organizationId resolves to the production workspace. Falls back to any CLIENT
         // membership when DREXONYX_ORG_ID is not set (development mode).
-        const productionOrgId = process.env.DREXONYX_ORG_ID;
-        const membership = productionOrgId
-          ? (membershipRows.find((m) => m.organization_id === productionOrgId) ?? membershipRows[0])
-          : membershipRows[0];
+        const membership = selectPreferredMembership(membershipRows, process.env.DREXONYX_ORG_ID);
 
         return {
           id: user.id,

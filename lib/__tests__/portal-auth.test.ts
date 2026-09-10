@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Hoisted mocks so they're available in vi.mock factories
 const { mockBcryptCompare } = vi.hoisted(() => ({
@@ -86,6 +86,70 @@ describe('CLIENT role gate', () => {
 
   it('CLIENT is the only role that grants portal access', () => {
     expect('CLIENT').toBe('CLIENT');
+  });
+});
+
+// ─── DR 0106: selectPreferredMembership ───────────────────────────────────────
+
+import { selectPreferredMembership } from '../portal/types';
+
+describe('selectPreferredMembership (DR 0106)', () => {
+  const brandOrg = { organization_id: 'brand-org-1', role: 'CLIENT' };
+  const drexOrg = { organization_id: 'drex-prod-org', role: 'CLIENT' };
+  const otherOrg = { organization_id: 'other-org', role: 'CLIENT' };
+
+  afterEach(() => {
+    delete process.env.DREXONYX_ORG_ID;
+  });
+
+  it('returns the only membership when there is just one', () => {
+    const result = selectPreferredMembership([brandOrg], undefined);
+    expect(result).toBe(brandOrg);
+  });
+
+  it('returns first membership when productionOrgId is undefined', () => {
+    const result = selectPreferredMembership([brandOrg, drexOrg], undefined);
+    expect(result).toBe(brandOrg);
+  });
+
+  it('returns first membership when productionOrgId is an empty string', () => {
+    const result = selectPreferredMembership([brandOrg, drexOrg], '');
+    expect(result).toBe(brandOrg);
+  });
+
+  it('prefers the production org membership when productionOrgId matches', () => {
+    const result = selectPreferredMembership(
+      [brandOrg, drexOrg],
+      'drex-prod-org',
+    );
+    expect(result).toBe(drexOrg);
+  });
+
+  it('prefers production org even when it is not the first in the list', () => {
+    const result = selectPreferredMembership(
+      [otherOrg, brandOrg, drexOrg],
+      'drex-prod-org',
+    );
+    expect(result).toBe(drexOrg);
+  });
+
+  it('falls back to first membership when productionOrgId has no match', () => {
+    const result = selectPreferredMembership(
+      [brandOrg, otherOrg],
+      'drex-prod-org', // not in list
+    );
+    expect(result).toBe(brandOrg);
+  });
+
+  it('returns the single production org membership when it is the only one', () => {
+    const result = selectPreferredMembership([drexOrg], 'drex-prod-org');
+    expect(result).toBe(drexOrg);
+  });
+
+  it('preserves the full membership object on selection', () => {
+    const rich = { organization_id: 'drex-prod-org', role: 'CLIENT', extra: 'data' };
+    const result = selectPreferredMembership([brandOrg, rich], 'drex-prod-org');
+    expect(result).toMatchObject({ organization_id: 'drex-prod-org', extra: 'data' });
   });
 });
 
