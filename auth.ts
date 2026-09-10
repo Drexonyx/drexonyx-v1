@@ -30,10 +30,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   // Equivalent to AUTH_TRUST_HOST=true. Safe because Vercel controls the host.
   trustHost: true,
 
-  // Explicitly set secret so assertConfig() never sees a missing-secret
-  // condition regardless of environment variable timing (DR 0042).
-  secret: process.env.AUTH_SECRET,
-
   providers: [
     // Portal provider — CLIENT-only (DR 0039). No explicit id: effective default is
     // "credentials". Must not be renamed to preserve Phase 05 regression compatibility
