@@ -1,7 +1,15 @@
-// DR 0042 / Phase 24: Custom admin login route (email-only, temporary V1 period).
-// Password authentication will be added from the Admin dashboard in a future phase.
+// DR 0042 / Phase 24: Custom admin login route — email + bcrypt password.
+//
+// Deployment model:
+//   Public site  — ENABLE_ADMIN_ROUTES unset:   /admin/* returns 404 in middleware.
+//   Admin deployment — ENABLE_ADMIN_ROUTES=true: this route is reachable.
 //
 // Security guarantees:
+//   - ADMIN_LOGIN_PASSWORD_HASH required (fail closed if unset): bcrypt hash of the
+//     operator passphrase, generated with:
+//       node -e "require('bcryptjs').hash('yourpassword', 12).then(h => console.log(h))"
+//     Store only the hash in Vercel env vars; never commit or log the plaintext.
+//   - Password checked before any DB query (fail early on wrong credential).
 //   - Looks up the user by email in the database (never trusts email text alone).
 //   - Requires the user to be active (not archived).
 //   - Requires exactly one active Admin-role membership in the DREXONYX production org
@@ -11,6 +19,7 @@
 //   - Session token is HMAC-SHA256 signed; cookie is HttpOnly + Secure + SameSite=Lax.
 
 import { NextResponse } from 'next/server';
+import bcrypt from 'bcryptjs';
 import { db } from '@/db/index';
 import { users, orgMemberships } from '@/db/schema/identity';
 import { eq, and, inArray, isNull } from 'drizzle-orm';
@@ -22,15 +31,34 @@ export const runtime = 'nodejs';
 
 export async function POST(request: Request): Promise<NextResponse> {
   let email: string;
+  let password: string;
   try {
     const body = await request.json();
     email = typeof body?.email === 'string' ? body.email.trim().toLowerCase() : '';
+    password = typeof body?.password === 'string' ? body.password : '';
   } catch {
     return NextResponse.json({ error: 'Bad request' }, { status: 400 });
   }
 
-  if (!email) {
-    return NextResponse.json({ error: 'Invalid email' }, { status: 401 });
+  if (!email || !password) {
+    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+  }
+
+  // Fail closed if the operator password hash is not configured.
+  const passwordHash = process.env.ADMIN_LOGIN_PASSWORD_HASH?.trim();
+  if (!passwordHash) {
+    return NextResponse.json({ error: 'Configuration error' }, { status: 500 });
+  }
+
+  // Verify password before touching the database.
+  let passwordValid: boolean;
+  try {
+    passwordValid = await bcrypt.compare(password, passwordHash);
+  } catch {
+    return NextResponse.json({ error: 'Service error' }, { status: 503 });
+  }
+  if (!passwordValid) {
+    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }
 
   // Fail closed if the production org ID is not configured.

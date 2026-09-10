@@ -7,6 +7,7 @@ import s from '../admin.module.css';
 export default function AdminLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -19,11 +20,14 @@ export default function AdminLoginPage() {
       const res = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim().toLowerCase() }),
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          password,
+        }),
       });
 
       if (!res.ok) {
-        setError('Invalid email or insufficient permissions.');
+        setError('Invalid credentials or insufficient permissions.');
         return;
       }
 
@@ -57,6 +61,21 @@ export default function AdminLoginPage() {
               className={s.input}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          <div className={s.field}>
+            <label className={s.label} htmlFor="password">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              autoComplete="current-password"
+              required
+              className={s.input}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 
