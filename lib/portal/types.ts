@@ -37,3 +37,17 @@ export type PortalSession = {
   name: string | null;
   email: string | null;
 };
+
+// DR 0106: Select the preferred CLIENT membership from a list of active memberships.
+// When productionOrgId is set, prefers the membership matching that org.
+// Falls back to the first available membership (dev mode or missing match).
+// Callers guarantee memberships.length >= 1.
+export function selectPreferredMembership<T extends { organization_id: string }>(
+  memberships: T[],
+  productionOrgId: string | undefined,
+): T {
+  if (productionOrgId) {
+    return memberships.find((m) => m.organization_id === productionOrgId) ?? memberships[0];
+  }
+  return memberships[0];
+}
