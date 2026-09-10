@@ -25,66 +25,109 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   if (!email || !password) {
+    console.log('[admin-login] rejected: missing email or password');
     return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }
 
-  const userRows = await db
-    .select({
-      id: users.id,
-      email: users.email,
-      display_name: users.display_name,
-      password_hash: users.password_hash,
-      archived_at: users.archived_at,
-    })
-    .from(users)
-    .where(eq(users.email, email))
-    .limit(1);
+  let userRows: Array<{
+    id: string;
+    email: string;
+    display_name: string;
+    password_hash: string | null;
+    archived_at: Date | null;
+  }>;
+  try {
+    userRows = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        display_name: users.display_name,
+        password_hash: users.password_hash,
+        archived_at: users.archived_at,
+      })
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
+  } catch (err) {
+    console.error('[admin-login] db error on user lookup:', (err as Error).message);
+    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+  }
+
+  console.log('[admin-login] user found:', userRows.length > 0);
 
   if (userRows.length === 0) {
     return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }
   const user = userRows[0];
 
-  if (user.archived_at !== null) {
+  const isArchived = user.archived_at !== null;
+  const hasHash = !!user.password_hash;
+  console.log('[admin-login] archived:', isArchived, '| has_hash:', hasHash);
+
+  if (isArchived) {
     return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }
-  if (!user.password_hash) {
+  if (!hasHash) {
     return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }
 
-  const valid = await bcrypt.compare(password, user.password_hash);
+  let valid: boolean;
+  try {
+    valid = await bcrypt.compare(password, user.password_hash!);
+  } catch (err) {
+    console.error('[admin-login] bcrypt error:', (err as Error).message);
+    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+  }
+  console.log('[admin-login] password_valid:', valid);
+
   if (!valid) {
     return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }
 
-  // Multi-org fail-closed (DR 0042): exactly 1 eligible active membership required.
-  const membershipRows = await db
-    .select({
-      organization_id: orgMemberships.organization_id,
-      role: orgMemberships.role,
-    })
-    .from(orgMemberships)
-    .where(
-      and(
-        eq(orgMemberships.user_id, user.id),
-        inArray(orgMemberships.role, [...ADMIN_ROLES]),
-        isNull(orgMemberships.archived_at),
-      ),
-    );
+  let membershipRows: Array<{ organization_id: string; role: string }>;
+  try {
+    membershipRows = await db
+      .select({
+        organization_id: orgMemberships.organization_id,
+        role: orgMemberships.role,
+      })
+      .from(orgMemberships)
+      .where(
+        and(
+          eq(orgMemberships.user_id, user.id),
+          inArray(orgMemberships.role, [...ADMIN_ROLES]),
+          isNull(orgMemberships.archived_at),
+        ),
+      );
+  } catch (err) {
+    console.error('[admin-login] db error on membership lookup:', (err as Error).message);
+    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+  }
 
+  console.log('[admin-login] active admin memberships:', membershipRows.length,
+    '| roles:', membershipRows.map(m => m.role).join(','));
+
+  // Multi-org fail-closed (DR 0042): exactly 1 eligible active membership required.
   if (membershipRows.length !== 1) {
     return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }
 
   const membership = membershipRows[0];
-  const token = createAdminToken({
-    userId: user.id,
-    organizationId: membership.organization_id,
-    role: membership.role as AdminRole,
-    name: user.display_name,
-    email: user.email,
-  });
+  let token: string;
+  try {
+    token = createAdminToken({
+      userId: user.id,
+      organizationId: membership.organization_id,
+      role: membership.role as AdminRole,
+      name: user.display_name,
+      email: user.email,
+    });
+  } catch (err) {
+    console.error('[admin-login] token creation error:', (err as Error).message);
+    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+  }
 
+  console.log('[admin-login] session created: true');
   const response = NextResponse.json({ ok: true });
   response.headers.set('Set-Cookie', makeSessionCookieHeader(token));
   return response;
