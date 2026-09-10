@@ -25,6 +25,11 @@ declare module 'next-auth' {
 const ADMIN_ROLES = ['OWNER', 'ADMIN_OPERATIONS', 'CREATIVE_PRODUCTION', 'QC'] as const;
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  // Required on Vercel and any multi-domain deployment: Auth.js v5 rejects
+  // requests whose Host header it cannot verify unless this is set.
+  // Equivalent to AUTH_TRUST_HOST=true. Safe because Vercel controls the host.
+  trustHost: true,
+
   providers: [
     // Portal provider — CLIENT-only (DR 0039). No explicit id: effective default is
     // "credentials". Must not be renamed to preserve Phase 05 regression compatibility
