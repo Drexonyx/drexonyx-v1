@@ -341,10 +341,11 @@ describe('admin route boundary (DR 0042)', () => {
     }
   });
 
-  it('proxy matcher includes both portal and admin paths', () => {
-    const PROXY_MATCHER = ['/portal/:path*', '/admin/:path*'];
+  it('proxy matcher includes portal, admin, and admin API paths', () => {
+    const PROXY_MATCHER = ['/portal/:path*', '/admin/:path*', '/api/admin/:path*'];
     expect(PROXY_MATCHER).toContain('/portal/:path*');
     expect(PROXY_MATCHER).toContain('/admin/:path*');
+    expect(PROXY_MATCHER).toContain('/api/admin/:path*');
   });
 });
 
