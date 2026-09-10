@@ -23,7 +23,13 @@ export default function AdminLoginPage() {
       });
 
       if (!res.ok) {
-        setError('Invalid email or insufficient permissions.');
+        if (res.status === 401) {
+          setError('Authentication rejected (401).');
+        } else if (res.status === 500) {
+          setError('Server authentication error (500).');
+        } else {
+          setError(`Authentication request failed: HTTP ${res.status}.`);
+        }
         return;
       }
 
