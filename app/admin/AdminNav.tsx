@@ -19,6 +19,7 @@ const NAV_SECTIONS = [
     items: [
       { href: '/admin/inquiries', label: 'Inquiries' },
       { href: '/admin/campaigns', label: 'Campaigns' },
+      { href: '/admin/briefs', label: 'Briefs' },
       { href: '/admin/quotes', label: 'Quotes' },
       { href: '/admin/orders', label: 'Orders' },
     ],
