@@ -10,7 +10,7 @@ export default async function NewClientPage() {
   if (!session) redirect('/admin/login');
 
   const { role } = session;
-  if (role !== 'OWNER' && role !== 'ADMIN_OPERATIONS') {
+  if (role !== 'OWNER') {
     redirect('/admin/dashboard');
   }
 
