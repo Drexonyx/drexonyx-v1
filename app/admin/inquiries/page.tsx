@@ -149,6 +149,8 @@ export default async function AdminInquiriesPage({
                         inquiryId={inq.id}
                         status={inq.status}
                         canAct={canAct}
+                        brandName={inq.brand_name}
+                        contactEmail={inq.contact_email}
                       />
                     </td>
                   )}
