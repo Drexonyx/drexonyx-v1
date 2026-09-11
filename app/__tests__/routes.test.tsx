@@ -98,9 +98,9 @@ describe("About page", () => {
     expect(screen.getByText("Continuous Improvement")).toBeInTheDocument();
   });
 
-  it("renders a team placeholder", () => {
+  it("renders the team section", () => {
     render(<AboutPage />);
-    expect(screen.getByText(/team member profiles pending/i)).toBeInTheDocument();
+    expect(screen.getByText(/team profiles will be published/i)).toBeInTheDocument();
   });
 });
 

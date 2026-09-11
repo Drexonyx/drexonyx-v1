@@ -236,8 +236,7 @@ export default function StartCampaignPage() {
                   Prefer to reach out directly while the form is in development?
                 </p>
                 <p className={styles.contactEmail}>
-                  {/* PLACEHOLDER — official contact email to be confirmed */}
-                  PLACEHOLDER — contact email TBD
+                  drexonyx.studio@gmail.com
                 </p>
               </div>
 
