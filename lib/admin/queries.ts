@@ -2,7 +2,7 @@ import { and, desc, eq, inArray, isNull } from 'drizzle-orm';
 import { db } from '@/db/index';
 import { organizations } from '@/db/schema/core';
 import { users, orgMemberships } from '@/db/schema/identity';
-import { campaigns, quotes, orders, orderBudgets, pricingConfigs } from '@/db/schema/commercial';
+import { campaigns, quotes, orders, orderBudgets, pricingConfigs, inquiries } from '@/db/schema/commercial';
 import { payments, financialLedger, expenses } from '@/db/schema/financial';
 import { assets, qcReviews, approvals, deliveries, productionJobs, aiGenerations, deliveryAssets } from '@/db/schema/production';
 import { auditEvents } from '@/db/schema/system';
@@ -347,6 +347,29 @@ export async function getAdminAuditEvents(organizationId: string) {
     .limit(200);
 }
 
+// Inquiries — pre-org intake records; no organization_id scope.
+export async function getAdminInquiries() {
+  return db
+    .select({
+      id: inquiries.id,
+      status: inquiries.status,
+      brand_name: inquiries.brand_name,
+      contact_email: inquiries.contact_email,
+      website: inquiries.website,
+      campaign_objective: inquiries.campaign_objective,
+      target_audience: inquiries.target_audience,
+      creative_types: inquiries.creative_types,
+      platforms: inquiries.platforms,
+      additional_notes: inquiries.additional_notes,
+      submitted_at: inquiries.submitted_at,
+      created_at: inquiries.created_at,
+      updated_at: inquiries.updated_at,
+    })
+    .from(inquiries)
+    .orderBy(desc(inquiries.submitted_at))
+    .limit(500);
+}
+
 // Admin dashboard summary counts — full internal visibility.
 export async function getAdminDashboardCounts(organizationId: string) {
   const [
@@ -358,6 +381,7 @@ export async function getAdminDashboardCounts(organizationId: string) {
     allApprovals,
     allDeliveries,
     allPayments,
+    allInquiries,
   ] = await Promise.all([
     getAdminCampaigns(organizationId),
     getAdminQuotes(organizationId),
@@ -367,9 +391,11 @@ export async function getAdminDashboardCounts(organizationId: string) {
     getAdminApprovals(organizationId),
     getAdminDeliveries(organizationId),
     getAdminPayments(organizationId),
+    getAdminInquiries(),
   ]);
 
   return {
+    newInquiries: allInquiries.filter((i) => i.status === 'NEW').length,
     campaigns: allCampaigns.filter((c) => !c.archived_at).length,
     quoteDrafts: allQuotes.filter((q) => q.status === 'DRAFT').length,
     quoteSent: allQuotes.filter((q) => q.status === 'SENT').length,

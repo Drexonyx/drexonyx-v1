@@ -17,6 +17,7 @@ const NAV_SECTIONS = [
   {
     label: 'Commercial',
     items: [
+      { href: '/admin/inquiries', label: 'Inquiries' },
       { href: '/admin/campaigns', label: 'Campaigns' },
       { href: '/admin/quotes', label: 'Quotes' },
       { href: '/admin/orders', label: 'Orders' },
