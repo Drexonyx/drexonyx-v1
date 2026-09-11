@@ -327,6 +327,64 @@ describe('provisionClient', () => {
     expect(payload).not.toHaveProperty('temporaryPassword');
   });
 
+  // ─── DR 0106: production org membership ───────────────────────────────────
+
+  it('inserts a CLIENT membership in the DREXONYX production org (DR 0106)', async () => {
+    const membershipInserts: Record<string, unknown>[] = [];
+    selectSequence([[]]);
+    const tx = makeTx((data) => {
+      const row = data as Record<string, unknown>;
+      if ('role' in row) membershipInserts.push(row);
+    });
+    mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
+      await fn(tx);
+    });
+
+    await provisionClient(base);
+
+    const clientOrgMembership = membershipInserts.find(
+      (m) => m.organization_id !== base.actorOrganizationId,
+    );
+    const productionOrgMembership = membershipInserts.find(
+      (m) => m.organization_id === base.actorOrganizationId,
+    );
+    expect(clientOrgMembership).toMatchObject({ role: 'CLIENT' });
+    expect(productionOrgMembership).toMatchObject({
+      organization_id: base.actorOrganizationId,
+      role: 'CLIENT',
+    });
+    expect(membershipInserts.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('emits CLIENT_PRODUCTION_ORG_MEMBERSHIP_CREATED audit event (DR 0106)', async () => {
+    const auditInserts: Record<string, unknown>[] = [];
+    selectSequence([[]]);
+    const tx = makeTx((data) => {
+      const row = data as Record<string, unknown>;
+      if ('action' in row) auditInserts.push(row);
+    });
+    mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
+      await fn(tx);
+    });
+
+    await provisionClient(base);
+
+    const productionAudit = auditInserts.find(
+      (a) => a.action === 'CLIENT_PRODUCTION_ORG_MEMBERSHIP_CREATED',
+    );
+    expect(productionAudit).toBeDefined();
+    expect(productionAudit).toMatchObject({
+      organization_id: base.actorOrganizationId,
+      entity_type: 'user',
+      actor_id: base.actorId,
+      actor_role: 'OWNER',
+    });
+    const payload = productionAudit?.payload as Record<string, unknown>;
+    expect(payload).toMatchObject({ role: 'CLIENT', client_organization_id: expect.any(String) });
+    expect(payload).not.toHaveProperty('password_hash');
+    expect(payload).not.toHaveProperty('temporaryPassword');
+  });
+
   // ─── Duplicate / UNIQUE constraint handling ────────────────────────────────
 
   it('maps slug UNIQUE constraint violation to SLUG_TAKEN', async () => {

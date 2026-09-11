@@ -122,6 +122,7 @@ export async function provisionClient(params: {
   const newOrgId = uuidv7();
   const newUserId = uuidv7();
   const newMembershipId = uuidv7();
+  const productionMembershipId = uuidv7();
 
   try {
     await db.transaction(async (tx) => {
@@ -153,6 +154,15 @@ export async function provisionClient(params: {
       await tx.insert(orgMemberships).values({
         id: newMembershipId,
         organization_id: newOrgId,
+        user_id: newUserId,
+        role: 'CLIENT',
+      });
+
+      // DR 0106: CLIENT membership in DREXONYX production org so portal queries
+      // resolve to production records (all admin-created data is scoped to actorOrganizationId).
+      await tx.insert(orgMemberships).values({
+        id: productionMembershipId,
+        organization_id: actorOrganizationId,
         user_id: newUserId,
         role: 'CLIENT',
       });
@@ -189,6 +199,24 @@ export async function provisionClient(params: {
           membership_id: newMembershipId,
           role: 'CLIENT',
           actor_organization_id: actorOrganizationId,
+        },
+      });
+
+      // DR 0106: Audit event — production org membership created
+      await tx.insert(auditEvents).values({
+        id: uuidv7(),
+        organization_id: actorOrganizationId,
+        entity_type: 'user',
+        entity_id: newUserId,
+        actor_id: actorId,
+        actor_role: actorRole,
+        action: 'CLIENT_PRODUCTION_ORG_MEMBERSHIP_CREATED',
+        payload: {
+          user_id: newUserId,
+          user_email: emailT,
+          production_membership_id: productionMembershipId,
+          role: 'CLIENT',
+          client_organization_id: newOrgId,
         },
       });
 
