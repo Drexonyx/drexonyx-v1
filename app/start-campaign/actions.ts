@@ -81,7 +81,8 @@ export async function submitBrief(
     }).catch(() => undefined);
 
     return { status: 'success', inquiryId: inserted.id };
-  } catch {
+  } catch (error) {
+    console.error('[submitBrief] db insert failed:', error);
     return {
       status: 'error',
       error: 'Submission failed. Please try again or contact us directly at drexonyx.studio@gmail.com.',

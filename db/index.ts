@@ -27,7 +27,9 @@ function getDb() {
     if (!connectionString) {
       throw new Error('DATABASE_URL environment variable is not set');
     }
-    const client = postgres(connectionString);
+    // prepare: false — required for Neon's connection pooler (PgBouncer in transaction mode
+    // does not support named prepared statements). Safe for direct connections too.
+    const client = postgres(connectionString, { prepare: false });
     _db = drizzle(client, { schema });
   }
   return _db;
