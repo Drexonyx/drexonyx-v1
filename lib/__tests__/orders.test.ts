@@ -87,29 +87,46 @@ describe('completeOrder', () => {
     expect(result).toMatchObject({ ok: false });
   });
 
+  // DR 0104 §3.4: Fast-path idempotency
+  it('returns ok:true immediately when idempotency key is COMPLETED', async () => {
+    selectSequence([[{ status: 'COMPLETED' }]]);
+    const result = await completeOrder(base);
+    expect(result).toMatchObject({ ok: true, orderId: 'order1' });
+    expect(mockSelect).toHaveBeenCalledTimes(1);
+    expect(mockTransaction).not.toHaveBeenCalled();
+  });
+
+  it('returns ok:false (IN_PROGRESS) when idempotency key is PROCESSING', async () => {
+    selectSequence([[{ status: 'PROCESSING' }]]);
+    const result = await completeOrder(base);
+    expect(result).toMatchObject({ ok: false, reason: 'IN_PROGRESS' });
+    expect(mockTransaction).not.toHaveBeenCalled();
+  });
+
   it('returns ok:false when order not found', async () => {
-    selectSequence([[]]);
+    selectSequence([[], []]);  // empty idem key, empty order
     const result = await completeOrder(base);
     expect(result).toMatchObject({ ok: false, reason: 'Order not found' });
   });
 
   it('returns ok:true (idempotent) when order already COMPLETED', async () => {
-    selectSequence([[{ id: 'order1', status: 'COMPLETED' }]]);
+    selectSequence([[], [{ id: 'order1', status: 'COMPLETED' }]]);
     const result = await completeOrder(base);
     expect(result).toMatchObject({ ok: true, orderId: 'order1' });
     expect(mockTransaction).not.toHaveBeenCalled();
   });
 
   it('returns ok:false when order is CANCELLED', async () => {
-    selectSequence([[{ id: 'order1', status: 'CANCELLED' }]]);
+    selectSequence([[], [{ id: 'order1', status: 'CANCELLED' }]]);
     const result = await completeOrder(base);
     expect(result).toMatchObject({ ok: false, reason: expect.stringContaining('CANCELLED') });
   });
 
   it('returns ok:false when no Deliveries exist (DR 0104 conjunction guard)', async () => {
     selectSequence([
+      [],                               // no idem key
       [{ id: 'order1', status: 'ACTIVE' }],
-      [], // no deliveries
+      [],                               // no deliveries
     ]);
     const result = await completeOrder(base);
     expect(result).toMatchObject({ ok: false, reason: expect.stringContaining('Deliveries') });
@@ -117,6 +134,7 @@ describe('completeOrder', () => {
 
   it('returns ok:false when deliveries exist but not all COMPLETED', async () => {
     selectSequence([
+      [],
       [{ id: 'order1', status: 'ACTIVE' }],
       [
         { id: 'd1', status: 'COMPLETED' },
@@ -132,9 +150,10 @@ describe('completeOrder', () => {
 
   it('returns ok:false when no Approvals exist (DR 0104 conjunction guard)', async () => {
     selectSequence([
+      [],
       [{ id: 'order1', status: 'ACTIVE' }],
       [{ id: 'd1', status: 'COMPLETED' }],
-      [], // no approvals
+      [],                               // no approvals
     ]);
     const result = await completeOrder(base);
     expect(result).toMatchObject({ ok: false, reason: expect.stringContaining('Approvals') });
@@ -142,6 +161,7 @@ describe('completeOrder', () => {
 
   it('returns ok:false when approvals exist but not all APPROVED', async () => {
     selectSequence([
+      [],
       [{ id: 'order1', status: 'ACTIVE' }],
       [{ id: 'd1', status: 'COMPLETED' }],
       [
@@ -158,6 +178,7 @@ describe('completeOrder', () => {
 
   it('completes order when all conjunction guard conditions pass', async () => {
     selectSequence([
+      [],
       [{ id: 'order1', status: 'ACTIVE' }],
       [{ id: 'd1', status: 'COMPLETED' }],
       [{ id: 'a1', status: 'APPROVED' }],
@@ -173,11 +194,11 @@ describe('completeOrder', () => {
 
   it('handles CONCURRENT_MODIFICATION as ok:true (idempotent)', async () => {
     selectSequence([
+      [],
       [{ id: 'order1', status: 'ACTIVE' }],
       [{ id: 'd1', status: 'COMPLETED' }],
       [{ id: 'a1', status: 'APPROVED' }],
     ]);
-    // CAS returns empty array → concurrent modifier won
     mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
       await fn(makeTx([]));
     });
@@ -188,6 +209,7 @@ describe('completeOrder', () => {
 
   it('allows ADMIN_OPERATIONS role', async () => {
     selectSequence([
+      [],
       [{ id: 'order1', status: 'ACTIVE' }],
       [{ id: 'd1', status: 'COMPLETED' }],
       [{ id: 'a1', status: 'APPROVED' }],
@@ -198,6 +220,47 @@ describe('completeOrder', () => {
 
     const result = await completeOrder({ ...base, actorRole: 'ADMIN_OPERATIONS' });
     expect(result).toMatchObject({ ok: true });
+  });
+
+  it('audit event payload includes delivery_ids and approval_ids (DR 0104 §3.5)', async () => {
+    selectSequence([
+      [],
+      [{ id: 'order1', status: 'ACTIVE' }],
+      [{ id: 'd1', status: 'COMPLETED' }, { id: 'd2', status: 'COMPLETED' }],
+      [{ id: 'a1', status: 'APPROVED' }],
+    ]);
+    const inserts: unknown[] = [];
+    const tx = {
+      insert: vi.fn().mockReturnValue({
+        values: vi.fn().mockImplementation((data: unknown) => {
+          inserts.push(data);
+          return { onConflictDoNothing: vi.fn().mockResolvedValue([]) };
+        }),
+      }),
+      update: vi.fn().mockReturnValue({
+        set: vi.fn().mockReturnValue({
+          where: vi.fn().mockReturnValue({
+            returning: vi.fn().mockResolvedValue([{ id: 'order1' }]),
+          }),
+        }),
+      }),
+    };
+    mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
+      await fn(tx);
+    });
+
+    await completeOrder(base);
+
+    const auditRow = inserts[1] as Record<string, unknown>;
+    expect(auditRow).toMatchObject({
+      action: 'ORDER_COMPLETED',
+      payload: expect.objectContaining({
+        previous_status: 'ACTIVE',
+        new_status: 'COMPLETED',
+        delivery_ids: ['d1', 'd2'],
+        approval_ids: ['a1'],
+      }),
+    });
   });
 });
 
@@ -221,29 +284,46 @@ describe('cancelOrder', () => {
     expect(mockSelect).not.toHaveBeenCalled();
   });
 
+  // DR 0104 §3.9: Fast-path idempotency
+  it('returns ok:true immediately when idempotency key is COMPLETED', async () => {
+    selectSequence([[{ status: 'COMPLETED' }]]);
+    const result = await cancelOrder(base);
+    expect(result).toMatchObject({ ok: true, orderId: 'order1' });
+    expect(mockSelect).toHaveBeenCalledTimes(1);
+    expect(mockTransaction).not.toHaveBeenCalled();
+  });
+
+  it('returns ok:false (IN_PROGRESS) when idempotency key is PROCESSING', async () => {
+    selectSequence([[{ status: 'PROCESSING' }]]);
+    const result = await cancelOrder(base);
+    expect(result).toMatchObject({ ok: false, reason: 'IN_PROGRESS' });
+    expect(mockTransaction).not.toHaveBeenCalled();
+  });
+
   it('returns ok:false when order not found', async () => {
-    selectSequence([[]]);
+    selectSequence([[], []]);  // empty idem key, empty order
     const result = await cancelOrder(base);
     expect(result).toMatchObject({ ok: false, reason: 'Order not found' });
   });
 
   it('returns ok:true (idempotent) when order already CANCELLED', async () => {
-    selectSequence([[{ id: 'order1', status: 'CANCELLED' }]]);
+    selectSequence([[], [{ id: 'order1', status: 'CANCELLED' }]]);
     const result = await cancelOrder(base);
     expect(result).toMatchObject({ ok: true, orderId: 'order1' });
     expect(mockTransaction).not.toHaveBeenCalled();
   });
 
   it('returns ok:false when order is COMPLETED', async () => {
-    selectSequence([[{ id: 'order1', status: 'COMPLETED' }]]);
+    selectSequence([[], [{ id: 'order1', status: 'COMPLETED' }]]);
     const result = await cancelOrder(base);
     expect(result).toMatchObject({ ok: false, reason: expect.stringContaining('COMPLETED') });
   });
 
   it('cancels ACTIVE order without PAID payments', async () => {
     selectSequence([
+      [],                               // no idem key
       [{ id: 'order1', status: 'ACTIVE' }],
-      [], // no PAID payments
+      [],                               // no PAID payments
     ]);
     mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
       await fn(makeTx([{ id: 'order1' }]));
@@ -254,10 +334,11 @@ describe('cancelOrder', () => {
     expect(mockTransaction).toHaveBeenCalledOnce();
   });
 
-  it('cancels order and logs PAID payments without financial mutation (DR 0104 Owner Decision 4)', async () => {
+  it('cancels order and logs PAID payments without financial mutation (DR 0104 §3.7)', async () => {
     selectSequence([
+      [],
       [{ id: 'order1', status: 'ACTIVE' }],
-      [{ id: 'pay1', amount: 10000, currency: 'usd' }],
+      [{ id: 'pay1' }],
     ]);
     const tx = makeTx([{ id: 'order1' }]);
     mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
@@ -268,7 +349,6 @@ describe('cancelOrder', () => {
     expect(result).toMatchObject({ ok: true, orderId: 'order1' });
     // Payment table must NOT be updated (no financial mutation)
     const txUpdateCalls = (tx.update as ReturnType<typeof vi.fn>).mock.calls;
-    // update is called for orders status and idempotency key — never for payments
     for (const call of txUpdateCalls) {
       expect(call[0]).not.toMatchObject({ _: expect.objectContaining({ name: 'payments' }) });
     }
@@ -276,6 +356,7 @@ describe('cancelOrder', () => {
 
   it('handles CONCURRENT_MODIFICATION as ok:true (idempotent)', async () => {
     selectSequence([
+      [],
       [{ id: 'order1', status: 'ACTIVE' }],
       [],
     ]);
@@ -289,6 +370,7 @@ describe('cancelOrder', () => {
 
   it('allows ADMIN_OPERATIONS role', async () => {
     selectSequence([
+      [],
       [{ id: 'order1', status: 'ACTIVE' }],
       [],
     ]);
@@ -298,5 +380,84 @@ describe('cancelOrder', () => {
 
     const result = await cancelOrder({ ...base, actorRole: 'ADMIN_OPERATIONS' });
     expect(result).toMatchObject({ ok: true });
+  });
+
+  it('audit event payload includes had_paid_payment, payment_id, and reason (DR 0104 §3.10)', async () => {
+    selectSequence([
+      [],
+      [{ id: 'order1', status: 'ACTIVE' }],
+      [{ id: 'pay1' }],
+    ]);
+    const inserts: unknown[] = [];
+    const tx = {
+      insert: vi.fn().mockReturnValue({
+        values: vi.fn().mockImplementation((data: unknown) => {
+          inserts.push(data);
+          return { onConflictDoNothing: vi.fn().mockResolvedValue([]) };
+        }),
+      }),
+      update: vi.fn().mockReturnValue({
+        set: vi.fn().mockReturnValue({
+          where: vi.fn().mockReturnValue({
+            returning: vi.fn().mockResolvedValue([{ id: 'order1' }]),
+          }),
+        }),
+      }),
+    };
+    mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
+      await fn(tx);
+    });
+
+    await cancelOrder({ ...base, reason: 'Client requested' });
+
+    const auditRow = inserts[1] as Record<string, unknown>;
+    expect(auditRow).toMatchObject({
+      action: 'ORDER_CANCELLED',
+      payload: expect.objectContaining({
+        previous_status: 'ACTIVE',
+        new_status: 'CANCELLED',
+        reason: 'Client requested',
+        had_paid_payment: true,
+        payment_id: 'pay1',
+      }),
+    });
+  });
+
+  it('audit payload has had_paid_payment:false and payment_id:null when no PAID payment', async () => {
+    selectSequence([
+      [],
+      [{ id: 'order1', status: 'ACTIVE' }],
+      [],  // no PAID payments
+    ]);
+    const inserts: unknown[] = [];
+    const tx = {
+      insert: vi.fn().mockReturnValue({
+        values: vi.fn().mockImplementation((data: unknown) => {
+          inserts.push(data);
+          return { onConflictDoNothing: vi.fn().mockResolvedValue([]) };
+        }),
+      }),
+      update: vi.fn().mockReturnValue({
+        set: vi.fn().mockReturnValue({
+          where: vi.fn().mockReturnValue({
+            returning: vi.fn().mockResolvedValue([{ id: 'order1' }]),
+          }),
+        }),
+      }),
+    };
+    mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
+      await fn(tx);
+    });
+
+    await cancelOrder(base);
+
+    const auditRow = inserts[1] as Record<string, unknown>;
+    expect(auditRow).toMatchObject({
+      payload: expect.objectContaining({
+        had_paid_payment: false,
+        payment_id: null,
+        reason: null,
+      }),
+    });
   });
 });

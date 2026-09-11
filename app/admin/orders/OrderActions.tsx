@@ -7,6 +7,7 @@ import s from '../admin.module.css';
 export function OrderActions({ orderId }: { orderId: string }) {
   const [pending, setPending] = useState<'complete' | 'cancel' | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [cancelReason, setCancelReason] = useState('');
 
   async function handleComplete() {
     setPending('complete');
@@ -19,13 +20,13 @@ export function OrderActions({ orderId }: { orderId: string }) {
   async function handleCancel() {
     setPending('cancel');
     setError(null);
-    const result = await actionCancelOrder(orderId);
+    const result = await actionCancelOrder(orderId, cancelReason.trim() || undefined);
     if (!result.ok) setError(result.reason ?? 'Failed to cancel order');
     setPending(null);
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
       {error && (
         <span
           style={{
@@ -65,6 +66,23 @@ export function OrderActions({ orderId }: { orderId: string }) {
           {pending === 'cancel' ? '…' : 'Cancel'}
         </button>
       </div>
+      <input
+        type="text"
+        value={cancelReason}
+        onChange={(e) => setCancelReason(e.target.value)}
+        placeholder="Cancel reason (optional)"
+        disabled={pending !== null}
+        style={{
+          fontSize: '0.72rem',
+          padding: '0.2rem 0.375rem',
+          borderRadius: '3px',
+          border: '1px solid var(--drex-border, #444)',
+          background: 'var(--drex-input-bg, transparent)',
+          color: 'inherit',
+          width: '12rem',
+          opacity: pending !== null ? 0.5 : 1,
+        }}
+      />
     </div>
   );
 }

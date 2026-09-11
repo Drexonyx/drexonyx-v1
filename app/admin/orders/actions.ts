@@ -29,6 +29,7 @@ export async function actionCompleteOrder(
 
 export async function actionCancelOrder(
   orderId: string,
+  cancellationReason?: string,
 ): Promise<{ ok: boolean; reason?: string }> {
   const session = await getAdminSession();
   if (!session) redirect('/admin/login');
@@ -43,6 +44,7 @@ export async function actionCancelOrder(
     organizationId,
     actorId: userId,
     actorRole: role as 'OWNER' | 'ADMIN_OPERATIONS',
+    reason: cancellationReason,
   });
 
   if (result.ok) revalidatePath('/admin/orders');
