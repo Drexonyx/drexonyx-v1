@@ -109,11 +109,6 @@ export default function AboutPage() {
             Team profiles will be published as DREXONYX grows its public presence. For now, the
             work speaks.
           </p>
-          <div className={styles.teamPlaceholder} aria-label="Team profiles — coming soon">
-            <p className={styles.teamPlaceholderText}>
-              PLACEHOLDER — Team member profiles pending
-            </p>
-          </div>
         </div>
       </section>
 
