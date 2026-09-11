@@ -114,20 +114,21 @@ describe("Start Campaign page", () => {
     expect(screen.getByRole("form", { name: /campaign brief intake form/i })).toBeInTheDocument();
   });
 
-  it("renders a dev notice that form is not yet active", () => {
+  it("submit button is enabled", () => {
     render(<StartCampaignPage />);
-    expect(screen.getByText(/intake form in development/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /submit brief/i })).not.toBeDisabled();
   });
 
-  it("submit button is disabled", () => {
-    render(<StartCampaignPage />);
-    expect(screen.getByRole("button", { name: /submit brief/i })).toBeDisabled();
-  });
-
-  it("renders platform options as disabled checkboxes", () => {
+  it("renders platform options as enabled checkboxes", () => {
     render(<StartCampaignPage />);
     const checkboxes = screen.getAllByRole("checkbox");
     expect(checkboxes.length).toBeGreaterThan(0);
-    checkboxes.forEach((cb) => expect(cb).toBeDisabled());
+    checkboxes.forEach((cb) => expect(cb).not.toBeDisabled());
+  });
+
+  it("renders brand name and email inputs", () => {
+    render(<StartCampaignPage />);
+    expect(screen.getByLabelText(/brand name/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/contact email/i)).toBeInTheDocument();
   });
 });

@@ -121,14 +121,12 @@
   padding: 0.75rem 1rem;
   font-size: 0.9375rem;
   font-family: inherit;
-  color: var(--drex-text-muted);
+  color: var(--drex-text);
   background: var(--drex-surface);
   border: 1px solid var(--drex-border);
   border-radius: 8px;
   resize: vertical;
   transition: border-color var(--drex-duration) var(--drex-ease);
-  opacity: 0.6;
-  cursor: not-allowed;
 }
 
 .input::placeholder,
@@ -136,10 +134,16 @@
   color: var(--drex-text-muted);
 }
 
-.input:not(:disabled):focus,
-.textarea:not(:disabled):focus {
+.input:focus,
+.textarea:focus {
   outline: none;
   border-color: var(--drex-accent);
+}
+
+.input:disabled,
+.textarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .checkboxGroup {
@@ -154,8 +158,7 @@
   gap: 0.625rem;
   font-size: 0.9375rem;
   color: var(--drex-text-secondary);
-  cursor: not-allowed;
-  opacity: 0.6;
+  cursor: pointer;
 }
 
 .checkbox {
@@ -163,7 +166,7 @@
   height: 16px;
   border-radius: 4px;
   accent-color: var(--drex-accent);
-  cursor: not-allowed;
+  cursor: pointer;
 }
 
 .submitBtn {
@@ -173,17 +176,52 @@
   padding: 0.875rem 2rem;
   font-size: 1rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.4);
-  background: rgba(200, 152, 10, 0.2);
+  color: #0a0a0a;
+  background: var(--drex-accent);
   border-radius: 8px;
-  cursor: not-allowed;
+  cursor: pointer;
   align-self: flex-start;
+  transition: opacity var(--drex-duration) var(--drex-ease);
 }
 
-.submitNote {
-  font-size: 0.8125rem;
-  font-weight: 400;
-  color: var(--drex-text-muted);
+.submitBtn:hover {
+  opacity: 0.88;
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.errorBanner {
+  padding: 0.875rem 1.25rem;
+  background: rgba(220, 38, 38, 0.06);
+  border: 1px solid rgba(220, 38, 38, 0.25);
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  color: #dc2626;
+}
+
+.successBanner {
+  padding: 1.5rem;
+  background: rgba(22, 163, 74, 0.06);
+  border: 1px solid rgba(22, 163, 74, 0.25);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.successHeading {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #16a34a;
+}
+
+.successText {
+  font-size: 0.9375rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.6;
 }
 
 /* Sidebar */

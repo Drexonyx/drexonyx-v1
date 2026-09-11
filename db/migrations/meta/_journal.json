@@ -50,6 +50,13 @@
       "when": 1788633419000,
       "tag": "0006_phase10_skills",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1789120553593,
+      "tag": "0007_premium_typhoid_mary",
+      "breakpoints": true
     }
   ]
 }

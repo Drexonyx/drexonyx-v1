@@ -15,6 +15,38 @@ import { organizations } from './core';
 
 export const commercialSchema = pgSchema('commercial');
 
+// ─── Inquiries ───────────────────────────────────────────────────────────────
+// Pre-org intake record written by public /start-campaign form submissions.
+// No organization_id required — the visitor is not yet a client.
+// Admin converts to Campaign + Brief + Quote as the next operational step.
+
+export const inquiries = commercialSchema.table(
+  'inquiries',
+  {
+    id: uuid('id').primaryKey().$defaultFn(() => uuidv7()),
+    status: text('status').notNull().default('NEW'),
+    brand_name: text('brand_name').notNull(),
+    contact_email: text('contact_email').notNull(),
+    website: text('website'),
+    campaign_objective: text('campaign_objective').notNull(),
+    target_audience: text('target_audience'),
+    creative_types: text('creative_types'),
+    platforms: text('platforms'),
+    additional_notes: text('additional_notes'),
+    submitted_at: timestamp('submitted_at', { withTimezone: true }).notNull().defaultNow(),
+    created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updated_at: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    check(
+      'inquiries_status_check',
+      sql`${t.status} IN ('NEW','REVIEWED','CONVERTED','DISMISSED')`,
+    ),
+    index('inquiries_status_idx').on(t.status),
+    index('inquiries_submitted_at_idx').on(t.submitted_at),
+  ],
+);
+
 // ─── Campaigns ─────────────────────────────────────────────────────────────
 
 export const campaigns = commercialSchema.table(
