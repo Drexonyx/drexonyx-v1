@@ -8,19 +8,17 @@ export const metadata: Metadata = {
     "DREXONYX pricing and packages — performance UGC creative production. Campaign-based packages tailored to your brand's production needs.",
 };
 
-// Package details are not yet finalized. Pricing and package names are placeholders
-// pending internal approval before public release.
 const PACKAGES = [
   {
     id: "starter",
-    name: "PLACEHOLDER — Starter Package",
-    priceLabel: "Price TBD",
+    name: "Starter",
+    priceLabel: "AED 1,500",
     description:
       "Entry-level performance creative package. Ideal for brands launching their first UGC advertising program.",
     includes: [
-      "PLACEHOLDER — deliverable count and types TBD",
-      "PLACEHOLDER — revision rounds TBD",
-      "PLACEHOLDER — turnaround timeline TBD",
+      "1 UGC advertising video",
+      "1 revision round",
+      "5 business days turnaround",
       "Creative strategy brief",
       "QC review included",
     ],
@@ -28,14 +26,14 @@ const PACKAGES = [
   },
   {
     id: "growth",
-    name: "PLACEHOLDER — Growth Package",
-    priceLabel: "Price TBD",
+    name: "Growth",
+    priceLabel: "AED 3,500",
     description:
       "For brands scaling performance creative volume. Expanded deliverable set with creative testing support.",
     includes: [
-      "PLACEHOLDER — deliverable count and types TBD",
-      "PLACEHOLDER — revision rounds TBD",
-      "PLACEHOLDER — turnaround timeline TBD",
+      "3 UGC advertising videos",
+      "2 revision rounds",
+      "7 business days turnaround",
       "Creative strategy brief",
       "A/B variant production",
       "QC review included",
@@ -44,14 +42,14 @@ const PACKAGES = [
   },
   {
     id: "scale",
-    name: "PLACEHOLDER — Scale Package",
-    priceLabel: "Price TBD",
+    name: "Scale",
+    priceLabel: "AED 6,500",
     description:
       "High-volume creative production for performance-led brands running multiple campaigns simultaneously.",
     includes: [
-      "PLACEHOLDER — deliverable count and types TBD",
-      "PLACEHOLDER — revision rounds TBD",
-      "PLACEHOLDER — turnaround timeline TBD",
+      "6 UGC advertising videos",
+      "3 revision rounds",
+      "10 business days turnaround",
       "Full creative strategy",
       "Multi-format variant production",
       "Priority QC and delivery",
@@ -79,11 +77,6 @@ export default function PricingPage() {
 
       <section className={styles.packagesSection} aria-label="Pricing packages">
         <div className="container">
-          <div className={styles.pricingNotice} role="note">
-            <strong>Pricing in development.</strong> Package names, deliverable counts, and
-            prices are not yet finalized. Contact us to discuss your campaign scope.
-          </div>
-
           <div className={styles.packagesGrid}>
             {PACKAGES.map((pkg) => (
               <article
@@ -144,7 +137,11 @@ export default function PricingPage() {
               },
               {
                 q: "How long does production take?",
-                a: "Timelines vary by package and deliverable type. Specific turnaround commitments are finalized at project scope.",
+                a: "Starter packages deliver in 5 business days. Growth packages deliver in 7 business days. Scale packages deliver in 10 business days. Timelines begin once your brief and payment are confirmed.",
+              },
+              {
+                q: "Do you manage ad campaigns or media buying?",
+                a: "No. DREXONYX produces UGC advertising creative only. Campaign management, media buying, and ad optimization are outside our scope.",
               },
             ].map((item) => (
               <div key={item.q} className={styles.faqItem}>

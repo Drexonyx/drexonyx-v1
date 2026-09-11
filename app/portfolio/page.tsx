@@ -10,46 +10,6 @@ export const metadata: Metadata = {
 
 const CATEGORIES = ["All", "UGC Video", "Static Creative", "Creative Strategy"] as const;
 
-// Portfolio content is intentionally held until client-approved work can be featured.
-// Cards below represent category placeholders — no real client data, logos, or stats.
-const PORTFOLIO_ITEMS = [
-  {
-    id: "p-001",
-    category: "UGC Video",
-    label: "PLACEHOLDER — UGC Video Campaign",
-    note: "Work sample pending client approval",
-  },
-  {
-    id: "p-002",
-    category: "Static Creative",
-    label: "PLACEHOLDER — Static Ad Set",
-    note: "Work sample pending client approval",
-  },
-  {
-    id: "p-003",
-    category: "UGC Video",
-    label: "PLACEHOLDER — UGC Video Campaign",
-    note: "Work sample pending client approval",
-  },
-  {
-    id: "p-004",
-    category: "Creative Strategy",
-    label: "PLACEHOLDER — Creative Strategy Brief",
-    note: "Work sample pending client approval",
-  },
-  {
-    id: "p-005",
-    category: "Static Creative",
-    label: "PLACEHOLDER — Static Ad Set",
-    note: "Work sample pending client approval",
-  },
-  {
-    id: "p-006",
-    category: "UGC Video",
-    label: "PLACEHOLDER — UGC Video Campaign",
-    note: "Work sample pending client approval",
-  },
-] as const;
 
 export default function PortfolioPage() {
   return (
@@ -79,26 +39,6 @@ export default function PortfolioPage() {
               >
                 {cat}
               </button>
-            ))}
-          </div>
-
-          <div className={styles.portfolioGrid} role="list">
-            {PORTFOLIO_ITEMS.map((item) => (
-              <article
-                key={item.id}
-                className={styles.portfolioCard}
-                role="listitem"
-                aria-label={item.label}
-              >
-                <div className={styles.cardPlaceholder} aria-hidden="true">
-                  <span className={styles.cardPlaceholderIcon}>▶</span>
-                </div>
-                <div className={styles.cardMeta}>
-                  <span className={styles.cardCategory}>{item.category}</span>
-                  <p className={styles.cardLabel}>{item.label}</p>
-                  <p className={styles.cardNote}>{item.note}</p>
-                </div>
-              </article>
             ))}
           </div>
 

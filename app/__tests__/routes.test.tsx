@@ -67,15 +67,14 @@ describe("Pricing page", () => {
     expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
   });
 
-  it("renders the pricing-in-development notice", () => {
+  it("renders all three package cards with real prices", () => {
     render(<PricingPage />);
-    expect(screen.getByText(/pricing in development/i)).toBeInTheDocument();
-  });
-
-  it("renders package cards", () => {
-    render(<PricingPage />);
-    const cards = screen.getAllByText(/PLACEHOLDER — .* Package/);
-    expect(cards.length).toBe(3);
+    expect(screen.getByText("Starter")).toBeInTheDocument();
+    expect(screen.getByText("Growth")).toBeInTheDocument();
+    expect(screen.getByText("Scale")).toBeInTheDocument();
+    expect(screen.getByText("AED 1,500")).toBeInTheDocument();
+    expect(screen.getByText("AED 3,500")).toBeInTheDocument();
+    expect(screen.getByText("AED 6,500")).toBeInTheDocument();
   });
 });
 
