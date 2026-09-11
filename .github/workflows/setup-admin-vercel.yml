@@ -1,0 +1,127 @@
+name: Configure Admin Vercel Project
+
+# Configures all required environment variables on the drexonyx-v1-admin Vercel
+# project and triggers a production deployment.
+#
+# Prerequisites before running:
+#   1. Create the drexonyx-v1-admin project in the Vercel dashboard:
+#      - New Project → Import Git Repo → Drexonyx/drexonyx-v1
+#      - Project name: drexonyx-v1-admin
+#      - Do NOT set any env vars in the wizard; this workflow sets them.
+#      - Do NOT deploy yet; cancel the initial deploy or let it fail.
+#
+#   2. Add these GitHub repository secrets (Settings → Secrets → Actions):
+#
+#      VERCEL_TOKEN            — Vercel personal access token
+#                                (vercel.com/account/tokens → Create Token)
+#
+#      ADMIN_DATABASE_URL      — Production Neon connection string
+#                                (copy DATABASE_URL from drexonyx-v1 Vercel project)
+#
+#      ADMIN_AUTH_SECRET       — Auth.js secret
+#                                (copy AUTH_SECRET from drexonyx-v1 Vercel project)
+#
+#      ADMIN_LOGIN_PASSWORD_HASH — bcrypt hash of the operator passphrase (cost 12)
+#                                  Generate: node -e "require('bcryptjs').hash('YOUR_PASSPHRASE',12).then(h=>console.log(h))"
+#
+#      ADMIN_SESSION_SECRET    — Random HMAC key for admin session tokens
+#                                Generate: openssl rand -base64 32
+#
+#   3. Run this workflow (Actions → Configure Admin Vercel Project → Run workflow)
+#      and type SET in the confirm field.
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type SET to confirm setting env vars on drexonyx-v1-admin"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  configure:
+    name: Set env vars and deploy drexonyx-v1-admin
+    runs-on: ubuntu-latest
+    if: github.event.inputs.confirm == 'SET'
+
+    steps:
+      - name: Set non-secret environment variables
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          set -euo pipefail
+          TEAM_ID="team_qqKMKFtQjrjZIjlth9LBDNu0"
+          PROJECT="drexonyx-v1-admin"
+
+          set_plain() {
+            local key="$1" value="$2"
+            local json_value
+            json_value=$(python3 -c "import json,sys; print(json.dumps(sys.argv[1]))" "$value")
+            curl -sf -X POST \
+              "https://api.vercel.com/v10/projects/${PROJECT}/env?teamId=${TEAM_ID}" \
+              -H "Authorization: Bearer ${VERCEL_TOKEN}" \
+              -H "Content-Type: application/json" \
+              -d "{\"key\":\"${key}\",\"value\":${json_value},\"type\":\"plain\",\"target\":[\"production\"]}"
+            echo "  ✓ ${key}"
+          }
+
+          echo "Setting non-secret env vars..."
+          set_plain ENABLE_ADMIN_ROUTES "true"
+          set_plain DREXONYX_ORG_ID "63b642fd-38f6-48ea-b9b1-ca2cbb4c3810"
+          set_plain AUTH_URL "https://drexonyx-v1-admin.vercel.app"
+
+      - name: Set secret environment variables
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          ADMIN_DATABASE_URL: ${{ secrets.ADMIN_DATABASE_URL }}
+          ADMIN_AUTH_SECRET: ${{ secrets.ADMIN_AUTH_SECRET }}
+          ADMIN_LOGIN_PASSWORD_HASH: ${{ secrets.ADMIN_LOGIN_PASSWORD_HASH }}
+          ADMIN_SESSION_SECRET: ${{ secrets.ADMIN_SESSION_SECRET }}
+        run: |
+          set -euo pipefail
+          TEAM_ID="team_qqKMKFtQjrjZIjlth9LBDNu0"
+          PROJECT="drexonyx-v1-admin"
+
+          set_secret() {
+            local key="$1" value="$2"
+            local json_value
+            json_value=$(python3 -c "import json,sys; print(json.dumps(sys.argv[1]))" "$value")
+            curl -sf -X POST \
+              "https://api.vercel.com/v10/projects/${PROJECT}/env?teamId=${TEAM_ID}" \
+              -H "Authorization: Bearer ${VERCEL_TOKEN}" \
+              -H "Content-Type: application/json" \
+              -d "{\"key\":\"${key}\",\"value\":${json_value},\"type\":\"encrypted\",\"target\":[\"production\"]}"
+            echo "  ✓ ${key}"
+          }
+
+          echo "Setting secret env vars..."
+          set_secret DATABASE_URL "$ADMIN_DATABASE_URL"
+          set_secret AUTH_SECRET "$ADMIN_AUTH_SECRET"
+          set_secret ADMIN_LOGIN_PASSWORD_HASH "$ADMIN_LOGIN_PASSWORD_HASH"
+          set_secret ADMIN_SESSION_SECRET "$ADMIN_SESSION_SECRET"
+
+      - name: Trigger production deployment
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          set -euo pipefail
+          TEAM_ID="team_qqKMKFtQjrjZIjlth9LBDNu0"
+          echo "Triggering production deployment of drexonyx-v1-admin from main..."
+          curl -sf -X POST \
+            "https://api.vercel.com/v13/deployments?teamId=${TEAM_ID}&forceNew=1" \
+            -H "Authorization: Bearer ${VERCEL_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "name": "drexonyx-v1-admin",
+              "gitSource": {
+                "type": "github",
+                "org": "Drexonyx",
+                "repo": "drexonyx-v1",
+                "ref": "main"
+              },
+              "target": "production"
+            }' | python3 -c "import json,sys; d=json.load(sys.stdin); print('Deployment URL:', d.get('url','(check Vercel dashboard)'))"
+          echo "Deployment triggered. Monitor progress at https://vercel.com/drexonyxstudio-7806/drexonyx-v1-admin"
