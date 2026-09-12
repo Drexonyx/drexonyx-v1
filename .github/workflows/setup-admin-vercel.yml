@@ -58,13 +58,25 @@ jobs:
 
           set_plain() {
             local key="$1" value="$2"
-            local json_value
+            local json_value envid
             json_value=$(python3 -c "import json,sys; print(json.dumps(sys.argv[1]))" "$value")
-            curl -s --fail-with-body -X POST \
+            envid=$(curl -s \
               "https://api.vercel.com/v10/projects/${PROJECT}/env?teamId=${TEAM_ID}" \
-              -H "Authorization: Bearer ${VERCEL_TOKEN}" \
-              -H "Content-Type: application/json" \
-              -d "{\"key\":\"${key}\",\"value\":${json_value},\"type\":\"plain\",\"target\":[\"production\"]}"
+              -H "Authorization: Bearer ${VERCEL_TOKEN}" | \
+              python3 -c "import json,sys; d=json.load(sys.stdin); r=[e['id'] for e in d.get('envs',[]) if e['key']==sys.argv[1]]; print(r[0] if r else '')" "${key}")
+            if [ -n "$envid" ]; then
+              curl -s --fail-with-body -X PATCH \
+                "https://api.vercel.com/v10/projects/${PROJECT}/env/${envid}?teamId=${TEAM_ID}" \
+                -H "Authorization: Bearer ${VERCEL_TOKEN}" \
+                -H "Content-Type: application/json" \
+                -d "{\"value\":${json_value},\"type\":\"plain\",\"target\":[\"production\"]}" > /dev/null
+            else
+              curl -s --fail-with-body -X POST \
+                "https://api.vercel.com/v10/projects/${PROJECT}/env?teamId=${TEAM_ID}" \
+                -H "Authorization: Bearer ${VERCEL_TOKEN}" \
+                -H "Content-Type: application/json" \
+                -d "{\"key\":\"${key}\",\"value\":${json_value},\"type\":\"plain\",\"target\":[\"production\"]}" > /dev/null
+            fi
             echo "  ✓ ${key}"
           }
 
@@ -87,13 +99,25 @@ jobs:
 
           set_secret() {
             local key="$1" value="$2"
-            local json_value
+            local json_value envid
             json_value=$(python3 -c "import json,sys; print(json.dumps(sys.argv[1]))" "$value")
-            curl -s --fail-with-body -X POST \
+            envid=$(curl -s \
               "https://api.vercel.com/v10/projects/${PROJECT}/env?teamId=${TEAM_ID}" \
-              -H "Authorization: Bearer ${VERCEL_TOKEN}" \
-              -H "Content-Type: application/json" \
-              -d "{\"key\":\"${key}\",\"value\":${json_value},\"type\":\"encrypted\",\"target\":[\"production\"]}"
+              -H "Authorization: Bearer ${VERCEL_TOKEN}" | \
+              python3 -c "import json,sys; d=json.load(sys.stdin); r=[e['id'] for e in d.get('envs',[]) if e['key']==sys.argv[1]]; print(r[0] if r else '')" "${key}")
+            if [ -n "$envid" ]; then
+              curl -s --fail-with-body -X PATCH \
+                "https://api.vercel.com/v10/projects/${PROJECT}/env/${envid}?teamId=${TEAM_ID}" \
+                -H "Authorization: Bearer ${VERCEL_TOKEN}" \
+                -H "Content-Type: application/json" \
+                -d "{\"value\":${json_value},\"type\":\"encrypted\",\"target\":[\"production\"]}" > /dev/null
+            else
+              curl -s --fail-with-body -X POST \
+                "https://api.vercel.com/v10/projects/${PROJECT}/env?teamId=${TEAM_ID}" \
+                -H "Authorization: Bearer ${VERCEL_TOKEN}" \
+                -H "Content-Type: application/json" \
+                -d "{\"key\":\"${key}\",\"value\":${json_value},\"type\":\"encrypted\",\"target\":[\"production\"]}" > /dev/null
+            fi
             echo "  ✓ ${key}"
           }
 
