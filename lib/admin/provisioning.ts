@@ -1,20 +1,21 @@
 // DR 0105: Client provisioning — atomic organization + user + CLIENT membership creation.
-// Actor authority: OWNER and ADMIN_OPERATIONS.
+// Actor authority: OWNER only (DR 0105 §3.1, Owner decision 1).
 // Password: server-generated cryptographically secure random (randomBytes); bcryptjs cost 12.
 // Password never logged, never in audit payload, never stored plaintext.
+// Idempotency: fast-path via system.idempotency_keys keyed on slug (Owner decision 3).
 // Slug and email uniqueness enforced by DB UNIQUE constraints (caught and mapped to error codes).
 // organizationId for actor always from server-side JWT.
 
 import { db } from '@/db/index';
 import { organizations } from '@/db/schema/core';
 import { users, orgMemberships } from '@/db/schema/identity';
-import { auditEvents } from '@/db/schema/system';
+import { auditEvents, idempotencyKeys } from '@/db/schema/system';
+import { and, eq } from 'drizzle-orm';
 import { uuidv7 } from 'uuidv7';
 import bcrypt from 'bcryptjs';
 import { randomBytes } from 'crypto';
 import type { AdminRole } from './types';
 
-const PROVISION_ROLES: AdminRole[] = ['OWNER', 'ADMIN_OPERATIONS'];
 const SLUG_PATTERN = /^[a-z0-9-]+$/;
 const BCRYPT_COST = 12;
 const GENERATED_PASSWORD_BYTES = 18; // 24-char base64url output
@@ -48,7 +49,8 @@ export async function provisionClient(params: {
     actorRole,
   } = params;
 
-  if (!PROVISION_ROLES.includes(actorRole)) {
+  // DR 0105 §3.1, Owner decision 1: OWNER only
+  if (actorRole !== 'OWNER') {
     return { ok: false, reason: 'Insufficient authority' };
   }
 
@@ -78,16 +80,64 @@ export async function provisionClient(params: {
     return { ok: false, reason: 'User display name must be 1–255 characters' };
   }
 
-  // Server-side generated password — never accepted from caller
+  const idempKey = `CLIENT_PROVISIONED:${slugT}`;
+
+  // DR 0105 §3.6 + Owner decision 3: Fast-path idempotency check
+  const existingKey = await db
+    .select({ status: idempotencyKeys.status, response_payload: idempotencyKeys.response_payload })
+    .from(idempotencyKeys)
+    .where(
+      and(
+        eq(idempotencyKeys.key, idempKey),
+        eq(idempotencyKeys.organization_id, actorOrganizationId),
+        eq(idempotencyKeys.operation_type, 'CLIENT_PROVISIONED'),
+      ),
+    )
+    .limit(1);
+
+  if (existingKey.length > 0) {
+    if (existingKey[0].status === 'COMPLETED') {
+      const stored = existingKey[0].response_payload as {
+        organizationId: string;
+        userId: string;
+        membershipId: string;
+      } | null;
+      return {
+        ok: true,
+        organizationId: stored?.organizationId ?? '',
+        userId: stored?.userId ?? '',
+        membershipId: stored?.membershipId ?? '',
+        temporaryPassword: '',
+      };
+    }
+    if (existingKey[0].status === 'PROCESSING') {
+      return { ok: false, reason: 'IN_PROGRESS' };
+    }
+  }
+
+  // Server-side generated password — never accepted from caller (Owner decision 2)
   const temporaryPassword = randomBytes(GENERATED_PASSWORD_BYTES).toString('base64url');
   const passwordHash = await bcrypt.hash(temporaryPassword, BCRYPT_COST);
 
   const newOrgId = uuidv7();
   const newUserId = uuidv7();
   const newMembershipId = uuidv7();
+  const productionMembershipId = uuidv7();
 
   try {
     await db.transaction(async (tx) => {
+      await tx
+        .insert(idempotencyKeys)
+        .values({
+          id: uuidv7(),
+          key: idempKey,
+          organization_id: actorOrganizationId,
+          operation_type: 'CLIENT_PROVISIONED',
+          status: 'PROCESSING',
+          expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        })
+        .onConflictDoNothing();
+
       await tx.insert(organizations).values({
         id: newOrgId,
         name: nameT,
@@ -108,9 +158,8 @@ export async function provisionClient(params: {
         role: 'CLIENT',
       });
 
-      // DR 0106: CLIENT membership in DREXONYX's production org so the client
-      // can access production records (campaigns, quotes, orders, deliveries) via the portal.
-      const productionMembershipId = uuidv7();
+      // DR 0106: CLIENT membership in DREXONYX production org so portal queries
+      // resolve to production records (all admin-created data is scoped to actorOrganizationId).
       await tx.insert(orgMemberships).values({
         id: productionMembershipId,
         organization_id: actorOrganizationId,
@@ -118,6 +167,7 @@ export async function provisionClient(params: {
         role: 'CLIENT',
       });
 
+      // DR 0105 §3.7: Audit event 1 — organization provisioned
       await tx.insert(auditEvents).values({
         id: uuidv7(),
         organization_id: newOrgId,
@@ -134,6 +184,7 @@ export async function provisionClient(params: {
         },
       });
 
+      // DR 0105 §3.7: Audit event 2 — CLIENT user provisioned
       await tx.insert(auditEvents).values({
         id: uuidv7(),
         organization_id: newOrgId,
@@ -151,7 +202,7 @@ export async function provisionClient(params: {
         },
       });
 
-      // DR 0106: Audit the production org membership separately so both orgs have a record.
+      // DR 0106: Audit event — production org membership created
       await tx.insert(auditEvents).values({
         id: uuidv7(),
         organization_id: actorOrganizationId,
@@ -168,10 +219,27 @@ export async function provisionClient(params: {
           client_organization_id: newOrgId,
         },
       });
+
+      await tx
+        .update(idempotencyKeys)
+        .set({
+          status: 'COMPLETED',
+          response_payload: {
+            organizationId: newOrgId,
+            userId: newUserId,
+            membershipId: newMembershipId,
+          },
+          updated_at: new Date(),
+        })
+        .where(
+          and(
+            eq(idempotencyKeys.key, idempKey),
+            eq(idempotencyKeys.organization_id, actorOrganizationId),
+          ),
+        );
     });
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : String(e);
-    // Map UNIQUE constraint violations to structured error codes
     if (
       msg.includes('organizations_slug_unique') ||
       (msg.toLowerCase().includes('unique') && msg.toLowerCase().includes('slug'))

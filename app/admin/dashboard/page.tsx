@@ -12,7 +12,9 @@ export default async function AdminDashboardPage() {
   const counts = await getAdminDashboardCounts(session.organizationId);
 
   const stats = [
+    { label: 'New Inquiries', value: counts.newInquiries, accent: counts.newInquiries > 0 },
     { label: 'Campaigns', value: counts.campaigns },
+    { label: 'Briefs Submitted', value: counts.briefsSubmitted, accent: counts.briefsSubmitted > 0 },
     { label: 'Quote Drafts', value: counts.quoteDrafts },
     { label: 'Quotes Sent', value: counts.quoteSent, accent: counts.quoteSent > 0 },
     { label: 'Active Orders', value: counts.ordersActive, accent: counts.ordersActive > 0 },

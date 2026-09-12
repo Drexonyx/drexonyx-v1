@@ -1,7 +1,7 @@
 // DR 0104: Order lifecycle close-out — ACTIVE→COMPLETED / ACTIVE→CANCELLED.
 // completeOrder: OWNER/ADMIN_OPERATIONS. Conjunction guard: ≥1 Delivery (all COMPLETED)
-//   AND ≥1 Approval (all APPROVED). CAS on status='ACTIVE'. Idempotency key + audit in transaction.
-// cancelOrder: OWNER/ADMIN_OPERATIONS. No cascade to related records. PAID payments: LOG-ONLY.
+//   AND ≥1 Approval (all APPROVED). Idempotency fast-path + CAS. Audit ORDER_COMPLETED.
+// cancelOrder: OWNER/ADMIN_OPERATIONS. No cascade. PAID payments: LOG-ONLY (no reversal).
 // organizationId always from server-side JWT. Financial tables not mutated.
 
 import { db } from '@/db/index';
@@ -35,6 +35,26 @@ export async function completeOrder(params: {
     return { ok: false, reason: 'Insufficient authority' };
   }
 
+  const idempKey = `ORDER_COMPLETED:${orderId}`;
+
+  // DR 0104 §3.4: Fast-path idempotency check — skip guard and UPDATE if already done
+  const existingKey = await db
+    .select({ status: idempotencyKeys.status })
+    .from(idempotencyKeys)
+    .where(
+      and(
+        eq(idempotencyKeys.key, idempKey),
+        eq(idempotencyKeys.organization_id, organizationId),
+        eq(idempotencyKeys.operation_type, 'ORDER_COMPLETED'),
+      ),
+    )
+    .limit(1);
+
+  if (existingKey.length > 0) {
+    if (existingKey[0].status === 'COMPLETED') return { ok: true, orderId };
+    if (existingKey[0].status === 'PROCESSING') return { ok: false, reason: 'IN_PROGRESS' };
+  }
+
   const orderRows = await db
     .select({ id: orders.id, status: orders.status })
     .from(orders)
@@ -59,7 +79,7 @@ export async function completeOrder(params: {
     return { ok: false, reason: `Order cannot be completed: status is ${orderRows[0].status}` };
   }
 
-  // DR 0104 Owner Decision 1: conjunction guard
+  // DR 0104 §3.2: Conjunction guard — ≥1 Delivery all COMPLETED AND ≥1 Approval all APPROVED
   const deliveryRows = await db
     .select({ id: deliveries.id, status: deliveries.status })
     .from(deliveries)
@@ -100,8 +120,6 @@ export async function completeOrder(params: {
     return { ok: false, reason: 'Order cannot be completed: all Approvals must be APPROVED' };
   }
 
-  const idempKey = `ORDER_COMPLETED:${orderId}`;
-
   try {
     await db.transaction(async (tx) => {
       await tx
@@ -132,6 +150,7 @@ export async function completeOrder(params: {
         throw new Error('CONCURRENT_MODIFICATION');
       }
 
+      // DR 0104 §3.5: Audit event with delivery_ids and approval_ids arrays
       await tx.insert(auditEvents).values({
         id: uuidv7(),
         organization_id: organizationId,
@@ -142,9 +161,10 @@ export async function completeOrder(params: {
         action: 'ORDER_COMPLETED',
         payload: {
           order_id: orderId,
-          delivery_count: deliveryRows.length,
-          approval_count: approvalRows.length,
-          organization_id: organizationId,
+          previous_status: 'ACTIVE',
+          new_status: 'COMPLETED',
+          delivery_ids: deliveryRows.map((d) => d.id),
+          approval_ids: approvalRows.map((a) => a.id),
         },
       });
 
@@ -173,11 +193,32 @@ export async function cancelOrder(params: {
   organizationId: string;
   actorId: string;
   actorRole: AdminRole;
+  reason?: string;
 }): Promise<CancelOrderResult> {
-  const { orderId, organizationId, actorId, actorRole } = params;
+  const { orderId, organizationId, actorId, actorRole, reason } = params;
 
   if (!MANAGE_ROLES.includes(actorRole)) {
     return { ok: false, reason: 'Insufficient authority' };
+  }
+
+  const idempKey = `ORDER_CANCELLED:${orderId}`;
+
+  // DR 0104 §3.9: Fast-path idempotency check
+  const existingKey = await db
+    .select({ status: idempotencyKeys.status })
+    .from(idempotencyKeys)
+    .where(
+      and(
+        eq(idempotencyKeys.key, idempKey),
+        eq(idempotencyKeys.organization_id, organizationId),
+        eq(idempotencyKeys.operation_type, 'ORDER_CANCELLED'),
+      ),
+    )
+    .limit(1);
+
+  if (existingKey.length > 0) {
+    if (existingKey[0].status === 'COMPLETED') return { ok: true, orderId };
+    if (existingKey[0].status === 'PROCESSING') return { ok: false, reason: 'IN_PROGRESS' };
   }
 
   const orderRows = await db
@@ -204,9 +245,9 @@ export async function cancelOrder(params: {
     return { ok: false, reason: `Order cannot be cancelled: status is ${orderRows[0].status}` };
   }
 
-  // DR 0104 Owner Decision 4: log PAID payments — no financial mutation
+  // DR 0104 §3.7: Check for PAID payments — log only, no financial mutation
   const paidPayments = await db
-    .select({ id: payments.id, amount: payments.amount, currency: payments.currency })
+    .select({ id: payments.id })
     .from(payments)
     .where(
       and(
@@ -214,9 +255,11 @@ export async function cancelOrder(params: {
         eq(payments.organization_id, organizationId),
         eq(payments.status, 'PAID'),
       ),
-    );
+    )
+    .limit(1);
 
-  const idempKey = `ORDER_CANCELLED:${orderId}`;
+  const hadPaidPayment = paidPayments.length > 0;
+  const paymentId = paidPayments[0]?.id ?? null;
 
   try {
     await db.transaction(async (tx) => {
@@ -248,6 +291,7 @@ export async function cancelOrder(params: {
         throw new Error('CONCURRENT_MODIFICATION');
       }
 
+      // DR 0104 §3.10: Audit event with had_paid_payment, payment_id, and optional reason
       await tx.insert(auditEvents).values({
         id: uuidv7(),
         organization_id: organizationId,
@@ -258,9 +302,11 @@ export async function cancelOrder(params: {
         action: 'ORDER_CANCELLED',
         payload: {
           order_id: orderId,
-          paid_payment_count: paidPayments.length,
-          paid_payment_ids: paidPayments.map((p) => p.id),
-          organization_id: organizationId,
+          previous_status: 'ACTIVE',
+          new_status: 'CANCELLED',
+          reason: reason ?? null,
+          had_paid_payment: hadPaidPayment,
+          payment_id: paymentId,
         },
       });
 

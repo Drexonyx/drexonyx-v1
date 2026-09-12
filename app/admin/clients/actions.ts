@@ -16,8 +16,8 @@ export async function actionProvisionClient(
   if (!session) redirect('/admin/login');
   const { role, organizationId: actorOrganizationId, userId: actorId } = session;
 
-  if (role !== 'OWNER' && role !== 'ADMIN_OPERATIONS') {
-    return { ok: false, reason: 'Only OWNER or ADMIN_OPERATIONS may provision clients' };
+  if (role !== 'OWNER') {
+    return { ok: false, reason: 'Only OWNER may provision clients' };
   }
 
   const organizationName = (formData.get('organizationName') as string | null) ?? '';
@@ -32,7 +32,7 @@ export async function actionProvisionClient(
     userDisplayName,
     actorId,
     actorOrganizationId,
-    actorRole: role as 'OWNER' | 'ADMIN_OPERATIONS',
+    actorRole: 'OWNER',
   });
 
   if (result.ok) {

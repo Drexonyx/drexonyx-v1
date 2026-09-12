@@ -14,9 +14,6 @@ const PLATFORM_OPTIONS = [
 
 const CREATIVE_TYPE_OPTIONS = [
   'UGC Video Ads',
-  'Static Ad Creative',
-  'Creative Strategy Only',
-  'Full Service (Strategy + Production)',
 ] as const;
 
 const IDLE: { status: 'idle' } = { status: 'idle' };
