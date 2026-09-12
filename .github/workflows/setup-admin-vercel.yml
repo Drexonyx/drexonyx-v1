@@ -70,7 +70,7 @@ jobs:
                 "https://api.vercel.com/v10/projects/${PROJECT}/env/${envid}?teamId=${TEAM_ID}" \
                 -H "Authorization: Bearer ${VERCEL_TOKEN}" \
                 -H "Content-Type: application/json" \
-                -d "{\"value\":${json_value},\"target\":[\"production\"]}"
+                -d "{\"value\":${json_value},\"type\":\"plain\",\"target\":[\"production\"]}"
             else
               curl -s --fail-with-body -X POST \
                 "https://api.vercel.com/v10/projects/${PROJECT}/env?teamId=${TEAM_ID}" \
@@ -101,9 +101,31 @@ jobs:
             "https://api.vercel.com/v10/projects/${PROJECT}/env?teamId=${TEAM_ID}" \
             -H "Authorization: Bearer ${VERCEL_TOKEN}" \
             -H "Content-Type: application/json" \
-            -d '{"key":"ENABLE_ADMIN_ROUTES","value":"true","type":"plain","target":["production"]}' | \
-            python3 -c "import json,sys; d=json.load(sys.stdin); print('  created type:', d.get('type','?'), 'value:', d.get('value','?'))"
-          echo "  ✓ ENABLE_ADMIN_ROUTES"
+            -d '{"key":"ENABLE_ADMIN_ROUTES","value":"true","type":"plain","target":["production"]}'
+          echo "  ✓ ENABLE_ADMIN_ROUTES (created)"
+
+          # Verify ENABLE_ADMIN_ROUTES was stored as plain type.
+          python3 -c "
+          import json, subprocess, sys
+          result = subprocess.run(
+            ['curl', '-s',
+             'https://api.vercel.com/v10/projects/${PROJECT}/env?teamId=${TEAM_ID}',
+             '-H', 'Authorization: Bearer ${VERCEL_TOKEN}'],
+            capture_output=True, text=True
+          )
+          d = json.loads(result.stdout)
+          matches = [e for e in d.get('envs', []) if e['key'] == 'ENABLE_ADMIN_ROUTES']
+          if not matches:
+              print('FAIL: ENABLE_ADMIN_ROUTES not found after creation')
+              sys.exit(1)
+          e = matches[0]
+          t = e.get('type', 'unknown')
+          print(f'  verify: ENABLE_ADMIN_ROUTES type={t} id={e[\"id\"]}')
+          if t != 'plain':
+              print(f'FAIL: expected type=plain, got type={t}')
+              sys.exit(1)
+          print('  ✓ ENABLE_ADMIN_ROUTES verified as plain type')
+          "
 
           set_plain DREXONYX_ORG_ID "63b642fd-38f6-48ea-b9b1-ca2cbb4c3810"
           set_plain AUTH_URL "https://drexonyx-v1-admin.vercel.app"
@@ -167,14 +189,14 @@ jobs:
             python3 -c "import json,sys; d=json.load(sys.stdin); print('nodeVersion:', d.get('nodeVersion','(not returned)'))"
           echo "  ✓ Node.js version set to 24.x"
 
-      - name: Trigger production deployment
+      - name: Trigger production deployment and wait for Ready
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
           set -euo pipefail
           TEAM_ID="team_qqKMKFtQjrjZIjlth9LBDNu0"
           echo "Triggering production deployment of drexonyx-v1-admin from main..."
-          curl -sf -X POST \
+          DEPLOY_RESPONSE=$(curl -sf -X POST \
             "https://api.vercel.com/v13/deployments?teamId=${TEAM_ID}&forceNew=1" \
             -H "Authorization: Bearer ${VERCEL_TOKEN}" \
             -H "Content-Type: application/json" \
@@ -187,5 +209,42 @@ jobs:
                 "ref": "main"
               },
               "target": "production"
-            }' | python3 -c "import json,sys; d=json.load(sys.stdin); print('Deployment URL:', d.get('url','(check Vercel dashboard)'))"
-          echo "Deployment triggered. Monitor progress at https://vercel.com/drexonyxstudio-7806/drexonyx-v1-admin"
+            }')
+          DEPLOY_URL=$(echo "$DEPLOY_RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('url',''))")
+          DEPLOY_ID=$(echo "$DEPLOY_RESPONSE" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('id',''))")
+          echo "Deployment URL: ${DEPLOY_URL}"
+          echo "Deployment ID:  ${DEPLOY_ID}"
+
+          echo "Waiting for deployment to become Ready (timeout 10 min)..."
+          for i in $(seq 1 30); do
+            sleep 20
+            STATUS=$(curl -s \
+              "https://api.vercel.com/v13/deployments/${DEPLOY_ID}?teamId=${TEAM_ID}" \
+              -H "Authorization: Bearer ${VERCEL_TOKEN}" | \
+              python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('status','UNKNOWN'))")
+            echo "  [${i}/30] status=${STATUS}"
+            if [ "$STATUS" = "READY" ]; then
+              echo "  ✓ Deployment READY"
+              break
+            elif [ "$STATUS" = "ERROR" ] || [ "$STATUS" = "CANCELED" ]; then
+              echo "  ✗ Deployment failed with status: ${STATUS}"
+              echo "  Check logs at: https://vercel.com/drexonyxstudio-7806/drexonyx-v1-admin"
+              exit 1
+            fi
+          done
+          if [ "$STATUS" != "READY" ]; then
+            echo "  ✗ Deployment did not reach READY within 10 minutes (last status: ${STATUS})"
+            exit 1
+          fi
+
+          echo "Verifying /admin/login endpoint..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://drexonyx-v1-admin.vercel.app/admin/login")
+          echo "  /admin/login HTTP status: ${HTTP_STATUS}"
+          if [ "$HTTP_STATUS" = "200" ]; then
+            echo "  ✓ /admin/login returned 200 OK"
+          else
+            echo "  ✗ /admin/login returned ${HTTP_STATUS} (expected 200)"
+            echo "  Note: This may be a propagation delay — check manually at https://drexonyx-v1-admin.vercel.app/admin/login"
+            exit 1
+          fi
+          echo "Production URL: https://drexonyx-v1-admin.vercel.app"
