@@ -60,7 +60,7 @@ jobs:
             local key="$1" value="$2"
             local json_value
             json_value=$(python3 -c "import json,sys; print(json.dumps(sys.argv[1]))" "$value")
-            curl -sf -X POST \
+            curl -s --fail-with-body -X POST \
               "https://api.vercel.com/v10/projects/${PROJECT}/env?teamId=${TEAM_ID}" \
               -H "Authorization: Bearer ${VERCEL_TOKEN}" \
               -H "Content-Type: application/json" \
@@ -89,7 +89,7 @@ jobs:
             local key="$1" value="$2"
             local json_value
             json_value=$(python3 -c "import json,sys; print(json.dumps(sys.argv[1]))" "$value")
-            curl -sf -X POST \
+            curl -s --fail-with-body -X POST \
               "https://api.vercel.com/v10/projects/${PROJECT}/env?teamId=${TEAM_ID}" \
               -H "Authorization: Bearer ${VERCEL_TOKEN}" \
               -H "Content-Type: application/json" \
