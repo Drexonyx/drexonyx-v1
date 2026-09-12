@@ -6,7 +6,7 @@
 import { auth } from '@/auth';
 import { NextResponse } from 'next/server';
 
-export default auth(function proxy(request) {
+export default auth(function middleware(request) {
   const { pathname } = request.nextUrl;
   if (
     (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) &&

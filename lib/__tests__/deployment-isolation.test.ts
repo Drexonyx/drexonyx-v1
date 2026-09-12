@@ -6,7 +6,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 //   PUBLIC:  ENABLE_ADMIN_ROUTES unset   → /admin/* and /api/admin/* return 404
 //   ADMIN:   ENABLE_ADMIN_ROUTES=true    → all admin routes are reachable
 //
-// The proxy guard function in proxy.ts implements this logic.
+// The proxy guard function in middleware.ts implements this logic.
 
 // Guard function extracted from proxy.ts for unit testing
 function adminGuardShouldBlock(pathname: string, enableAdminRoutes: string | undefined): boolean {
