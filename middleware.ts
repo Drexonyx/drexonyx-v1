@@ -2,9 +2,15 @@
 // Set ENABLE_ADMIN_ROUTES=true in the admin Vercel project; leave it unset on the public
 // site. Any request to /admin/* or /api/admin/* without the flag returns 404 immediately,
 // so the admin control surface is completely absent from the public deployment.
+//
+// auth.config.ts (not auth.ts) is used here: auth.ts imports the DB client which uses
+// postgres.js — a Node.js-only library that crashes the Vercel Edge runtime.
 
-import { auth } from '@/auth';
+import NextAuth from 'next-auth';
+import { authConfig } from './auth.config';
 import { NextResponse } from 'next/server';
+
+const { auth } = NextAuth(authConfig);
 
 export default auth(function middleware(request) {
   const { pathname } = request.nextUrl;
