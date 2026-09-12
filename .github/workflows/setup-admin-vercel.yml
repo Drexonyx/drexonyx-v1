@@ -129,6 +129,22 @@ jobs:
           set_secret ADMIN_LOGIN_PASSWORD_HASH "$ADMIN_LOGIN_PASSWORD_HASH"
           set_secret ADMIN_SESSION_SECRET "$ADMIN_SESSION_SECRET"
 
+      - name: Set Node.js version to 24.x
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          set -euo pipefail
+          TEAM_ID="team_qqKMKFtQjrjZIjlth9LBDNu0"
+          PROJECT="drexonyx-v1-admin"
+          echo "Setting Node.js version to 24.x..."
+          curl -sf -X PATCH \
+            "https://api.vercel.com/v9/projects/${PROJECT}?teamId=${TEAM_ID}" \
+            -H "Authorization: Bearer ${VERCEL_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d '{"nodeVersion":"24.x"}' | \
+            python3 -c "import json,sys; d=json.load(sys.stdin); print('nodeVersion:', d.get('nodeVersion','(not returned)'))"
+          echo "  ✓ Node.js version set to 24.x"
+
       - name: Trigger production deployment
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
