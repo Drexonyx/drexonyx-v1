@@ -68,14 +68,28 @@ describe("Pricing page", () => {
     expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
   });
 
-  it("renders all three package cards with real prices", () => {
+  it("renders all eight package cards with real prices", () => {
     render(<PricingPage />);
+    // Entry products
+    expect(screen.getByText("Micro Creative")).toBeInTheDocument();
+    expect(screen.getByText("Creative Brief")).toBeInTheDocument();
+    expect(screen.getByText("Spark")).toBeInTheDocument();
+    expect(screen.getByText("AED 199")).toBeInTheDocument();
+    expect(screen.getByText("AED 299")).toBeInTheDocument();
+    expect(screen.getByText("AED 499")).toBeInTheDocument();
+    // Core production
     expect(screen.getByText("Starter")).toBeInTheDocument();
     expect(screen.getByText("Growth")).toBeInTheDocument();
     expect(screen.getByText("Scale")).toBeInTheDocument();
     expect(screen.getByText("AED 1,500")).toBeInTheDocument();
     expect(screen.getByText("AED 3,500")).toBeInTheDocument();
     expect(screen.getByText("AED 6,500")).toBeInTheDocument();
+    // Premium
+    expect(screen.getByText("Production")).toBeInTheDocument();
+    expect(screen.getByText("AED 14,500")).toBeInTheDocument();
+    // Custom
+    expect(screen.getByText("Brand Film")).toBeInTheDocument();
+    expect(screen.getByText("From AED 35,000")).toBeInTheDocument();
   });
 });
 

@@ -1,13 +1,71 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import styles from "./page.module.css";
-import { PACKAGES, formatPriceAED } from "@/lib/pricing";
+import { PACKAGES, formatPriceAED, type Package } from "@/lib/pricing";
 
 export const metadata: Metadata = {
   title: "Pricing",
   description:
     "DREXONYX pricing and packages — performance UGC creative production. Campaign-based packages tailored to your brand's production needs.",
 };
+
+function PackageCard({ pkg }: { pkg: Package }) {
+  const priceDisplay = pkg.priceFrom
+    ? `From ${formatPriceAED(pkg.priceAED)}`
+    : formatPriceAED(pkg.priceAED);
+
+  const isCustom = pkg.category === "custom";
+  const ctaLabel = isCustom ? "Brief Your Project" : "Get Started";
+  const ctaClass = pkg.highlight ? styles.ctaPrimary : styles.ctaSecondary;
+
+  return (
+    <article
+      className={`${styles.packageCard} ${pkg.highlight ? styles.packageCardHighlight : ""}`}
+      aria-label={pkg.name}
+    >
+      {pkg.highlight && (
+        <div className={styles.packageBadge} aria-label="Most popular package">
+          Most Popular
+        </div>
+      )}
+      <div className={styles.packageHeader}>
+        <h3 className={styles.packageName}>{pkg.name}</h3>
+        <div className={styles.packagePrice}>{priceDisplay}</div>
+      </div>
+      <p className={styles.packageDesc}>{pkg.description}</p>
+      <ul className={styles.packageIncludes} aria-label={`${pkg.name} inclusions`}>
+        {pkg.includes.map((item) => (
+          <li key={item} className={styles.packageItem}>
+            {item}
+          </li>
+        ))}
+      </ul>
+      {pkg.excludes.length > 0 && (
+        <div className={styles.packageExcludes}>
+          <span className={styles.packageExcludesLabel}>Not included</span>
+          <ul
+            className={styles.packageExcludesList}
+            aria-label={`${pkg.name} exclusions`}
+          >
+            {pkg.excludes.map((item) => (
+              <li key={item} className={styles.packageExcludesItem}>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <Link href="/start-project" className={ctaClass}>
+        {ctaLabel}
+      </Link>
+    </article>
+  );
+}
+
+const entryPackages = PACKAGES.filter((p) => p.category === "entry");
+const corePackages = PACKAGES.filter((p) => p.category === "core");
+const premiumPackages = PACKAGES.filter((p) => p.category === "premium");
+const customPackages = PACKAGES.filter((p) => p.category === "custom");
 
 export default function PricingPage() {
   return (
@@ -27,42 +85,67 @@ export default function PricingPage() {
 
       <section className={styles.packagesSection} aria-label="Pricing packages">
         <div className="container">
-          <div className={styles.packagesGrid}>
-            {PACKAGES.map((pkg) => (
-              <article
-                key={pkg.id}
-                className={`${styles.packageCard} ${pkg.highlight ? styles.packageCardHighlight : ""}`}
-                aria-label={pkg.name}
-              >
-                {pkg.highlight && (
-                  <div className={styles.packageBadge} aria-label="Most popular package">
-                    Most Popular
-                  </div>
-                )}
-                <div className={styles.packageHeader}>
-                  <h2 className={styles.packageName}>{pkg.name}</h2>
-                  <div className={styles.packagePrice}>{formatPriceAED(pkg.priceAED)}</div>
-                </div>
-                <p className={styles.packageDesc}>{pkg.description}</p>
-                <ul
-                  className={styles.packageIncludes}
-                  aria-label={`${pkg.name} inclusions`}
-                >
-                  {pkg.includes.map((item) => (
-                    <li key={item} className={styles.packageItem}>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href="/start-project"
-                  className={pkg.highlight ? styles.ctaPrimary : styles.ctaSecondary}
-                >
-                  Get Started
-                </Link>
-              </article>
-            ))}
+
+          {/* Entry Products */}
+          <div className={styles.packagesGroup}>
+            <div className={styles.packagesGroupHeader}>
+              <h2 className={styles.packagesGroupTitle}>Entry Products</h2>
+              <p className={styles.packagesGroupDesc}>
+                Minimum viable creative for brands testing the water or working with limited budgets.
+              </p>
+            </div>
+            <div className={styles.packagesGrid}>
+              {entryPackages.map((pkg) => (
+                <PackageCard key={pkg.id} pkg={pkg} />
+              ))}
+            </div>
           </div>
+
+          {/* Core Production */}
+          <div className={styles.packagesGroup}>
+            <div className={styles.packagesGroupHeader}>
+              <h2 className={styles.packagesGroupTitle}>Production Packages</h2>
+              <p className={styles.packagesGroupDesc}>
+                Full-production UGC advertising programs for brands running consistent campaigns.
+              </p>
+            </div>
+            <div className={styles.packagesGrid}>
+              {corePackages.map((pkg) => (
+                <PackageCard key={pkg.id} pkg={pkg} />
+              ))}
+            </div>
+          </div>
+
+          {/* Premium Production */}
+          <div className={styles.packagesGroup}>
+            <div className={styles.packagesGroupHeader}>
+              <h2 className={styles.packagesGroupTitle}>Premium Production</h2>
+              <p className={styles.packagesGroupDesc}>
+                Cinematic-grade creative for premium brands where quality is the brief.
+              </p>
+            </div>
+            <div className={styles.packagesGridWide}>
+              {premiumPackages.map((pkg) => (
+                <PackageCard key={pkg.id} pkg={pkg} />
+              ))}
+            </div>
+          </div>
+
+          {/* Custom Engagements */}
+          <div className={styles.packagesGroup}>
+            <div className={styles.packagesGroupHeader}>
+              <h2 className={styles.packagesGroupTitle}>Custom Engagements</h2>
+              <p className={styles.packagesGroupDesc}>
+                Fully scoped production partnerships built around your brief.
+              </p>
+            </div>
+            <div className={styles.packagesGridWide}>
+              {customPackages.map((pkg) => (
+                <PackageCard key={pkg.id} pkg={pkg} />
+              ))}
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -87,7 +170,7 @@ export default function PricingPage() {
               },
               {
                 q: "How long does production take?",
-                a: "Starter packages deliver in 5 business days. Growth packages deliver in 7 business days. Scale packages deliver in 10 business days. Timelines begin once your brief and payment are confirmed.",
+                a: "Entry products (Micro Creative, Creative Brief, Spark) deliver in 48 hours. Starter delivers in 5 business days. Growth in 7 business days. Scale in 10 business days. Production packages in 15 business days. Brand Film timelines are scoped at briefing. All timelines begin once your brief and payment are confirmed.",
               },
               {
                 q: "Do you manage ad campaigns or media buying?",
