@@ -333,6 +333,20 @@
   z-index: 1;
 }
 
+/* Interactive play button — visually identical to .playOverlay but clickable */
+.playButton {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 2;
+  padding: 0;
+}
+
 .playIcon {
   width: 44px;
   height: 44px;
@@ -389,6 +403,96 @@
   font-size: 0.8125rem;
   color: var(--drex-text-muted);
   max-width: none;
+}
+
+/* Hover tint on the playButton's icon — mirrors the .portfolioCard:hover rule */
+.playButton:hover .playIcon,
+.playButton:focus-visible .playIcon {
+  background: rgba(200, 152, 10, 0.75);
+  border-color: transparent;
+}
+
+.playButton:focus-visible {
+  outline: 2px solid var(--drex-accent);
+  outline-offset: -4px;
+  border-radius: 0;
+}
+
+/* ─── VIDEO LIGHTBOX ─────────────────────────────────── */
+.videoDialog {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.videoDialog::backdrop {
+  background: rgba(4, 4, 4, 0.9);
+  backdrop-filter: blur(4px);
+}
+
+.videoDialogInner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  max-height: 90vh;
+  max-width: 90vw;
+}
+
+.videoPlayer {
+  max-height: 82vh;
+  max-width: min(calc(82vh * 9 / 16), 90vw);
+  width: auto;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+  background: #000;
+  outline: none;
+}
+
+.videoClose {
+  position: absolute;
+  top: -2.25rem;
+  right: 0;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition:
+    background 180ms ease,
+    color 180ms ease;
+}
+
+.videoClose:hover,
+.videoClose:focus-visible {
+  background: rgba(200, 152, 10, 0.75);
+  color: #000;
+  outline: none;
+}
+
+.videoCaption {
+  font-size: 0.8125rem;
+  color: rgba(244, 244, 245, 0.35);
+  letter-spacing: 0.04em;
+  text-align: center;
 }
 
 /* ─── CTA BAND ──────────────────────────────────────── */
