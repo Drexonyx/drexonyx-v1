@@ -20,6 +20,10 @@ export default function Footer() {
             <Image src="/brand/drexonyx-horizontal-lockup.png" alt="DREXONYX" width={3198} height={540} className={styles.logoImg} />
           </Link>
           <p className={styles.tagline}>Performance Creative Studio</p>
+          <p className={styles.location}>Dubai, UAE · Global</p>
+          <a href="mailto:drexonyx.studio@gmail.com" className={styles.contactLink}>
+            drexonyx.studio@gmail.com
+          </a>
         </div>
 
         <nav aria-label="Footer navigation">

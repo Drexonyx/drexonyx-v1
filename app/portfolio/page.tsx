@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import styles from "./page.module.css";
+import PortfolioFilter from "./PortfolioFilter";
+import { PORTFOLIO_ITEMS } from "@/lib/portfolio";
 
 export const metadata: Metadata = {
   title: "Portfolio",
   description:
     "DREXONYX portfolio — performance UGC creative work across categories. See our approach to brand-safe, conversion-focused advertising.",
 };
-
-const CATEGORIES = ["All", "UGC Video", "Static Creative", "Creative Strategy"] as const;
-
 
 export default function PortfolioPage() {
   return (
@@ -29,24 +28,7 @@ export default function PortfolioPage() {
 
       <section className={styles.portfolioSection} aria-label="Portfolio pieces">
         <div className="container">
-          {/* Category filter — static, no JS required for initial render */}
-          <div className={styles.filterRow} role="group" aria-label="Filter by category">
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat}
-                className={`${styles.filterBtn} ${cat === "All" ? styles.filterBtnActive : ""}`}
-                aria-pressed={cat === "All"}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-
-          <div className={styles.portfolioNotice}>
-            <p>
-              Portfolio is actively updated as client-approved work is cleared for public display.
-            </p>
-          </div>
+          <PortfolioFilter items={PORTFOLIO_ITEMS} />
         </div>
       </section>
 

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import styles from "./page.module.css";
-import BriefForm from "./BriefForm";
+import ProjectFlowForm from "./ProjectFlowForm";
 
 export const metadata: Metadata = {
   title: "Start Project",
@@ -31,7 +31,7 @@ export default function StartCampaignPage() {
               <h2 id="form-heading" className={styles.formHeading}>
                 Campaign Brief
               </h2>
-              <BriefForm />
+              <ProjectFlowForm />
             </div>
 
             <aside className={styles.sidebar} aria-label="Contact and process information">

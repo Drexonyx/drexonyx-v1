@@ -1,63 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import styles from "./page.module.css";
+import { PACKAGES, formatPriceAED } from "@/lib/pricing";
 
 export const metadata: Metadata = {
   title: "Pricing",
   description:
     "DREXONYX pricing and packages — performance UGC creative production. Campaign-based packages tailored to your brand's production needs.",
 };
-
-const PACKAGES = [
-  {
-    id: "starter",
-    name: "Starter",
-    priceLabel: "AED 1,500",
-    description:
-      "Entry-level performance creative package. Ideal for brands launching their first UGC advertising program.",
-    includes: [
-      "1 UGC advertising video",
-      "1 revision round",
-      "5 business days turnaround",
-      "Creative strategy brief",
-      "QC review included",
-    ],
-    highlight: false,
-  },
-  {
-    id: "growth",
-    name: "Growth",
-    priceLabel: "AED 3,500",
-    description:
-      "For brands scaling performance creative volume. Expanded deliverable set with creative testing support.",
-    includes: [
-      "3 UGC advertising videos",
-      "2 revision rounds",
-      "7 business days turnaround",
-      "Creative strategy brief",
-      "A/B variant production",
-      "QC review included",
-    ],
-    highlight: true,
-  },
-  {
-    id: "scale",
-    name: "Scale",
-    priceLabel: "AED 6,500",
-    description:
-      "High-volume creative production for performance-led brands running multiple campaigns simultaneously.",
-    includes: [
-      "6 UGC advertising videos",
-      "3 revision rounds",
-      "10 business days turnaround",
-      "Full creative strategy",
-      "Multi-format variant production",
-      "Priority QC and delivery",
-      "Dedicated account coordination",
-    ],
-    highlight: false,
-  },
-] as const;
 
 export default function PricingPage() {
   return (
@@ -91,7 +41,7 @@ export default function PricingPage() {
                 )}
                 <div className={styles.packageHeader}>
                   <h2 className={styles.packageName}>{pkg.name}</h2>
-                  <div className={styles.packagePrice}>{pkg.priceLabel}</div>
+                  <div className={styles.packagePrice}>{formatPriceAED(pkg.priceAED)}</div>
                 </div>
                 <p className={styles.packageDesc}>{pkg.description}</p>
                 <ul

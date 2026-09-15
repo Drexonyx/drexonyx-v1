@@ -37,6 +37,22 @@
   max-width: none;
 }
 
+.location {
+  font-size: 0.8125rem;
+  color: var(--drex-text-muted);
+  max-width: none;
+}
+
+.contactLink {
+  font-size: 0.8125rem;
+  color: var(--drex-text-muted);
+  transition: color var(--drex-duration) var(--drex-ease);
+}
+
+.contactLink:hover {
+  color: var(--drex-accent);
+}
+
 .links {
   display: flex;
   flex-wrap: wrap;

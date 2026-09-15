@@ -1,0 +1,205 @@
+.hero {
+  padding: 5rem 0 4rem;
+  border-bottom: 1px solid var(--drex-border);
+  background: radial-gradient(ellipse 60% 40% at 50% -5%, rgba(200, 152, 10, 0.07) 0%, transparent 70%);
+}
+
+.heroBadge {
+  display: inline-block;
+  margin-bottom: 1.25rem;
+  padding: 0.3rem 0.875rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--drex-accent);
+  background: var(--drex-accent-subtle);
+  border: 1px solid rgba(200, 152, 10, 0.25);
+  border-radius: 100px;
+}
+
+.heroHeading {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: var(--drex-text);
+  margin-bottom: 1.25rem;
+}
+
+.heroSub {
+  font-size: 1.125rem;
+  color: var(--drex-text-secondary);
+  max-width: 52ch;
+  line-height: 1.7;
+}
+
+.checkoutSection {
+  padding: 5rem 0;
+}
+
+.checkoutLayout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 3rem;
+  align-items: start;
+}
+
+.orderCard {
+  padding: 2rem;
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.orderHeading {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--drex-accent);
+}
+
+.pkgHeader {
+  display: flex;
+  align-items: baseline;
+  gap: 1.5rem;
+}
+
+.pkgName {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--drex-text);
+}
+
+.pkgPrice {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--drex-accent);
+}
+
+.pkgDesc {
+  font-size: 0.9375rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.65;
+}
+
+.pkgIncludes {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pkgItem {
+  font-size: 0.9375rem;
+  color: var(--drex-text-secondary);
+  padding-left: 1.25rem;
+  position: relative;
+}
+
+.pkgItem::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--drex-accent);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.totalRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--drex-border);
+}
+
+.totalLabel {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--drex-text);
+}
+
+.totalPrice {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--drex-accent);
+}
+
+.paymentCard {
+  padding: 2rem;
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  position: sticky;
+  top: 88px;
+}
+
+.paymentHeading {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--drex-text-muted);
+}
+
+.paymentNote {
+  font-size: 0.9rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.65;
+}
+
+.proceedBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0a0a0a;
+  background: var(--drex-accent);
+  border-radius: 8px;
+  cursor: not-allowed;
+  opacity: 0.5;
+  transition: opacity var(--drex-duration) var(--drex-ease);
+}
+
+.altLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--drex-text-secondary);
+  background: transparent;
+  border: 1px solid var(--drex-border);
+  border-radius: 8px;
+  text-align: center;
+  transition: color var(--drex-duration) var(--drex-ease),
+    border-color var(--drex-duration) var(--drex-ease);
+}
+
+.altLink:hover {
+  color: var(--drex-text);
+  border-color: var(--drex-text-muted);
+}
+
+@media (max-width: 900px) {
+  .checkoutLayout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .paymentCard {
+    position: static;
+  }
+}

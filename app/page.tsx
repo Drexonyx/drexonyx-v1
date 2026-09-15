@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./page.module.css";
+import { getFeaturedItems } from "@/lib/portfolio";
 
 export const metadata: Metadata = {
   title: "DREXONYX — Performance Creative Studio",
   description:
-    "AI-powered UGC advertising built for modern brands. DREXONYX delivers performance creative at scale — fast, measurable, brand-safe.",
+    "Dubai-based performance creative studio. AI-powered UGC advertising for global brands — creative at scale, built to perform.",
 };
 
 export default function HomePage() {
@@ -27,15 +28,15 @@ export default function HomePage() {
 
         <div className={`container ${styles.heroInner}`}>
           <div className={styles.heroContent}>
-            <div className={styles.heroBadge}>Performance Creative Studio</div>
+            <div className={styles.heroBadge}>Dubai · Performance Creative Studio</div>
             <h1 id="hero-heading" className={styles.heroHeading}>
               UGC Advertising
               <br />
               <span className={styles.heroAccent}>Built to Perform</span>
             </h1>
             <p className={styles.heroSub}>
-              DREXONYX delivers AI-powered user-generated content advertising for modern brands.
-              Creative at scale. Performance at the core.
+              DREXONYX delivers AI-powered UGC advertising for brands worldwide. Based in Dubai,
+              building performance creative at global scale.
             </p>
             <div className={styles.heroCtas}>
               <Link href="/start-project" className={styles.ctaPrimary}>
@@ -90,6 +91,42 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Featured Work */}
+      {(() => {
+        const featured = getFeaturedItems();
+        return (
+          <section className={styles.featuredWork} aria-labelledby="featured-heading">
+            <div className="container">
+              <h2 id="featured-heading" className={styles.sectionHeading}>
+                Featured Work
+              </h2>
+              <p className={styles.sectionSub}>
+                Client-approved performance creative from our studio.
+              </p>
+              {featured.length === 0 ? (
+                <div className={styles.featuredEmpty}>
+                  <p>Featured work will appear here as client-approved pieces are cleared for public display.</p>
+                </div>
+              ) : (
+                <div className={styles.featuredGrid}>
+                  {featured.map((item) => (
+                    <article key={item.id} className={styles.featuredCard}>
+                      <p className={styles.featuredCategory}>{item.category}</p>
+                      <p className={styles.featuredTitle}>{item.title}</p>
+                    </article>
+                  ))}
+                </div>
+              )}
+              <div className={styles.featuredCta}>
+                <Link href="/portfolio" className={styles.ctaSecondary}>
+                  View Full Portfolio
+                </Link>
+              </div>
+            </div>
+          </section>
+        );
+      })()}
+
       {/* Services teaser */}
       <section className={styles.serviceTeaser} aria-labelledby="services-heading">
         <div className="container">
@@ -132,6 +169,60 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* How It Works teaser */}
+      <section className={styles.processBand} aria-labelledby="process-heading">
+        <div className="container">
+          <h2 id="process-heading" className={styles.sectionHeading}>
+            How It Works
+          </h2>
+          <p className={styles.sectionSub}>
+            From brief to campaign-ready — a streamlined production pipeline.
+          </p>
+          <div className={styles.processSteps}>
+            {[
+              { num: "01", title: "Campaign Brief", desc: "Submit your brand brief, objectives, and platform targets." },
+              { num: "02", title: "Creative Strategy", desc: "We develop a data-backed creative direction aligned to your goals." },
+              { num: "03", title: "Production & Delivery", desc: "Campaign-ready assets delivered on time, QC-reviewed." },
+            ].map((step) => (
+              <div key={step.num} className={styles.processStep}>
+                <span className={styles.processNum}>{step.num}</span>
+                <p className={styles.processTitle}>{step.title}</p>
+                <p className={styles.processDesc}>{step.desc}</p>
+              </div>
+            ))}
+          </div>
+          <Link href="/how-it-works" className={styles.ctaSecondary}>
+            See Full Process
+          </Link>
+        </div>
+      </section>
+
+      {/* Industries */}
+      <section className={styles.industries} aria-labelledby="industries-heading">
+        <div className="container">
+          <h2 id="industries-heading" className={styles.sectionHeading}>
+            Industries We Serve
+          </h2>
+          <p className={styles.sectionSub}>
+            Performance creative for brands across high-growth verticals.
+          </p>
+          <div className={styles.industriesGrid}>
+            {[
+              "E-commerce & DTC",
+              "Beauty & Skincare",
+              "Health & Wellness",
+              "Food & Beverage",
+              "Fashion & Apparel",
+              "Consumer Tech",
+            ].map((industry) => (
+              <div key={industry} className={styles.industryTile}>
+                <p className={styles.industryLabel}>{industry}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA band */}
       <section className={styles.ctaBand} aria-labelledby="cta-band-heading">
         <div className="container">
@@ -139,7 +230,8 @@ export default function HomePage() {
             Ready to launch performance creative?
           </h2>
           <p className={styles.ctaBandSub}>
-            Tell us about your brand and campaign goals. We&apos;ll take it from there.
+            Dubai-based, globally active. Tell us about your brand and we&apos;ll take it from
+            there.
           </p>
           <Link href="/start-project" className={styles.ctaPrimary}>
             Start Project

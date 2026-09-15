@@ -294,8 +294,145 @@
   box-shadow: 0 8px 24px rgba(200, 152, 10, 0.3);
 }
 
+/* Featured Work */
+.featuredWork {
+  padding: 5rem 0;
+  border-bottom: 1px solid var(--drex-border);
+}
+
+.featuredGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.featuredCard {
+  padding: 1.75rem;
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: border-color var(--drex-duration) var(--drex-ease);
+}
+
+.featuredCard:hover {
+  border-color: rgba(200, 152, 10, 0.25);
+}
+
+.featuredCategory {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--drex-accent);
+}
+
+.featuredTitle {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--drex-text);
+}
+
+.featuredEmpty {
+  padding: 1.25rem 1.5rem;
+  background: var(--drex-elevated);
+  border: 1px solid var(--drex-border);
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.featuredEmpty p {
+  font-size: 0.875rem;
+  color: var(--drex-text-muted);
+}
+
+.featuredCta {
+  display: flex;
+  margin-top: 2rem;
+}
+
+/* How It Works teaser */
+.processBand {
+  padding: 5rem 0;
+  border-bottom: 1px solid var(--drex-border);
+  background: var(--drex-surface);
+}
+
+.processSteps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+}
+
+.processStep {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.processNum {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--drex-accent);
+  font-family: var(--font-geist-mono), monospace;
+}
+
+.processTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--drex-text);
+}
+
+.processDesc {
+  font-size: 0.9375rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.6;
+}
+
+/* Industries */
+.industries {
+  padding: 5rem 0;
+  border-bottom: 1px solid var(--drex-border);
+}
+
+.industriesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.industryTile {
+  padding: 1.25rem 1.5rem;
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: 10px;
+  transition: border-color var(--drex-duration) var(--drex-ease);
+}
+
+.industryTile:hover {
+  border-color: rgba(200, 152, 10, 0.2);
+}
+
+.industryLabel {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--drex-text-secondary);
+}
+
 @media (max-width: 900px) {
   .pillarsGrid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .featuredGrid,
+  .processSteps,
+  .industriesGrid {
     grid-template-columns: 1fr;
     gap: 1.25rem;
   }

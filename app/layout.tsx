@@ -20,14 +20,14 @@ export const metadata: Metadata = {
     template: "%s | DREXONYX",
   },
   description:
-    "AI-powered UGC advertising built for modern brands. DREXONYX delivers performance creative at scale.",
-  keywords: ["UGC advertising", "performance creative", "AI advertising", "brand campaigns"],
+    "Dubai-based performance creative studio. AI-powered UGC advertising for global brands — creative at scale, built to perform.",
+  keywords: ["UGC advertising", "performance creative", "AI advertising", "brand campaigns", "Dubai", "UAE", "UGC studio"],
   openGraph: {
     type: "website",
     siteName: "DREXONYX",
     title: "DREXONYX — Performance Creative Studio",
     description:
-      "AI-powered UGC advertising built for modern brands. DREXONYX delivers performance creative at scale.",
+      "Dubai-based performance creative studio. AI-powered UGC advertising for global brands — creative at scale, built to perform.",
   },
   robots: { index: true, follow: true },
 };

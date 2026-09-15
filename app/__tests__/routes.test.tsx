@@ -6,6 +6,7 @@ import PortfolioPage from "../portfolio/page";
 import PricingPage from "../pricing/page";
 import AboutPage from "../about/page";
 import StartCampaignPage from "../start-project/page";
+import CheckoutPage from "../checkout/page";
 
 describe("Services page", () => {
   it("renders an h1 heading", () => {
@@ -114,9 +115,9 @@ describe("Start Project page", () => {
     expect(screen.getByRole("form", { name: /campaign brief intake form/i })).toBeInTheDocument();
   });
 
-  it("submit button is enabled", () => {
+  it("continue button is enabled on step 1", () => {
     render(<StartCampaignPage />);
-    expect(screen.getByRole("button", { name: /submit brief/i })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: /continue/i })).not.toBeDisabled();
   });
 
   it("renders platform options as enabled checkboxes", () => {
@@ -126,9 +127,21 @@ describe("Start Project page", () => {
     checkboxes.forEach((cb) => expect(cb).not.toBeDisabled());
   });
 
-  it("renders brand name and email inputs", () => {
+  it("renders creative type options on step 1", () => {
     render(<StartCampaignPage />);
-    expect(screen.getByLabelText(/brand name/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/contact email/i)).toBeInTheDocument();
+    expect(screen.getByText("UGC Video Ads")).toBeInTheDocument();
+    expect(screen.getByText("Static Ad Creative")).toBeInTheDocument();
+  });
+});
+
+describe("Checkout page", () => {
+  it("renders an h1 heading", () => {
+    render(<CheckoutPage />);
+    expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
+  });
+
+  it("renders the proceed to payment button", () => {
+    render(<CheckoutPage />);
+    expect(screen.getByRole("button", { name: /proceed to payment/i })).toBeInTheDocument();
   });
 });
