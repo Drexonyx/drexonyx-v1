@@ -6,6 +6,7 @@
 import { db } from '@/db/index';
 import { productionJobs, aiGenerations } from '@/db/schema/production';
 import { orders } from '@/db/schema/commercial';
+import { payments } from '@/db/schema/financial';
 import { auditEvents, idempotencyKeys } from '@/db/schema/system';
 import { and, eq, isNull } from 'drizzle-orm';
 import { uuidv7 } from 'uuidv7';
@@ -114,6 +115,22 @@ export async function createProductionJob(params: {
   }
   if (orderRows[0].status !== 'ACTIVE') {
     return { ok: false, reason: `Cannot create ProductionJob for Order in ${orderRows[0].status} status` };
+  }
+
+  // DR 0053 §2.7: Production must not start without confirmed payment.
+  const paidPayments = await db
+    .select({ id: payments.id })
+    .from(payments)
+    .where(
+      and(
+        eq(payments.order_id, orderId),
+        eq(payments.status, 'PAID'),
+      ),
+    )
+    .limit(1);
+
+  if (paidPayments.length === 0) {
+    return { ok: false, reason: 'Cannot start production: no confirmed payment on record for this order.' };
   }
 
   const jobId = uuidv7();
