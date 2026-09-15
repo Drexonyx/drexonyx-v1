@@ -118,8 +118,8 @@ export default function HowItWorksPage() {
             Submit your campaign brief and we&apos;ll take it from step one.
           </p>
           <div className={styles.ctaRow}>
-            <Link href="/start-campaign" className={styles.ctaPrimary}>
-              Start Your Campaign
+            <Link href="/start-project" className={styles.ctaPrimary}>
+              Start Project
             </Link>
             <Link href="/pricing" className={styles.ctaSecondary}>
               View Pricing

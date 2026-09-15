@@ -121,8 +121,8 @@ export default function AboutPage() {
             Ready to build performance creative for your brand? Start your campaign brief.
           </p>
           <div className={styles.ctaRow}>
-            <Link href="/start-campaign" className={styles.ctaPrimary}>
-              Start Your Campaign
+            <Link href="/start-project" className={styles.ctaPrimary}>
+              Start Project
             </Link>
             <Link href="/services" className={styles.ctaSecondary}>
               View Services

@@ -3,7 +3,7 @@ import styles from "./page.module.css";
 import BriefForm from "./BriefForm";
 
 export const metadata: Metadata = {
-  title: "Start Campaign",
+  title: "Start Project",
   description:
     "Start your DREXONYX campaign — submit your brand brief and campaign objectives to begin performance UGC creative production.",
 };
@@ -15,7 +15,7 @@ export default function StartCampaignPage() {
         <div className="container">
           <div className={styles.heroBadge}>Get Started</div>
           <h1 id="start-hero-heading" className={styles.heroHeading}>
-            Start Your Campaign
+            Start Project
           </h1>
           <p className={styles.heroSub}>
             Tell us about your brand and campaign goals. We&apos;ll review your brief and

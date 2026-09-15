@@ -8,9 +8,9 @@ describe("Home page", () => {
     expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
   });
 
-  it("renders a link to start a campaign", () => {
+  it("renders a link to start a project", () => {
     render(<Home />);
-    const links = screen.getAllByRole("link", { name: /start.*campaign/i });
+    const links = screen.getAllByRole("link", { name: /start project/i });
     expect(links.length).toBeGreaterThan(0);
   });
 

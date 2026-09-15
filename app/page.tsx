@@ -38,8 +38,8 @@ export default function HomePage() {
               Creative at scale. Performance at the core.
             </p>
             <div className={styles.heroCtas}>
-              <Link href="/start-campaign" className={styles.ctaPrimary}>
-                Start Your Campaign
+              <Link href="/start-project" className={styles.ctaPrimary}>
+                Start Project
               </Link>
               <Link href="/how-it-works" className={styles.ctaSecondary}>
                 See How It Works
@@ -141,8 +141,8 @@ export default function HomePage() {
           <p className={styles.ctaBandSub}>
             Tell us about your brand and campaign goals. We&apos;ll take it from there.
           </p>
-          <Link href="/start-campaign" className={styles.ctaPrimary}>
-            Start Your Campaign
+          <Link href="/start-project" className={styles.ctaPrimary}>
+            Start Project
           </Link>
         </div>
       </section>

@@ -5,7 +5,7 @@ import HowItWorksPage from "../how-it-works/page";
 import PortfolioPage from "../portfolio/page";
 import PricingPage from "../pricing/page";
 import AboutPage from "../about/page";
-import StartCampaignPage from "../start-campaign/page";
+import StartCampaignPage from "../start-project/page";
 
 describe("Services page", () => {
   it("renders an h1 heading", () => {
@@ -21,9 +21,9 @@ describe("Services page", () => {
     expect(screen.getByText("Campaign QC")).toBeInTheDocument();
   });
 
-  it("has a start campaign link", () => {
+  it("has a start project link", () => {
     render(<ServicesPage />);
-    expect(screen.getByRole("link", { name: /start.*campaign/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /start project/i })).toBeInTheDocument();
   });
 });
 
@@ -103,7 +103,7 @@ describe("About page", () => {
   });
 });
 
-describe("Start Campaign page", () => {
+describe("Start Project page", () => {
   it("renders an h1 heading", () => {
     render(<StartCampaignPage />);
     expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();

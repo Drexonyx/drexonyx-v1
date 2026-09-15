@@ -68,8 +68,8 @@ describe('ENABLE_ADMIN_ROUTES deployment flag — guard logic', () => {
       expect(adminGuardShouldBlock('/pricing', flag)).toBe(false);
     });
 
-    it('/start-campaign passes through', () => {
-      expect(adminGuardShouldBlock('/start-campaign', flag)).toBe(false);
+    it('/start-project passes through', () => {
+      expect(adminGuardShouldBlock('/start-project', flag)).toBe(false);
     });
 
     it('/portal/login passes through', () => {

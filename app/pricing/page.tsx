@@ -105,7 +105,7 @@ export default function PricingPage() {
                   ))}
                 </ul>
                 <Link
-                  href="/start-campaign"
+                  href="/start-project"
                   className={pkg.highlight ? styles.ctaPrimary : styles.ctaSecondary}
                 >
                   Get Started
@@ -161,8 +161,8 @@ export default function PricingPage() {
           <p className={styles.ctaBandSub}>
             Submit your campaign brief and we&apos;ll recommend the right scope for your goals.
           </p>
-          <Link href="/start-campaign" className={styles.ctaPrimary}>
-            Start Your Campaign
+          <Link href="/start-project" className={styles.ctaPrimary}>
+            Start Project
           </Link>
         </div>
       </section>

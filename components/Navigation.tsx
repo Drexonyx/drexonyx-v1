@@ -44,8 +44,8 @@ export default function Navigation() {
             ))}
           </ul>
 
-          <Link href="/start-campaign" className={styles.cta}>
-            Start Campaign
+          <Link href="/start-project" className={styles.cta}>
+            Start Project
           </Link>
 
           {/* Mobile menu button */}
@@ -84,12 +84,12 @@ export default function Navigation() {
             ))}
             <li>
               <Link
-                href="/start-campaign"
+                href="/start-project"
                 className={styles.drawerCta}
                 onClick={closeMenu}
                 tabIndex={menuOpen ? 0 : -1}
               >
-                Start Campaign
+                Start Project
               </Link>
             </li>
           </ul>

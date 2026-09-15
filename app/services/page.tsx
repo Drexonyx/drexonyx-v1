@@ -116,8 +116,8 @@ export default function ServicesPage() {
           <p className={styles.ctaBandSub}>
             Tell us about your brand and objectives. We&apos;ll propose the right creative mix.
           </p>
-          <Link href="/start-campaign" className={styles.ctaPrimary}>
-            Start Your Campaign
+          <Link href="/start-project" className={styles.ctaPrimary}>
+            Start Project
           </Link>
         </div>
       </section>

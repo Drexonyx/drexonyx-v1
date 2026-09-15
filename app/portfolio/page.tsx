@@ -58,8 +58,8 @@ export default function PortfolioPage() {
           <p className={styles.ctaBandSub}>
             Start your campaign inquiry and we&apos;ll share category-specific work directly.
           </p>
-          <Link href="/start-campaign" className={styles.ctaPrimary}>
-            Start Your Campaign
+          <Link href="/start-project" className={styles.ctaPrimary}>
+            Start Project
           </Link>
         </div>
       </section>

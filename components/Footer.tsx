@@ -8,7 +8,7 @@ const FOOTER_LINKS = [
   { href: "/portfolio", label: "Portfolio" },
   { href: "/pricing", label: "Pricing" },
   { href: "/about", label: "About" },
-  { href: "/start-campaign", label: "Start Campaign" },
+  { href: "/start-project", label: "Start Project" },
 ] as const;
 
 export default function Footer() {
