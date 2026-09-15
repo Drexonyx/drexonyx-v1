@@ -237,15 +237,15 @@ jobs:
             "https://api.vercel.com/v9/projects/${PROJECT_SLUG}?teamId=${TEAM_ID}" \
             -H "Authorization: Bearer ${VERCEL_TOKEN}")
           python3 -c "
-import json, sys
-d = json.loads(sys.argv[1])
-print('  framework:', d.get('framework'))
-print('  buildCommand:', d.get('buildCommand'))
-print('  outputDirectory:', d.get('outputDirectory'))
-print('  installCommand:', d.get('installCommand'))
-print('  rootDirectory:', d.get('rootDirectory'))
-print('  nodeVersion:', d.get('nodeVersion'))
-" "${PROJECT_SETTINGS}"
+          import json, sys
+          d = json.loads(sys.argv[1])
+          print('  framework:', d.get('framework'))
+          print('  buildCommand:', d.get('buildCommand'))
+          print('  outputDirectory:', d.get('outputDirectory'))
+          print('  installCommand:', d.get('installCommand'))
+          print('  rootDirectory:', d.get('rootDirectory'))
+          print('  nodeVersion:', d.get('nodeVersion'))
+          " "${PROJECT_SETTINGS}"
 
           echo "Ensuring framework=nextjs is set..."
           curl -sf -X PATCH \
