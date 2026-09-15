@@ -2,12 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { submitBrief } from './actions';
-import {
-  recommendPackage,
-  getPackageById,
-  formatPriceAED,
-  type PackageId,
-} from '@/lib/pricing';
+import { PRODUCTION_PACKAGES } from '@/lib/pricing';
 import styles from './page.module.css';
 
 const PLATFORM_OPTIONS = [
@@ -39,8 +34,14 @@ export default function ProjectFlowForm() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const recommendedPackageId: PackageId = recommendPackage({ creativeTypes, platforms });
-  const recommendedPkg = getPackageById(recommendedPackageId);
+  const recommendedPkg = (() => {
+    const wantsVideo = creativeTypes.some((t) => t.toLowerCase().includes('video'));
+    const wantsStrategy = creativeTypes.some((t) => t.toLowerCase().includes('strategy'));
+    if (!wantsVideo && wantsStrategy) {
+      return PRODUCTION_PACKAGES.find((p) => p.id === 'starter') ?? PRODUCTION_PACKAGES[0];
+    }
+    return PRODUCTION_PACKAGES.find((p) => p.highlight) ?? PRODUCTION_PACKAGES[0];
+  })();
 
   function toggle(arr: string[], val: string, set: (v: string[]) => void) {
     set(arr.includes(val) ? arr.filter((x) => x !== val) : [...arr, val]);
@@ -262,7 +263,7 @@ export default function ProjectFlowForm() {
             <div className={styles.recommendCard}>
               <p className={styles.recommendLabel}>Recommended based on your scope</p>
               <p className={styles.recommendName}>{recommendedPkg.name}</p>
-              <p className={styles.recommendPrice}>{formatPriceAED(recommendedPkg.priceAED)}</p>
+              <p className={styles.recommendPrice}>{recommendedPkg.priceLabel}</p>
               <p className={styles.recommendDesc}>{recommendedPkg.description}</p>
             </div>
           )}

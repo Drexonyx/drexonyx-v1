@@ -53,10 +53,19 @@
   color: var(--drex-accent);
 }
 
+.sectionLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--drex-text-muted);
+  margin-bottom: 2rem;
+}
+
 .packagesGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
+  gap: 1.25rem;
   align-items: start;
 }
 
@@ -264,14 +273,135 @@
   margin-bottom: 1.375rem;
 }
 
-@media (max-width: 900px) {
+/* Micro section */
+.microSection {
+  padding: 4rem 0;
+  border-bottom: 1px solid var(--drex-border);
+  background: var(--drex-elevated);
+}
+
+.microSectionHeading {
+  font-size: clamp(1.25rem, 2.5vw, 1.625rem);
+  font-weight: 700;
+  color: var(--drex-text);
+  margin-bottom: 0.625rem;
+}
+
+.microSectionDesc {
+  font-size: 0.9375rem;
+  color: var(--drex-text-secondary);
+  max-width: 56ch;
+  line-height: 1.65;
+  margin-bottom: 2.5rem;
+}
+
+.microGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+  max-width: 760px;
+}
+
+.microCard {
+  position: relative;
+  padding: 1.75rem;
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: border-color var(--drex-duration) var(--drex-ease);
+}
+
+.microCard:hover {
+  border-color: rgba(200, 152, 10, 0.2);
+}
+
+.scopeNote {
+  font-size: 0.8125rem;
+  color: var(--drex-text-muted);
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* Custom / Enterprise section */
+.customSection {
+  padding: 5rem 0;
+  border-bottom: 1px solid var(--drex-border);
+}
+
+.customSectionHeading {
+  font-size: clamp(1.25rem, 2.5vw, 1.625rem);
+  font-weight: 700;
+  color: var(--drex-text);
+  margin-bottom: 0.625rem;
+}
+
+.customSectionDesc {
+  font-size: 0.9375rem;
+  color: var(--drex-text-secondary);
+  max-width: 56ch;
+  line-height: 1.65;
+  margin-bottom: 2.5rem;
+}
+
+.customGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.customCard {
+  position: relative;
+  padding: 2rem;
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  transition: border-color var(--drex-duration) var(--drex-ease);
+}
+
+.customCard:hover {
+  border-color: rgba(200, 152, 10, 0.2);
+}
+
+.customPriceLabel {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--drex-text);
+  font-family: var(--font-geist-mono), monospace;
+}
+
+@media (max-width: 1000px) {
   .packagesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .microGrid {
     grid-template-columns: 1fr;
     max-width: 480px;
+  }
+
+  .customGrid {
+    grid-template-columns: 1fr;
   }
 
   .faqItem {
     grid-template-columns: 1fr;
     gap: 0.75rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .packagesGrid {
+    grid-template-columns: 1fr;
+    max-width: 480px;
   }
 }

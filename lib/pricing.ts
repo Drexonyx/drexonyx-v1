@@ -1,106 +1,178 @@
-export type PackageId = 'starter' | 'growth' | 'scale';
-
-export interface Package {
-  id: PackageId;
+export type Package = {
+  id: string;
   name: string;
-  priceAED: number;
+  price: number;
+  priceLabel: string;
   description: string;
-  includes: readonly string[];
-  highlight: boolean;
-  deliverableCount: number;
-  turnaroundDays: number;
-  revisionRounds: number;
-}
+  includes: string[];
+  scopeNote?: string;
+  highlight?: boolean;
+  badge?: string;
+};
 
-/** Selling prices shown to clients. Internal cost and margin are never stored here. */
-export const PACKAGES: readonly Package[] = [
+export type CustomTier = {
+  id: string;
+  name: string;
+  priceLabel: string;
+  description: string;
+  attributes: string[];
+  cta: string;
+  ctaHref: string;
+};
+
+// Creative direction products — no video production
+export const MICRO_PACKAGES: Package[] = [
+  {
+    id: 'micro-creative',
+    name: 'Micro Creative',
+    price: 199,
+    priceLabel: 'AED 199',
+    description:
+      'Professional creative direction for brands with focused budgets. One concept, one hook, one clear direction — delivered as a concise digital document.',
+    includes: [
+      'Creative concept & hook direction',
+      'CTA direction',
+      'Creative recommendation & guidance',
+      'Digital creative brief document',
+      '1 revision / clarification round',
+    ],
+    scopeNote: 'Creative direction only — does not include video production or editing.',
+  },
+  {
+    id: 'creative-brief',
+    name: 'Creative Brief',
+    price: 299,
+    priceLabel: 'AED 299',
+    description:
+      'A complete campaign creative brief — everything you need to confidently brief a creator, an agency, or an in-house production team.',
+    includes: [
+      'Campaign objective & creative strategy',
+      'Core creative concept',
+      'Hook framework',
+      'CTA direction',
+      'Platform & creative direction',
+      'Full campaign brief document',
+      '1 revision / clarification round',
+    ],
+    scopeNote: 'Strategy and brief only — does not include video production or media buying.',
+  },
+];
+
+// Core production ladder — Spark through Production
+export const PRODUCTION_PACKAGES: Package[] = [
+  {
+    id: 'spark',
+    name: 'Spark',
+    price: 499,
+    priceLabel: 'AED 499',
+    description:
+      'Your first DREXONYX production. One AI UGC video — concept to delivery in 48 hours.',
+    includes: [
+      '1 × AI UGC video (15–30 sec)',
+      'Creative concept & script',
+      'Production & QC',
+      '1 minor revision round',
+      '48-hour turnaround',
+    ],
+  },
   {
     id: 'starter',
     name: 'Starter',
-    priceAED: 1500,
+    price: 1500,
+    priceLabel: 'AED 1,500',
     description:
-      'Entry-level performance creative package. Ideal for brands launching their first UGC advertising program.',
+      'A full-length UGC video ad for brands launching their first performance creative campaign.',
     includes: [
-      '1 UGC advertising video',
+      '1 × UGC video ad (up to 60 sec)',
+      'Creative brief + script',
       '1 revision round',
-      '5 business days turnaround',
-      'Creative strategy brief',
+      '5 business days',
       'QC review included',
     ],
-    highlight: false,
-    deliverableCount: 1,
-    turnaroundDays: 5,
-    revisionRounds: 1,
   },
   {
     id: 'growth',
     name: 'Growth',
-    priceAED: 3500,
+    price: 3500,
+    priceLabel: 'AED 3,500',
     description:
-      'For brands scaling performance creative volume. Expanded deliverable set with creative testing support.',
+      'Scale your performance creative with multi-video production and A/B variant testing.',
     includes: [
-      '3 UGC advertising videos',
-      '2 revision rounds',
-      '7 business days turnaround',
-      'Creative strategy brief',
+      '3 × UGC video ads',
       'A/B variant production',
-      'QC review included',
+      'Full creative strategy brief',
+      '2 revision rounds',
+      '7 business days',
     ],
     highlight: true,
-    deliverableCount: 3,
-    turnaroundDays: 7,
-    revisionRounds: 2,
+    badge: 'Most Popular',
   },
   {
     id: 'scale',
     name: 'Scale',
-    priceAED: 6500,
+    price: 6500,
+    priceLabel: 'AED 6,500',
     description:
       'High-volume creative production for performance-led brands running multiple campaigns simultaneously.',
     includes: [
-      '6 UGC advertising videos',
-      '3 revision rounds',
-      '10 business days turnaround',
-      'Full creative strategy',
+      '6 × UGC video ads',
       'Multi-format variant production',
-      'Priority QC and delivery',
+      'Full creative strategy',
+      '3 revision rounds',
+      '10 business days',
+      'Priority QC',
+    ],
+  },
+  {
+    id: 'production',
+    name: 'Production',
+    price: 14500,
+    priceLabel: 'AED 14,500',
+    description:
+      'Premium creative production for hero content, product launches, and cinematic brand storytelling.',
+    includes: [
+      '1 × cinematic product commercial (30–60 sec)',
+      '— or up to 12 mixed video/static deliverables',
+      'Full creative direction',
+      '3 revision rounds',
+      '15 business days',
       'Dedicated account coordination',
     ],
-    highlight: false,
-    deliverableCount: 6,
-    turnaroundDays: 10,
-    revisionRounds: 3,
   },
 ];
 
-export function formatPriceAED(priceAED: number): string {
-  const thousands = Math.floor(priceAED / 1000);
-  const remainder = priceAED % 1000;
-  if (thousands > 0) {
-    const rem = remainder > 0 ? `,${String(remainder).padStart(3, '0')}` : ',000';
-    return `AED ${thousands}${rem}`;
-  }
-  return `AED ${priceAED}`;
-}
-
-export function getPackageById(id: PackageId): Package | undefined {
-  return PACKAGES.find((p) => p.id === id);
-}
-
-export interface RecommendationInput {
-  creativeTypes: string[];
-  platforms: string[];
-}
-
-/**
- * Recommends a package based on creative scope and platform breadth.
- * Recommendation logic reflects scope complexity only — never internal cost or margin.
- */
-export function recommendPackage(input: RecommendationInput): PackageId {
-  const { creativeTypes, platforms } = input;
-  const broadPlatforms = platforms.length >= 3;
-  const multiCreative = creativeTypes.length >= 2;
-  if (broadPlatforms || multiCreative) return 'scale';
-  if (platforms.length >= 2 || creativeTypes.length >= 1) return 'growth';
-  return 'starter';
-}
+// Custom / bespoke tiers — no fixed price
+export const CUSTOM_TIERS: CustomTier[] = [
+  {
+    id: 'brand-film',
+    name: 'Brand Film',
+    priceLabel: 'From AED 35,000',
+    description:
+      'Full brand film production for campaigns that demand cinematic quality, multi-platform deliverables, and a bespoke creative approach.',
+    attributes: [
+      'Custom creative brief',
+      'Full brand film production',
+      'Multi-platform deliverables',
+      'Bespoke scope & timeline',
+      'Custom revision rounds',
+    ],
+    cta: 'Brief Us on Your Project',
+    ctaHref: '/start-project',
+  },
+  {
+    id: 'enterprise',
+    name: 'Enterprise & Custom',
+    priceLabel: 'Custom Quote',
+    description:
+      'For luxury brands, large campaigns, multi-campaign programs, and institutional projects. Scoped and priced to your production requirements.',
+    attributes: [
+      'Multi-campaign production',
+      'Enterprise creative programs',
+      'Luxury & high-end brand work',
+      'Bespoke scope & pricing',
+      'Dedicated project management',
+    ],
+    cta: 'Start a Custom Project',
+    ctaHref: '/start-project',
+  },
+];

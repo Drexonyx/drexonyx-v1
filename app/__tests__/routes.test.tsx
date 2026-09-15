@@ -68,14 +68,36 @@ describe("Pricing page", () => {
     expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
   });
 
-  it("renders all three package cards with real prices", () => {
+  it("renders all five production package cards", () => {
     render(<PricingPage />);
+    expect(screen.getByText("Spark")).toBeInTheDocument();
     expect(screen.getByText("Starter")).toBeInTheDocument();
     expect(screen.getByText("Growth")).toBeInTheDocument();
     expect(screen.getByText("Scale")).toBeInTheDocument();
-    expect(screen.getByText("AED 1,500")).toBeInTheDocument();
+    expect(screen.getByText("Production")).toBeInTheDocument();
+  });
+
+  it("renders the two micro entry products", () => {
+    render(<PricingPage />);
+    expect(screen.getByText("Micro Creative")).toBeInTheDocument();
+    expect(screen.getByText("Creative Brief")).toBeInTheDocument();
+  });
+
+  it("renders custom tiers", () => {
+    render(<PricingPage />);
+    expect(screen.getByText("Brand Film")).toBeInTheDocument();
+    expect(screen.getByText("Enterprise & Custom")).toBeInTheDocument();
+  });
+
+  it("renders AED prices", () => {
+    render(<PricingPage />);
+    expect(screen.getByText("AED 499")).toBeInTheDocument();
     expect(screen.getByText("AED 3,500")).toBeInTheDocument();
-    expect(screen.getByText("AED 6,500")).toBeInTheDocument();
+  });
+
+  it("marks Growth as Most Popular", () => {
+    render(<PricingPage />);
+    expect(screen.getByText("Most Popular")).toBeInTheDocument();
   });
 });
 

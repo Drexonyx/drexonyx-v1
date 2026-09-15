@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { PACKAGES, formatPriceAED } from '@/lib/pricing';
+import { PRODUCTION_PACKAGES } from '@/lib/pricing';
 import styles from './page.module.css';
 
 export const metadata: Metadata = {
@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: 'Complete your DREXONYX project order.',
 };
 
-const defaultPackage = PACKAGES.find((p) => p.highlight) ?? PACKAGES[0];
+const defaultPackage = PRODUCTION_PACKAGES.find((p) => p.highlight) ?? PRODUCTION_PACKAGES[0];
 
 export default function CheckoutPage() {
   return (
@@ -32,7 +32,7 @@ export default function CheckoutPage() {
               <h2 className={styles.orderHeading}>Selected Package</h2>
               <div className={styles.pkgHeader}>
                 <p className={styles.pkgName}>{defaultPackage.name}</p>
-                <p className={styles.pkgPrice}>{formatPriceAED(defaultPackage.priceAED)}</p>
+                <p className={styles.pkgPrice}>{defaultPackage.priceLabel}</p>
               </div>
               <p className={styles.pkgDesc}>{defaultPackage.description}</p>
               <ul className={styles.pkgIncludes} aria-label="Package inclusions">
@@ -44,7 +44,7 @@ export default function CheckoutPage() {
               </ul>
               <div className={styles.totalRow}>
                 <span className={styles.totalLabel}>Total</span>
-                <span className={styles.totalPrice}>{formatPriceAED(defaultPackage.priceAED)}</span>
+                <span className={styles.totalPrice}>{defaultPackage.priceLabel}</span>
               </div>
             </div>
 
