@@ -261,7 +261,11 @@ jobs:
           npm ci
 
           echo "Building for production..."
-          vercel build --prod --token="${VERCEL_TOKEN}" --yes
+          VERCEL_ORG_ID="${TEAM_ID}" VERCEL_PROJECT_ID="${PROJECT_ID}" \
+            vercel build --prod --token="${VERCEL_TOKEN}" --yes --debug 2>&1 | head -60 || true
+          echo "--- vercel build exit (debug run) ---"
+          VERCEL_ORG_ID="${TEAM_ID}" VERCEL_PROJECT_ID="${PROJECT_ID}" \
+            vercel build --prod --token="${VERCEL_TOKEN}" --yes
 
           echo "Deploying prebuilt to production..."
           DEPLOY_URL=$(vercel deploy --prebuilt --prod --token="${VERCEL_TOKEN}" --scope="${TEAM_SLUG}")
