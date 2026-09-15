@@ -132,7 +132,7 @@ export const PRODUCTION_PACKAGES: Package[] = [
       'Premium creative production for hero content, product launches, and cinematic brand storytelling.',
     includes: [
       '1 × cinematic product commercial (30–60 sec)',
-      '— or up to 12 mixed video/static deliverables',
+      'or up to 12 mixed video/static deliverables — one scope per engagement, agreed at brief',
       'Full creative direction',
       '3 revision rounds',
       '15 business days',

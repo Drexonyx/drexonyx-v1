@@ -75,8 +75,9 @@ export default function PricingPage() {
             Need Something Smaller?
           </h2>
           <p className={styles.microSectionDesc}>
-            Creative direction products for brands that need professional strategy before
-            committing to full production.
+            Professional DREXONYX creative guidance accessible to everyone — individuals,
+            creators, solo entrepreneurs, and businesses of any size. The same strategic
+            thinking and creative quality, without a full production commitment.
           </p>
 
           <div className={styles.microGrid}>

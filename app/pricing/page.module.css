@@ -64,9 +64,19 @@
 
 .packagesGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 1.25rem;
   align-items: start;
+}
+
+/* Row 1: Spark, Starter, Growth — three equal cards */
+.packagesGrid > article:nth-child(-n+3) {
+  grid-column: span 2;
+}
+
+/* Row 2: Scale, Production — two wider premium cards */
+.packagesGrid > article:nth-child(n+4) {
+  grid-column: span 3;
 }
 
 .packageCard {
@@ -381,6 +391,17 @@
   .packagesGrid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  /* Reset desktop spans — equal 2-col layout */
+  .packagesGrid > article:nth-child(-n+3),
+  .packagesGrid > article:nth-child(n+4) {
+    grid-column: span 1;
+  }
+
+  /* Production card spans full row on tablet */
+  .packagesGrid > article:last-child {
+    grid-column: span 2;
+  }
 }
 
 @media (max-width: 900px) {
@@ -403,5 +424,12 @@
   .packagesGrid {
     grid-template-columns: 1fr;
     max-width: 480px;
+  }
+
+  /* Reset all column spans at mobile */
+  .packagesGrid > article:nth-child(-n+3),
+  .packagesGrid > article:nth-child(n+4),
+  .packagesGrid > article:last-child {
+    grid-column: span 1;
   }
 }
