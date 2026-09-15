@@ -75,8 +75,9 @@ export default function PricingPage() {
             Need Something Smaller?
           </h2>
           <p className={styles.microSectionDesc}>
-            Creative direction products for brands that need professional strategy before
-            committing to full production.
+            Professional DREXONYX creative guidance accessible to everyone — individuals,
+            creators, solo entrepreneurs, and businesses of any size. The same strategic
+            thinking and creative quality, without a full production commitment.
           </p>
 
           <div className={styles.microGrid}>
@@ -174,7 +175,7 @@ export default function PricingPage() {
               },
               {
                 q: "Do you manage ad campaigns or media buying?",
-                a: "No. DREXONYX produces UGC advertising creative only. Campaign management, media buying, and ad optimization are outside our scope.",
+                a: "No. DREXONYX produces creative content and advertising assets. Campaign management, media buying, and ad optimization are outside our scope.",
               },
             ].map((item) => (
               <div key={item.q} className={styles.faqItem}>
