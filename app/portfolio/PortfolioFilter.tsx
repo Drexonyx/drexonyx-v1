@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { PORTFOLIO_CATEGORIES, type PortfolioCategory, type PortfolioItem } from '@/lib/portfolio';
 import styles from './page.module.css';
 
@@ -29,8 +29,31 @@ interface PortfolioFilterProps {
 
 export default function PortfolioFilter({ items }: PortfolioFilterProps) {
   const [active, setActive] = useState<FilterCategory>('All');
+  const [playing, setPlaying] = useState<PortfolioItem | null>(null);
 
   const filtered = active === 'All' ? items : items.filter((item) => item.category === active);
+
+  const openVideo = useCallback((item: PortfolioItem) => {
+    setPlaying(item);
+  }, []);
+
+  const closeVideo = useCallback(() => {
+    setPlaying(null);
+  }, []);
+
+  // ESC to close + body scroll lock
+  useEffect(() => {
+    if (!playing) return;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeVideo();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [playing, closeVideo]);
 
   return (
     <>
@@ -89,11 +112,19 @@ export default function PortfolioFilter({ items }: PortfolioFilterProps) {
                   <span className={styles.cardCategoryBadge}>{item.category}</span>
                   <span className={styles.cardTypeBadge}>{item.mediaType}</span>
                 </div>
-                {item.mediaType === 'video' && (
+                {item.mediaType === 'video' && item.src ? (
+                  <button
+                    className={styles.playButton}
+                    onClick={() => openVideo(item)}
+                    aria-label={`Play ${item.title}`}
+                  >
+                    <span className={styles.playIcon} aria-hidden="true" />
+                  </button>
+                ) : item.mediaType === 'video' ? (
                   <div className={styles.playOverlay} aria-hidden="true">
                     <div className={styles.playIcon} />
                   </div>
-                )}
+                ) : null}
               </div>
               <div className={styles.cardMeta}>
                 <span className={styles.cardCategory}>{item.category}</span>
@@ -102,6 +133,41 @@ export default function PortfolioFilter({ items }: PortfolioFilterProps) {
               </div>
             </article>
           ))}
+        </div>
+      )}
+
+      {/* Video lightbox — only mounted when playing; never in DOM otherwise */}
+      {playing?.src && (
+        <div
+          className={styles.videoOverlay}
+          role="dialog"
+          aria-modal="true"
+          aria-label={playing.title}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) closeVideo();
+          }}
+        >
+          <div className={styles.videoDialogInner}>
+            <button
+              className={styles.videoClose}
+              onClick={closeVideo}
+              aria-label="Close video"
+            >
+              ✕
+            </button>
+            <video
+              key={playing.src}
+              src={playing.src}
+              controls
+              playsInline
+              preload="metadata"
+              autoPlay
+              className={styles.videoPlayer}
+            >
+              Your browser does not support the video element.
+            </video>
+            <p className={styles.videoCaption}>{playing.title}</p>
+          </div>
         </div>
       )}
     </>

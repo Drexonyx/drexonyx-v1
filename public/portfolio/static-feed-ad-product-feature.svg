@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  <defs>
+    <radialGradient id="sg1" cx="50%" cy="50%" r="50%" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#c8980a" stop-opacity="0.22"/>
+      <stop offset="55%" stop-color="#0f0d06" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#090909" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="sg2" cx="50%" cy="50%" r="50%" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#c8980a" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#090909" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="orb" cx="42%" cy="38%" r="58%" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#e8b80a" stop-opacity="1"/>
+      <stop offset="40%" stop-color="#a87c08" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#3d2d03" stop-opacity="1"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background layers -->
+  <rect width="1080" height="1080" fill="#090909"/>
+  <rect width="1080" height="1080" fill="url(#sg2)"/>
+
+  <!-- Top gold rule (visible even when cropped) -->
+  <rect x="0" y="0" width="1080" height="4" fill="#c8980a" opacity="0.7"/>
+
+  <!-- "SAMPLE AD CREATIVE" badge — top-left, in non-cropped area for full image view -->
+  <rect x="40" y="28" width="260" height="30" rx="4" fill="#c8980a" opacity="0.12"/>
+  <rect x="40" y="28" width="260" height="30" rx="4" fill="none" stroke="#c8980a" stroke-width="1" opacity="0.3"/>
+  <text x="170" y="49" text-anchor="middle"
+    font-family="system-ui,-apple-system,'Segoe UI',sans-serif"
+    font-weight="700" font-size="11" letter-spacing="4"
+    fill="#c8980a" opacity="0.8">CONCEPT CREATIVE · DEMO</text>
+
+  <!-- Central orb — center of safe zone y=236-844, centered at y=495 -->
+  <circle cx="540" cy="495" r="168" fill="url(#sg1)"/>
+  <circle cx="540" cy="495" r="168" fill="none" stroke="#c8980a" stroke-width="1.5" opacity="0.35"/>
+  <circle cx="540" cy="495" r="128" fill="none" stroke="#c8980a" stroke-width="0.75" opacity="0.2"/>
+  <circle cx="540" cy="495" r="88"  fill="none" stroke="#c8980a" stroke-width="0.75" opacity="0.18"/>
+
+  <!-- Orb inner sphere -->
+  <circle cx="540" cy="495" r="56" fill="url(#orb)"/>
+  <ellipse cx="524" cy="478" rx="18" ry="12"
+    fill="#fff8e0" opacity="0.25"
+    transform="rotate(-30 524 478)"/>
+
+  <!-- Headline — y=368 safe above orb (safe zone top = 236) -->
+  <text x="540" y="340" text-anchor="middle"
+    font-family="system-ui,-apple-system,'Segoe UI',sans-serif"
+    font-weight="900" font-size="68" letter-spacing="-2"
+    fill="#f5f5f3">BUILT</text>
+  <text x="540" y="408" text-anchor="middle"
+    font-family="system-ui,-apple-system,'Segoe UI',sans-serif"
+    font-weight="900" font-size="68" letter-spacing="-2"
+    fill="#f5f5f3">DIFFERENT.</text>
+
+  <!-- Sub copy below orb — y=668+ safe (safe zone bottom = 844) -->
+  <text x="540" y="680" text-anchor="middle"
+    font-family="system-ui,-apple-system,'Segoe UI',sans-serif"
+    font-weight="400" font-size="22" letter-spacing="1"
+    fill="#f5f5f3" opacity="0.55">Performance creative that converts.</text>
+
+  <!-- CTA -->
+  <rect x="390" y="714" width="300" height="54" rx="8"
+    fill="#c8980a" opacity="0.12"/>
+  <rect x="390" y="714" width="300" height="54" rx="8"
+    fill="none" stroke="#c8980a" stroke-width="1.5" opacity="0.5"/>
+  <text x="540" y="748" text-anchor="middle"
+    font-family="system-ui,-apple-system,'Segoe UI',sans-serif"
+    font-weight="700" font-size="15" letter-spacing="5"
+    fill="#c8980a">SHOP NOW →</text>
+
+  <!-- Bottom label strip (in safe zone) -->
+  <rect x="0" y="1028" width="1080" height="52" fill="#c8980a" opacity="0.07"/>
+  <line x1="0" y1="1028" x2="1080" y2="1028" stroke="#c8980a" stroke-width="1" opacity="0.2"/>
+  <text x="540" y="1059" text-anchor="middle"
+    font-family="system-ui,-apple-system,'Segoe UI',sans-serif"
+    font-weight="700" font-size="13" letter-spacing="3"
+    fill="#c8980a" opacity="0.6">DREXONYX · INTERNAL PRODUCTION SAMPLE</text>
+</svg>
