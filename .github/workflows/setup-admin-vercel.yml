@@ -192,84 +192,90 @@ jobs:
             python3 -c "import json,sys; d=json.load(sys.stdin); print('nodeVersion:', d.get('nodeVersion','(not returned)'))"
           echo "  ✓ Node.js version set to 24.x"
 
-      - name: Set up Node.js 24
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-          cache: 'npm'
-
-      - name: Build and deploy via Vercel CLI
+      - name: Deploy via Vercel REST API
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
           set -euo pipefail
           TEAM_ID="team_qqKMKFtQjrjZIjlth9LBDNu0"
-          TEAM_SLUG="drexonyxstudio-7806"
           PROJECT_SLUG="drexonyx-v1-admin"
 
-          echo "Installing Vercel CLI..."
-          npm install -g vercel@latest
-
-          echo "Fetching project ID..."
-          PROJECT_ID=$(curl -sf \
-            "https://api.vercel.com/v9/projects/${PROJECT_SLUG}?teamId=${TEAM_ID}" \
-            -H "Authorization: Bearer ${VERCEL_TOKEN}" | \
-            python3 -c "import json,sys; d=json.load(sys.stdin); print(d['id'])")
-          echo "  Project ID: ${PROJECT_ID}"
-
-          # CLI auth: vercel build reads ~/.config/vercel/auth.json and
-          # config.json (for currentTeam scope) to resolve project settings.
-          echo "Setting up Vercel CLI auth..."
-          mkdir -p ~/.config/vercel ~/.vercel
-          printf '{"token":"%s"}\n' "${VERCEL_TOKEN}" > ~/.config/vercel/auth.json
-          cp ~/.config/vercel/auth.json ~/.vercel/auth.json
-          printf '{"currentTeam":"%s"}\n' "${TEAM_ID}" > ~/.config/vercel/config.json
-          echo "  ✓ ~/.config/vercel/auth.json + config.json written"
-
-          # Create .vercel/project.json so the CLI resolves the correct project
-          echo "Creating .vercel/project.json..."
-          mkdir -p .vercel
-          printf '{"orgId":"%s","projectId":"%s"}\n' "${TEAM_ID}" "${PROJECT_ID}" > .vercel/project.json
-          cat .vercel/project.json
-          echo "  ✓ .vercel/project.json created"
-
-          echo "Checking project settings..."
-          PROJECT_SETTINGS=$(curl -sf \
+          echo "Fetching project link info..."
+          PROJECT_DATA=$(curl -sf \
             "https://api.vercel.com/v9/projects/${PROJECT_SLUG}?teamId=${TEAM_ID}" \
             -H "Authorization: Bearer ${VERCEL_TOKEN}")
+
           python3 -c "
           import json, sys
           d = json.loads(sys.argv[1])
-          print('  framework:', d.get('framework'))
-          print('  buildCommand:', d.get('buildCommand'))
-          print('  outputDirectory:', d.get('outputDirectory'))
-          print('  installCommand:', d.get('installCommand'))
-          print('  rootDirectory:', d.get('rootDirectory'))
-          print('  nodeVersion:', d.get('nodeVersion'))
-          " "${PROJECT_SETTINGS}"
+          link = d.get('link', {})
+          print('  link.type:', link.get('type'))
+          print('  link.org:', link.get('org'))
+          print('  link.repo:', link.get('repo'))
+          print('  link.repoId:', link.get('repoId'))
+          print('  link.productionBranch:', link.get('productionBranch'))
+          " "${PROJECT_DATA}"
 
-          echo "Ensuring framework=nextjs is set..."
-          curl -sf -X PATCH \
-            "https://api.vercel.com/v9/projects/${PROJECT_SLUG}?teamId=${TEAM_ID}" \
+          REPO_ID=$(python3 -c "import json,sys; d=json.loads(sys.argv[1]); print(d.get('link',{}).get('repoId',''))" "${PROJECT_DATA}")
+          echo "  GitHub repo ID: ${REPO_ID}"
+
+          if [ -z "${REPO_ID}" ]; then
+            echo "ERROR: Could not get repo ID from project link. Is the project connected to GitHub?"
+            exit 1
+          fi
+
+          echo "Triggering production deployment via REST API..."
+          DEPLOY_RESPONSE=$(curl -sf -X POST \
+            "https://api.vercel.com/v13/deployments?teamId=${TEAM_ID}&forceNew=1" \
             -H "Authorization: Bearer ${VERCEL_TOKEN}" \
             -H "Content-Type: application/json" \
-            -d '{"framework":"nextjs"}' | \
-            python3 -c "import json,sys; d=json.load(sys.stdin); print('  framework now:', d.get('framework'))"
-          echo "  ✓ framework=nextjs ensured"
+            -d "{\"name\":\"${PROJECT_SLUG}\",\"target\":\"production\",\"gitSource\":{\"type\":\"github\",\"ref\":\"main\",\"repoId\":${REPO_ID}}}")
 
-          echo "Installing dependencies..."
-          npm ci
+          python3 -c "
+          import json, sys
+          d = json.loads(sys.argv[1])
+          if 'error' in d:
+            print('  ERROR:', d['error'].get('message', d['error']))
+            sys.exit(1)
+          print('  id:', d.get('id'))
+          print('  readyState:', d.get('readyState'))
+          print('  url:', d.get('url'))
+          " "${DEPLOY_RESPONSE}"
 
-          echo "Building for production..."
-          VERCEL_ORG_ID="${TEAM_ID}" VERCEL_PROJECT_ID="${PROJECT_ID}" \
-            vercel build --prod --token="${VERCEL_TOKEN}" --yes --debug 2>&1 | head -60 || true
-          echo "--- vercel build exit (debug run) ---"
-          VERCEL_ORG_ID="${TEAM_ID}" VERCEL_PROJECT_ID="${PROJECT_ID}" \
-            vercel build --prod --token="${VERCEL_TOKEN}" --yes
+          DEPLOYMENT_ID=$(python3 -c "
+          import json, sys
+          d = json.loads(sys.argv[1])
+          if 'error' in d:
+            print('ERROR', file=sys.stderr)
+            sys.exit(1)
+          print(d.get('id', 'ERROR'))
+          " "${DEPLOY_RESPONSE}")
+          echo "  Deployment ID: ${DEPLOYMENT_ID}"
 
-          echo "Deploying prebuilt to production..."
-          DEPLOY_URL=$(vercel deploy --prebuilt --prod --token="${VERCEL_TOKEN}" --scope="${TEAM_SLUG}")
-          echo "  Deployed to: ${DEPLOY_URL}"
+          echo "Polling for deployment completion (up to 10 min)..."
+          FINAL_STATUS=""
+          for i in $(seq 1 40); do
+            sleep 15
+            STATUS_RESP=$(curl -sf \
+              "https://api.vercel.com/v13/deployments/${DEPLOYMENT_ID}?teamId=${TEAM_ID}" \
+              -H "Authorization: Bearer ${VERCEL_TOKEN}")
+            STATUS=$(python3 -c "import json,sys; d=json.loads(sys.argv[1]); print(d.get('readyState','UNKNOWN'))" "${STATUS_RESP}")
+            echo "  [${i}/40] Deployment status: ${STATUS}"
+            if [ "${STATUS}" = "READY" ]; then
+              echo "  ✓ Deployment complete"
+              FINAL_STATUS="READY"
+              break
+            elif [ "${STATUS}" = "ERROR" ] || [ "${STATUS}" = "CANCELED" ]; then
+              echo "  ✗ Deployment failed with status: ${STATUS}"
+              FINAL_STATUS="${STATUS}"
+              break
+            fi
+          done
+
+          if [ "${FINAL_STATUS}" != "READY" ]; then
+            echo "  ✗ Deployment did not reach READY state (final: ${FINAL_STATUS:-TIMEOUT})"
+            exit 1
+          fi
 
           echo "Verifying /admin/login endpoint (up to 2 min)..."
           HTTP_STATUS="000"
