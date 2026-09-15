@@ -175,7 +175,7 @@ export default function PricingPage() {
               },
               {
                 q: "Do you manage ad campaigns or media buying?",
-                a: "No. DREXONYX produces UGC advertising creative only. Campaign management, media buying, and ad optimization are outside our scope.",
+                a: "No. DREXONYX produces creative content and advertising assets. Campaign management, media buying, and ad optimization are outside our scope.",
               },
             ].map((item) => (
               <div key={item.q} className={styles.faqItem}>
