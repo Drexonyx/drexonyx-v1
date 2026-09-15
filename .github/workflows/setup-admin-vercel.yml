@@ -217,13 +217,14 @@ jobs:
             python3 -c "import json,sys; d=json.load(sys.stdin); print(d['id'])")
           echo "  Project ID: ${PROJECT_ID}"
 
-          # CLI auth: vercel build reads ~/.config/vercel/auth.json for project
-          # settings lookup even when --token is supplied for the deployment call.
+          # CLI auth: vercel build reads ~/.config/vercel/auth.json and
+          # config.json (for currentTeam scope) to resolve project settings.
           echo "Setting up Vercel CLI auth..."
           mkdir -p ~/.config/vercel ~/.vercel
           printf '{"token":"%s"}\n' "${VERCEL_TOKEN}" > ~/.config/vercel/auth.json
           cp ~/.config/vercel/auth.json ~/.vercel/auth.json
-          echo "  ✓ ~/.config/vercel/auth.json written"
+          printf '{"currentTeam":"%s"}\n' "${TEAM_ID}" > ~/.config/vercel/config.json
+          echo "  ✓ ~/.config/vercel/auth.json + config.json written"
 
           # Create .vercel/project.json so the CLI resolves the correct project
           echo "Creating .vercel/project.json..."
