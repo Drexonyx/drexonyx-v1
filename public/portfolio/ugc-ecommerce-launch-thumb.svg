@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
+  <defs>
+    <radialGradient id="eg1" cx="22%" cy="60%" r="48%" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#c8980a" stop-opacity="0.11"/>
+      <stop offset="100%" stop-color="#090909" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="eg2" cx="50%" cy="50%" r="50%" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#c8980a" stop-opacity="0.18"/>
+      <stop offset="60%" stop-color="#1a1108" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#090909" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1600" height="900" fill="#090909"/>
+  <rect width="1600" height="900" fill="url(#eg1)"/>
+
+  <!-- Right-side abstract product orb -->
+  <circle cx="1260" cy="450" r="280" fill="url(#eg2)"/>
+  <circle cx="1260" cy="450" r="280" fill="none" stroke="#c8980a" stroke-width="1" opacity="0.18"/>
+  <circle cx="1260" cy="450" r="210" fill="none" stroke="#c8980a" stroke-width="0.75" opacity="0.12"/>
+  <circle cx="1260" cy="450" r="140" fill="none" stroke="#c8980a" stroke-width="0.75" opacity="0.1"/>
+  <circle cx="1260" cy="450" r="70"  fill="none" stroke="#c8980a" stroke-width="1.5" opacity="0.22"/>
+
+  <!-- Orb inner highlight -->
+  <ellipse cx="1225" cy="375" rx="55" ry="40"
+    fill="#c8980a" opacity="0.12"
+    transform="rotate(-25 1225 375)"/>
+
+  <!-- Left edge gold accent -->
+  <rect x="0" y="0" width="5" height="900" fill="#c8980a" opacity="0.8"/>
+
+  <!-- Top divider line -->
+  <line x1="80" y1="170" x2="900" y2="170" stroke="#c8980a" stroke-width="1" opacity="0.2"/>
+
+  <!-- Eyebrow -->
+  <text x="80" y="155"
+    font-family="system-ui,-apple-system,'Segoe UI',sans-serif"
+    font-weight="700" font-size="17" letter-spacing="7"
+    fill="#c8980a" opacity="0.9">E-COMMERCE</text>
+
+  <!-- Main type: LAUNCH -->
+  <text x="75" y="450"
+    font-family="system-ui,-apple-system,'Segoe UI',sans-serif"
+    font-weight="900" font-size="230" letter-spacing="-8"
+    fill="#f5f5f3" opacity="0.96">LAUNCH</text>
+
+  <!-- Sub: AD in gold outline style -->
+  <text x="82" y="548"
+    font-family="system-ui,-apple-system,'Segoe UI',sans-serif"
+    font-weight="900" font-size="90" letter-spacing="4"
+    fill="none" stroke="#c8980a" stroke-width="1.5" opacity="0.65">AD</text>
+
+  <!-- Divider -->
+  <line x1="80" y1="590" x2="540" y2="590" stroke="#c8980a" stroke-width="1.5" opacity="0.38"/>
+
+  <!-- Subline -->
+  <text x="80" y="630"
+    font-family="system-ui,-apple-system,'Segoe UI',sans-serif"
+    font-weight="400" font-size="20" letter-spacing="5"
+    fill="#f5f5f3" opacity="0.35">PRODUCT LAUNCH · UGC FORMAT</text>
+
+  <!-- Bottom label strip -->
+  <rect x="0" y="856" width="1600" height="44" fill="#c8980a" opacity="0.065"/>
+  <line x1="0" y1="856" x2="1600" y2="856" stroke="#c8980a" stroke-width="1" opacity="0.22"/>
+  <text x="80" y="883"
+    font-family="system-ui,-apple-system,'Segoe UI',sans-serif"
+    font-weight="700" font-size="14" letter-spacing="3"
+    fill="#c8980a" opacity="0.65">DREXONYX · INTERNAL PRODUCTION SAMPLE</text>
+</svg>

@@ -50,9 +50,9 @@ describe("Portfolio page", () => {
     expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
   });
 
-  it("renders a notice that portfolio is actively updated", () => {
+  it("renders portfolio items", () => {
     render(<PortfolioPage />);
-    expect(screen.getByText(/portfolio is actively updated/i)).toBeInTheDocument();
+    expect(screen.getByText("Performance Creative — Demo Reel")).toBeInTheDocument();
   });
 
   it("renders category filter buttons", () => {
