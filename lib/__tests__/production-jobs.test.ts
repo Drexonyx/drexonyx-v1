@@ -63,19 +63,32 @@ describe('createProductionJob', () => {
   });
 
   it('returns ok:false when order not found', async () => {
-    mockSelect.mockReturnValue(makeSelectChain([]));
+    selectSequence([[]]);
     const result = await createProductionJob(base);
     expect(result).toMatchObject({ ok: false, reason: 'Order not found' });
   });
 
   it('returns ok:false when order not ACTIVE', async () => {
-    mockSelect.mockReturnValue(makeSelectChain([{ id: 'order1', status: 'COMPLETED' }]));
+    selectSequence([[{ id: 'order1', status: 'COMPLETED' }]]);
     const result = await createProductionJob(base);
     expect(result).toMatchObject({ ok: false, reason: expect.stringContaining('COMPLETED') });
   });
 
-  it('creates job and returns ok:true for MANUAL_UPLOAD', async () => {
-    mockSelect.mockReturnValue(makeSelectChain([{ id: 'order1', status: 'ACTIVE' }]));
+  it('returns ok:false when order is ACTIVE but no PAID payment exists', async () => {
+    selectSequence([[{ id: 'order1', status: 'ACTIVE' }], []]);
+    const result = await createProductionJob(base);
+    expect(result).toMatchObject({ ok: false, reason: 'Cannot start production: no confirmed payment on record for this order.' });
+    expect(mockTransaction).not.toHaveBeenCalled();
+  });
+
+  it('returns ok:false when payment exists but is not PAID', async () => {
+    selectSequence([[{ id: 'order1', status: 'ACTIVE' }], []]);
+    const result = await createProductionJob(base);
+    expect(result).toMatchObject({ ok: false, reason: expect.stringContaining('no confirmed payment') });
+  });
+
+  it('creates job and returns ok:true when PAID payment exists', async () => {
+    selectSequence([[{ id: 'order1', status: 'ACTIVE' }], [{ id: 'pay1' }]]);
     mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
       const tx = {
         insert: vi.fn().mockReturnValue({ values: vi.fn().mockReturnValue({ onConflictDoNothing: vi.fn().mockResolvedValue([]) }) }),
@@ -88,16 +101,15 @@ describe('createProductionJob', () => {
     expect(result).toMatchObject({ ok: true, jobId: 'test-uuid' });
   });
 
-  it('CREATIVE_PRODUCTION role is allowed to create', async () => {
-    mockSelect.mockReturnValue(makeSelectChain([{ id: 'order1', status: 'ACTIVE' }]));
+  it('CREATIVE_PRODUCTION role is allowed to create when payment is PAID', async () => {
+    selectSequence([[{ id: 'order1', status: 'ACTIVE' }], [{ id: 'pay1' }]]);
     mockTransaction.mockResolvedValue(undefined);
     const result = await createProductionJob({ ...base, actorRole: 'CREATIVE_PRODUCTION' });
-    // We don't expect an authority failure
     expect(result).not.toMatchObject({ ok: false, reason: expect.stringContaining('authority') });
   });
 
   it('AI_GENERATION jobType triggers ai_generation creation', async () => {
-    mockSelect.mockReturnValue(makeSelectChain([{ id: 'order1', status: 'ACTIVE' }]));
+    selectSequence([[{ id: 'order1', status: 'ACTIVE' }], [{ id: 'pay1' }]]);
     const insertMock = vi.fn().mockReturnValue({ values: vi.fn().mockReturnValue({ onConflictDoNothing: vi.fn().mockResolvedValue([]) }) });
     mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
       const tx = {
