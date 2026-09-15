@@ -1,11 +1,27 @@
 'use client';
 
+import Image from 'next/image';
 import { useState } from 'react';
 import { PORTFOLIO_CATEGORIES, type PortfolioCategory, type PortfolioItem } from '@/lib/portfolio';
 import styles from './page.module.css';
 
 const ALL_CATEGORIES = ['All', ...PORTFOLIO_CATEGORIES] as const;
 type FilterCategory = PortfolioCategory | 'All';
+
+const FORMAT_DESCRIPTIONS: Record<PortfolioCategory, { cat: string; desc: string }> = {
+  'UGC Video': {
+    cat: 'UGC Video Ads',
+    desc: 'Creator-style video advertising built for platform-native performance — TikTok, Reels, YouTube Shorts.',
+  },
+  'Static Creative': {
+    cat: 'Static Ad Creative',
+    desc: 'High-conversion static and motion graphic assets across feed, story, and display formats.',
+  },
+  'Creative Strategy': {
+    cat: 'Creative Strategy',
+    desc: 'Brief development, hook frameworks, and creative direction aligned to campaign objectives.',
+  },
+};
 
 interface PortfolioFilterProps {
   items: PortfolioItem[];
@@ -14,8 +30,7 @@ interface PortfolioFilterProps {
 export default function PortfolioFilter({ items }: PortfolioFilterProps) {
   const [active, setActive] = useState<FilterCategory>('All');
 
-  const filtered =
-    active === 'All' ? items : items.filter((item) => item.category === active);
+  const filtered = active === 'All' ? items : items.filter((item) => item.category === active);
 
   return (
     <>
@@ -33,8 +48,25 @@ export default function PortfolioFilter({ items }: PortfolioFilterProps) {
       </div>
 
       {filtered.length === 0 ? (
-        <div className={styles.portfolioNotice}>
-          <p>
+        <div className={styles.emptyState}>
+          <div className={styles.emptyTop}>
+            <span className={styles.emptyEyebrow}>Work in Curation</span>
+            <p className={styles.emptyStatement}>
+              Built for performance. Cleared for display when clients approve.
+            </p>
+          </div>
+
+          <div className={styles.formatRow}>
+            {PORTFOLIO_CATEGORIES.map((cat) => (
+              <div key={cat} className={styles.formatCol}>
+                <div className={styles.formatMediaZone} aria-hidden="true" />
+                <span className={styles.formatCat}>{FORMAT_DESCRIPTIONS[cat].cat}</span>
+                <p className={styles.formatDesc}>{FORMAT_DESCRIPTIONS[cat].desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <p className={styles.portfolioNotice}>
             Portfolio is actively updated as client-approved work is cleared for public display.
           </p>
         </div>
@@ -42,17 +74,31 @@ export default function PortfolioFilter({ items }: PortfolioFilterProps) {
         <div className={styles.portfolioGrid}>
           {filtered.map((item) => (
             <article key={item.id} className={styles.portfolioCard}>
-              <div className={styles.cardPlaceholder} aria-hidden="true">
-                <span className={styles.cardPlaceholderIcon}>
-                  {item.mediaType === 'video' ? '▶' : '◻'}
-                </span>
+              <div className={styles.cardMedia}>
+                {item.thumbnailSrc ? (
+                  <Image
+                    src={item.thumbnailSrc}
+                    alt={item.title}
+                    fill
+                    className={styles.cardImg}
+                    sizes="(max-width: 540px) 100vw, (max-width: 960px) 50vw, 33vw"
+                  />
+                ) : null}
+                <div className={styles.cardOverlay} aria-hidden="true" />
+                <div className={styles.cardBadgeRow}>
+                  <span className={styles.cardCategoryBadge}>{item.category}</span>
+                  <span className={styles.cardTypeBadge}>{item.mediaType}</span>
+                </div>
+                {item.mediaType === 'video' && (
+                  <div className={styles.playOverlay} aria-hidden="true">
+                    <div className={styles.playIcon} />
+                  </div>
+                )}
               </div>
               <div className={styles.cardMeta}>
                 <span className={styles.cardCategory}>{item.category}</span>
                 <p className={styles.cardLabel}>{item.title}</p>
-                {item.description && (
-                  <p className={styles.cardNote}>{item.description}</p>
-                )}
+                {item.description && <p className={styles.cardNote}>{item.description}</p>}
               </div>
             </article>
           ))}

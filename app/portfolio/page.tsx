@@ -14,15 +14,24 @@ export default function PortfolioPage() {
   return (
     <>
       <section className={styles.hero} aria-labelledby="portfolio-hero-heading">
+        <div className={styles.heroGoldLine} aria-hidden="true" />
+        <div className={styles.heroGlow} aria-hidden="true" />
         <div className="container">
-          <div className={styles.heroBadge}>Portfolio</div>
-          <h1 id="portfolio-hero-heading" className={styles.heroHeading}>
-            Performance Creative Work
-          </h1>
-          <p className={styles.heroSub}>
-            Performance UGC creative across categories — work samples will be featured here as
-            client-approved pieces become available for public display.
-          </p>
+          <div className={styles.heroContent}>
+            <div className={styles.heroBadge}>Dubai · Portfolio</div>
+            <h1 id="portfolio-hero-heading" className={styles.heroHeading}>
+              Performance <span className={styles.heroAccent}>Creative Work</span>
+            </h1>
+            <p className={styles.heroSub}>
+              UGC advertising creative built for conversion — across video, static, and strategy.
+              Work samples are added as client-approved pieces clear for public display.
+            </p>
+            <div className={styles.heroCta}>
+              <Link href="/start-project" className={styles.ctaPrimary}>
+                Start a Project
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -34,15 +43,26 @@ export default function PortfolioPage() {
 
       <section className={styles.ctaBand} aria-labelledby="portfolio-cta-heading">
         <div className="container">
-          <h2 id="portfolio-cta-heading" className={styles.ctaBandHeading}>
-            Want to see more relevant examples?
-          </h2>
-          <p className={styles.ctaBandSub}>
-            Start your campaign inquiry and we&apos;ll share category-specific work directly.
-          </p>
-          <Link href="/start-project" className={styles.ctaPrimary}>
-            Start Project
-          </Link>
+          <div className={styles.ctaBandInner}>
+            <div className={styles.ctaBandLeft}>
+              <span className={styles.ctaBandEyebrow}>Ready to produce?</span>
+              <h2 id="portfolio-cta-heading" className={styles.ctaBandHeading}>
+                Want category-specific examples?
+              </h2>
+              <p className={styles.ctaBandSub}>
+                Submit your campaign brief and we&apos;ll share relevant work from our production
+                history directly.
+              </p>
+            </div>
+            <div className={styles.ctaBandRight}>
+              <Link href="/start-project" className={styles.ctaPrimary}>
+                Start Project
+              </Link>
+              <Link href="/services" className={styles.ctaContactLink}>
+                View services →
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
     </>
