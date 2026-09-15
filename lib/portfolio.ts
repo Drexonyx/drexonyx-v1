@@ -35,6 +35,7 @@ export const PORTFOLIO_ITEMS: PortfolioItem[] = [
     description:
       'Internal production sample. Hook-led AI UGC concept built for TikTok and Reels. 15-second direct-response format demonstrating the DREXONYX production workflow.',
     mediaType: 'video',
+    src: '/portfolio/ugc-demo-reel.mp4',
     thumbnailSrc: '/portfolio/ugc-demo-reel-thumb.svg',
     featured: true,
     industry: 'Consumer Goods',
