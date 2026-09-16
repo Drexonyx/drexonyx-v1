@@ -111,8 +111,21 @@ export default function HomePage() {
                 <div className={styles.featuredGrid}>
                   {featured.map((item) => (
                     <article key={item.id} className={styles.featuredCard}>
-                      <p className={styles.featuredCategory}>{item.category}</p>
-                      <p className={styles.featuredTitle}>{item.title}</p>
+                      {item.thumbnailSrc && (
+                        <div className={styles.featuredCardMedia}>
+                          <Image
+                            src={item.thumbnailSrc}
+                            alt={item.title}
+                            fill
+                            className={styles.featuredCardImg}
+                            sizes="(max-width: 900px) 100vw, 33vw"
+                          />
+                        </div>
+                      )}
+                      <div className={styles.featuredCardText}>
+                        <p className={styles.featuredCategory}>{item.category}</p>
+                        <p className={styles.featuredTitle}>{item.title}</p>
+                      </div>
                     </article>
                   ))}
                 </div>

@@ -308,14 +308,33 @@
 }
 
 .featuredCard {
-  padding: 1.75rem;
+  overflow: hidden;
   background: var(--drex-surface);
   border: 1px solid var(--drex-border);
   border-radius: 10px;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
   transition: border-color var(--drex-duration) var(--drex-ease);
+}
+
+.featuredCardMedia {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--drex-elevated);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.featuredCardImg {
+  object-fit: cover;
+  object-position: center;
+}
+
+.featuredCardText {
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .featuredCard:hover {

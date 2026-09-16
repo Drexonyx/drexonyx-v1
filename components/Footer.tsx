@@ -35,6 +35,11 @@ export default function Footer() {
                 </Link>
               </li>
             ))}
+            <li className={styles.clientLoginItem}>
+              <Link href="/portal/login" className={styles.clientLoginLink}>
+                Client Login
+              </Link>
+            </li>
           </ul>
         </nav>
       </div>

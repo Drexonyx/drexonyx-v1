@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.drexonyx.com"),
   title: {
     default: "DREXONYX — Performance Creative Studio",
     template: "%s | DREXONYX",
@@ -28,6 +29,14 @@ export const metadata: Metadata = {
     title: "DREXONYX — Performance Creative Studio",
     description:
       "Dubai-based performance creative studio. AI-powered UGC advertising for global brands — creative at scale, built to perform.",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "DREXONYX — Performance Creative Studio" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DREXONYX — Performance Creative Studio",
+    description:
+      "Dubai-based performance creative studio. AI-powered UGC advertising for global brands — creative at scale, built to perform.",
+    images: ["/opengraph-image"],
   },
   robots: { index: true, follow: true },
 };
