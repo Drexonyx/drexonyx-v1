@@ -24,7 +24,7 @@
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--drex-accent);
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.75rem;
 }
 
 /* Hero wordmark — branded image extracted from official lockup asset */
@@ -46,7 +46,7 @@
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  padding: 0.3rem 0 0;
+  padding: 0.9rem 0 0;
 }
 
 .heroTagline {
@@ -544,7 +544,7 @@
 
 .whyGrid {
   display: grid;
-  grid-template-columns: 55fr 45fr;
+  grid-template-columns: 44fr 56fr;
   min-height: 560px;
 }
 
@@ -579,7 +579,7 @@
 
 .whyImg {
   object-fit: cover;
-  object-position: 60% center;
+  object-position: 50% center;
 }
 
 .whyOverlay {
