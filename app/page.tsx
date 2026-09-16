@@ -74,8 +74,15 @@ export default function HomePage() {
         <div className={styles.heroGradient} aria-hidden="true" />
         <div className={styles.heroContent}>
           <p className={styles.heroEyebrow}>Performance Creative Studio</p>
-          <h1 id="hero-heading" className={styles.heroWordmark}>
-            DREXONYX
+          <h1 id="hero-heading" className={styles.heroWordmarkWrapper}>
+            <Image
+              src="/brand/drexonyx-horizontal-lockup.png"
+              alt="DREXONYX"
+              width={480}
+              height={81}
+              className={styles.heroWordmarkImg}
+              priority
+            />
           </h1>
           <p className={styles.heroTagline}>
             Powerful Creative Content<br />for Modern Brands

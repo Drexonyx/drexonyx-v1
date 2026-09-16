@@ -58,13 +58,16 @@
   margin-bottom: 1.25rem;
 }
 
-.heroWordmark {
-  font-size: clamp(3.75rem, 7.5vw, 6rem);
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  color: var(--drex-text);
-  line-height: 0.9;
+.heroWordmarkWrapper {
   margin-bottom: 1.375rem;
+  line-height: 1;
+}
+
+.heroWordmarkImg {
+  display: block;
+  width: clamp(280px, 38vw, 480px);
+  height: auto;
+  filter: brightness(0) invert(1);
 }
 
 .heroTagline {
@@ -780,8 +783,8 @@
     );
   }
 
-  .heroWordmark {
-    font-size: clamp(3rem, 13vw, 4.5rem);
+  .heroWordmarkImg {
+    width: clamp(220px, 60vw, 340px);
   }
 
   .serviceCards {
