@@ -104,7 +104,7 @@ export default function PortfolioFilter({ items }: PortfolioFilterProps) {
                     alt={item.title}
                     fill
                     className={styles.cardImg}
-                    sizes="(max-width: 540px) 100vw, (max-width: 960px) 50vw, 33vw"
+                    sizes="(max-width: 540px) 100vw, (max-width: 960px) 50vw, 25vw"
                   />
                 ) : null}
                 <div className={styles.cardOverlay} aria-hidden="true" />
