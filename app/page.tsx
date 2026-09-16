@@ -74,14 +74,7 @@ export default function HomePage() {
         <div className={styles.heroLeft}>
           <p className={styles.heroEyebrow}>Global Creative Production</p>
           <h1 id="hero-heading" className={styles.heroWordmark}>
-            <Image
-              src="/brand/drexonyx-horizontal-lockup.png"
-              alt="DREXONYX"
-              width={3198}
-              height={540}
-              className={styles.heroLogo}
-              priority
-            />
+            DREXONY<span className={styles.heroWordmarkX}>X</span>
           </h1>
           <div className={styles.heroBody}>
             <p className={styles.heroTagline}>

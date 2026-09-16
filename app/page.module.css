@@ -25,17 +25,20 @@
   margin-bottom: 1.25rem;
 }
 
-/* Wordmark block */
+/* Standalone hero wordmark — large CSS text, fills the left panel */
 .heroWordmark {
-  line-height: 1;
+  font-size: clamp(3rem, 8vw, 6.75rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: var(--drex-text);
+  line-height: 0.95;
   margin-bottom: 0;
+  text-transform: uppercase;
 }
 
-/* Logo fills the available left panel width — dominant hero wordmark */
-.heroLogo {
-  display: block;
-  width: 100%;
-  height: auto;
+/* Gold accent on the X */
+.heroWordmarkX {
+  color: var(--drex-accent);
 }
 
 /* Main body: tagline, sub, CTAs */
@@ -807,10 +810,6 @@
 @media (max-width: 600px) {
   .heroRight {
     height: 220px;
-  }
-
-  .heroLogo {
-    width: 100%;
   }
 
   .heroCred {
