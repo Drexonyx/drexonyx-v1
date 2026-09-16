@@ -68,38 +68,60 @@ export default function HomePage() {
 
   return (
     <>
-      {/* ── Hero: full-bleed cinematic composition ─────────────────────── */}
+      {/* ── Hero: two-panel cinematic composition ─────────────────────── */}
       <section className={styles.hero} aria-labelledby="hero-heading">
-        <div className={styles.heroBg} aria-hidden="true" />
-        <div className={styles.heroGradient} aria-hidden="true" />
-        <div className={styles.heroContent}>
-          <p className={styles.heroEyebrow}>Performance Creative Studio</p>
-          <h1 id="hero-heading" className={styles.heroWordmarkWrapper}>
-            <Image
-              src="/brand/drexonyx-horizontal-lockup.png"
-              alt="DREXONYX"
-              width={480}
-              height={81}
-              className={styles.heroWordmarkImg}
-              priority
-            />
-          </h1>
-          <p className={styles.heroTagline}>
-            Powerful Creative Content<br />for Modern Brands
-          </p>
-          <p className={styles.heroSub}>
-            Dubai-based performance creative studio. AI-powered UGC advertising
-            for brands worldwide — creative at scale, built to perform.
-          </p>
-          <div className={styles.heroCtas}>
-            <Link href="/start-project" className={styles.ctaPrimary}>
-              Start Project →
-            </Link>
-            <Link href="/portfolio" className={styles.ctaSecondary}>
-              ▶ Watch Showreel
-            </Link>
+        {/* Left: dark editorial copy panel */}
+        <div className={styles.heroLeft}>
+          <div className={styles.heroBrand}>
+            <h1 id="hero-heading" className={styles.heroWordmark}>
+              <Image
+                src="/brand/drexonyx-horizontal-lockup.png"
+                alt="DREXONYX"
+                width={3198}
+                height={540}
+                className={styles.heroLogo}
+                priority
+              />
+            </h1>
+            <span className={styles.heroBrandTag}>Performance Creative Studio</span>
+          </div>
+          <div className={styles.heroBody}>
+            <p className={styles.heroTagline}>
+              Powerful Creative Content<br />for Modern Brands
+            </p>
+            <p className={styles.heroSub}>
+              Dubai-based performance creative studio. AI-powered UGC advertising
+              for brands worldwide — creative at scale, built to perform.
+            </p>
+            <div className={styles.heroCtas}>
+              <Link href="/start-project" className={styles.ctaPrimary}>
+                Start Project →
+              </Link>
+              <Link href="/portfolio" className={styles.ctaSecondary}>
+                ▶ Watch Showreel
+              </Link>
+            </div>
           </div>
           <p className={styles.heroLocation}>Dubai, UAE · Global</p>
+        </div>
+
+        {/* Right: cinematic image panel with play element */}
+        <div className={styles.heroRight} aria-hidden="true">
+          <Image
+            src="/images/drexonyx-hero-final.webp"
+            alt=""
+            fill
+            className={styles.heroImg}
+            priority
+            sizes="55vw"
+          />
+          <div className={styles.heroRightEdge} />
+          <div className={styles.heroPlay}>
+            <span className={styles.heroPlayRing}>
+              <span className={styles.heroPlayIcon}>▶</span>
+            </span>
+            <span className={styles.heroPlayLabel}>Showreel</span>
+          </div>
         </div>
       </section>
 

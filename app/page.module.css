@@ -1,105 +1,164 @@
-/* ── Hero: full-bleed cinematic composition ──────────────────────────────── */
+/* ── Hero: two-panel cinematic composition ───────────────────────────────── */
 .hero {
-  position: relative;
-  min-height: clamp(700px, 93vh, 980px);
+  display: grid;
+  grid-template-columns: 45fr 55fr;
+  min-height: clamp(600px, 90vh, 1020px);
   border-bottom: 1px solid var(--drex-border);
-  overflow: hidden;
-  display: flex;
-  align-items: center;
 }
 
-/* Cinematic image layer — full bleed */
-.heroBg {
-  position: absolute;
-  inset: 0;
-  background-image: url('/images/drexonyx-hero-final.webp');
-  background-size: cover;
-  background-position: 70% center;
-  z-index: 0;
-}
-
-/* Directional gradient — dark on the left, fades to transparent */
-/* Creates editorial composition: text lives on the dark side, image reveals right */
-.heroGradient {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    93deg,
-    rgba(6, 6, 6, 0.97) 0%,
-    rgba(6, 6, 6, 0.90) 28%,
-    rgba(6, 6, 6, 0.55) 52%,
-    rgba(6, 6, 6, 0.15) 72%,
-    transparent 88%
-  );
-  z-index: 1;
-}
-
-/* Content block — lives on the dark left side */
-.heroContent {
-  position: relative;
-  z-index: 2;
+/* Left: dark editorial copy panel */
+.heroLeft {
+  background: var(--drex-bg);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 0;
-  padding-left: max(var(--drex-pad), calc((100vw - var(--drex-container)) / 2 + var(--drex-pad)));
-  padding-right: 50%;
-  padding-top: 9rem;
-  padding-bottom: 6rem;
-  width: 100%;
+  padding: 2.75rem 3.5rem 2.75rem max(var(--drex-pad), calc((100vw - var(--drex-container)) / 2 + var(--drex-pad)));
+  border-right: 1px solid var(--drex-border);
 }
 
-.heroEyebrow {
-  font-size: 0.6875rem;
-  font-weight: 800;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--drex-accent);
-  margin-bottom: 1.25rem;
+/* Brand row: logo + studio label */
+.heroBrand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0;
 }
 
-.heroWordmarkWrapper {
-  margin-bottom: 1.375rem;
+.heroWordmark {
+  flex-shrink: 0;
   line-height: 1;
 }
 
-.heroWordmarkImg {
+/* Logo displayed as-is — no color filter */
+.heroLogo {
   display: block;
-  width: clamp(280px, 38vw, 480px);
+  width: clamp(130px, 12vw, 195px);
   height: auto;
-  filter: brightness(0) invert(1);
+}
+
+.heroBrandTag {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--drex-text-muted);
+  border-left: 1px solid var(--drex-border);
+  padding-left: 0.875rem;
+  line-height: 1.45;
+  max-width: 10ch;
+}
+
+/* Main body: tagline, sub, CTAs — vertically centered */
+.heroBody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 2.75rem 0;
 }
 
 .heroTagline {
-  font-size: clamp(1.125rem, 2vw, 1.5rem);
-  font-weight: 600;
-  color: var(--drex-text-secondary);
-  letter-spacing: -0.01em;
-  line-height: 1.3;
-  margin-bottom: 1.125rem;
+  font-size: clamp(1.625rem, 3vw, 2.625rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  color: var(--drex-text);
+  line-height: 1.1;
 }
 
 .heroSub {
   font-size: 0.9375rem;
   color: var(--drex-text-muted);
   line-height: 1.7;
-  max-width: 44ch;
-  margin-bottom: 2rem;
+  max-width: 42ch;
 }
 
 .heroCtas {
   display: flex;
   flex-wrap: wrap;
   gap: 0.875rem;
-  margin-bottom: 2.5rem;
+  margin-top: 0.25rem;
 }
 
+/* Info strip at bottom of left panel */
 .heroLocation {
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--drex-text-muted);
+  border-top: 1px solid var(--drex-border);
+  padding-top: 1.5rem;
+}
+
+/* Right: cinematic image panel */
+.heroRight {
+  position: relative;
+  overflow: hidden;
+  background: var(--drex-elevated);
+}
+
+.heroImg {
+  object-fit: cover;
+  object-position: center 20%;
+}
+
+/* Subtle left-edge vignette: blends into left panel */
+.heroRightEdge {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(6, 6, 6, 0.55) 0%,
+    rgba(6, 6, 6, 0.15) 22%,
+    transparent 40%
+  );
+  z-index: 1;
+}
+
+/* Play / showreel element */
+.heroPlay {
+  position: absolute;
+  bottom: 2.75rem;
+  right: 2.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 2;
+  cursor: pointer;
+}
+
+.heroPlayRing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.75rem;
+  height: 3.75rem;
+  border: 1.5px solid rgba(255, 255, 255, 0.65);
+  border-radius: 50%;
+  background: rgba(6, 6, 6, 0.3);
+  backdrop-filter: blur(6px);
+  transition: border-color var(--drex-duration) var(--drex-ease),
+              background var(--drex-duration) var(--drex-ease);
+}
+
+.heroPlay:hover .heroPlayRing {
+  border-color: var(--drex-accent);
+  background: rgba(200, 152, 10, 0.15);
+}
+
+.heroPlayIcon {
+  font-size: 0.9375rem;
+  color: #fff;
+  padding-left: 3px;
+}
+
+.heroPlayLabel {
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 /* ── Shared section utilities ──────────────────────────────────────────── */
@@ -695,21 +754,25 @@
 }
 
 @media (max-width: 900px) {
-  /* Hero: switch to full-height with bottom gradient on mobile */
-  .heroContent {
-    padding-right: var(--drex-pad);
-    padding-top: 7rem;
-    padding-bottom: 4rem;
+  /* Hero: stack panels vertically on tablet/mobile */
+  .hero {
+    grid-template-columns: 1fr;
+    min-height: auto;
   }
 
-  .heroGradient {
-    background: linear-gradient(
-      to top,
-      rgba(6, 6, 6, 0.97) 0%,
-      rgba(6, 6, 6, 0.80) 45%,
-      rgba(6, 6, 6, 0.40) 75%,
-      rgba(6, 6, 6, 0.12) 100%
-    );
+  .heroRight {
+    order: -1;
+    height: 300px;
+  }
+
+  .heroLeft {
+    border-right: none;
+    padding: 2.5rem var(--drex-pad);
+  }
+
+  .heroPlay {
+    bottom: 1.5rem;
+    right: 1.5rem;
   }
 
   .serviceCards {
@@ -762,29 +825,16 @@
 }
 
 @media (max-width: 600px) {
-  .hero {
-    min-height: clamp(580px, 85vh, 760px);
-    align-items: flex-end;
+  .heroRight {
+    height: 220px;
   }
 
-  .heroContent {
-    padding-top: 5rem;
-    padding-bottom: 3.5rem;
-    padding-right: var(--drex-pad);
+  .heroLogo {
+    width: clamp(110px, 38vw, 155px);
   }
 
-  .heroGradient {
-    background: linear-gradient(
-      to top,
-      rgba(6, 6, 6, 0.98) 0%,
-      rgba(6, 6, 6, 0.85) 40%,
-      rgba(6, 6, 6, 0.45) 70%,
-      rgba(6, 6, 6, 0.15) 100%
-    );
-  }
-
-  .heroWordmarkImg {
-    width: clamp(220px, 60vw, 340px);
+  .heroTagline {
+    font-size: clamp(1.375rem, 6vw, 1.875rem);
   }
 
   .serviceCards {
