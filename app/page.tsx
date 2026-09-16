@@ -106,7 +106,7 @@ export default function HomePage() {
         {/* Right: cinematic image panel */}
         <div className={styles.heroRight} aria-hidden="true">
           <Image
-            src="/images/drexonyx-hero-final.webp"
+            src="/images/drexonyx-creative-crew-hero.png"
             alt=""
             fill
             className={styles.heroImg}

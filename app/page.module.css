@@ -34,18 +34,16 @@
 /* Logo displayed as-is — no color filter */
 .heroLogo {
   display: block;
-  width: clamp(200px, 20vw, 340px);
+  width: clamp(280px, 34vw, 480px);
   height: auto;
 }
 
-/* Main body: tagline, sub, CTAs — vertically centered */
+/* Main body: tagline, sub, CTAs */
 .heroBody {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   gap: 1.25rem;
-  padding: 2.75rem 0;
+  padding: 1.5rem 0 0;
 }
 
 .heroTagline {
@@ -79,6 +77,7 @@
   color: var(--drex-text-muted);
   border-top: 1px solid var(--drex-border);
   padding-top: 1.5rem;
+  margin-top: auto;
 }
 
 /* Right: cinematic image panel */
@@ -90,7 +89,7 @@
 
 .heroImg {
   object-fit: cover;
-  object-position: center 20%;
+  object-position: 55% center;
 }
 
 /* Subtle left-edge vignette: blends into left panel */
@@ -811,7 +810,7 @@
   }
 
   .heroLogo {
-    width: clamp(160px, 42vw, 220px);
+    width: clamp(180px, 50vw, 260px);
   }
 
   .heroCred {
