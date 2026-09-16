@@ -46,7 +46,7 @@ export const agentTasks = orchestrationSchema.table(
   (t) => [
     check(
       'agent_tasks_status_check',
-      sql`${t.status} IN ('PENDING','PLANNING','AWAITING_APPROVAL','RUNNING','COMPLETED','FAILED','CANCELLED')`,
+      sql`${t.status} IN ('PENDING','PLAN_READY','EXECUTING','AWAITING_GATE','COMPLETED','FAILED','ESCALATED','CANCELLED')`,
     ),
     check(
       'agent_tasks_initiator_role_check',
@@ -54,7 +54,7 @@ export const agentTasks = orchestrationSchema.table(
     ),
     check(
       'agent_tasks_intent_type_check',
-      sql`${t.intent_type} IN ('BATCH_QC_REVIEW','BATCH_UPLOAD_REVIEW','PROMPT_OPTIMIZE','BATCH_COORDINATE')`,
+      sql`${t.intent_type} IN ('ROUTE_APPROVAL','INSPECT_ASSET_METADATA','OPTIMIZE_BRIEF_PROMPTS','COORDINATE_BATCH_OPERATION')`,
     ),
     foreignKey({
       columns: [t.organization_id],
@@ -147,11 +147,11 @@ export const taskSteps = orchestrationSchema.table(
   (t) => [
     check(
       'task_steps_status_check',
-      sql`${t.status} IN ('PENDING','RUNNING','SUCCEEDED','FAILED','SKIPPED','CANCELLED')`,
+      sql`${t.status} IN ('PENDING','DISPATCHED','RUNNING','SUCCEEDED','FAILED','RETRY_PENDING','GATE_PENDING','GATE_APPROVED','GATE_REJECTED','SKIPPED')`,
     ),
     check(
       'task_steps_step_type_check',
-      sql`${t.step_type} IN ('SKILL','HUMAN_GATE')`,
+      sql`${t.step_type} IN ('SKILL','HUMAN_GATE','FINANCIAL_CHECK')`,
     ),
     foreignKey({
       columns: [t.agent_task_id, t.organization_id],

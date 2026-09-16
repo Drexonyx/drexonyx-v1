@@ -17,9 +17,9 @@ CREATE TABLE "orchestration"."agent_tasks" (
 	"archived_at" timestamp with time zone,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
-	CONSTRAINT "agent_tasks_status_check" CHECK ("orchestration"."agent_tasks"."status" IN ('PENDING','PLANNING','AWAITING_APPROVAL','RUNNING','COMPLETED','FAILED','CANCELLED')),
+	CONSTRAINT "agent_tasks_status_check" CHECK ("orchestration"."agent_tasks"."status" IN ('PENDING','PLAN_READY','EXECUTING','AWAITING_GATE','COMPLETED','FAILED','ESCALATED','CANCELLED')),
 	CONSTRAINT "agent_tasks_initiator_role_check" CHECK ("orchestration"."agent_tasks"."initiator_role" IN ('OWNER','ADMIN_OPERATIONS','CREATIVE_PRODUCTION','QC')),
-	CONSTRAINT "agent_tasks_intent_type_check" CHECK ("orchestration"."agent_tasks"."intent_type" IN ('BATCH_QC_REVIEW','BATCH_UPLOAD_REVIEW','PROMPT_OPTIMIZE','BATCH_COORDINATE'))
+	CONSTRAINT "agent_tasks_intent_type_check" CHECK ("orchestration"."agent_tasks"."intent_type" IN ('ROUTE_APPROVAL','INSPECT_ASSET_METADATA','OPTIMIZE_BRIEF_PROMPTS','COORDINATE_BATCH_OPERATION'))
 );
 --> statement-breakpoint
 CREATE TABLE "orchestration"."task_approvals" (
@@ -57,8 +57,8 @@ CREATE TABLE "orchestration"."task_steps" (
 	"completed_at" timestamp with time zone,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
-	CONSTRAINT "task_steps_status_check" CHECK ("orchestration"."task_steps"."status" IN ('PENDING','RUNNING','SUCCEEDED','FAILED','SKIPPED','CANCELLED')),
-	CONSTRAINT "task_steps_step_type_check" CHECK ("orchestration"."task_steps"."step_type" IN ('SKILL','HUMAN_GATE'))
+	CONSTRAINT "task_steps_status_check" CHECK ("orchestration"."task_steps"."status" IN ('PENDING','DISPATCHED','RUNNING','SUCCEEDED','FAILED','RETRY_PENDING','GATE_PENDING','GATE_APPROVED','GATE_REJECTED','SKIPPED')),
+	CONSTRAINT "task_steps_step_type_check" CHECK ("orchestration"."task_steps"."step_type" IN ('SKILL','HUMAN_GATE','FINANCIAL_CHECK'))
 );
 --> statement-breakpoint
 ALTER TABLE "orchestration"."agent_tasks" ADD CONSTRAINT "agent_tasks_organization_id_fk" FOREIGN KEY ("organization_id") REFERENCES "core"."organizations"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint

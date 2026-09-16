@@ -9,8 +9,8 @@ import { taskSteps } from '../schema/orchestration';
 // state machines from the Complex Agent Architecture v2 (§15, §20).
 
 const AGENT_TASK_STATES = [
-  'PENDING', 'PLANNING', 'AWAITING_APPROVAL', 'RUNNING',
-  'COMPLETED', 'FAILED', 'CANCELLED',
+  'PENDING', 'PLAN_READY', 'EXECUTING', 'AWAITING_GATE',
+  'COMPLETED', 'FAILED', 'ESCALATED', 'CANCELLED',
 ] as const;
 
 const AGENT_TASK_INITIATOR_ROLES = [
@@ -18,7 +18,7 @@ const AGENT_TASK_INITIATOR_ROLES = [
 ] as const;
 
 const AGENT_TASK_INTENT_TYPES = [
-  'BATCH_QC_REVIEW', 'BATCH_UPLOAD_REVIEW', 'PROMPT_OPTIMIZE', 'BATCH_COORDINATE',
+  'ROUTE_APPROVAL', 'INSPECT_ASSET_METADATA', 'OPTIMIZE_BRIEF_PROMPTS', 'COORDINATE_BATCH_OPERATION',
 ] as const;
 
 const TASK_APPROVAL_STATES = [
@@ -28,10 +28,11 @@ const TASK_APPROVAL_STATES = [
 const TASK_APPROVAL_APPROVER_ROLES = ['OWNER', 'ADMIN_OPERATIONS'] as const;
 
 const TASK_STEP_STATES = [
-  'PENDING', 'RUNNING', 'SUCCEEDED', 'FAILED', 'SKIPPED', 'CANCELLED',
+  'PENDING', 'DISPATCHED', 'RUNNING', 'SUCCEEDED', 'FAILED',
+  'RETRY_PENDING', 'GATE_PENDING', 'GATE_APPROVED', 'GATE_REJECTED', 'SKIPPED',
 ] as const;
 
-const TASK_STEP_TYPES = ['SKILL', 'HUMAN_GATE'] as const;
+const TASK_STEP_TYPES = ['SKILL', 'HUMAN_GATE', 'FINANCIAL_CHECK'] as const;
 
 function getCheckConstraintSql(
   table: ReturnType<typeof getTableConfig>,
@@ -54,17 +55,23 @@ const taskStepsConfig = getTableConfig(taskSteps);
 // ─── AgentTask state machine ──────────────────────────────────────────────────
 
 describe('AgentTask state machine (Phase 1 orchestration)', () => {
-  it('has exactly 7 approved states', () => {
-    expect(AGENT_TASK_STATES).toHaveLength(7);
+  it('has exactly 8 approved states', () => {
+    expect(AGENT_TASK_STATES).toHaveLength(8);
   });
 
-  it('includes AWAITING_APPROVAL as the human-gate blocking state', () => {
-    expect(AGENT_TASK_STATES).toContain('AWAITING_APPROVAL');
+  it('includes AWAITING_GATE as the human-gate blocking state', () => {
+    expect(AGENT_TASK_STATES).toContain('AWAITING_GATE');
   });
 
-  it('terminal states are COMPLETED, FAILED, CANCELLED', () => {
+  it('includes PLAN_READY and EXECUTING as active lifecycle states', () => {
+    expect(AGENT_TASK_STATES).toContain('PLAN_READY');
+    expect(AGENT_TASK_STATES).toContain('EXECUTING');
+  });
+
+  it('terminal states are COMPLETED, FAILED, ESCALATED, CANCELLED', () => {
     expect(AGENT_TASK_STATES).toContain('COMPLETED');
     expect(AGENT_TASK_STATES).toContain('FAILED');
+    expect(AGENT_TASK_STATES).toContain('ESCALATED');
     expect(AGENT_TASK_STATES).toContain('CANCELLED');
   });
 
@@ -123,10 +130,10 @@ describe('AgentTask Phase 1 intent types', () => {
   });
 
   it('includes all Phase 1 approved intent types', () => {
-    expect(AGENT_TASK_INTENT_TYPES).toContain('BATCH_QC_REVIEW');
-    expect(AGENT_TASK_INTENT_TYPES).toContain('BATCH_UPLOAD_REVIEW');
-    expect(AGENT_TASK_INTENT_TYPES).toContain('PROMPT_OPTIMIZE');
-    expect(AGENT_TASK_INTENT_TYPES).toContain('BATCH_COORDINATE');
+    expect(AGENT_TASK_INTENT_TYPES).toContain('ROUTE_APPROVAL');
+    expect(AGENT_TASK_INTENT_TYPES).toContain('INSPECT_ASSET_METADATA');
+    expect(AGENT_TASK_INTENT_TYPES).toContain('OPTIMIZE_BRIEF_PROMPTS');
+    expect(AGENT_TASK_INTENT_TYPES).toContain('COORDINATE_BATCH_OPERATION');
   });
 
   it('agent_tasks table has intent_type CHECK constraint covering all Phase 1 types', () => {
@@ -199,8 +206,8 @@ describe('TaskApproval approver role constraint', () => {
 // ─── TaskStep state machine ───────────────────────────────────────────────────
 
 describe('TaskStep state machine', () => {
-  it('has exactly 6 approved states', () => {
-    expect(TASK_STEP_STATES).toHaveLength(6);
+  it('has exactly 10 approved states', () => {
+    expect(TASK_STEP_STATES).toHaveLength(10);
   });
 
   it('uses SUCCEEDED (not COMPLETED) as success terminal, matching skill_outputs', () => {
@@ -208,15 +215,26 @@ describe('TaskStep state machine', () => {
     expect(TASK_STEP_STATES).not.toContain('COMPLETED');
   });
 
+  it('includes DISPATCHED as the sent-to-executor state', () => {
+    expect(TASK_STEP_STATES).toContain('DISPATCHED');
+  });
+
+  it('includes RETRY_PENDING for retry lifecycle', () => {
+    expect(TASK_STEP_STATES).toContain('RETRY_PENDING');
+  });
+
+  it('includes gate resolution states GATE_PENDING, GATE_APPROVED, GATE_REJECTED', () => {
+    expect(TASK_STEP_STATES).toContain('GATE_PENDING');
+    expect(TASK_STEP_STATES).toContain('GATE_APPROVED');
+    expect(TASK_STEP_STATES).toContain('GATE_REJECTED');
+  });
+
   it('includes SKIPPED for steps bypassed by plan logic', () => {
     expect(TASK_STEP_STATES).toContain('SKIPPED');
   });
 
-  it('terminal states are SUCCEEDED, FAILED, SKIPPED, CANCELLED', () => {
-    expect(TASK_STEP_STATES).toContain('SUCCEEDED');
-    expect(TASK_STEP_STATES).toContain('FAILED');
-    expect(TASK_STEP_STATES).toContain('SKIPPED');
-    expect(TASK_STEP_STATES).toContain('CANCELLED');
+  it('does not include CANCELLED (task-level cancellation, not step-level)', () => {
+    expect(TASK_STEP_STATES).not.toContain('CANCELLED');
   });
 
   it('task_steps table has status CHECK constraint covering all approved states', () => {
@@ -231,8 +249,8 @@ describe('TaskStep state machine', () => {
 // ─── TaskStep type CHECK ──────────────────────────────────────────────────────
 
 describe('TaskStep type constraint', () => {
-  it('has exactly 2 approved step types', () => {
-    expect(TASK_STEP_TYPES).toHaveLength(2);
+  it('has exactly 3 approved step types', () => {
+    expect(TASK_STEP_TYPES).toHaveLength(3);
   });
 
   it('SKILL type invokes an approved skill', () => {
@@ -241,6 +259,10 @@ describe('TaskStep type constraint', () => {
 
   it('HUMAN_GATE type blocks on TaskApproval resolution', () => {
     expect(TASK_STEP_TYPES).toContain('HUMAN_GATE');
+  });
+
+  it('FINANCIAL_CHECK type enforces budget guard', () => {
+    expect(TASK_STEP_TYPES).toContain('FINANCIAL_CHECK');
   });
 
   it('task_steps table has step_type CHECK constraint covering both types', () => {
