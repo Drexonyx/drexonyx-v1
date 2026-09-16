@@ -31,10 +31,10 @@
   margin-bottom: 0;
 }
 
-/* Logo displayed as-is — no color filter */
+/* Logo fills the available left panel width — dominant hero wordmark */
 .heroLogo {
   display: block;
-  width: clamp(280px, 34vw, 480px);
+  width: 100%;
   height: auto;
 }
 
@@ -810,7 +810,7 @@
   }
 
   .heroLogo {
-    width: clamp(180px, 50vw, 260px);
+    width: 100%;
   }
 
   .heroCred {
