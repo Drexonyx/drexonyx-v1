@@ -27,20 +27,16 @@
   margin-bottom: 1.25rem;
 }
 
-/* Standalone hero wordmark — large CSS text, fills the left panel */
+/* Hero wordmark — branded image extracted from official lockup asset */
 .heroWordmark {
-  font-size: clamp(3rem, 8vw, 6.75rem);
-  font-weight: 900;
-  letter-spacing: -0.03em;
-  color: var(--drex-text);
-  line-height: 0.95;
   margin-bottom: 0;
-  text-transform: uppercase;
+  line-height: 0;
 }
 
-/* Gold accent on the X */
-.heroWordmarkX {
-  color: var(--drex-accent);
+.heroWordmarkImg {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 /* Main body: tagline, sub, CTAs */

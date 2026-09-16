@@ -74,7 +74,14 @@ export default function HomePage() {
         <div className={styles.heroLeft}>
           <p className={styles.heroEyebrow}>Global Creative Production</p>
           <h1 id="hero-heading" className={styles.heroWordmark}>
-            DREXONY<span className={styles.heroWordmarkX}>X</span>
+            <Image
+              src="/brand/drexonyx-hero-wordmark.png"
+              alt="DREXONYX"
+              width={2018}
+              height={540}
+              className={styles.heroWordmarkImg}
+              priority
+            />
           </h1>
           <div className={styles.heroBody}>
             <p className={styles.heroTagline}>
@@ -247,7 +254,7 @@ export default function HomePage() {
           </div>
           <div className={styles.whyRight} aria-hidden="true">
             <Image
-              src="/images/drexonyx-hero-final.webp"
+              src="/images/drexonyx-hero.webp"
               alt=""
               fill
               className={styles.whyImg}
