@@ -1,0 +1,136 @@
+.hero {
+  padding: 6rem 0 5rem;
+  border-bottom: 1px solid var(--drex-border);
+  background: radial-gradient(ellipse 60% 40% at 50% -5%, rgba(200, 152, 10, 0.07) 0%, transparent 70%);
+}
+
+.eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--drex-accent);
+  margin-bottom: 1.25rem;
+}
+
+.heroHeading {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: var(--drex-text);
+  margin-bottom: 1.25rem;
+  line-height: 1.05;
+}
+
+.heroSub {
+  font-size: 1.125rem;
+  color: var(--drex-text-secondary);
+  max-width: 52ch;
+  line-height: 1.7;
+}
+
+.contactSection {
+  padding: 5rem 0 6rem;
+}
+
+.contactGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.contactBlock {
+  padding: 2rem;
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  transition: border-color var(--drex-duration) var(--drex-ease);
+}
+
+.contactBlock:hover {
+  border-color: rgba(200, 152, 10, 0.2);
+}
+
+.contactLabel {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--drex-accent);
+}
+
+.contactValue {
+  font-size: 1rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.6;
+}
+
+.contactEmail {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--drex-text);
+  transition: color var(--drex-duration) var(--drex-ease);
+  line-height: 1.5;
+}
+
+.contactEmail:hover {
+  color: var(--drex-accent);
+}
+
+.ctaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.ctaPrimary {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.8125rem 1.875rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #000;
+  background: var(--drex-accent);
+  border-radius: 8px;
+  transition: background var(--drex-duration) var(--drex-ease),
+    transform var(--drex-duration) var(--drex-ease),
+    box-shadow var(--drex-duration) var(--drex-ease);
+}
+
+.ctaPrimary:hover {
+  background: var(--drex-accent-dim);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(200, 152, 10, 0.3);
+}
+
+.ctaSecondary {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.8125rem 1.875rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--drex-text-secondary);
+  background: transparent;
+  border: 1px solid var(--drex-border);
+  border-radius: 8px;
+  transition: color var(--drex-duration) var(--drex-ease),
+    border-color var(--drex-duration) var(--drex-ease),
+    background var(--drex-duration) var(--drex-ease);
+}
+
+.ctaSecondary:hover {
+  color: var(--drex-text);
+  border-color: var(--drex-text-muted);
+  background: var(--drex-elevated);
+}
+
+@media (max-width: 768px) {
+  .contactGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
