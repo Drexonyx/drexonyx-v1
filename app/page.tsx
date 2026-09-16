@@ -13,27 +13,27 @@ export const metadata: Metadata = {
 const SERVICES = [
   {
     number: "01",
-    title: "UGC Video Ads",
-    desc: "Authentic-feeling video creative optimised for Meta, TikTok, and YouTube — hook-first structure built for platform algorithms and conversion.",
-    href: "/services#ugc-video",
+    title: "UGC Content",
+    desc: "Authentic UGC video creative built for TikTok, Reels, and Meta — hook-first structure designed to convert at scale.",
+    href: "/services",
   },
   {
     number: "02",
-    title: "Static Ad Creative",
-    desc: "High-conversion static and carousel creative across feed, story, and display formats — built around your campaign brief and platform specs.",
-    href: "/services#static-creative",
+    title: "Cinematic Commercials",
+    desc: "High-production cinematic brand films and commercials — visually elevated storytelling for global campaign launches.",
+    href: "/services",
   },
   {
     number: "03",
-    title: "Creative Strategy",
-    desc: "Data-backed creative briefs that bridge your performance data and brand positioning into actionable creative direction.",
-    href: "/services#creative-strategy",
+    title: "Product Films",
+    desc: "Studio-quality product showcase films and hero visuals — precision-crafted to elevate your brand's product presence.",
+    href: "/services",
   },
   {
     number: "04",
-    title: "Campaign QC",
-    desc: "Rigorous quality control before every deliverable leaves our studio — brand safety, platform compliance, technical spec verification.",
-    href: "/services#campaign-qc",
+    title: "Social Creative",
+    desc: "Performance-led static and motion creative for feed, story, and display — built to stop the scroll and drive action.",
+    href: "/services",
   },
 ] as const;
 
@@ -68,9 +68,10 @@ export default function HomePage() {
 
   return (
     <>
-      {/* ── Hero: genuine two-panel split ─────────────────────────────── */}
+      {/* ── Hero: full-bleed cinematic composition ─────────────────────── */}
       <section className={styles.hero} aria-labelledby="hero-heading">
-        {/* Left panel: dark content surface — independent from any image */}
+        <div className={styles.heroBg} aria-hidden="true" />
+        <div className={styles.heroGradient} aria-hidden="true" />
         <div className={styles.heroContent}>
           <p className={styles.heroEyebrow}>Performance Creative Studio</p>
           <h1 id="hero-heading" className={styles.heroWordmark}>
@@ -93,19 +94,9 @@ export default function HomePage() {
           </div>
           <p className={styles.heroLocation}>Dubai, UAE · Global</p>
         </div>
-
-        {/* Right panel: cinematic visual — CSS background, cannot bleed into left panel */}
-        <div className={styles.heroVisual} aria-hidden="true">
-          <div className={styles.heroVisualOverlay} />
-          <div className={styles.heroVisualLabel}>
-            <span>Dubai</span>
-            <span className={styles.heroVisualDot}>·</span>
-            <span>Global</span>
-          </div>
-        </div>
       </section>
 
-      {/* ── Services: editorial full-width rows ───────────────────────── */}
+      {/* ── Services: editorial 4-col card grid ───────────────────────── */}
       <section className={styles.services} aria-labelledby="services-heading">
         <div className="container">
           <p className={styles.sectionEyebrow}>Our Services</p>
@@ -113,19 +104,19 @@ export default function HomePage() {
             Complete Creative Solutions
           </h2>
           <p className={styles.sectionSub}>
-            End-to-end UGC advertising production — from strategic brief to campaign-ready deliverables.
+            End-to-end creative production — from cinematic commercials to performance UGC, built to perform globally.
           </p>
-          <div className={styles.servicesRows}>
+          <div className={styles.serviceCards}>
             {SERVICES.map((s) => (
-              <article key={s.number} className={styles.serviceRow}>
-                <span className={styles.serviceRowNum} aria-hidden="true">
+              <article key={s.number} className={styles.serviceCard}>
+                <span className={styles.serviceCardNum} aria-hidden="true">
                   {s.number}
                 </span>
-                <div className={styles.serviceRowBody}>
-                  <h3 className={styles.serviceRowTitle}>{s.title}</h3>
-                  <p className={styles.serviceRowDesc}>{s.desc}</p>
+                <div className={styles.serviceCardBody}>
+                  <h3 className={styles.serviceCardTitle}>{s.title}</h3>
+                  <p className={styles.serviceCardDesc}>{s.desc}</p>
                 </div>
-                <Link href={s.href} className={styles.serviceRowLink}>
+                <Link href={s.href} className={styles.serviceCardLink}>
                   Learn More →
                 </Link>
               </article>
@@ -284,11 +275,11 @@ export default function HomePage() {
           <div className={styles.ctaBandContent}>
             <p className={styles.ctaBandEyebrow}>Dubai · Global</p>
             <h2 id="cta-band-heading" className={styles.ctaBandHeading}>
-              Ready to Launch<br />Performance Creative?
+              Let&apos;s Bring Your<br />Vision to Life.
             </h2>
             <p className={styles.ctaBandSub}>
               Dubai-based. Globally active. Tell us about your brand and we&apos;ll
-              take it from there.
+              bring your vision to the world.
             </p>
             <Link href="/start-project" className={styles.ctaPrimaryLarge}>
               Start Project →

@@ -1,20 +1,52 @@
-/* ── Hero: genuine two-panel grid ──────────────────────────────────────── */
+/* ── Hero: full-bleed cinematic composition ──────────────────────────────── */
 .hero {
-  display: grid;
-  grid-template-columns: 55fr 45fr;
-  min-height: clamp(600px, 90vh, 860px);
+  position: relative;
+  min-height: clamp(700px, 93vh, 980px);
   border-bottom: 1px solid var(--drex-border);
   overflow: hidden;
+  display: flex;
+  align-items: center;
 }
 
-/* Left panel — independent dark surface, no image behind it */
+/* Cinematic image layer — full bleed */
+.heroBg {
+  position: absolute;
+  inset: 0;
+  background-image: url('/images/drexonyx-hero-final.webp');
+  background-size: cover;
+  background-position: 70% center;
+  z-index: 0;
+}
+
+/* Directional gradient — dark on the left, fades to transparent */
+/* Creates editorial composition: text lives on the dark side, image reveals right */
+.heroGradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    93deg,
+    rgba(6, 6, 6, 0.97) 0%,
+    rgba(6, 6, 6, 0.90) 28%,
+    rgba(6, 6, 6, 0.55) 52%,
+    rgba(6, 6, 6, 0.15) 72%,
+    transparent 88%
+  );
+  z-index: 1;
+}
+
+/* Content block — lives on the dark left side */
 .heroContent {
-  background: #060606;
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 0;
-  padding: 5rem 3rem 5rem max(var(--drex-pad), calc((100vw - var(--drex-container)) / 2 + var(--drex-pad)));
+  padding-left: max(var(--drex-pad), calc((100vw - var(--drex-container)) / 2 + var(--drex-pad)));
+  padding-right: 50%;
+  padding-top: 9rem;
+  padding-bottom: 6rem;
+  width: 100%;
 }
 
 .heroEyebrow {
@@ -27,12 +59,12 @@
 }
 
 .heroWordmark {
-  font-size: clamp(3.5rem, 7vw, 5.5rem);
+  font-size: clamp(3.75rem, 7.5vw, 6rem);
   font-weight: 900;
   letter-spacing: -0.04em;
   color: var(--drex-text);
-  line-height: 0.92;
-  margin-bottom: 1.25rem;
+  line-height: 0.9;
+  margin-bottom: 1.375rem;
 }
 
 .heroTagline {
@@ -41,7 +73,7 @@
   color: var(--drex-text-secondary);
   letter-spacing: -0.01em;
   line-height: 1.3;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.125rem;
 }
 
 .heroSub {
@@ -65,39 +97,6 @@
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--drex-text-muted);
-}
-
-/* Right panel — CSS background-image, physically contained to this element */
-.heroVisual {
-  background-image: url('/images/drexonyx-hero-final.webp');
-  background-size: cover;
-  background-position: 70% center;
-  position: relative;
-}
-
-.heroVisualOverlay {
-  position: absolute;
-  inset: 0;
-  /* subtle seam blend only — NOT a dark veil */
-  background: linear-gradient(to left, transparent 60%, rgba(6, 6, 6, 0.25) 100%);
-}
-
-.heroVisualLabel {
-  position: absolute;
-  bottom: 1.5rem;
-  left: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.heroVisualDot {
-  color: var(--drex-accent);
 }
 
 /* ── Shared section utilities ──────────────────────────────────────────── */
@@ -207,78 +206,95 @@
   box-shadow: 0 10px 32px rgba(200, 152, 10, 0.35);
 }
 
-/* ── Services: editorial horizontal rows ──────────────────────────────── */
+/* ── Services: 4-col visual card grid ─────────────────────────────────── */
 .services {
-  padding: 5rem 0;
+  padding: 6rem 0;
   border-bottom: 1px solid var(--drex-border);
 }
 
-.servicesRows {
-  border-top: 1px solid var(--drex-border);
-  display: flex;
-  flex-direction: column;
+.serviceCards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--drex-border);
+  border: 1px solid var(--drex-border);
+  border-radius: 12px;
+  overflow: hidden;
   margin-bottom: 3rem;
 }
 
-.serviceRow {
-  display: grid;
-  grid-template-columns: 3.5rem 1fr auto;
-  align-items: center;
-  gap: 2.5rem;
-  padding: 3rem 0;
-  border-bottom: 1px solid var(--drex-border);
-  transition: padding-left var(--drex-duration) var(--drex-ease);
+.serviceCard {
+  background: var(--drex-surface);
+  padding: 2.75rem 2rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  transition: background var(--drex-duration) var(--drex-ease);
+  min-height: 340px;
 }
 
-.serviceRow:hover {
-  padding-left: 0.5rem;
+.serviceCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: transparent;
+  transition: background var(--drex-duration) var(--drex-ease);
 }
 
-.serviceRow:hover .serviceRowTitle {
-  color: var(--drex-text);
+.serviceCard:hover {
+  background: var(--drex-elevated);
 }
 
-.serviceRowNum {
+.serviceCard:hover::before {
+  background: var(--drex-accent);
+}
+
+.serviceCardNum {
   font-size: 0.625rem;
   font-weight: 800;
   letter-spacing: 0.15em;
   font-family: var(--font-geist-mono), monospace;
   color: var(--drex-accent);
-  align-self: start;
-  padding-top: 0.5em;
+  margin-bottom: 1.5rem;
 }
 
-.serviceRowBody {
+.serviceCardBody {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.875rem;
+  margin-bottom: 2rem;
 }
 
-.serviceRowTitle {
-  font-size: 1.875rem;
+.serviceCardTitle {
+  font-size: 1.375rem;
   font-weight: 800;
   color: var(--drex-text);
-  letter-spacing: -0.035em;
-  transition: color var(--drex-duration) var(--drex-ease);
+  letter-spacing: -0.03em;
+  line-height: 1.2;
 }
 
-.serviceRowDesc {
-  font-size: 0.9375rem;
-  color: var(--drex-text-muted);
-  line-height: 1.65;
-  max-width: 52ch;
-}
-
-.serviceRowLink {
+.serviceCardDesc {
   font-size: 0.875rem;
+  color: var(--drex-text-muted);
+  line-height: 1.75;
+}
+
+.serviceCardLink {
+  font-size: 0.8125rem;
   font-weight: 600;
   color: var(--drex-accent);
-  white-space: nowrap;
+  margin-top: auto;
   transition: opacity var(--drex-duration) var(--drex-ease),
     transform var(--drex-duration) var(--drex-ease);
+  align-self: flex-start;
 }
 
-.serviceRowLink:hover {
+.serviceCardLink:hover {
   opacity: 0.7;
   transform: translateX(3px);
 }
@@ -289,7 +305,7 @@
 
 /* ── Featured Work: editorial 3-col grid ───────────────────────────────── */
 .featuredWork {
-  padding: 5rem 0;
+  padding: 6rem 0;
   border-bottom: 1px solid var(--drex-border);
 }
 
@@ -299,7 +315,7 @@
   font-size: 0.9375rem;
 }
 
-/* 3-col grid: lead spans 2 cols; card 4 spans 2 cols — fills grid cleanly */
+/* 3-col grid: lead spans 2 cols; card 4 spans 2 cols */
 .featuredGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -318,13 +334,13 @@
   grid-column: span 2;
 }
 
-/* Cards 2 & 3 (nth positions): portrait format in their 1/3 column */
+/* Cards 2 & 3: portrait format */
 .featuredGrid > article:nth-child(2) .featuredCardMedia,
 .featuredGrid > article:nth-child(3) .featuredCardMedia {
   aspect-ratio: 3 / 4;
 }
 
-/* Card 4: spans 2 cols like the lead */
+/* Card 4: spans 2 cols */
 .featuredGrid > article:nth-child(4) {
   grid-column: span 2;
 }
@@ -392,9 +408,9 @@
   display: flex;
 }
 
-/* ── How It Works: premium production workflow ──────────────────────────── */
+/* ── How It Works: connected production workflow ────────────────────────── */
 .process {
-  padding: 5rem 0;
+  padding: 6rem 0;
   border-bottom: 1px solid var(--drex-border);
 }
 
@@ -403,7 +419,19 @@
   grid-template-columns: repeat(5, 1fr);
   gap: 0;
   margin-bottom: 3rem;
-  border-top: 1px solid var(--drex-border);
+  border-top: 2px solid var(--drex-accent);
+  position: relative;
+}
+
+/* Horizontal connector line between steps */
+.processSteps::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--drex-border);
 }
 
 .processStep {
@@ -420,13 +448,12 @@
 }
 
 .processNum {
-  font-size: 2rem;
+  font-size: 2.25rem;
   font-weight: 900;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.05em;
   font-family: var(--font-geist-mono), monospace;
   color: var(--drex-accent);
   line-height: 1;
-  opacity: 0.8;
 }
 
 .processTitle {
@@ -542,6 +569,13 @@
   background: var(--drex-surface);
   border: 1px solid var(--drex-border);
   border-radius: 100px;
+  transition: border-color var(--drex-duration) var(--drex-ease),
+    background var(--drex-duration) var(--drex-ease);
+}
+
+.industryItem:hover {
+  border-color: var(--drex-accent);
+  background: var(--drex-elevated);
 }
 
 .industryLabel {
@@ -554,7 +588,7 @@
 /* ── CTA Band: cinematic editorial full-bleed ─────────────────────────── */
 .ctaBand {
   position: relative;
-  padding: 7rem 0;
+  padding: 8rem 0;
   overflow: hidden;
 }
 
@@ -566,7 +600,7 @@
 .ctaBandBgImg {
   object-fit: cover;
   object-position: center 30%;
-  filter: brightness(0.35);
+  filter: brightness(0.3);
 }
 
 .ctaBandOverlay {
@@ -574,9 +608,9 @@
   inset: 0;
   background: linear-gradient(
     135deg,
-    rgba(6, 6, 6, 0.75) 0%,
-    rgba(6, 6, 6, 0.4) 60%,
-    rgba(200, 152, 10, 0.08) 100%
+    rgba(6, 6, 6, 0.82) 0%,
+    rgba(6, 6, 6, 0.45) 60%,
+    rgba(200, 152, 10, 0.06) 100%
   );
 }
 
@@ -586,8 +620,8 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 1.25rem;
-  max-width: 640px;
+  gap: 1.375rem;
+  max-width: 680px;
 }
 
 .ctaBandEyebrow {
@@ -599,11 +633,11 @@
 }
 
 .ctaBandHeading {
-  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-size: clamp(2.25rem, 5.5vw, 4rem);
   font-weight: 900;
   letter-spacing: -0.04em;
   color: #fff;
-  line-height: 1.05;
+  line-height: 1.02;
 }
 
 .ctaBandSub {
@@ -615,6 +649,10 @@
 
 /* ── Responsive ───────────────────────────────────────────────────────── */
 @media (max-width: 1100px) {
+  .serviceCards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .processSteps {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -654,36 +692,26 @@
 }
 
 @media (max-width: 900px) {
-  .hero {
-    grid-template-columns: 1fr;
-    min-height: auto;
-    overflow: visible;
-  }
-
+  /* Hero: switch to full-height with bottom gradient on mobile */
   .heroContent {
-    padding: 4rem var(--drex-pad);
-    order: 1;
+    padding-right: var(--drex-pad);
+    padding-top: 7rem;
+    padding-bottom: 4rem;
   }
 
-  .heroVisual {
-    order: 2;
-    height: 360px;
-    min-height: 280px;
+  .heroGradient {
+    background: linear-gradient(
+      to top,
+      rgba(6, 6, 6, 0.97) 0%,
+      rgba(6, 6, 6, 0.80) 45%,
+      rgba(6, 6, 6, 0.40) 75%,
+      rgba(6, 6, 6, 0.12) 100%
+    );
   }
 
-  .serviceRow {
-    grid-template-columns: 2.5rem 1fr;
-    gap: 1.5rem;
-    padding: 2rem 0;
-  }
-
-  .serviceRowLink {
-    grid-column: 2;
-    padding-top: 0;
-  }
-
-  .serviceRowTitle {
-    font-size: 1.5rem;
+  .serviceCards {
+    grid-template-columns: repeat(2, 1fr);
+    border-radius: 10px;
   }
 
   .whyGrid {
@@ -726,17 +754,42 @@
   }
 
   .processNum {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
   }
 }
 
 @media (max-width: 600px) {
-  .heroVisual {
-    height: 260px;
+  .hero {
+    min-height: clamp(580px, 85vh, 760px);
+    align-items: flex-end;
+  }
+
+  .heroContent {
+    padding-top: 5rem;
+    padding-bottom: 3.5rem;
+    padding-right: var(--drex-pad);
+  }
+
+  .heroGradient {
+    background: linear-gradient(
+      to top,
+      rgba(6, 6, 6, 0.98) 0%,
+      rgba(6, 6, 6, 0.85) 40%,
+      rgba(6, 6, 6, 0.45) 70%,
+      rgba(6, 6, 6, 0.15) 100%
+    );
   }
 
   .heroWordmark {
-    font-size: clamp(2.75rem, 12vw, 4rem);
+    font-size: clamp(3rem, 13vw, 4.5rem);
+  }
+
+  .serviceCards {
+    grid-template-columns: 1fr;
+  }
+
+  .serviceCard {
+    min-height: auto;
   }
 
   .featuredGrid {
@@ -757,6 +810,7 @@
 
   .processSteps {
     grid-template-columns: 1fr;
+    border-top-width: 2px;
   }
 
   .processStep {
@@ -770,10 +824,10 @@
   }
 
   .whyRight {
-    height: 260px;
+    height: 280px;
   }
 
-  .serviceRowTitle {
-    font-size: 1.25rem;
+  .ctaBand {
+    padding: 5rem 0;
   }
 }
