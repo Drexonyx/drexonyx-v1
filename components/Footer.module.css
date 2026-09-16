@@ -113,11 +113,22 @@
   max-width: var(--drex-container);
   margin: 0 auto;
   padding: 1.25rem var(--drex-pad);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .copy {
   font-size: 0.8125rem;
   color: var(--drex-text-muted);
+}
+
+.copyTagline {
+  font-size: 0.8125rem;
+  color: var(--drex-text-muted);
+  font-style: italic;
 }
 
 @media (max-width: 900px) {

@@ -15,36 +15,27 @@
   border-right: 1px solid var(--drex-border);
 }
 
-/* Brand row: logo + studio label */
-.heroBrand {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 0;
+/* Eyebrow above wordmark */
+.heroEyebrow {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--drex-accent);
+  margin-bottom: 1.25rem;
 }
 
+/* Wordmark block */
 .heroWordmark {
-  flex-shrink: 0;
   line-height: 1;
+  margin-bottom: 0;
 }
 
 /* Logo displayed as-is — no color filter */
 .heroLogo {
   display: block;
-  width: clamp(130px, 12vw, 195px);
+  width: clamp(200px, 20vw, 340px);
   height: auto;
-}
-
-.heroBrandTag {
-  font-size: 0.5625rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--drex-text-muted);
-  border-left: 1px solid var(--drex-border);
-  padding-left: 0.875rem;
-  line-height: 1.45;
-  max-width: 10ch;
 }
 
 /* Main body: tagline, sub, CTAs — vertically centered */
@@ -159,6 +150,36 @@
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.6);
+}
+
+/* Credential overlay — upper-right of right panel */
+.heroCred {
+  position: absolute;
+  top: 2.5rem;
+  right: 2.75rem;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+}
+
+.heroCredCity {
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.heroCredSub {
+  font-size: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.38);
+  text-align: right;
+  line-height: 1.6;
 }
 
 /* ── Shared section utilities ──────────────────────────────────────────── */
@@ -365,7 +386,7 @@
   display: flex;
 }
 
-/* ── Featured Work: editorial 3-col grid ───────────────────────────────── */
+/* ── Featured Work: 4-col equal card grid ──────────────────────────────── */
 .featuredWork {
   padding: 6rem 0;
   border-bottom: 1px solid var(--drex-border);
@@ -377,10 +398,9 @@
   font-size: 0.9375rem;
 }
 
-/* 3-col grid: lead spans 2 cols; card 4 spans 2 cols */
 .featuredGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1.25rem;
   margin-bottom: 3rem;
 }
@@ -391,31 +411,10 @@
   background: var(--drex-elevated);
 }
 
-/* Lead card: first item, spans 2 of 3 cols */
-.featuredCardLead {
-  grid-column: span 2;
-}
-
-/* Cards 2 & 3: portrait format */
-.featuredGrid > article:nth-child(2) .featuredCardMedia,
-.featuredGrid > article:nth-child(3) .featuredCardMedia {
-  aspect-ratio: 3 / 4;
-}
-
-/* Card 4: spans 2 cols */
-.featuredGrid > article:nth-child(4) {
-  grid-column: span 2;
-}
-
 .featuredCardMedia {
   position: relative;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-}
-
-/* Lead: cinematic wide ratio */
-.featuredCardLead .featuredCardMedia {
-  aspect-ratio: 16 / 9;
 }
 
 .featuredCardImg {
@@ -732,24 +731,7 @@
 
 @media (max-width: 960px) {
   .featuredGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .featuredCardLead {
-    grid-column: 1 / -1;
-  }
-
-  .featuredGrid > article:nth-child(2) .featuredCardMedia,
-  .featuredGrid > article:nth-child(3) .featuredCardMedia {
-    aspect-ratio: 16 / 9;
-  }
-
-  .featuredGrid > article:nth-child(4) {
-    grid-column: 1 / -1;
-  }
-
-  .featuredGrid > article:nth-child(4) .featuredCardMedia {
-    aspect-ratio: 16 / 6;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -830,7 +812,11 @@
   }
 
   .heroLogo {
-    width: clamp(110px, 38vw, 155px);
+    width: clamp(160px, 42vw, 220px);
+  }
+
+  .heroCred {
+    display: none;
   }
 
   .heroTagline {
@@ -847,18 +833,6 @@
 
   .featuredGrid {
     grid-template-columns: 1fr;
-  }
-
-  .featuredCardLead {
-    grid-column: 1;
-  }
-
-  .featuredGrid > article:nth-child(4) {
-    grid-column: 1;
-  }
-
-  .featuredGrid > article:nth-child(4) .featuredCardMedia {
-    aspect-ratio: 16 / 9;
   }
 
   .processSteps {

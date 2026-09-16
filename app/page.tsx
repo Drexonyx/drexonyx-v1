@@ -38,21 +38,21 @@ const SERVICES = [
 ] as const;
 
 const WHY_ITEMS = [
-  "Global Creative Mindset",
+  "Global Mindset",
   "AI-Powered Production",
-  "Scales With Your Campaign",
+  "Scalable for Any Business",
   "Fast & Reliable Delivery",
-  "Performance-First Quality",
-  "Brief-Disciplined Process",
+  "Creative Excellence",
+  "Dedicated Support",
 ];
 
 const INDUSTRIES = [
-  "E-commerce & DTC",
-  "Beauty & Skincare",
-  "Health & Wellness",
-  "Food & Beverage",
-  "Fashion & Apparel",
-  "Consumer Tech",
+  "Startups",
+  "SMEs",
+  "E-commerce",
+  "Hospitality",
+  "Retail",
+  "Enterprise",
 ];
 
 const PROCESS_STEPS = [
@@ -72,19 +72,17 @@ export default function HomePage() {
       <section className={styles.hero} aria-labelledby="hero-heading">
         {/* Left: dark editorial copy panel */}
         <div className={styles.heroLeft}>
-          <div className={styles.heroBrand}>
-            <h1 id="hero-heading" className={styles.heroWordmark}>
-              <Image
-                src="/brand/drexonyx-horizontal-lockup.png"
-                alt="DREXONYX"
-                width={3198}
-                height={540}
-                className={styles.heroLogo}
-                priority
-              />
-            </h1>
-            <span className={styles.heroBrandTag}>Performance Creative Studio</span>
-          </div>
+          <p className={styles.heroEyebrow}>Global Creative Production</p>
+          <h1 id="hero-heading" className={styles.heroWordmark}>
+            <Image
+              src="/brand/drexonyx-horizontal-lockup.png"
+              alt="DREXONYX"
+              width={3198}
+              height={540}
+              className={styles.heroLogo}
+              priority
+            />
+          </h1>
           <div className={styles.heroBody}>
             <p className={styles.heroTagline}>
               Powerful Creative Content<br />for Modern Brands
@@ -105,7 +103,7 @@ export default function HomePage() {
           <p className={styles.heroLocation}>Dubai, UAE · Global</p>
         </div>
 
-        {/* Right: cinematic image panel with play element */}
+        {/* Right: cinematic image panel */}
         <div className={styles.heroRight} aria-hidden="true">
           <Image
             src="/images/drexonyx-hero-final.webp"
@@ -116,11 +114,15 @@ export default function HomePage() {
             sizes="55vw"
           />
           <div className={styles.heroRightEdge} />
+          <div className={styles.heroCred}>
+            <span className={styles.heroCredCity}>Dubai</span>
+            <span className={styles.heroCredSub}>A Global Stage<br />for Bolder Ideas</span>
+          </div>
           <div className={styles.heroPlay}>
             <span className={styles.heroPlayRing}>
               <span className={styles.heroPlayIcon}>▶</span>
             </span>
-            <span className={styles.heroPlayLabel}>Showreel</span>
+            <span className={styles.heroPlayLabel}>Watch Our Story</span>
           </div>
         </div>
       </section>
@@ -175,10 +177,10 @@ export default function HomePage() {
             </div>
           ) : (
             <div className={styles.featuredGrid}>
-              {featured.map((item, idx) => (
+              {featured.map((item) => (
                 <article
                   key={item.id}
-                  className={`${styles.featuredCard} ${idx === 0 ? styles.featuredCardLead : ""}`}
+                  className={styles.featuredCard}
                 >
                   <div className={styles.featuredCardMedia}>
                     {item.thumbnailSrc && (
@@ -302,7 +304,7 @@ export default function HomePage() {
         </div>
         <div className="container">
           <div className={styles.ctaBandContent}>
-            <p className={styles.ctaBandEyebrow}>Dubai · Global</p>
+            <p className={styles.ctaBandEyebrow}>Ready to Create Something Extraordinary?</p>
             <h2 id="cta-band-heading" className={styles.ctaBandHeading}>
               Let&apos;s Bring Your<br />Vision to Life.
             </h2>

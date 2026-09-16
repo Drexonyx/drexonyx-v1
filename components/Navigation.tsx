@@ -8,7 +8,6 @@ import styles from "./Navigation.module.css";
 
 const NAV_LINKS = [
   { href: "/services", label: "Services" },
-  { href: "/how-it-works", label: "How It Works" },
   { href: "/portfolio", label: "Portfolio" },
   { href: "/pricing", label: "Pricing" },
   { href: "/about", label: "About" },

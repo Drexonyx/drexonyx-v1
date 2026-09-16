@@ -13,10 +13,10 @@ const QUICK_LINKS = [
 ] as const;
 
 const SERVICE_LINKS = [
-  { href: "/services#ugc-video", label: "UGC Video Ads" },
-  { href: "/services#static-creative", label: "Static Ad Creative" },
-  { href: "/services#creative-strategy", label: "Creative Strategy" },
-  { href: "/services#campaign-qc", label: "Campaign QC" },
+  { href: "/services", label: "UGC Content" },
+  { href: "/services", label: "Cinematic Commercials" },
+  { href: "/services", label: "Product Films" },
+  { href: "/services", label: "Social Creative" },
 ] as const;
 
 export default function Footer() {
@@ -34,7 +34,7 @@ export default function Footer() {
               className={styles.logoImg}
             />
           </Link>
-          <p className={styles.tagline}>Performance Creative Studio</p>
+          <p className={styles.tagline}>Global Creative Production</p>
           <p className={styles.location}>Dubai, UAE · Global</p>
         </div>
 
@@ -86,6 +86,7 @@ export default function Footer() {
         <p className={styles.copy}>
           &copy; {new Date().getFullYear()} DREXONYX. All rights reserved.
         </p>
+        <p className={styles.copyTagline}>Creativity Today. A Bolder Tomorrow.</p>
       </div>
     </footer>
   );
