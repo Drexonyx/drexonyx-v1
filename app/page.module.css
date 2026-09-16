@@ -575,10 +575,11 @@
 .whyRight {
   position: relative;
   overflow: hidden;
+  background: #060606;
 }
 
 .whyImg {
-  object-fit: cover;
+  object-fit: contain;
   object-position: 50% center;
 }
 
