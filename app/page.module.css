@@ -1,18 +1,20 @@
-/* ── Hero: two-panel cinematic composition ───────────────────────────────── */
+/* ── Hero: full-bleed cinematic composition ──────────────────────────────── */
 .hero {
-  display: grid;
-  grid-template-columns: 45fr 55fr;
+  position: relative;
+  display: flex;
   min-height: clamp(600px, 90vh, 1020px);
   border-bottom: 1px solid var(--drex-border);
+  overflow: hidden;
 }
 
-/* Left: dark editorial copy panel */
+/* Left: foreground copy panel — floats over the full-bleed image */
 .heroLeft {
-  background: var(--drex-bg);
+  position: relative;
+  z-index: 2;
+  flex: 0 0 45%;
   display: flex;
   flex-direction: column;
   padding: 2.75rem 3.5rem 2.75rem max(var(--drex-pad), calc((100vw - var(--drex-container)) / 2 + var(--drex-pad)));
-  border-right: 1px solid var(--drex-border);
 }
 
 /* Eyebrow above wordmark */
@@ -83,9 +85,11 @@
   margin-top: auto;
 }
 
-/* Right: cinematic image panel */
+/* Right: full-bleed cinematic background — absolute, fills entire hero */
 .heroRight {
-  position: relative;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
   overflow: hidden;
   background: var(--drex-elevated);
 }
@@ -95,15 +99,17 @@
   object-position: 55% center;
 }
 
-/* Subtle left-edge vignette: blends into left panel */
+/* Full-bleed gradient: deep dark on left for text readability, fades right */
 .heroRightEdge {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to right,
-    rgba(6, 6, 6, 0.55) 0%,
-    rgba(6, 6, 6, 0.15) 22%,
-    transparent 40%
+    rgba(6, 6, 6, 0.93) 0%,
+    rgba(6, 6, 6, 0.82) 28%,
+    rgba(6, 6, 6, 0.45) 55%,
+    rgba(6, 6, 6, 0.12) 80%,
+    transparent 100%
   );
   z-index: 1;
 }
@@ -738,19 +744,18 @@
 }
 
 @media (max-width: 900px) {
-  /* Hero: stack panels vertically on tablet/mobile */
+  /* Hero: full-bleed background, full-width copy on mobile */
   .hero {
-    grid-template-columns: 1fr;
-    min-height: auto;
-  }
-
-  .heroRight {
-    height: 300px;
+    min-height: clamp(440px, 70vh, 680px);
   }
 
   .heroLeft {
-    border-right: none;
+    flex: 0 0 100%;
     padding: 2.5rem var(--drex-pad);
+  }
+
+  .heroRightEdge {
+    background: rgba(6, 6, 6, 0.78);
   }
 
   .heroPlay {

@@ -287,7 +287,7 @@ export default function HomePage() {
       <section className={styles.ctaBand} aria-labelledby="cta-band-heading">
         <div className={styles.ctaBandBg} aria-hidden="true">
           <Image
-            src="/images/drexonyx-hero-final.webp"
+            src="/images/drexonyx-creative-crew-hero.png"
             alt=""
             fill
             className={styles.ctaBandBgImg}

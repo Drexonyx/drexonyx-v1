@@ -30,9 +30,9 @@
 }
 
 .logoImg {
-  height: 30px;
+  height: 36px;
   width: auto;
-  max-width: 220px;
+  max-width: 264px;
   display: block;
 }
 
@@ -45,6 +45,7 @@
 }
 
 .link {
+  position: relative;
   display: block;
   padding: 0.4rem 0.625rem;
   font-size: 0.875rem;
@@ -62,6 +63,18 @@
 
 .linkActive {
   color: var(--drex-accent);
+}
+
+.linkActive::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 1.5px;
+  background: var(--drex-accent);
+  border-radius: 1px;
 }
 
 /* Nav actions group */
