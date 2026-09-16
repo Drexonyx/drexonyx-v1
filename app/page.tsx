@@ -68,47 +68,52 @@ export default function HomePage() {
 
   return (
     <>
-      {/* ── Hero: cinematic split ──────────────────────────────────────── */}
+      {/* ── Hero: genuine two-panel split ─────────────────────────────── */}
       <section className={styles.hero} aria-labelledby="hero-heading">
-        {/* Full-bleed background — strong left-side gradient exposes right 45% */}
-        <div className={styles.heroBg} aria-hidden="true">
+        {/* Left panel: dark content surface — independent from any image */}
+        <div className={styles.heroContent}>
+          <p className={styles.heroEyebrow}>Performance Creative Studio</p>
+          <h1 id="hero-heading" className={styles.heroWordmark}>
+            DREXONYX
+          </h1>
+          <p className={styles.heroTagline}>
+            Powerful Creative Content<br />for Modern Brands
+          </p>
+          <p className={styles.heroSub}>
+            Dubai-based performance creative studio. AI-powered UGC advertising
+            for brands worldwide — creative at scale, built to perform.
+          </p>
+          <div className={styles.heroCtas}>
+            <Link href="/start-project" className={styles.ctaPrimary}>
+              Start Project →
+            </Link>
+            <Link href="/portfolio" className={styles.ctaSecondary}>
+              ▶ Watch Showreel
+            </Link>
+          </div>
+          <p className={styles.heroLocation}>Dubai, UAE · Global</p>
+        </div>
+
+        {/* Right panel: cinematic visual — independent image composition */}
+        <div className={styles.heroVisual} aria-hidden="true">
           <Image
             src="/images/drexonyx-hero-final.webp"
             alt=""
             fill
-            className={styles.heroBgImg}
+            className={styles.heroImg}
             priority
-            sizes="100vw"
+            sizes="(max-width: 900px) 100vw, 45vw"
           />
-          <div className={styles.heroBgGradient} />
-        </div>
-
-        <div className={`container ${styles.heroInner}`}>
-          <div className={styles.heroContent}>
-            <p className={styles.heroEyebrow}>Global Creative Production</p>
-            <h1 id="hero-heading" className={styles.heroWordmark}>
-              DREXONYX
-            </h1>
-            <p className={styles.heroTagline}>
-              Powerful Creative Content<br />for Modern Brands
-            </p>
-            <p className={styles.heroSub}>
-              Dubai-based performance creative studio. AI-powered UGC advertising
-              for brands worldwide — creative at scale, built to perform.
-            </p>
-            <div className={styles.heroCtas}>
-              <Link href="/start-project" className={styles.ctaPrimary}>
-                Start Project →
-              </Link>
-              <Link href="/portfolio" className={styles.ctaSecondary}>
-                ▶ Watch Showreel
-              </Link>
-            </div>
+          <div className={styles.heroVisualOverlay} />
+          <div className={styles.heroVisualLabel}>
+            <span>Dubai</span>
+            <span className={styles.heroVisualDot}>·</span>
+            <span>Global</span>
           </div>
         </div>
       </section>
 
-      {/* ── Services: 2×2 grid ────────────────────────────────────────── */}
+      {/* ── Services: editorial full-width rows ───────────────────────── */}
       <section className={styles.services} aria-labelledby="services-heading">
         <div className="container">
           <p className={styles.sectionEyebrow}>Our Services</p>
@@ -118,19 +123,19 @@ export default function HomePage() {
           <p className={styles.sectionSub}>
             End-to-end UGC advertising production — from strategic brief to campaign-ready deliverables.
           </p>
-          <div className={styles.servicesGrid}>
+          <div className={styles.servicesRows}>
             {SERVICES.map((s) => (
-              <article key={s.number} className={styles.serviceCard}>
-                <div className={styles.serviceCardPanel} aria-hidden="true">
-                  <span className={styles.serviceCardNum}>{s.number}</span>
+              <article key={s.number} className={styles.serviceRow}>
+                <span className={styles.serviceRowNum} aria-hidden="true">
+                  {s.number}
+                </span>
+                <div className={styles.serviceRowBody}>
+                  <h3 className={styles.serviceRowTitle}>{s.title}</h3>
+                  <p className={styles.serviceRowDesc}>{s.desc}</p>
                 </div>
-                <div className={styles.serviceCardBody}>
-                  <h3 className={styles.serviceCardTitle}>{s.title}</h3>
-                  <p className={styles.serviceCardDesc}>{s.desc}</p>
-                  <Link href={s.href} className={styles.serviceCardLink}>
-                    Learn More →
-                  </Link>
-                </div>
+                <Link href={s.href} className={styles.serviceRowLink}>
+                  Learn More →
+                </Link>
               </article>
             ))}
           </div>
@@ -142,7 +147,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Featured Work ─────────────────────────────────────────────── */}
+      {/* ── Featured Work: cinematic card grid ────────────────────────── */}
       <section className={styles.featuredWork} aria-labelledby="featured-heading">
         <div className="container">
           <p className={styles.sectionEyebrow}>Featured Work</p>
@@ -158,22 +163,26 @@ export default function HomePage() {
             </div>
           ) : (
             <div className={styles.featuredGrid}>
-              {featured.map((item) => (
-                <article key={item.id} className={styles.featuredCard}>
-                  {item.thumbnailSrc && (
-                    <div className={styles.featuredCardMedia}>
+              {featured.map((item, idx) => (
+                <article
+                  key={item.id}
+                  className={`${styles.featuredCard} ${idx === 0 ? styles.featuredCardLead : ""}`}
+                >
+                  <div className={styles.featuredCardMedia}>
+                    {item.thumbnailSrc && (
                       <Image
                         src={item.thumbnailSrc}
                         alt={item.title}
                         fill
                         className={styles.featuredCardImg}
-                        sizes="(max-width: 900px) 100vw, 33vw"
+                        sizes="(max-width: 900px) 100vw, (max-width: 1200px) 65vw, 800px"
                       />
+                    )}
+                    <div className={styles.featuredCardOverlay} />
+                    <div className={styles.featuredCardText}>
+                      <p className={styles.featuredCategory}>{item.category}</p>
+                      <p className={styles.featuredTitle}>{item.title}</p>
                     </div>
-                  )}
-                  <div className={styles.featuredCardText}>
-                    <p className={styles.featuredCategory}>{item.category}</p>
-                    <p className={styles.featuredTitle}>{item.title}</p>
                   </div>
                 </article>
               ))}
@@ -267,7 +276,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── CTA band: cinematic ───────────────────────────────────────── */}
+      {/* ── CTA band: cinematic editorial ────────────────────────────── */}
       <section className={styles.ctaBand} aria-labelledby="cta-band-heading">
         <div className={styles.ctaBandBg} aria-hidden="true">
           <Image
@@ -283,7 +292,7 @@ export default function HomePage() {
           <div className={styles.ctaBandContent}>
             <p className={styles.ctaBandEyebrow}>Dubai · Global</p>
             <h2 id="cta-band-heading" className={styles.ctaBandHeading}>
-              Ready to Launch Performance Creative?
+              Ready to Launch<br />Performance Creative?
             </h2>
             <p className={styles.ctaBandSub}>
               Dubai-based. Globally active. Tell us about your brand and we&apos;ll
