@@ -27,14 +27,12 @@
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  overflow: hidden;
-  margin-top: 3px;
 }
 
 .logoImg {
-  height: 56px;
+  height: 42px;
   width: auto;
-  max-width: 160px;
+  max-width: 260px;
   display: block;
 }
 
