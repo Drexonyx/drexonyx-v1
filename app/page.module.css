@@ -24,17 +24,19 @@
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--drex-accent);
-  margin-bottom: 0;
+  margin-bottom: 0.3rem;
 }
 
 /* Hero wordmark — branded image extracted from official lockup asset */
+/* Negative margins compensate for the 16px transparent padding baked into the PNG */
 .heroWordmark {
-  margin-bottom: 0;
+  margin-top: -0.4rem;
+  margin-bottom: -0.6rem;
   line-height: 0;
 }
 
 .heroWordmarkImg {
-  width: 142%;
+  width: 175%;
   height: auto;
   display: block;
 }
@@ -44,7 +46,7 @@
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  padding: 0.2rem 0 0;
+  padding: 0.3rem 0 0;
 }
 
 .heroTagline {

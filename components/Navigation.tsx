@@ -27,9 +27,9 @@ export default function Navigation() {
         <div className={styles.inner}>
           <Link href="/" className={styles.logo} onClick={closeMenu} aria-label="DREXONYX home">
             <Image
-              src="/brand/drexonyx-horizontal-lockup.png"
+              src="/brand/drexonyx-dx-badge.png"
               alt="DREXONYX"
-              width={3198}
+              width={1149}
               height={540}
               className={styles.logoImg}
               priority

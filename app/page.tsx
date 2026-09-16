@@ -78,7 +78,7 @@ export default function HomePage() {
               src="/brand/drexonyx-hero-wordmark.png"
               alt="DREXONYX"
               width={2018}
-              height={540}
+              height={206}
               className={styles.heroWordmarkImg}
               priority
             />
