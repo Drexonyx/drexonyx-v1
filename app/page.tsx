@@ -254,7 +254,7 @@ export default function HomePage() {
           </div>
           <div className={styles.whyRight} aria-hidden="true">
             <Image
-              src="/images/drexonyx-hero.webp"
+              src="/images/drexonyx-hero-final.webp"
               alt=""
               fill
               className={styles.whyImg}

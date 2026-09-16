@@ -579,8 +579,8 @@
 }
 
 .whyImg {
-  object-fit: contain;
-  object-position: 50% center;
+  object-fit: cover;
+  object-position: 65% center;
 }
 
 .whyOverlay {
