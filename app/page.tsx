@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./page.module.css";
-import { getFeaturedItems } from "@/lib/portfolio";
+import { PORTFOLIO_ITEMS } from "@/lib/portfolio";
 
 export const metadata: Metadata = {
   title: "DREXONYX — Performance Creative Studio",
@@ -64,7 +64,7 @@ const PROCESS_STEPS = [
 ];
 
 export default function HomePage() {
-  const featured = getFeaturedItems();
+  const featured = PORTFOLIO_ITEMS;
 
   return (
     <>
@@ -94,16 +94,8 @@ export default function HomePage() {
           <p className={styles.heroLocation}>Dubai, UAE · Global</p>
         </div>
 
-        {/* Right panel: cinematic visual — independent image composition */}
+        {/* Right panel: cinematic visual — CSS background, cannot bleed into left panel */}
         <div className={styles.heroVisual} aria-hidden="true">
-          <Image
-            src="/images/drexonyx-hero-final.webp"
-            alt=""
-            fill
-            className={styles.heroImg}
-            priority
-            sizes="(max-width: 900px) 100vw, 45vw"
-          />
           <div className={styles.heroVisualOverlay} />
           <div className={styles.heroVisualLabel}>
             <span>Dubai</span>

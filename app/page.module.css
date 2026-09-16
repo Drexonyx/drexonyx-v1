@@ -4,10 +4,12 @@
   grid-template-columns: 55fr 45fr;
   min-height: clamp(600px, 90vh, 860px);
   border-bottom: 1px solid var(--drex-border);
+  overflow: hidden;
 }
 
+/* Left panel — independent dark surface, no image behind it */
 .heroContent {
-  background: var(--drex-bg);
+  background: #060606;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -65,29 +67,25 @@
   color: var(--drex-text-muted);
 }
 
-/* Right panel: cinematic visual — independent image panel */
+/* Right panel — CSS background-image, physically contained to this element */
 .heroVisual {
+  background-image: url('/images/drexonyx-hero-final.webp');
+  background-size: cover;
+  background-position: 70% center;
   position: relative;
-  overflow: hidden;
-}
-
-.heroImg {
-  object-fit: cover;
-  object-position: 70% center;
 }
 
 .heroVisualOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to left, transparent 55%, rgba(6, 6, 6, 0.35) 100%);
-  z-index: 1;
+  /* subtle seam blend only — NOT a dark veil */
+  background: linear-gradient(to left, transparent 60%, rgba(6, 6, 6, 0.25) 100%);
 }
 
 .heroVisualLabel {
   position: absolute;
   bottom: 1.5rem;
   left: 1.5rem;
-  z-index: 2;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -225,45 +223,50 @@
 .serviceRow {
   display: grid;
   grid-template-columns: 3.5rem 1fr auto;
-  align-items: start;
-  gap: 2rem;
-  padding: 2.5rem 0;
+  align-items: center;
+  gap: 2.5rem;
+  padding: 3rem 0;
   border-bottom: 1px solid var(--drex-border);
-  transition: background var(--drex-duration) var(--drex-ease);
-  border-radius: 2px;
+  transition: padding-left var(--drex-duration) var(--drex-ease);
 }
 
 .serviceRow:hover {
-  background: rgba(200, 152, 10, 0.025);
+  padding-left: 0.5rem;
+}
+
+.serviceRow:hover .serviceRowTitle {
+  color: var(--drex-text);
 }
 
 .serviceRowNum {
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   font-weight: 800;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.15em;
   font-family: var(--font-geist-mono), monospace;
   color: var(--drex-accent);
-  padding-top: 0.35em;
+  align-self: start;
+  padding-top: 0.5em;
 }
 
 .serviceRowBody {
   display: flex;
   flex-direction: column;
-  gap: 0.625rem;
+  gap: 0.75rem;
 }
 
 .serviceRowTitle {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1.875rem;
+  font-weight: 800;
   color: var(--drex-text);
-  letter-spacing: -0.025em;
+  letter-spacing: -0.035em;
+  transition: color var(--drex-duration) var(--drex-ease);
 }
 
 .serviceRowDesc {
   font-size: 0.9375rem;
   color: var(--drex-text-muted);
   line-height: 1.65;
-  max-width: 520px;
+  max-width: 52ch;
 }
 
 .serviceRowLink {
@@ -271,19 +274,20 @@
   font-weight: 600;
   color: var(--drex-accent);
   white-space: nowrap;
-  padding-top: 0.35em;
-  transition: opacity var(--drex-duration) var(--drex-ease);
+  transition: opacity var(--drex-duration) var(--drex-ease),
+    transform var(--drex-duration) var(--drex-ease);
 }
 
 .serviceRowLink:hover {
   opacity: 0.7;
+  transform: translateX(3px);
 }
 
 .servicesCta {
   display: flex;
 }
 
-/* ── Featured Work: cinematic card grid ────────────────────────────────── */
+/* ── Featured Work: editorial 3-col grid ───────────────────────────────── */
 .featuredWork {
   padding: 5rem 0;
   border-bottom: 1px solid var(--drex-border);
@@ -295,10 +299,11 @@
   font-size: 0.9375rem;
 }
 
+/* 3-col grid: lead spans 2 cols; card 4 spans 2 cols — fills grid cleanly */
 .featuredGrid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
   margin-bottom: 3rem;
 }
 
@@ -306,11 +311,22 @@
   border-radius: 10px;
   overflow: hidden;
   background: var(--drex-elevated);
-  cursor: default;
 }
 
+/* Lead card: first item, spans 2 of 3 cols */
 .featuredCardLead {
-  grid-column: 1 / -1;
+  grid-column: span 2;
+}
+
+/* Cards 2 & 3 (nth positions): portrait format in their 1/3 column */
+.featuredGrid > article:nth-child(2) .featuredCardMedia,
+.featuredGrid > article:nth-child(3) .featuredCardMedia {
+  aspect-ratio: 3 / 4;
+}
+
+/* Card 4: spans 2 cols like the lead */
+.featuredGrid > article:nth-child(4) {
+  grid-column: span 2;
 }
 
 .featuredCardMedia {
@@ -319,8 +335,9 @@
   overflow: hidden;
 }
 
+/* Lead: cinematic wide ratio */
 .featuredCardLead .featuredCardMedia {
-  aspect-ratio: 21 / 9;
+  aspect-ratio: 16 / 9;
 }
 
 .featuredCardImg {
@@ -337,8 +354,8 @@
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(6, 6, 6, 0.88) 0%,
-    rgba(6, 6, 6, 0.25) 45%,
+    rgba(6, 6, 6, 0.9) 0%,
+    rgba(6, 6, 6, 0.3) 40%,
     transparent 100%
   );
   z-index: 1;
@@ -365,7 +382,7 @@
 }
 
 .featuredTitle {
-  font-size: 1.125rem;
+  font-size: 1.0625rem;
   font-weight: 700;
   color: #fff;
   letter-spacing: -0.02em;
@@ -375,7 +392,7 @@
   display: flex;
 }
 
-/* ── How It Works: process steps ───────────────────────────────────────── */
+/* ── How It Works: premium production workflow ──────────────────────────── */
 .process {
   padding: 5rem 0;
   border-bottom: 1px solid var(--drex-border);
@@ -385,16 +402,16 @@
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 0;
-  border-top: 1px solid var(--drex-border);
   margin-bottom: 3rem;
+  border-top: 1px solid var(--drex-border);
 }
 
 .processStep {
-  padding: 2rem 1.5rem 2rem 0;
+  padding: 2.5rem 2rem 2.5rem 0;
   border-right: 1px solid var(--drex-border);
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
 .processStep:last-child {
@@ -403,24 +420,27 @@
 }
 
 .processNum {
-  font-size: 0.625rem;
-  font-weight: 800;
-  letter-spacing: 0.15em;
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: -0.04em;
   font-family: var(--font-geist-mono), monospace;
   color: var(--drex-accent);
+  line-height: 1;
+  opacity: 0.8;
 }
 
 .processTitle {
-  font-size: 0.9375rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--drex-text);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
 }
 
 .processDesc {
   font-size: 0.8125rem;
   color: var(--drex-text-muted);
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
 /* ── Why DREXONYX: editorial two-panel ─────────────────────────────────── */
@@ -482,7 +502,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 1rem;
+  gap: 1.125rem;
   padding: 3rem 2.5rem;
   list-style: none;
 }
@@ -531,7 +551,7 @@
   letter-spacing: 0.01em;
 }
 
-/* ── CTA Band: cinematic editorial ────────────────────────────────────── */
+/* ── CTA Band: cinematic editorial full-bleed ─────────────────────────── */
 .ctaBand {
   position: relative;
   padding: 7rem 0;
@@ -606,6 +626,30 @@
   .processStep:nth-child(4),
   .processStep:nth-child(5) {
     border-top: 1px solid var(--drex-border);
+    padding-top: 2rem;
+  }
+}
+
+@media (max-width: 960px) {
+  .featuredGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .featuredCardLead {
+    grid-column: 1 / -1;
+  }
+
+  .featuredGrid > article:nth-child(2) .featuredCardMedia,
+  .featuredGrid > article:nth-child(3) .featuredCardMedia {
+    aspect-ratio: 16 / 9;
+  }
+
+  .featuredGrid > article:nth-child(4) {
+    grid-column: 1 / -1;
+  }
+
+  .featuredGrid > article:nth-child(4) .featuredCardMedia {
+    aspect-ratio: 16 / 6;
   }
 }
 
@@ -613,6 +657,7 @@
   .hero {
     grid-template-columns: 1fr;
     min-height: auto;
+    overflow: visible;
   }
 
   .heroContent {
@@ -628,6 +673,8 @@
 
   .serviceRow {
     grid-template-columns: 2.5rem 1fr;
+    gap: 1.5rem;
+    padding: 2rem 0;
   }
 
   .serviceRowLink {
@@ -635,16 +682,8 @@
     padding-top: 0;
   }
 
-  .featuredGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .featuredCardLead {
-    grid-column: 1;
-  }
-
-  .featuredCardLead .featuredCardMedia {
-    aspect-ratio: 16 / 9;
+  .serviceRowTitle {
+    font-size: 1.5rem;
   }
 
   .whyGrid {
@@ -679,10 +718,15 @@
   .processStep:nth-child(4),
   .processStep:nth-child(5) {
     border-top: 1px solid var(--drex-border);
+    padding-top: 2rem;
   }
 
   .processStep:nth-child(4) {
     border-right: none;
+  }
+
+  .processNum {
+    font-size: 1.5rem;
   }
 }
 
@@ -695,8 +739,20 @@
     font-size: clamp(2.75rem, 12vw, 4rem);
   }
 
-  .serviceRowTitle {
-    font-size: 1.25rem;
+  .featuredGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .featuredCardLead {
+    grid-column: 1;
+  }
+
+  .featuredGrid > article:nth-child(4) {
+    grid-column: 1;
+  }
+
+  .featuredGrid > article:nth-child(4) .featuredCardMedia {
+    aspect-ratio: 16 / 9;
   }
 
   .processSteps {
@@ -706,7 +762,7 @@
   .processStep {
     border-right: none;
     border-top: 1px solid var(--drex-border);
-    padding: 1.5rem 0;
+    padding: 1.75rem 0;
   }
 
   .processStep:first-child {
@@ -715,5 +771,9 @@
 
   .whyRight {
     height: 260px;
+  }
+
+  .serviceRowTitle {
+    font-size: 1.25rem;
   }
 }
