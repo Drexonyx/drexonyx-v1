@@ -99,16 +99,16 @@
   object-position: 55% center;
 }
 
-/* Full-bleed gradient: deep dark on left for text readability, fades right */
+/* Full-bleed gradient: dark on left for readability, image visible throughout */
 .heroRightEdge {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to right,
-    rgba(6, 6, 6, 0.93) 0%,
-    rgba(6, 6, 6, 0.82) 28%,
-    rgba(6, 6, 6, 0.45) 55%,
-    rgba(6, 6, 6, 0.12) 80%,
+    rgba(6, 6, 6, 0.68) 0%,
+    rgba(6, 6, 6, 0.52) 30%,
+    rgba(6, 6, 6, 0.22) 58%,
+    rgba(6, 6, 6, 0.05) 82%,
     transparent 100%
   );
   z-index: 1;
@@ -813,10 +813,6 @@
 }
 
 @media (max-width: 600px) {
-  .heroRight {
-    height: 220px;
-  }
-
   .heroCred {
     display: none;
   }
