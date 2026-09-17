@@ -120,3 +120,17 @@ CREATE POLICY audit_events_isolation ON system.audit_events
 ALTER TABLE system.idempotency_keys ENABLE ROW LEVEL SECURITY;
 CREATE POLICY idempotency_keys_isolation ON system.idempotency_keys
   USING (organization_id = current_setting('app.current_organization_id', true)::uuid);
+
+-- ─── orchestration schema ─────────────────────────────────────────────────────
+
+ALTER TABLE orchestration.agent_tasks ENABLE ROW LEVEL SECURITY;
+CREATE POLICY agent_tasks_isolation ON orchestration.agent_tasks
+  USING (organization_id = current_setting('app.current_organization_id', true)::uuid);
+
+ALTER TABLE orchestration.task_approvals ENABLE ROW LEVEL SECURITY;
+CREATE POLICY task_approvals_isolation ON orchestration.task_approvals
+  USING (organization_id = current_setting('app.current_organization_id', true)::uuid);
+
+ALTER TABLE orchestration.task_steps ENABLE ROW LEVEL SECURITY;
+CREATE POLICY task_steps_isolation ON orchestration.task_steps
+  USING (organization_id = current_setting('app.current_organization_id', true)::uuid);

@@ -72,7 +72,7 @@ export default function ServicesPage() {
     <>
       <section className={styles.hero} aria-labelledby="services-hero-heading">
         <div className="container">
-          <div className={styles.heroBadge}>Services</div>
+          <p className={styles.heroEyebrow}>Our Services</p>
           <h1 id="services-hero-heading" className={styles.heroHeading}>
             End-to-End Performance Creative
           </h1>

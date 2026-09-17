@@ -8,10 +8,10 @@ import styles from "./Navigation.module.css";
 
 const NAV_LINKS = [
   { href: "/services", label: "Services" },
-  { href: "/how-it-works", label: "How It Works" },
   { href: "/portfolio", label: "Portfolio" },
   { href: "/pricing", label: "Pricing" },
   { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
 ] as const;
 
 export default function Navigation() {
@@ -26,7 +26,14 @@ export default function Navigation() {
       <nav className={styles.nav} aria-label="Main navigation">
         <div className={styles.inner}>
           <Link href="/" className={styles.logo} onClick={closeMenu} aria-label="DREXONYX home">
-            <Image src="/brand/drexonyx-horizontal-lockup.png" alt="DREXONYX" width={3198} height={540} className={styles.logoImg} priority />
+            <Image
+              src="/brand/drexonyx-dx-badge.png"
+              alt=""
+              width={1149}
+              height={540}
+              className={styles.logoImg}
+              priority
+            />
           </Link>
 
           {/* Desktop links */}
@@ -44,9 +51,14 @@ export default function Navigation() {
             ))}
           </ul>
 
-          <Link href="/start-project" className={styles.cta}>
-            Start Project
-          </Link>
+          <div className={styles.navActions}>
+            <Link href="/portal/login" className={styles.portalLink}>
+              Client Portal
+            </Link>
+            <Link href="/start-project" className={styles.cta}>
+              Start Project
+            </Link>
+          </div>
 
           {/* Mobile menu button */}
           <button
@@ -82,6 +94,16 @@ export default function Navigation() {
                 </Link>
               </li>
             ))}
+            <li className={styles.drawerPortalItem}>
+              <Link
+                href="/portal/login"
+                className={styles.drawerPortalLink}
+                onClick={closeMenu}
+                tabIndex={menuOpen ? 0 : -1}
+              >
+                Client Portal
+              </Link>
+            </li>
             <li>
               <Link
                 href="/start-project"

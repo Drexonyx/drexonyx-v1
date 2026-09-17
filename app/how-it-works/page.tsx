@@ -46,9 +46,9 @@ export default function HowItWorksPage() {
     <>
       <section className={styles.hero} aria-labelledby="hiw-hero-heading">
         <div className="container">
-          <div className={styles.heroBadge}>Process</div>
+          <p className={styles.heroEyebrow}>How It Works</p>
           <h1 id="hiw-hero-heading" className={styles.heroHeading}>
-            How DREXONYX Works
+            From Brief to Delivery
           </h1>
           <p className={styles.heroSub}>
             A structured, transparent production process — from brief to deliverable — designed

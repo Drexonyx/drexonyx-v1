@@ -1,0 +1,5 @@
+-- Phase 3: Production Agent and QC Agent intent types (DR 0113, DR 0114)
+-- Extend agent_tasks intent_type CHECK constraint to include new coordinator types.
+ALTER TABLE "orchestration"."agent_tasks" DROP CONSTRAINT "agent_tasks_intent_type_check";
+--> statement-breakpoint
+ALTER TABLE "orchestration"."agent_tasks" ADD CONSTRAINT "agent_tasks_intent_type_check" CHECK ("orchestration"."agent_tasks"."intent_type" IN ('ROUTE_APPROVAL','INSPECT_ASSET_METADATA','OPTIMIZE_BRIEF_PROMPTS','COORDINATE_BATCH_OPERATION','COORDINATE_PRODUCTION_RUN','COORDINATE_QC_REVIEW'));

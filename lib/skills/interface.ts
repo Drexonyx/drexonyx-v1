@@ -1,7 +1,7 @@
 // DR 0072 §2.2: Skill interface, SkillContext, SkillResult.
 // DR 0074 §2.1: version follows semver; all V1 skills start at 1.0.0.
 
-export type SkillFamily = 'BRIEF' | 'SCRIPT' | 'HOOK' | 'STRATEGY' | 'QC' | 'UTILITY';
+export type SkillFamily = 'BRIEF' | 'SCRIPT' | 'HOOK' | 'STRATEGY' | 'QC' | 'UTILITY' | 'COMMUNICATION';
 
 export type SkillId =
   | 'brief.analyze'
@@ -18,6 +18,9 @@ export type SkillId =
   | 'qc.script.review'
   | 'qc.brand.alignment'
   | 'qc.asset.metadata'
+  | 'qc.creative.quality'
+  | 'qc.facebook_policy.check'
+  | 'communication.whatsapp.classify'
   | 'utility.prompt.optimize'
   | 'utility.output.format'
   | 'utility.batch.coordinate';

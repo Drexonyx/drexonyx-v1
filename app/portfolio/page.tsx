@@ -24,7 +24,7 @@ export default function PortfolioPage() {
             </h1>
             <p className={styles.heroSub}>
               UGC advertising creative built for conversion — across video, static, and strategy.
-              Work samples are added as client-approved pieces clear for public display.
+              Work samples are internal production samples added as they are completed.
             </p>
             <div className={styles.heroCta}>
               <Link href="/start-project" className={styles.ctaPrimary}>

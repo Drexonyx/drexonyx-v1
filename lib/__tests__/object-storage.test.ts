@@ -9,7 +9,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 const { mockSend, MockS3Client, mockGetSignedUrl } = vi.hoisted(() => {
   const mockSend = vi.fn();
   // Must be a regular function (not arrow) so it can be called as a constructor with `new`.
-  // eslint-disable-next-line prefer-arrow-callback
   const MockS3Client = vi.fn(function () { return { send: mockSend }; });
   const mockGetSignedUrl = vi.fn();
   return { mockSend, MockS3Client, mockGetSignedUrl };

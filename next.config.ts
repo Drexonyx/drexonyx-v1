@@ -12,6 +12,12 @@ const nextConfig: NextConfig = {
         destination: "https://www.drexonyx.com/:path*",
         permanent: true,
       },
+      // /work was an alternate entry point for the portfolio; redirect permanently.
+      {
+        source: "/work",
+        destination: "/portfolio",
+        permanent: true,
+      },
     ];
   },
 };
