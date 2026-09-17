@@ -69,6 +69,12 @@ const PLAN_TEMPLATES: Record<TaskIntent['intent_type'], readonly Omit<PlanStep, 
     { step_type: 'HUMAN_GATE', skill_id: undefined },
     { step_type: 'NOTIFICATION', skill_id: undefined },
   ],
+  // DR 0122: DREXONYX Website Agent — read-only content inspection → human review gate → notification
+  AUDIT_WEBSITE_CONTENT: [
+    { step_type: 'VERIFY', skill_id: undefined },
+    { step_type: 'HUMAN_GATE', skill_id: undefined },
+    { step_type: 'NOTIFICATION', skill_id: undefined },
+  ],
 };
 
 export type PlanResult =

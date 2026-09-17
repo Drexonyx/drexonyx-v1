@@ -18,5 +18,7 @@ export { delegateLeadHunter } from './lead-hunter-specialist';
 export type { LeadHunterDelegationParams, LeadHunterDelegationResult } from './lead-hunter-specialist';
 export { delegateWebsiteProduction } from './website-production-specialist';
 export type { WebsiteProductionDelegationParams, WebsiteProductionDelegationResult } from './website-production-specialist';
+export { delegateSiteAudit } from './site-audit-specialist';
+export type { SiteAuditDelegationParams, SiteAuditDelegationResult } from './site-audit-specialist';
 export { SPECIALIST_AGENT_REGISTRY } from './registry';
 export type { SpecialistAgentEntry } from './registry';

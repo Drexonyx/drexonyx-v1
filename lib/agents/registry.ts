@@ -11,6 +11,7 @@ import { delegateAnalytics, type AnalyticsDelegationParams, type AnalyticsDelega
 import { delegateCommunication, type CommunicationDelegationParams, type CommunicationDelegationResult } from './communication-specialist';
 import { delegateLeadHunter, type LeadHunterDelegationParams, type LeadHunterDelegationResult } from './lead-hunter-specialist';
 import { delegateWebsiteProduction, type WebsiteProductionDelegationParams, type WebsiteProductionDelegationResult } from './website-production-specialist';
+import { delegateSiteAudit, type SiteAuditDelegationParams, type SiteAuditDelegationResult } from './site-audit-specialist';
 
 // Each entry carries a typed delegate function. Callers must cast to the specific
 // agent's signature after looking up by ID — the registry stores the canonical handle.
@@ -97,6 +98,14 @@ export const SPECIALIST_AGENT_REGISTRY: ReadonlyMap<string, SpecialistAgentEntry
     {
       id: 'website-production',
       delegate: delegateWebsiteProduction as (params: WebsiteProductionDelegationParams) => Promise<WebsiteProductionDelegationResult>,
+    },
+  ],
+  // DR 0122: DREXONYX Website Agent — B2 resolved (registry entry approved)
+  [
+    'site-audit',
+    {
+      id: 'site-audit',
+      delegate: delegateSiteAudit as (params: SiteAuditDelegationParams) => Promise<SiteAuditDelegationResult>,
     },
   ],
 ]);
