@@ -53,6 +53,11 @@ const PLAN_TEMPLATES: Record<TaskIntent['intent_type'], readonly Omit<PlanStep, 
   COORDINATE_INTERNAL_NOTIFICATION: [
     { step_type: 'NOTIFICATION', skill_id: undefined },
   ],
+  // DR 0120: Lead Hunter Agent — read-only lead pipeline query → notification if actionable
+  HUNT_LEADS: [
+    { step_type: 'VERIFY', skill_id: undefined },
+    { step_type: 'NOTIFICATION', skill_id: undefined },
+  ],
 };
 
 export type PlanResult =

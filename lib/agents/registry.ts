@@ -9,6 +9,7 @@ import { delegateFinanceMonitoring, type FinanceMonitoringDelegationParams, type
 import { delegateReporting, type ReportingDelegationParams, type ReportingDelegationResult } from './reporting-specialist';
 import { delegateAnalytics, type AnalyticsDelegationParams, type AnalyticsDelegationResult } from './analytics-specialist';
 import { delegateCommunication, type CommunicationDelegationParams, type CommunicationDelegationResult } from './communication-specialist';
+import { delegateLeadHunter, type LeadHunterDelegationParams, type LeadHunterDelegationResult } from './lead-hunter-specialist';
 
 // Each entry carries a typed delegate function. Callers must cast to the specific
 // agent's signature after looking up by ID — the registry stores the canonical handle.
@@ -79,6 +80,14 @@ export const SPECIALIST_AGENT_REGISTRY: ReadonlyMap<string, SpecialistAgentEntry
     {
       id: 'communication',
       delegate: delegateCommunication as (params: CommunicationDelegationParams) => Promise<CommunicationDelegationResult>,
+    },
+  ],
+  // DR 0120: Lead Hunter Agent — B2 resolved (registry entry approved)
+  [
+    'lead-hunter',
+    {
+      id: 'lead-hunter',
+      delegate: delegateLeadHunter as (params: LeadHunterDelegationParams) => Promise<LeadHunterDelegationResult>,
     },
   ],
 ]);
