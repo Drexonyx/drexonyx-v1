@@ -2,6 +2,7 @@
 // Add entries only with explicit Owner approval + new/amended decision record.
 
 import { delegateQcMetadata, type QcMetadataDelegationParams, type QcMetadataDelegationResult } from './qc-metadata-specialist';
+import { delegatePromptOptimize, type PromptOptimizeDelegationParams, type PromptOptimizeDelegationResult } from './prompt-optimize-specialist';
 
 // Each entry carries a typed delegate function. Callers must cast to the specific
 // agent's signature after looking up by ID — the registry stores the canonical handle.
@@ -17,6 +18,13 @@ export const SPECIALIST_AGENT_REGISTRY: ReadonlyMap<string, SpecialistAgentEntry
     {
       id: 'qc-metadata',
       delegate: delegateQcMetadata as (params: QcMetadataDelegationParams) => Promise<QcMetadataDelegationResult>,
+    },
+  ],
+  [
+    'prompt-optimize',
+    {
+      id: 'prompt-optimize',
+      delegate: delegatePromptOptimize as (params: PromptOptimizeDelegationParams) => Promise<PromptOptimizeDelegationResult>,
     },
   ],
 ]);
