@@ -21,9 +21,8 @@ import {
   auditTaskFailed,
   auditBoundaryViolation,
 } from './audit';
+import { isRetryable } from './retry';
 import type { TaskPlan, PlanStep, InitiatorRole, ApproverRole, StepType } from './types';
-
-const MAX_RETRIES = 2;
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -357,7 +356,7 @@ async function processSkill(
   if (!result.ok) {
     const retryCount = step.retry_count;
 
-    if (result.isTransient && retryCount < MAX_RETRIES) {
+    if (isRetryable(result.isTransient, retryCount)) {
       const newRetryCount = retryCount + 1;
       await auditStepFailed({
         organizationId,
