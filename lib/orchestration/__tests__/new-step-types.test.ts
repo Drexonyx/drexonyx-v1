@@ -153,7 +153,7 @@ describe('Phase 2 step types — STATUS_TRANSITION', () => {
 describe('Phase 2 step types — QC_GATE', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('creates a gate with QC required role', async () => {
+  it('creates a gate with QC required role (no assetId — no readiness check)', async () => {
     mockCreateGate.mockResolvedValueOnce({ ok: true, gateId: 'gate-1' });
     let call = 0;
     mockSelect.mockImplementation(() => {
@@ -170,6 +170,61 @@ describe('Phase 2 step types — QC_GATE', () => {
     expect(mockCreateGate).toHaveBeenCalledWith(
       expect.objectContaining({ requiredRole: 'QC', gateType: 'QC_GATE' }),
     );
+  });
+
+  // DR 0123 §2.3: asset readiness enforcement
+  it('creates gate when assetId is present and asset is READY_FOR_QC', async () => {
+    mockCreateGate.mockResolvedValueOnce({ ok: true, gateId: 'gate-1' });
+    let call = 0;
+    mockSelect.mockImplementation(() => {
+      if (call === 0) { call++; return sel([{ ...BASE_TASK, plan: { steps: [{ step_index: 0, step_type: 'QC_GATE' }], generated_at: '' } }]); }
+      if (call === 1) { call++; return sel([makeStep('QC_GATE', { input: { assetId: 'asset-1' } })]); }
+      // call 2: assets query
+      call++;
+      return sel([{ status: 'READY_FOR_QC' }]);
+    });
+    mockUpdate.mockReturnValue(upd());
+
+    const result = await advanceTask({ taskId: 'task-1', organizationId: 'org-1' });
+    expect(result).toEqual({ ok: true, outcome: 'AWAITING_GATE' });
+    expect(mockCreateGate).toHaveBeenCalledOnce();
+  });
+
+  it('fails when assetId is present but asset not found', async () => {
+    let call = 0;
+    mockSelect.mockImplementation(() => {
+      if (call === 0) { call++; return sel([{ ...BASE_TASK, plan: { steps: [{ step_index: 0, step_type: 'QC_GATE' }], generated_at: '' } }]); }
+      if (call === 1) { call++; return sel([makeStep('QC_GATE', { input: { assetId: 'asset-missing' } })]); }
+      // call 2: assets query returns nothing
+      call++;
+      return sel([]);
+    });
+    mockUpdate.mockReturnValue(upd());
+
+    const result = await advanceTask({ taskId: 'task-1', organizationId: 'org-1' });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.reason).toMatch(/asset-missing/);
+    expect(mockCreateGate).not.toHaveBeenCalled();
+  });
+
+  it('fails when asset is not in READY_FOR_QC status', async () => {
+    let call = 0;
+    mockSelect.mockImplementation(() => {
+      if (call === 0) { call++; return sel([{ ...BASE_TASK, plan: { steps: [{ step_index: 0, step_type: 'QC_GATE' }], generated_at: '' } }]); }
+      if (call === 1) { call++; return sel([makeStep('QC_GATE', { input: { assetId: 'asset-1' } })]); }
+      // call 2: assets query — asset is still PROCESSING
+      call++;
+      return sel([{ status: 'PROCESSING' }]);
+    });
+    mockUpdate.mockReturnValue(upd());
+
+    const result = await advanceTask({ taskId: 'task-1', organizationId: 'org-1' });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.reason).toMatch(/PROCESSING/);
+      expect(result.reason).toMatch(/READY_FOR_QC/);
+    }
+    expect(mockCreateGate).not.toHaveBeenCalled();
   });
 });
 

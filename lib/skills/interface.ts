@@ -18,6 +18,7 @@ export type SkillId =
   | 'qc.script.review'
   | 'qc.brand.alignment'
   | 'qc.asset.metadata'
+  | 'qc.creative.quality'
   | 'utility.prompt.optimize'
   | 'utility.output.format'
   | 'utility.batch.coordinate';

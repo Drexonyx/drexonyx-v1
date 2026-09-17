@@ -9,7 +9,7 @@
 import { db } from '@/db/index';
 import { agentTasks, taskSteps } from '@/db/schema/orchestration';
 import { eq, and, asc, isNull, desc } from 'drizzle-orm';
-import { productionJobs } from '@/db/schema/production';
+import { productionJobs, assets } from '@/db/schema/production';
 import { uuidv7 } from 'uuidv7';
 import { executeSkillStep } from './executor';
 import { createGate } from './gates';
@@ -435,6 +435,33 @@ async function processQcGate(
   organizationId: string,
   now: Date,
 ): Promise<RunnerResult> {
+  // DR 0123 §2.3: when an assetId is provided, verify the asset is READY_FOR_QC
+  const input = (step.input ?? {}) as Record<string, unknown>;
+  const assetId = input.assetId as string | undefined;
+
+  if (assetId) {
+    const assetRows = await db
+      .select({ status: assets.status })
+      .from(assets)
+      .where(and(eq(assets.id, assetId), eq(assets.organization_id, organizationId)))
+      .limit(1);
+
+    const asset = assetRows[0] ?? null;
+    if (!asset) {
+      const reason = `Asset ${assetId} not found`;
+      await markStepFailed(step.id, organizationId, reason);
+      await markTaskFailed(taskId, organizationId, step.step_index, reason);
+      return { ok: false, outcome: 'TASK_FAILED', reason };
+    }
+
+    if (asset.status !== 'READY_FOR_QC') {
+      const reason = `Asset ${assetId} is not ready for QC (current status: ${asset.status}); transition asset to READY_FOR_QC before initiating QC gate`;
+      await markStepFailed(step.id, organizationId, reason);
+      await markTaskFailed(taskId, organizationId, step.step_index, reason);
+      return { ok: false, outcome: 'TASK_FAILED', reason };
+    }
+  }
+
   const result = await createGate({
     taskId,
     organizationId,

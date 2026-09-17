@@ -203,6 +203,12 @@ describe('resolveGate — happy paths', () => {
     );
   });
 
+  it('REJECTED on non-QC gate without decisionReason succeeds', async () => {
+    // ADMIN_OPERATIONS gate can be rejected without reason (backward compat)
+    const result = await resolveGate({ ...baseResolve, decision: 'REJECTED' });
+    expect(result).toEqual({ ok: true, decision: 'REJECTED' });
+  });
+
   it('OWNER can resolve an ADMIN_OPERATIONS-required gate', async () => {
     const result = await resolveGate({ ...baseResolve, resolverRole: 'OWNER' });
     expect(result).toEqual({ ok: true, decision: 'APPROVED' });
@@ -217,5 +223,82 @@ describe('resolveGate — happy paths', () => {
     });
     const result = await resolveGate({ ...baseResolve, resolverRole: 'OWNER' });
     expect(result).toEqual({ ok: true, decision: 'APPROVED' });
+  });
+});
+
+// ── DR 0123 §2.4: QC gate rejection requires decisionReason ──────────────────
+
+describe('resolveGate — QC gate decisionReason enforcement (DR 0123)', () => {
+  const qcGate = { ...pendingGate, approver_role: 'QC' };
+
+  function setupQcGate() {
+    let call = 0;
+    mockSelect.mockImplementation(() => {
+      const rows = call === 0 ? [qcGate] : [taskRow];
+      call++;
+      return makeSelectChain(rows);
+    });
+    mockUpdate.mockReturnValue(makeUpdateChain());
+  }
+
+  beforeEach(() => { vi.clearAllMocks(); setupQcGate(); });
+
+  it('rejects QC gate rejection when decisionReason is absent', async () => {
+    const result = await resolveGate({
+      ...baseResolve,
+      resolverRole: 'QC',
+      decision: 'REJECTED',
+      // no decisionReason
+    });
+    expect(result).toEqual({
+      ok: false,
+      reason: 'QC gate rejections require a decisionReason documenting the findings',
+    });
+  });
+
+  it('rejects QC gate rejection when decisionReason is empty string', async () => {
+    const result = await resolveGate({
+      ...baseResolve,
+      resolverRole: 'QC',
+      decision: 'REJECTED',
+      decisionReason: '   ',
+    });
+    expect(result).toEqual({
+      ok: false,
+      reason: 'QC gate rejections require a decisionReason documenting the findings',
+    });
+  });
+
+  it('accepts QC gate rejection when decisionReason is provided', async () => {
+    const result = await resolveGate({
+      ...baseResolve,
+      resolverRole: 'QC',
+      decision: 'REJECTED',
+      decisionReason: 'Product shot does not match brief — wrong color variant shown',
+    });
+    expect(result).toEqual({ ok: true, decision: 'REJECTED' });
+  });
+
+  it('accepts QC gate approval without decisionReason', async () => {
+    const result = await resolveGate({
+      ...baseResolve,
+      resolverRole: 'QC',
+      decision: 'APPROVED',
+      // no decisionReason required for approval
+    });
+    expect(result).toEqual({ ok: true, decision: 'APPROVED' });
+  });
+
+  it('OWNER resolving QC gate rejection also requires decisionReason', async () => {
+    const result = await resolveGate({
+      ...baseResolve,
+      resolverRole: 'OWNER',
+      decision: 'REJECTED',
+      // no decisionReason
+    });
+    expect(result).toEqual({
+      ok: false,
+      reason: 'QC gate rejections require a decisionReason documenting the findings',
+    });
   });
 });

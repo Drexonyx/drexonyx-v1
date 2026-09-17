@@ -17,6 +17,7 @@ const ALL_SKILL_IDS: SkillId[] = [
   'qc.script.review',
   'qc.brand.alignment',
   'qc.asset.metadata',
+  'qc.creative.quality',
   'utility.prompt.optimize',
   'utility.output.format',
   'utility.batch.coordinate',
@@ -24,12 +25,14 @@ const ALL_SKILL_IDS: SkillId[] = [
 
 describe('AGENT_ALLOWLIST', () => {
   // DR 0115: expanded from 2 to 4 — qc.script.review and qc.brand.alignment added.
-  it('contains exactly the four DR 0075 + DR 0115 approved skills', () => {
-    expect(AGENT_ALLOWLIST.size).toBe(4);
+  // DR 0123: expanded from 4 to 5 — qc.creative.quality added (brief fidelity check).
+  it('contains exactly the five DR 0075 + DR 0115 + DR 0123 approved skills', () => {
+    expect(AGENT_ALLOWLIST.size).toBe(5);
     expect(AGENT_ALLOWLIST.has('utility.prompt.optimize')).toBe(true);
     expect(AGENT_ALLOWLIST.has('qc.asset.metadata')).toBe(true);
     expect(AGENT_ALLOWLIST.has('qc.script.review')).toBe(true);
     expect(AGENT_ALLOWLIST.has('qc.brand.alignment')).toBe(true);
+    expect(AGENT_ALLOWLIST.has('qc.creative.quality')).toBe(true);
   });
 });
 
@@ -51,12 +54,17 @@ describe('isAgentAuthorized', () => {
     expect(isAgentAuthorized('qc.brand.alignment')).toBe(true);
   });
 
+  it('returns true for qc.creative.quality (DR 0123)', () => {
+    expect(isAgentAuthorized('qc.creative.quality')).toBe(true);
+  });
+
   it('returns false for all non-allowlisted skills', () => {
     const allowlisted = new Set([
       'utility.prompt.optimize',
       'qc.asset.metadata',
       'qc.script.review',
       'qc.brand.alignment',
+      'qc.creative.quality',
     ]);
     const others = ALL_SKILL_IDS.filter((id) => !allowlisted.has(id));
     for (const skillId of others) {
@@ -130,6 +138,7 @@ describe('isHumanAuthorized — CREATIVE_PRODUCTION access', () => {
     expect(isHumanAuthorized('qc.script.review', 'CREATIVE_PRODUCTION')).toBe(false);
     expect(isHumanAuthorized('qc.brand.alignment', 'CREATIVE_PRODUCTION')).toBe(false);
     expect(isHumanAuthorized('qc.asset.metadata', 'CREATIVE_PRODUCTION')).toBe(false);
+    expect(isHumanAuthorized('qc.creative.quality', 'CREATIVE_PRODUCTION')).toBe(false);
   });
 });
 
@@ -138,6 +147,7 @@ describe('isHumanAuthorized — QC access', () => {
     'qc.script.review',
     'qc.brand.alignment',
     'qc.asset.metadata',
+    'qc.creative.quality',
   ];
 
   it.each(qcSkills)('QC can invoke: %s', (skillId) => {

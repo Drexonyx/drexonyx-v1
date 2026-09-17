@@ -150,6 +150,13 @@ export async function resolveGate(params: {
     return { ok: false, reason: 'Resolver does not have the required approver role' };
   }
 
+  // DR 0123 §2.4: QC gate rejections require documented findings
+  if (gate.approver_role === 'QC' && params.decision === 'REJECTED') {
+    if (!params.decisionReason || !params.decisionReason.trim()) {
+      return { ok: false, reason: 'QC gate rejections require a decisionReason documenting the findings' };
+    }
+  }
+
   const now = new Date();
   const newApprovalStatus = params.decision === 'APPROVED' ? 'APPROVED' : 'REJECTED';
   const newStepStatus = params.decision === 'APPROVED' ? 'GATE_APPROVED' : 'GATE_REJECTED';

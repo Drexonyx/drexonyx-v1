@@ -18,6 +18,8 @@ const BASE_PARAMS = {
   assetId: 'asset-uuid-1',
   assetName: 'hero-banner.mp4',
   assetType: 'VIDEO',
+  briefId: 'brief-uuid-1',
+  briefText: 'Create a 30-second product video ad highlighting the key features.',
 };
 
 describe('delegateQcReview', () => {
@@ -65,21 +67,22 @@ describe('delegateQcReview', () => {
     );
   });
 
-  it('builds a five-step plan: 3 SKILL → QC_GATE → NOTIFICATION', async () => {
+  it('builds a six-step plan: 4 SKILL → QC_GATE → NOTIFICATION (DR 0123)', async () => {
     mockDelegateSubTask.mockResolvedValue({ ok: true, subTaskId: 'sub-uuid' });
 
     await delegateQcReview(BASE_PARAMS);
 
     const call = mockDelegateSubTask.mock.calls[0][0];
-    expect(call.plan.steps).toHaveLength(5);
+    expect(call.plan.steps).toHaveLength(6);
     expect(call.plan.steps[0].step_type).toBe('SKILL');
     expect(call.plan.steps[1].step_type).toBe('SKILL');
     expect(call.plan.steps[2].step_type).toBe('SKILL');
-    expect(call.plan.steps[3].step_type).toBe('QC_GATE');
-    expect(call.plan.steps[4].step_type).toBe('NOTIFICATION');
+    expect(call.plan.steps[3].step_type).toBe('SKILL');
+    expect(call.plan.steps[4].step_type).toBe('QC_GATE');
+    expect(call.plan.steps[5].step_type).toBe('NOTIFICATION');
   });
 
-  it('runs all three QC skills: qc.asset.metadata, qc.script.review, qc.brand.alignment', async () => {
+  it('runs four QC skills including qc.creative.quality (DR 0123)', async () => {
     mockDelegateSubTask.mockResolvedValue({ ok: true, subTaskId: 'sub-uuid' });
 
     await delegateQcReview(BASE_PARAMS);
@@ -88,23 +91,39 @@ describe('delegateQcReview', () => {
     expect(call.plan.steps[0].skill_id).toBe('qc.asset.metadata');
     expect(call.plan.steps[1].skill_id).toBe('qc.script.review');
     expect(call.plan.steps[2].skill_id).toBe('qc.brand.alignment');
+    expect(call.plan.steps[3].skill_id).toBe('qc.creative.quality');
   });
 
-  it('QC_GATE step carries assetId and required roles (DR 0090 §2.2)', async () => {
+  it('qc.creative.quality step carries briefText and assetId in input (DR 0123)', async () => {
     mockDelegateSubTask.mockResolvedValue({ ok: true, subTaskId: 'sub-uuid' });
 
     await delegateQcReview(BASE_PARAMS);
 
     const call = mockDelegateSubTask.mock.calls[0][0];
-    const gate = call.plan.steps[3];
+    expect(call.plan.steps[3].input).toMatchObject({
+      assetId: 'asset-uuid-1',
+      assetName: 'hero-banner.mp4',
+      assetType: 'VIDEO',
+      briefText: BASE_PARAMS.briefText,
+    });
+  });
+
+  it('QC_GATE step carries assetId, briefId, and required roles (DR 0090, DR 0123)', async () => {
+    mockDelegateSubTask.mockResolvedValue({ ok: true, subTaskId: 'sub-uuid' });
+
+    await delegateQcReview(BASE_PARAMS);
+
+    const call = mockDelegateSubTask.mock.calls[0][0];
+    const gate = call.plan.steps[4];
     expect(gate.step_type).toBe('QC_GATE');
     expect(gate.input).toMatchObject({
       assetId: 'asset-uuid-1',
+      briefId: 'brief-uuid-1',
       requiredRoles: expect.arrayContaining(['OWNER', 'ADMIN_OPERATIONS', 'QC']),
     });
   });
 
-  it('skill steps carry assetId, assetName, assetType in input', async () => {
+  it('skill steps 0-2 carry assetId, assetName, assetType in input', async () => {
     mockDelegateSubTask.mockResolvedValue({ ok: true, subTaskId: 'sub-uuid' });
 
     await delegateQcReview(BASE_PARAMS);
@@ -117,6 +136,20 @@ describe('delegateQcReview', () => {
         assetType: 'VIDEO',
       });
     }
+  });
+
+  it('rejects empty briefId (DR 0123)', async () => {
+    const result = await delegateQcReview({ ...BASE_PARAMS, briefId: '' });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toMatch(/briefId/);
+    expect(mockDelegateSubTask).not.toHaveBeenCalled();
+  });
+
+  it('rejects empty briefText (DR 0123)', async () => {
+    const result = await delegateQcReview({ ...BASE_PARAMS, briefText: '' });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toMatch(/briefText/);
+    expect(mockDelegateSubTask).not.toHaveBeenCalled();
   });
 
   it('inherits organizationId and initiator context', async () => {
@@ -163,7 +196,7 @@ describe('delegateQcReview', () => {
     if (!result.ok) expect(result.error).toBe('DB error');
   });
 
-  it('step indices are sequential 0–4', async () => {
+  it('step indices are sequential 0–5', async () => {
     mockDelegateSubTask.mockResolvedValue({ ok: true, subTaskId: 'sub-uuid' });
 
     await delegateQcReview(BASE_PARAMS);
