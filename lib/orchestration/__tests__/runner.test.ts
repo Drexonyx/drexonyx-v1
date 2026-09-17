@@ -275,8 +275,56 @@ describe('advanceTask — HUMAN_GATE step', () => {
 
   beforeEach(() => vi.clearAllMocks());
 
-  it('creates gate and returns AWAITING_GATE', async () => {
+  it('creates gate and returns AWAITING_GATE (legacy required_role key)', async () => {
     setupSelectSequence([gateStep]);
+    mockUpdate.mockReturnValue(makeUpdateChain());
+    mockCreateGate.mockResolvedValue({ ok: true, gateId: 'gate-1' });
+
+    const result = await advanceTask(params);
+    expect(result).toMatchObject({ ok: true, outcome: 'AWAITING_GATE' });
+    expect(mockCreateGate).toHaveBeenCalledWith(
+      expect.objectContaining({ requiredRole: 'ADMIN_OPERATIONS' }),
+    );
+  });
+
+  it('creates gate with ADMIN_OPERATIONS from requiredRoles array', async () => {
+    setupSelectSequence([{ ...gateStep, input: { requiredRoles: ['ADMIN_OPERATIONS'] } }]);
+    mockUpdate.mockReturnValue(makeUpdateChain());
+    mockCreateGate.mockResolvedValue({ ok: true, gateId: 'gate-1' });
+
+    const result = await advanceTask(params);
+    expect(result).toMatchObject({ ok: true, outcome: 'AWAITING_GATE' });
+    expect(mockCreateGate).toHaveBeenCalledWith(
+      expect.objectContaining({ requiredRole: 'ADMIN_OPERATIONS' }),
+    );
+  });
+
+  it('creates gate with QC from requiredRoles array', async () => {
+    setupSelectSequence([{ ...gateStep, input: { requiredRoles: ['QC'] } }]);
+    mockUpdate.mockReturnValue(makeUpdateChain());
+    mockCreateGate.mockResolvedValue({ ok: true, gateId: 'gate-1' });
+
+    const result = await advanceTask(params);
+    expect(result).toMatchObject({ ok: true, outcome: 'AWAITING_GATE' });
+    expect(mockCreateGate).toHaveBeenCalledWith(
+      expect.objectContaining({ requiredRole: 'QC' }),
+    );
+  });
+
+  it('creates gate with OWNER from requiredRoles array containing only OWNER', async () => {
+    setupSelectSequence([{ ...gateStep, input: { requiredRoles: ['OWNER'] } }]);
+    mockUpdate.mockReturnValue(makeUpdateChain());
+    mockCreateGate.mockResolvedValue({ ok: true, gateId: 'gate-1' });
+
+    const result = await advanceTask(params);
+    expect(result).toMatchObject({ ok: true, outcome: 'AWAITING_GATE' });
+    expect(mockCreateGate).toHaveBeenCalledWith(
+      expect.objectContaining({ requiredRole: 'OWNER' }),
+    );
+  });
+
+  it('defaults to ADMIN_OPERATIONS when no role input is supplied', async () => {
+    setupSelectSequence([{ ...gateStep, input: {} }]);
     mockUpdate.mockReturnValue(makeUpdateChain());
     mockCreateGate.mockResolvedValue({ ok: true, gateId: 'gate-1' });
 
@@ -302,6 +350,86 @@ describe('advanceTask — HUMAN_GATE step', () => {
 
     const result = await advanceTask(params);
     expect(result).toMatchObject({ ok: false, outcome: 'TASK_FAILED' });
+  });
+});
+
+// ── PRODUCTION_JOB step ───────────────────────────────────────────────────────
+
+describe('advanceTask — PRODUCTION_JOB step', () => {
+  const productionJobStep = {
+    ...pendingSkillStep,
+    step_type: 'PRODUCTION_JOB',
+    skill_id: null,
+    input: { orderId: 'order-1' },
+  };
+
+  function setupSelectSequence(stepsRows: unknown[], productionJobRows: unknown[]) {
+    let call = 0;
+    mockSelect.mockImplementation(() => {
+      call++;
+      if (call === 1) return makeSelectChain([taskExecuting]);
+      if (call === 2) return makeSelectChain(stepsRows);
+      return makeSelectChain(productionJobRows);
+    });
+  }
+
+  beforeEach(() => vi.clearAllMocks());
+
+  it('STEP_SUCCEEDED when production job found by orderId', async () => {
+    setupSelectSequence([productionJobStep], [{ id: 'prod-job-1' }]);
+    mockUpdate.mockReturnValue(makeUpdateChain());
+
+    const result = await advanceTask(params);
+    expect(result).toMatchObject({ ok: true, outcome: 'STEP_SUCCEEDED' });
+    expect(mockAuditStepSucceeded).toHaveBeenCalledOnce();
+  });
+
+  it('links production_job_id when found by orderId', async () => {
+    setupSelectSequence([productionJobStep], [{ id: 'prod-job-1' }]);
+    const updateChain = makeUpdateChain();
+    mockUpdate.mockReturnValue(updateChain);
+
+    await advanceTask(params);
+    expect(updateChain.set).toHaveBeenCalledWith(
+      expect.objectContaining({ production_job_id: 'prod-job-1', status: 'SUCCEEDED' }),
+    );
+  });
+
+  it('TASK_FAILED when no active production job found for orderId', async () => {
+    setupSelectSequence([productionJobStep], []); // empty — no matching job
+    mockUpdate.mockReturnValue(makeUpdateChain());
+
+    const result = await advanceTask(params);
+    expect(result).toMatchObject({ ok: false, outcome: 'TASK_FAILED' });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.reason).toMatch(/No active production job found for order order-1/);
+    }
+  });
+
+  it('TASK_FAILED when orderId is absent and production_job_id not provided', async () => {
+    const noInputStep = { ...productionJobStep, input: {} };
+    setupSelectSequence([noInputStep], []);
+    mockUpdate.mockReturnValue(makeUpdateChain());
+
+    const result = await advanceTask(params);
+    expect(result).toMatchObject({ ok: false, outcome: 'TASK_FAILED' });
+  });
+
+  it('STEP_SUCCEEDED when explicit production_job_id provided (backward compat)', async () => {
+    const explicitStep = { ...productionJobStep, input: { production_job_id: 'explicit-job-id' } };
+    let call = 0;
+    mockSelect.mockImplementation(() => {
+      call++;
+      if (call === 1) return makeSelectChain([taskExecuting]);
+      return makeSelectChain([explicitStep]); // only 2 selects — no productionJobs lookup
+    });
+    mockUpdate.mockReturnValue(makeUpdateChain());
+
+    const result = await advanceTask(params);
+    expect(result).toMatchObject({ ok: true, outcome: 'STEP_SUCCEEDED' });
+    // Confirms no third select call (productionJobs lookup skipped)
+    expect(mockSelect).toHaveBeenCalledTimes(2);
   });
 });
 

@@ -8,7 +8,8 @@
 
 import { db } from '@/db/index';
 import { agentTasks, taskSteps } from '@/db/schema/orchestration';
-import { eq, and, asc } from 'drizzle-orm';
+import { eq, and, asc, isNull, desc } from 'drizzle-orm';
+import { productionJobs } from '@/db/schema/production';
 import { uuidv7 } from 'uuidv7';
 import { executeSkillStep } from './executor';
 import { createGate } from './gates';
@@ -234,6 +235,19 @@ async function processStep(
   }
 }
 
+// ── resolveGateRole ───────────────────────────────────────────────────────────
+// Maps an array of role strings to a single ApproverRole for createGate.
+// OWNER always satisfies any gate (per hasRequiredApproverRole semantics), so
+// 'ADMIN_OPERATIONS' is returned when it is in the list (OWNER + ADMIN pass).
+// Priority: ADMIN_OPERATIONS > QC > OWNER.
+
+function resolveGateRole(roles: string[]): ApproverRole {
+  if (roles.includes('ADMIN_OPERATIONS')) return 'ADMIN_OPERATIONS';
+  if (roles.includes('QC')) return 'QC';
+  if (roles.includes('OWNER')) return 'OWNER';
+  return 'ADMIN_OPERATIONS';
+}
+
 // ── processHumanGate ──────────────────────────────────────────────────────────
 
 async function processHumanGate(
@@ -243,7 +257,16 @@ async function processHumanGate(
   now: Date,
 ): Promise<RunnerResult> {
   const input = (step.input ?? {}) as Record<string, unknown>;
-  const requiredRole: ApproverRole = (input.required_role as ApproverRole) ?? 'ADMIN_OPERATIONS';
+
+  let requiredRole: ApproverRole;
+  if (Array.isArray(input.requiredRoles) && (input.requiredRoles as unknown[]).length > 0) {
+    requiredRole = resolveGateRole(input.requiredRoles as string[]);
+  } else if (typeof input.required_role === 'string' && input.required_role) {
+    // Backward-compatible: step was authored with legacy snake_case key
+    requiredRole = input.required_role as ApproverRole;
+  } else {
+    requiredRole = 'ADMIN_OPERATIONS';
+  }
 
   const result = await createGate({
     taskId,
@@ -440,21 +463,50 @@ async function processProductionJob(
   now: Date,
 ): Promise<RunnerResult> {
   const input = (step.input ?? {}) as Record<string, unknown>;
-  const productionJobId = input.production_job_id as string | undefined;
 
-  if (!productionJobId) {
-    const reason = 'PRODUCTION_JOB step requires production_job_id in input';
-    await markStepFailed(step.id, organizationId, reason);
-    await markTaskFailed(taskId, organizationId, step.step_index, reason);
-    return { ok: false, outcome: 'TASK_FAILED', reason };
+  let resolvedJobId: string;
+  const explicitJobId = input.production_job_id as string | undefined;
+
+  if (explicitJobId) {
+    resolvedJobId = explicitJobId;
+  } else {
+    // Specialists supply orderId (camelCase) — look up the active production job.
+    const orderId = input.orderId as string | undefined;
+    if (!orderId) {
+      const reason = 'PRODUCTION_JOB step requires production_job_id or orderId in input';
+      await markStepFailed(step.id, organizationId, reason);
+      await markTaskFailed(taskId, organizationId, step.step_index, reason);
+      return { ok: false, outcome: 'TASK_FAILED', reason };
+    }
+
+    const jobType = input.jobType as string | undefined;
+    const matchingJobs = await db
+      .select({ id: productionJobs.id })
+      .from(productionJobs)
+      .where(and(
+        eq(productionJobs.order_id, orderId),
+        eq(productionJobs.organization_id, organizationId),
+        isNull(productionJobs.archived_at),
+        jobType ? eq(productionJobs.job_type, jobType as 'AI_GENERATION' | 'MANUAL_UPLOAD') : undefined,
+      ))
+      .orderBy(desc(productionJobs.created_at));
+
+    const job = matchingJobs[0] ?? null;
+    if (!job) {
+      const reason = `No active production job found for order ${orderId}; create a production job before advancing this step`;
+      await markStepFailed(step.id, organizationId, reason);
+      await markTaskFailed(taskId, organizationId, step.step_index, reason);
+      return { ok: false, outcome: 'TASK_FAILED', reason };
+    }
+    resolvedJobId = job.id;
   }
 
   await db
     .update(taskSteps)
     .set({
-      production_job_id: productionJobId,
+      production_job_id: resolvedJobId,
       status: 'SUCCEEDED',
-      output: { production_job_id: productionJobId },
+      output: { production_job_id: resolvedJobId },
       completed_at: now,
       updated_at: now,
     })
