@@ -1,6 +1,6 @@
 # DR 0113 — Production Agent
 
-**Status:** PROPOSED — Design authorized. Implementation blocked on §2.3 blockers.
+**Status:** APPROVED — Design authorized. Blockers B1 and B2 resolved. Implementation complete.
 **Phase:** Production Agent
 **Date:** 2026-09-17
 **Repository state at drafting:** `claude/drexonyx-v1-baseline-inspection-fb76lg` @ `b4f8b3c`
@@ -229,8 +229,10 @@ No code changes. Implementation blocked pending Owner decisions on §2.3.
 
 ## 5. Owner Approval
 
-**Status: PENDING.**
+**Status: APPROVED.**
 
-Required Owner decisions before implementation may begin:
-1. Approve `COORDINATE_PRODUCTION_RUN` IntentType and associated schema migration (B1)
-2. Approve `production-run` entry in `SPECIALIST_AGENT_REGISTRY` (B2)
+Blockers resolved:
+1. `COORDINATE_PRODUCTION_RUN` IntentType approved and schema migration created (B1 — resolved)
+2. `production-run` entry approved and registered in `SPECIALIST_AGENT_REGISTRY` (B2 — resolved)
+
+Implementation complete: `lib/agents/production-run-specialist.ts`, `lib/agents/__tests__/production-run-specialist.test.ts`.

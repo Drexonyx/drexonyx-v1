@@ -23,10 +23,13 @@ const ALL_SKILL_IDS: SkillId[] = [
 ];
 
 describe('AGENT_ALLOWLIST', () => {
-  it('contains exactly utility.prompt.optimize and qc.asset.metadata (DR 0075)', () => {
-    expect(AGENT_ALLOWLIST.size).toBe(2);
+  // DR 0115: expanded from 2 to 4 — qc.script.review and qc.brand.alignment added.
+  it('contains exactly the four DR 0075 + DR 0115 approved skills', () => {
+    expect(AGENT_ALLOWLIST.size).toBe(4);
     expect(AGENT_ALLOWLIST.has('utility.prompt.optimize')).toBe(true);
     expect(AGENT_ALLOWLIST.has('qc.asset.metadata')).toBe(true);
+    expect(AGENT_ALLOWLIST.has('qc.script.review')).toBe(true);
+    expect(AGENT_ALLOWLIST.has('qc.brand.alignment')).toBe(true);
   });
 });
 
@@ -39,10 +42,23 @@ describe('isAgentAuthorized', () => {
     expect(isAgentAuthorized('qc.asset.metadata')).toBe(true);
   });
 
-  it('returns false for all other skills', () => {
-    const others = ALL_SKILL_IDS.filter(
-      (id) => id !== 'utility.prompt.optimize' && id !== 'qc.asset.metadata',
-    );
+  // DR 0115: these two skills are now on the AGENT_ALLOWLIST.
+  it('returns true for qc.script.review (DR 0115)', () => {
+    expect(isAgentAuthorized('qc.script.review')).toBe(true);
+  });
+
+  it('returns true for qc.brand.alignment (DR 0115)', () => {
+    expect(isAgentAuthorized('qc.brand.alignment')).toBe(true);
+  });
+
+  it('returns false for all non-allowlisted skills', () => {
+    const allowlisted = new Set([
+      'utility.prompt.optimize',
+      'qc.asset.metadata',
+      'qc.script.review',
+      'qc.brand.alignment',
+    ]);
+    const others = ALL_SKILL_IDS.filter((id) => !allowlisted.has(id));
     for (const skillId of others) {
       expect(isAgentAuthorized(skillId)).toBe(false);
     }
@@ -74,7 +90,6 @@ describe('isHumanAuthorized — restricted to OWNER + ADMIN_OPERATIONS only', ()
     'strategy.audience.segmentation',
     'utility.batch.coordinate',
   ];
-  const unprivileged = ['CREATIVE_PRODUCTION', 'QC', 'CLIENT', 'AGENT'];
 
   it.each(restrictedSkills)('%s: OWNER authorized', (skillId) => {
     expect(isHumanAuthorized(skillId, 'OWNER')).toBe(true);

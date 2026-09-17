@@ -28,11 +28,14 @@ export const HUMAN_SKILL_AUTHORITY: Record<SkillId, ReadonlySet<string>> = {
   'utility.batch.coordinate':         new Set(['OWNER', 'ADMIN_OPERATIONS']),
 };
 
-// DR 0075 §2.2 Option B: AGENT may invoke ONLY these two skills.
+// DR 0075 §2.2 Option B: AGENT may invoke ONLY these skills.
 // Allowlist MUST NOT be expanded without explicit Owner approval + new/amended decision record.
+// DR 0115: expanded to include qc.script.review and qc.brand.alignment.
 export const AGENT_ALLOWLIST: ReadonlySet<SkillId> = new Set([
   'utility.prompt.optimize',
   'qc.asset.metadata',
+  'qc.script.review',    // DR 0115 — machine recommendation only, not a binding verdict
+  'qc.brand.alignment',  // DR 0115 — machine recommendation only, not a binding verdict
 ]);
 
 // Returns true if the given human role is authorized to invoke the skill.

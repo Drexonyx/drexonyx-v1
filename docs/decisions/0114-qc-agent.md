@@ -1,6 +1,6 @@
 # DR 0114 — QC Agent
 
-**Status:** PROPOSED — Design authorized. Implementation blocked on §2.3 blockers.
+**Status:** APPROVED — Design authorized. Blockers B1, B2, and B3 resolved. Implementation complete.
 **Phase:** QC Agent
 **Date:** 2026-09-17
 **Repository state at drafting:** `claude/drexonyx-v1-baseline-inspection-fb76lg` @ `b4f8b3c`
@@ -251,13 +251,14 @@ No code changes. Implementation blocked pending Owner decisions on §2.3.
 
 ## 5. Owner Approval
 
-**Status: PENDING.**
+**Status: APPROVED.**
 
-Required Owner decisions before implementation may begin:
-1. Approve `COORDINATE_QC_REVIEW` IntentType and associated schema migration (B1)
-2. Explicitly approve AGENT_ALLOWLIST expansion for `qc.script.review` and
-   `qc.brand.alignment` — requires new or amended DR (B2)
-3. Approve `qc-review` entry in `SPECIALIST_AGENT_REGISTRY` (B3)
+Blockers resolved:
+1. `COORDINATE_QC_REVIEW` IntentType approved and schema migration created (B1 — resolved)
+2. AGENT_ALLOWLIST expansion approved via DR 0115 for `qc.script.review` and `qc.brand.alignment` (B2 — resolved)
+3. `qc-review` entry approved and registered in `SPECIALIST_AGENT_REGISTRY` (B3 — resolved)
+
+Implementation complete: `lib/agents/qc-review-specialist.ts`, `lib/agents/__tests__/qc-review-specialist.test.ts`.
 
 Partial implementation (metadata-only QC flow) may proceed once B1 and B3 are resolved.
 Full three-skill flow requires all three.

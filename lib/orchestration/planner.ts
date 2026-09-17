@@ -19,6 +19,21 @@ const PLAN_TEMPLATES: Record<TaskIntent['intent_type'], readonly Omit<PlanStep, 
     { step_type: 'SKILL', skill_id: 'utility.prompt.optimize' },
     { step_type: 'HUMAN_GATE', skill_id: undefined },
   ],
+  // DR 0113: Production Agent — prompt optimize → human gate (job approval) → production job → notification
+  COORDINATE_PRODUCTION_RUN: [
+    { step_type: 'SKILL', skill_id: 'utility.prompt.optimize' },
+    { step_type: 'HUMAN_GATE', skill_id: undefined },
+    { step_type: 'PRODUCTION_JOB', skill_id: undefined },
+    { step_type: 'NOTIFICATION', skill_id: undefined },
+  ],
+  // DR 0114: QC Agent — qc skills → collect recommendations → QC_GATE (mandatory human verdict) → notification
+  COORDINATE_QC_REVIEW: [
+    { step_type: 'SKILL', skill_id: 'qc.asset.metadata' },
+    { step_type: 'SKILL', skill_id: 'qc.script.review' },
+    { step_type: 'SKILL', skill_id: 'qc.brand.alignment' },
+    { step_type: 'QC_GATE', skill_id: undefined },
+    { step_type: 'NOTIFICATION', skill_id: undefined },
+  ],
 };
 
 export type PlanResult =
