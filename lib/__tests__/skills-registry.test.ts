@@ -18,6 +18,7 @@ const EXPECTED_SKILLS: SkillId[] = [
   'qc.brand.alignment',
   'qc.asset.metadata',
   'qc.creative.quality',
+  'qc.facebook_policy.check',
   'utility.prompt.optimize',
   'utility.output.format',
   'utility.batch.coordinate',
@@ -39,14 +40,15 @@ const EXPECTED_FAMILIES: Record<SkillId, string> = {
   'qc.brand.alignment': 'QC',
   'qc.asset.metadata': 'QC',
   'qc.creative.quality': 'QC',
+  'qc.facebook_policy.check': 'QC',
   'utility.prompt.optimize': 'UTILITY',
   'utility.output.format': 'UTILITY',
   'utility.batch.coordinate': 'UTILITY',
 };
 
 describe('SKILL_REGISTRY', () => {
-  it('contains exactly 18 skills', () => {
-    expect(Object.keys(SKILL_REGISTRY)).toHaveLength(18);
+  it('contains exactly 19 skills', () => {
+    expect(Object.keys(SKILL_REGISTRY)).toHaveLength(19);
   });
 
   it.each(EXPECTED_SKILLS)('registers skill: %s', (skillId) => {

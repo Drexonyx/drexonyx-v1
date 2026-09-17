@@ -20,5 +20,7 @@ export { delegateWebsiteProduction } from './website-production-specialist';
 export type { WebsiteProductionDelegationParams, WebsiteProductionDelegationResult } from './website-production-specialist';
 export { delegateSiteAudit } from './site-audit-specialist';
 export type { SiteAuditDelegationParams, SiteAuditDelegationResult } from './site-audit-specialist';
+export { delegateMarketingCampaign } from './marketing-campaign-specialist';
+export type { MarketingCampaignDelegationParams, MarketingCampaignDelegationResult } from './marketing-campaign-specialist';
 export { SPECIALIST_AGENT_REGISTRY } from './registry';
 export type { SpecialistAgentEntry } from './registry';

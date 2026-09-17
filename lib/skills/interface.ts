@@ -19,6 +19,7 @@ export type SkillId =
   | 'qc.brand.alignment'
   | 'qc.asset.metadata'
   | 'qc.creative.quality'
+  | 'qc.facebook_policy.check'
   | 'utility.prompt.optimize'
   | 'utility.output.format'
   | 'utility.batch.coordinate';

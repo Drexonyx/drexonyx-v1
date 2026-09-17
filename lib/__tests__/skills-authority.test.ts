@@ -26,13 +26,15 @@ const ALL_SKILL_IDS: SkillId[] = [
 describe('AGENT_ALLOWLIST', () => {
   // DR 0115: expanded from 2 to 4 — qc.script.review and qc.brand.alignment added.
   // DR 0123: expanded from 4 to 5 — qc.creative.quality added (brief fidelity check).
-  it('contains exactly the five DR 0075 + DR 0115 + DR 0123 approved skills', () => {
-    expect(AGENT_ALLOWLIST.size).toBe(5);
+  // DR 0124: expanded from 5 to 6 — qc.facebook_policy.check added (deterministic, zero AI).
+  it('contains exactly the six DR 0075 + DR 0115 + DR 0123 + DR 0124 approved skills', () => {
+    expect(AGENT_ALLOWLIST.size).toBe(6);
     expect(AGENT_ALLOWLIST.has('utility.prompt.optimize')).toBe(true);
     expect(AGENT_ALLOWLIST.has('qc.asset.metadata')).toBe(true);
     expect(AGENT_ALLOWLIST.has('qc.script.review')).toBe(true);
     expect(AGENT_ALLOWLIST.has('qc.brand.alignment')).toBe(true);
     expect(AGENT_ALLOWLIST.has('qc.creative.quality')).toBe(true);
+    expect(AGENT_ALLOWLIST.has('qc.facebook_policy.check')).toBe(true);
   });
 });
 

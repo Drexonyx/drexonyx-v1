@@ -75,6 +75,15 @@ const PLAN_TEMPLATES: Record<TaskIntent['intent_type'], readonly Omit<PlanStep, 
     { step_type: 'HUMAN_GATE', skill_id: undefined },
     { step_type: 'NOTIFICATION', skill_id: undefined },
   ],
+  // DR 0124: Marketing Campaign Agent — content QC → brand alignment → platform policy →
+  // mandatory human publish gate → completion notification
+  COORDINATE_MARKETING_CAMPAIGN: [
+    { step_type: 'SKILL', skill_id: 'qc.script.review' },
+    { step_type: 'SKILL', skill_id: 'qc.brand.alignment' },
+    { step_type: 'SKILL', skill_id: 'qc.facebook_policy.check' },
+    { step_type: 'HUMAN_GATE', skill_id: undefined },
+    { step_type: 'NOTIFICATION', skill_id: undefined },
+  ],
 };
 
 export type PlanResult =
