@@ -39,6 +39,11 @@ const PLAN_TEMPLATES: Record<TaskIntent['intent_type'], readonly Omit<PlanStep, 
     { step_type: 'FINANCIAL_CHECK', skill_id: undefined },
     { step_type: 'NOTIFICATION', skill_id: undefined },
   ],
+  // DR 0117: Reporting Agent — read-only verify → notification
+  GENERATE_OPERATIONAL_REPORT: [
+    { step_type: 'VERIFY', skill_id: undefined },
+    { step_type: 'NOTIFICATION', skill_id: undefined },
+  ],
 };
 
 export type PlanResult =

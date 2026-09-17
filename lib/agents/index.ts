@@ -8,5 +8,7 @@ export { delegateQcReview } from './qc-review-specialist';
 export type { QcReviewDelegationParams, QcReviewDelegationResult } from './qc-review-specialist';
 export { delegateFinanceMonitoring } from './finance-monitoring-specialist';
 export type { FinanceMonitoringDelegationParams, FinanceMonitoringDelegationResult } from './finance-monitoring-specialist';
+export { delegateReporting } from './reporting-specialist';
+export type { ReportingDelegationParams, ReportingDelegationResult } from './reporting-specialist';
 export { SPECIALIST_AGENT_REGISTRY } from './registry';
 export type { SpecialistAgentEntry } from './registry';
