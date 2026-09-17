@@ -62,6 +62,8 @@ export interface PlanStep {
   step_index: number;
   step_type: StepType;
   skill_id?: string;
+  // Specialist-constructed plans only; the AI planner does not set this.
+  input?: Record<string, unknown>;
 }
 
 export interface TaskPlan {

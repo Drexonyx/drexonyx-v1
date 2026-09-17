@@ -94,6 +94,7 @@ export async function advanceTask(params: {
         step_index: step.step_index,
         step_type: step.step_type,
         skill_id: step.skill_id ?? null,
+        input: step.input ?? null,
         status: 'PENDING',
       }));
       await db.insert(taskSteps).values(stepRows);
