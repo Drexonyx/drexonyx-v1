@@ -6,5 +6,7 @@ export { delegateProductionRun } from './production-run-specialist';
 export type { ProductionRunDelegationParams, ProductionRunDelegationResult } from './production-run-specialist';
 export { delegateQcReview } from './qc-review-specialist';
 export type { QcReviewDelegationParams, QcReviewDelegationResult } from './qc-review-specialist';
+export { delegateFinanceMonitoring } from './finance-monitoring-specialist';
+export type { FinanceMonitoringDelegationParams, FinanceMonitoringDelegationResult } from './finance-monitoring-specialist';
 export { SPECIALIST_AGENT_REGISTRY } from './registry';
 export type { SpecialistAgentEntry } from './registry';

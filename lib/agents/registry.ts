@@ -5,6 +5,7 @@ import { delegateQcMetadata, type QcMetadataDelegationParams, type QcMetadataDel
 import { delegatePromptOptimize, type PromptOptimizeDelegationParams, type PromptOptimizeDelegationResult } from './prompt-optimize-specialist';
 import { delegateProductionRun, type ProductionRunDelegationParams, type ProductionRunDelegationResult } from './production-run-specialist';
 import { delegateQcReview, type QcReviewDelegationParams, type QcReviewDelegationResult } from './qc-review-specialist';
+import { delegateFinanceMonitoring, type FinanceMonitoringDelegationParams, type FinanceMonitoringDelegationResult } from './finance-monitoring-specialist';
 
 // Each entry carries a typed delegate function. Callers must cast to the specific
 // agent's signature after looking up by ID — the registry stores the canonical handle.
@@ -43,6 +44,14 @@ export const SPECIALIST_AGENT_REGISTRY: ReadonlyMap<string, SpecialistAgentEntry
     {
       id: 'qc-review',
       delegate: delegateQcReview as (params: QcReviewDelegationParams) => Promise<QcReviewDelegationResult>,
+    },
+  ],
+  // DR 0116: Finance Monitoring Agent — B2 resolved (registry entry approved)
+  [
+    'finance-monitoring',
+    {
+      id: 'finance-monitoring',
+      delegate: delegateFinanceMonitoring as (params: FinanceMonitoringDelegationParams) => Promise<FinanceMonitoringDelegationResult>,
     },
   ],
 ]);

@@ -34,6 +34,11 @@ const PLAN_TEMPLATES: Record<TaskIntent['intent_type'], readonly Omit<PlanStep, 
     { step_type: 'QC_GATE', skill_id: undefined },
     { step_type: 'NOTIFICATION', skill_id: undefined },
   ],
+  // DR 0116: Finance Monitoring Agent — financial check → notification
+  COORDINATE_FINANCIAL_MONITORING: [
+    { step_type: 'FINANCIAL_CHECK', skill_id: undefined },
+    { step_type: 'NOTIFICATION', skill_id: undefined },
+  ],
 };
 
 export type PlanResult =
