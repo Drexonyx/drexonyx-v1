@@ -10,5 +10,7 @@ export { delegateFinanceMonitoring } from './finance-monitoring-specialist';
 export type { FinanceMonitoringDelegationParams, FinanceMonitoringDelegationResult } from './finance-monitoring-specialist';
 export { delegateReporting } from './reporting-specialist';
 export type { ReportingDelegationParams, ReportingDelegationResult } from './reporting-specialist';
+export { delegateAnalytics } from './analytics-specialist';
+export type { AnalyticsDelegationParams, AnalyticsDelegationResult } from './analytics-specialist';
 export { SPECIALIST_AGENT_REGISTRY } from './registry';
 export type { SpecialistAgentEntry } from './registry';
