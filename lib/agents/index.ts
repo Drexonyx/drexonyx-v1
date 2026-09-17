@@ -12,5 +12,7 @@ export { delegateReporting } from './reporting-specialist';
 export type { ReportingDelegationParams, ReportingDelegationResult } from './reporting-specialist';
 export { delegateAnalytics } from './analytics-specialist';
 export type { AnalyticsDelegationParams, AnalyticsDelegationResult } from './analytics-specialist';
+export { delegateCommunication } from './communication-specialist';
+export type { CommunicationDelegationParams, CommunicationDelegationResult } from './communication-specialist';
 export { SPECIALIST_AGENT_REGISTRY } from './registry';
 export type { SpecialistAgentEntry } from './registry';

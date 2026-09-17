@@ -49,6 +49,10 @@ const PLAN_TEMPLATES: Record<TaskIntent['intent_type'], readonly Omit<PlanStep, 
     { step_type: 'VERIFY', skill_id: undefined },
     { step_type: 'NOTIFICATION', skill_id: undefined },
   ],
+  // DR 0119: Communication Agent — single NOTIFICATION step (internal operational email)
+  COORDINATE_INTERNAL_NOTIFICATION: [
+    { step_type: 'NOTIFICATION', skill_id: undefined },
+  ],
 };
 
 export type PlanResult =
