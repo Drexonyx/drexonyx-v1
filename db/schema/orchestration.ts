@@ -28,6 +28,7 @@ export const agentTasks = orchestrationSchema.table(
   {
     id: uuid('id').primaryKey().$defaultFn(() => uuidv7()),
     organization_id: uuid('organization_id').notNull(),
+    parent_task_id: uuid('parent_task_id'),
     initiated_by_user_id: uuid('initiated_by_user_id').notNull(),
     initiator_role: text('initiator_role').notNull(),
     intent_type: text('intent_type').notNull(),
@@ -66,6 +67,11 @@ export const agentTasks = orchestrationSchema.table(
       foreignColumns: [users.id],
       name: 'agent_tasks_initiated_by_user_id_fk',
     }),
+    foreignKey({
+      columns: [t.parent_task_id, t.organization_id],
+      foreignColumns: [t.id, t.organization_id],
+      name: 'agent_tasks_parent_task_id_fk',
+    }),
     unique('agent_tasks_id_org_unique').on(t.id, t.organization_id),
     index('agent_tasks_org_idx').on(t.organization_id),
     index('agent_tasks_status_idx').on(t.status),
@@ -100,7 +106,7 @@ export const taskApprovals = orchestrationSchema.table(
     ),
     check(
       'task_approvals_approver_role_check',
-      sql`${t.approver_role} IN ('OWNER','ADMIN_OPERATIONS')`,
+      sql`${t.approver_role} IN ('OWNER','ADMIN_OPERATIONS','QC')`,
     ),
     foreignKey({
       columns: [t.agent_task_id, t.organization_id],
@@ -151,7 +157,7 @@ export const taskSteps = orchestrationSchema.table(
     ),
     check(
       'task_steps_step_type_check',
-      sql`${t.step_type} IN ('SKILL','HUMAN_GATE','FINANCIAL_CHECK')`,
+      sql`${t.step_type} IN ('SKILL','HUMAN_GATE','FINANCIAL_CHECK','PRODUCTION_JOB','STATUS_TRANSITION','QC_GATE','NOTIFICATION','VERIFY')`,
     ),
     foreignKey({
       columns: [t.agent_task_id, t.organization_id],
@@ -177,5 +183,34 @@ export const taskSteps = orchestrationSchema.table(
     index('task_steps_task_idx').on(t.agent_task_id),
     index('task_steps_org_idx').on(t.organization_id),
     index('task_steps_status_idx').on(t.status),
+  ],
+);
+
+// ─── Task Tokens ──────────────────────────────────────────────────────────────
+// Phase 2: Task-scoped service tokens for specialist agent autonomous access.
+// Token is stored as HMAC-SHA256 hash; raw value is returned once at creation.
+// Tokens expire after 4 hours and may be explicitly revoked before expiry.
+
+export const taskTokens = orchestrationSchema.table(
+  'task_tokens',
+  {
+    id: uuid('id').primaryKey().$defaultFn(() => uuidv7()),
+    agent_task_id: uuid('agent_task_id').notNull(),
+    organization_id: uuid('organization_id').notNull(),
+    token_hash: text('token_hash').notNull(),
+    expires_at: timestamp('expires_at', { withTimezone: true }).notNull(),
+    revoked_at: timestamp('revoked_at', { withTimezone: true }),
+    created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    foreignKey({
+      columns: [t.agent_task_id, t.organization_id],
+      foreignColumns: [agentTasks.id, agentTasks.organization_id],
+      name: 'task_tokens_agent_task_id_fk',
+    }),
+    unique('task_tokens_id_org_unique').on(t.id, t.organization_id),
+    index('task_tokens_task_idx').on(t.agent_task_id),
+    index('task_tokens_org_idx').on(t.organization_id),
+    index('task_tokens_expires_idx').on(t.expires_at),
   ],
 );

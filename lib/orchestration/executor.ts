@@ -7,6 +7,7 @@
 import { isAgentAuthorized, isHumanAuthorized, SKILL_REGISTRY } from '@/lib/skills';
 import type { SkillId } from '@/lib/skills';
 import { auditBoundaryViolation } from './audit';
+import { sendBoundaryViolationAlert } from './email';
 import type { InitiatorRole } from './types';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -30,11 +31,19 @@ export async function executeSkillStep(params: {
 
   // ── Gate 1: AGENT allowlist ───────────────────────────────────────────────
   if (!isAgentAuthorized(skillId)) {
+    const attemptedAction = `SKILL_EXECUTE:${params.skillId}`;
+    const blockReason = `Skill ${params.skillId} is not on the AGENT allowlist`;
     await auditBoundaryViolation({
       organizationId: params.organizationId,
       taskId: params.taskId,
-      attemptedAction: `SKILL_EXECUTE:${params.skillId}`,
-      blockReason: `Skill ${params.skillId} is not on the AGENT allowlist`,
+      attemptedAction,
+      blockReason,
+    });
+    void sendBoundaryViolationAlert({
+      taskId: params.taskId,
+      organizationId: params.organizationId,
+      attemptedAction,
+      blockReason,
     });
     return {
       ok: false,
@@ -45,11 +54,19 @@ export async function executeSkillStep(params: {
 
   // ── Gate 2: Initiator role authorization ──────────────────────────────────
   if (!isHumanAuthorized(skillId, params.initiatorRole)) {
+    const attemptedAction = `SKILL_EXECUTE:${params.skillId}`;
+    const blockReason = `Initiator role ${params.initiatorRole} is not authorized for skill ${params.skillId}`;
     await auditBoundaryViolation({
       organizationId: params.organizationId,
       taskId: params.taskId,
-      attemptedAction: `SKILL_EXECUTE:${params.skillId}`,
-      blockReason: `Initiator role ${params.initiatorRole} is not authorized for skill ${params.skillId}`,
+      attemptedAction,
+      blockReason,
+    });
+    void sendBoundaryViolationAlert({
+      taskId: params.taskId,
+      organizationId: params.organizationId,
+      attemptedAction,
+      blockReason,
     });
     return {
       ok: false,

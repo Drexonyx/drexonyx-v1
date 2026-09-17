@@ -31,10 +31,18 @@ export type ApprovalStatus =
   | 'EXPIRED'
   | 'CANCELLED';
 
-export type ApproverRole = 'OWNER' | 'ADMIN_OPERATIONS';
+export type ApproverRole = 'OWNER' | 'ADMIN_OPERATIONS' | 'QC';
 
-// Phase 1 only: PRODUCTION_JOB, QC_GATE, STATUS_TRANSITION, NOTIFICATION, VERIFY are Phase 2+.
-export type StepType = 'SKILL' | 'HUMAN_GATE' | 'FINANCIAL_CHECK';
+// Phase 2: PRODUCTION_JOB, STATUS_TRANSITION, QC_GATE, NOTIFICATION, VERIFY added.
+export type StepType =
+  | 'SKILL'
+  | 'HUMAN_GATE'
+  | 'FINANCIAL_CHECK'
+  | 'PRODUCTION_JOB'
+  | 'STATUS_TRANSITION'
+  | 'QC_GATE'
+  | 'NOTIFICATION'
+  | 'VERIFY';
 
 export type StepStatus =
   | 'PENDING'

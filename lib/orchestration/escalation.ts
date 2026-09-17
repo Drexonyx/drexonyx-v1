@@ -1,12 +1,13 @@
-// Escalation router for Phase 1 (Architecture v2 §14, §18).
-// Phase 1: creates an ESCALATION gate in task_approvals, transitions task to ESCALATED,
-// writes TASK_ESCALATED audit event. Phase 2+: also sends email via Resend to OWNER.
+// Escalation router (Architecture v2 §14, §18, §20 P2).
+// Creates an ESCALATION gate in task_approvals, transitions task to ESCALATED,
+// writes TASK_ESCALATED audit event, and sends alert email to OWNER via Resend.
 
 import { db } from '@/db/index';
 import { agentTasks, taskApprovals } from '@/db/schema/orchestration';
 import { eq, and } from 'drizzle-orm';
 import { uuidv7 } from 'uuidv7';
 import { auditTaskEscalated } from './audit';
+import { sendEscalationEmail } from './email';
 import type { ApproverRole } from './types';
 
 export type EscalationResult =
@@ -46,6 +47,9 @@ export async function escalateTask(params: {
     escalationReason: reason,
     escalatedToRole,
   });
+
+  // Best-effort: email failures do not affect escalation outcome
+  void sendEscalationEmail({ taskId, organizationId, reason });
 
   return { ok: true, approvalId };
 }

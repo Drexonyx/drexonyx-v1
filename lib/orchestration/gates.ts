@@ -30,6 +30,7 @@ export async function createGate(params: {
   stepIndex: number;
   requiredRole: ApproverRole;
   expiresAt?: Date;
+  gateType?: string;
 }): Promise<CreateGateResult> {
   const gateId = uuidv7();
   const now = new Date();
@@ -67,7 +68,7 @@ export async function createGate(params: {
     organizationId: params.organizationId,
     taskId: params.taskId,
     stepIndex: params.stepIndex,
-    gateType: 'HUMAN_GATE',
+    gateType: params.gateType ?? 'HUMAN_GATE',
     requiredRole: params.requiredRole,
   });
 

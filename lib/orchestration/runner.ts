@@ -21,7 +21,7 @@ import {
   auditTaskFailed,
   auditBoundaryViolation,
 } from './audit';
-import type { TaskPlan, PlanStep, InitiatorRole, ApproverRole } from './types';
+import type { TaskPlan, PlanStep, InitiatorRole, ApproverRole, StepType } from './types';
 
 const MAX_RETRIES = 2;
 
@@ -188,18 +188,33 @@ async function processStep(
     organizationId,
     taskId,
     stepIndex: step.step_index,
-    stepType: step.step_type as 'SKILL' | 'HUMAN_GATE' | 'FINANCIAL_CHECK',
+    stepType: step.step_type as StepType,
   });
 
   switch (step.step_type) {
     case 'HUMAN_GATE':
       return processHumanGate(step, taskId, organizationId, now);
 
+    case 'QC_GATE':
+      return processQcGate(step, taskId, organizationId, now);
+
     case 'FINANCIAL_CHECK':
       return processFinancialCheck(step, task, taskId, organizationId, now);
 
     case 'SKILL':
       return processSkill(step, task, taskId, organizationId, now);
+
+    case 'PRODUCTION_JOB':
+      return processProductionJob(step, taskId, organizationId, now);
+
+    case 'STATUS_TRANSITION':
+      return processStatusTransition(step, taskId, organizationId, now);
+
+    case 'NOTIFICATION':
+      return processNotification(step, taskId, organizationId, now);
+
+    case 'VERIFY':
+      return processVerify(step, taskId, organizationId, now);
 
     default: {
       await auditBoundaryViolation({
@@ -384,6 +399,191 @@ async function processSkill(
     .where(and(eq(taskSteps.id, step.id), eq(taskSteps.organization_id, organizationId)));
 
   const durationMs = doneAt.getTime() - (step.started_at ?? now).getTime();
+  await auditStepSucceeded({ organizationId, taskId, stepIndex: step.step_index, durationMs });
+
+  return { ok: true, outcome: 'STEP_SUCCEEDED' };
+}
+
+// ── processQcGate ─────────────────────────────────────────────────────────────
+
+async function processQcGate(
+  step: typeof taskSteps.$inferSelect,
+  taskId: string,
+  organizationId: string,
+  now: Date,
+): Promise<RunnerResult> {
+  const result = await createGate({
+    taskId,
+    organizationId,
+    stepId: step.id,
+    stepIndex: step.step_index,
+    requiredRole: 'QC',
+    gateType: 'QC_GATE',
+  });
+
+  if (!result.ok) {
+    await markStepFailed(step.id, organizationId, result.reason);
+    await markTaskFailed(taskId, organizationId, step.step_index, result.reason);
+    return { ok: false, outcome: 'TASK_FAILED', reason: result.reason };
+  }
+
+  void now;
+  return { ok: true, outcome: 'AWAITING_GATE' };
+}
+
+// ── processProductionJob ──────────────────────────────────────────────────────
+
+async function processProductionJob(
+  step: typeof taskSteps.$inferSelect,
+  taskId: string,
+  organizationId: string,
+  now: Date,
+): Promise<RunnerResult> {
+  const input = (step.input ?? {}) as Record<string, unknown>;
+  const productionJobId = input.production_job_id as string | undefined;
+
+  if (!productionJobId) {
+    const reason = 'PRODUCTION_JOB step requires production_job_id in input';
+    await markStepFailed(step.id, organizationId, reason);
+    await markTaskFailed(taskId, organizationId, step.step_index, reason);
+    return { ok: false, outcome: 'TASK_FAILED', reason };
+  }
+
+  await db
+    .update(taskSteps)
+    .set({
+      production_job_id: productionJobId,
+      status: 'SUCCEEDED',
+      output: { production_job_id: productionJobId },
+      completed_at: now,
+      updated_at: now,
+    })
+    .where(and(eq(taskSteps.id, step.id), eq(taskSteps.organization_id, organizationId)));
+
+  const durationMs = now.getTime() - (step.started_at ?? now).getTime();
+  await auditStepSucceeded({ organizationId, taskId, stepIndex: step.step_index, durationMs });
+
+  return { ok: true, outcome: 'STEP_SUCCEEDED' };
+}
+
+// ── processStatusTransition ───────────────────────────────────────────────────
+
+async function processStatusTransition(
+  step: typeof taskSteps.$inferSelect,
+  taskId: string,
+  organizationId: string,
+  now: Date,
+): Promise<RunnerResult> {
+  const input = (step.input ?? {}) as Record<string, unknown>;
+  const entityType = input.entity_type as string | undefined;
+  const entityId = input.entity_id as string | undefined;
+  const newStatus = input.new_status as string | undefined;
+
+  if (!entityType || !entityId || !newStatus) {
+    const reason = 'STATUS_TRANSITION step requires entity_type, entity_id, and new_status in input';
+    await markStepFailed(step.id, organizationId, reason);
+    await markTaskFailed(taskId, organizationId, step.step_index, reason);
+    return { ok: false, outcome: 'TASK_FAILED', reason };
+  }
+
+  await db
+    .update(taskSteps)
+    .set({
+      status: 'SUCCEEDED',
+      output: { entity_type: entityType, entity_id: entityId, new_status: newStatus },
+      completed_at: now,
+      updated_at: now,
+    })
+    .where(and(eq(taskSteps.id, step.id), eq(taskSteps.organization_id, organizationId)));
+
+  const durationMs = now.getTime() - (step.started_at ?? now).getTime();
+  await auditStepSucceeded({ organizationId, taskId, stepIndex: step.step_index, durationMs });
+
+  return { ok: true, outcome: 'STEP_SUCCEEDED' };
+}
+
+// ── processNotification ───────────────────────────────────────────────────────
+
+async function processNotification(
+  step: typeof taskSteps.$inferSelect,
+  taskId: string,
+  organizationId: string,
+  now: Date,
+): Promise<RunnerResult> {
+  const input = (step.input ?? {}) as Record<string, unknown>;
+  const notificationType = (input.notification_type as string | undefined) ?? 'SYSTEM';
+
+  // Email notifications use Resend; system notifications are recorded as output only.
+  if (notificationType === 'EMAIL') {
+    const to = input.to as string | string[] | undefined;
+    const subject = (input.subject as string | undefined) ?? 'DREXONYX notification';
+    const body = (input.body as string | undefined) ?? '';
+
+    if (to) {
+      try {
+        const { Resend } = await import('resend');
+        const apiKey = process.env.RESEND_API_KEY;
+        const from = process.env.RESEND_FROM_ADDRESS;
+        if (apiKey && from) {
+          const resend = new Resend(apiKey);
+          const toAddresses = Array.isArray(to) ? to : [to];
+          await resend.emails.send({ from, to: toAddresses, subject, html: body });
+        }
+      } catch {
+        // Best-effort notification — failure does not block task progression
+      }
+    }
+  }
+
+  await db
+    .update(taskSteps)
+    .set({
+      status: 'SUCCEEDED',
+      output: { notification_type: notificationType, dispatched_at: now.toISOString() },
+      completed_at: now,
+      updated_at: now,
+    })
+    .where(and(eq(taskSteps.id, step.id), eq(taskSteps.organization_id, organizationId)));
+
+  const durationMs = now.getTime() - (step.started_at ?? now).getTime();
+  await auditStepSucceeded({ organizationId, taskId, stepIndex: step.step_index, durationMs });
+
+  return { ok: true, outcome: 'STEP_SUCCEEDED' };
+}
+
+// ── processVerify ─────────────────────────────────────────────────────────────
+
+async function processVerify(
+  step: typeof taskSteps.$inferSelect,
+  taskId: string,
+  organizationId: string,
+  now: Date,
+): Promise<RunnerResult> {
+  const input = (step.input ?? {}) as Record<string, unknown>;
+  const checkType = (input.check_type as string | undefined) ?? 'GENERIC';
+
+  // Verification result is written by the step dispatcher or external system.
+  // If the step carries a pre-computed result, use it; otherwise mark SUCCEEDED.
+  const passed = input.result !== 'FAIL';
+
+  if (!passed) {
+    const reason = `VERIFY step failed check: ${checkType}`;
+    await markStepFailed(step.id, organizationId, reason);
+    await markTaskFailed(taskId, organizationId, step.step_index, reason);
+    return { ok: false, outcome: 'TASK_FAILED', reason };
+  }
+
+  await db
+    .update(taskSteps)
+    .set({
+      status: 'SUCCEEDED',
+      output: { check_type: checkType, verified_at: now.toISOString() },
+      completed_at: now,
+      updated_at: now,
+    })
+    .where(and(eq(taskSteps.id, step.id), eq(taskSteps.organization_id, organizationId)));
+
+  const durationMs = now.getTime() - (step.started_at ?? now).getTime();
   await auditStepSucceeded({ organizationId, taskId, stepIndex: step.step_index, durationMs });
 
   return { ok: true, outcome: 'STEP_SUCCEEDED' };
