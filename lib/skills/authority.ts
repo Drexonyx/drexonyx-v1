@@ -24,6 +24,7 @@ export const HUMAN_SKILL_AUTHORITY: Record<SkillId, ReadonlySet<string>> = {
   'qc.asset.metadata':                new Set(['OWNER', 'ADMIN_OPERATIONS', 'QC']),
   'qc.creative.quality':              new Set(['OWNER', 'ADMIN_OPERATIONS', 'QC']),
   'qc.facebook_policy.check':         new Set(['OWNER', 'ADMIN_OPERATIONS', 'QC']),
+  'communication.whatsapp.classify':  new Set(['OWNER', 'ADMIN_OPERATIONS']),
   'utility.prompt.optimize':          new Set(['OWNER', 'ADMIN_OPERATIONS', 'CREATIVE_PRODUCTION']),
   'utility.output.format':            new Set(['OWNER', 'ADMIN_OPERATIONS', 'CREATIVE_PRODUCTION']),
   // DR 0075 §2.3: utility.batch.coordinate restricted to OWNER + ADMIN_OPERATIONS only
@@ -39,7 +40,8 @@ export const AGENT_ALLOWLIST: ReadonlySet<SkillId> = new Set([
   'qc.script.review',      // DR 0115 — machine recommendation only, not a binding verdict
   'qc.brand.alignment',    // DR 0115 — machine recommendation only, not a binding verdict
   'qc.creative.quality',         // DR 0123 — brief fidelity check, machine recommendation only
-  'qc.facebook_policy.check',   // DR 0124 — deterministic platform policy check, zero AI calls
+  'qc.facebook_policy.check',          // DR 0124 — deterministic platform policy check, zero AI calls
+  'communication.whatsapp.classify',   // DR 0125 — deterministic inbound classifier, zero AI calls
 ]);
 
 // Returns true if the given human role is authorized to invoke the skill.

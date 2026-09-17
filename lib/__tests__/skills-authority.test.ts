@@ -18,6 +18,7 @@ const ALL_SKILL_IDS: SkillId[] = [
   'qc.brand.alignment',
   'qc.asset.metadata',
   'qc.creative.quality',
+  'communication.whatsapp.classify',
   'utility.prompt.optimize',
   'utility.output.format',
   'utility.batch.coordinate',
@@ -27,14 +28,16 @@ describe('AGENT_ALLOWLIST', () => {
   // DR 0115: expanded from 2 to 4 — qc.script.review and qc.brand.alignment added.
   // DR 0123: expanded from 4 to 5 — qc.creative.quality added (brief fidelity check).
   // DR 0124: expanded from 5 to 6 — qc.facebook_policy.check added (deterministic, zero AI).
-  it('contains exactly the six DR 0075 + DR 0115 + DR 0123 + DR 0124 approved skills', () => {
-    expect(AGENT_ALLOWLIST.size).toBe(6);
+  // DR 0125: expanded from 6 to 7 — communication.whatsapp.classify added (deterministic, zero AI).
+  it('contains exactly the seven DR-approved skills', () => {
+    expect(AGENT_ALLOWLIST.size).toBe(7);
     expect(AGENT_ALLOWLIST.has('utility.prompt.optimize')).toBe(true);
     expect(AGENT_ALLOWLIST.has('qc.asset.metadata')).toBe(true);
     expect(AGENT_ALLOWLIST.has('qc.script.review')).toBe(true);
     expect(AGENT_ALLOWLIST.has('qc.brand.alignment')).toBe(true);
     expect(AGENT_ALLOWLIST.has('qc.creative.quality')).toBe(true);
     expect(AGENT_ALLOWLIST.has('qc.facebook_policy.check')).toBe(true);
+    expect(AGENT_ALLOWLIST.has('communication.whatsapp.classify')).toBe(true);
   });
 });
 
@@ -60,6 +63,10 @@ describe('isAgentAuthorized', () => {
     expect(isAgentAuthorized('qc.creative.quality')).toBe(true);
   });
 
+  it('returns true for communication.whatsapp.classify (DR 0125)', () => {
+    expect(isAgentAuthorized('communication.whatsapp.classify')).toBe(true);
+  });
+
   it('returns false for all non-allowlisted skills', () => {
     const allowlisted = new Set([
       'utility.prompt.optimize',
@@ -67,6 +74,8 @@ describe('isAgentAuthorized', () => {
       'qc.script.review',
       'qc.brand.alignment',
       'qc.creative.quality',
+      'qc.facebook_policy.check',
+      'communication.whatsapp.classify',
     ]);
     const others = ALL_SKILL_IDS.filter((id) => !allowlisted.has(id));
     for (const skillId of others) {
@@ -141,6 +150,7 @@ describe('isHumanAuthorized — CREATIVE_PRODUCTION access', () => {
     expect(isHumanAuthorized('qc.brand.alignment', 'CREATIVE_PRODUCTION')).toBe(false);
     expect(isHumanAuthorized('qc.asset.metadata', 'CREATIVE_PRODUCTION')).toBe(false);
     expect(isHumanAuthorized('qc.creative.quality', 'CREATIVE_PRODUCTION')).toBe(false);
+    expect(isHumanAuthorized('communication.whatsapp.classify', 'CREATIVE_PRODUCTION')).toBe(false);
   });
 });
 

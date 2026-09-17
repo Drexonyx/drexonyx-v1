@@ -84,6 +84,12 @@ const PLAN_TEMPLATES: Record<TaskIntent['intent_type'], readonly Omit<PlanStep, 
     { step_type: 'HUMAN_GATE', skill_id: undefined },
     { step_type: 'NOTIFICATION', skill_id: undefined },
   ],
+  // DR 0125: WhatsApp Inquiry — classify inbound message → mandatory staff review gate → notification
+  ROUTE_WHATSAPP_INQUIRY: [
+    { step_type: 'SKILL', skill_id: 'communication.whatsapp.classify' },
+    { step_type: 'HUMAN_GATE', skill_id: undefined },
+    { step_type: 'NOTIFICATION', skill_id: undefined },
+  ],
 };
 
 export type PlanResult =
