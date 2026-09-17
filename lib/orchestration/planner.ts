@@ -58,6 +58,17 @@ const PLAN_TEMPLATES: Record<TaskIntent['intent_type'], readonly Omit<PlanStep, 
     { step_type: 'VERIFY', skill_id: undefined },
     { step_type: 'NOTIFICATION', skill_id: undefined },
   ],
+  // DR 0121: Website Production Agent — brief validation → budget check → production auth →
+  // production job → QC gate → delivery approval → completion notification
+  COORDINATE_WEBSITE_PRODUCTION: [
+    { step_type: 'VERIFY', skill_id: undefined },
+    { step_type: 'FINANCIAL_CHECK', skill_id: undefined },
+    { step_type: 'HUMAN_GATE', skill_id: undefined },
+    { step_type: 'PRODUCTION_JOB', skill_id: undefined },
+    { step_type: 'QC_GATE', skill_id: undefined },
+    { step_type: 'HUMAN_GATE', skill_id: undefined },
+    { step_type: 'NOTIFICATION', skill_id: undefined },
+  ],
 };
 
 export type PlanResult =

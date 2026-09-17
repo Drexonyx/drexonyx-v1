@@ -16,5 +16,7 @@ export { delegateCommunication } from './communication-specialist';
 export type { CommunicationDelegationParams, CommunicationDelegationResult } from './communication-specialist';
 export { delegateLeadHunter } from './lead-hunter-specialist';
 export type { LeadHunterDelegationParams, LeadHunterDelegationResult } from './lead-hunter-specialist';
+export { delegateWebsiteProduction } from './website-production-specialist';
+export type { WebsiteProductionDelegationParams, WebsiteProductionDelegationResult } from './website-production-specialist';
 export { SPECIALIST_AGENT_REGISTRY } from './registry';
 export type { SpecialistAgentEntry } from './registry';
