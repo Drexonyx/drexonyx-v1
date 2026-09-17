@@ -43,7 +43,6 @@ export async function POST(
   let actorType: ActorKind;
   let actorRole: string;
   let organizationId: string;
-  let productionJobId: string | undefined;
 
   if (isBearerPresent) {
     // Agent path — Phase 09 Service Token
@@ -90,7 +89,6 @@ export async function POST(
     actorType = 'AGENT';
     actorRole = 'AGENT';
     organizationId = validation.organizationId;
-    productionJobId = validation.productionJobId;
 
     return executeSkill({
       rawSkillId,

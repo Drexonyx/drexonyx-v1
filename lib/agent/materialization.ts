@@ -25,7 +25,7 @@ async function downloadProviderOutput(
   let response: Response;
   try {
     response = await fetch(resultUrl);
-  } catch (err) {
+  } catch {
     return null;
   }
 

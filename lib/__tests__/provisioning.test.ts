@@ -29,7 +29,7 @@ vi.mock('crypto', async (importOriginal) => {
   const actual = await importOriginal<typeof import('crypto')>();
   return {
     ...actual,
-    randomBytes: (_n: number) => ({  // eslint-disable-line @typescript-eslint/no-unused-vars
+    randomBytes: (_n: number) => ({
       toString: () => 'generated-password-abc123',
     }),
   };

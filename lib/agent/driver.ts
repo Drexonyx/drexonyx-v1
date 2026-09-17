@@ -93,7 +93,7 @@ export async function runGenerationDriver(params: {
   const tokenResult = await issueServiceToken({ organizationId, productionJobId });
   if (!tokenResult.ok) return { ok: false, reason: `Token issuance failed: ${tokenResult.reason}` };
   // rawToken is held in-memory for this execution only — never stored or logged.
-  const _rawToken = tokenResult.rawToken; // eslint-disable-line @typescript-eslint/no-unused-vars
+  const _rawToken = tokenResult.rawToken;
 
   // Step 2: CAS claim — ProductionJob QUEUED→RUNNING (atomic, DR 0056 transition #1)
   const idempKey = `PRODUCTION_JOB_RUNNING:${productionJobId}`;

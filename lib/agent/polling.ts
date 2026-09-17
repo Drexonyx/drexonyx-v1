@@ -4,7 +4,7 @@
 
 import { db } from '@/db/index';
 import { aiGenerations } from '@/db/schema/production';
-import { and, eq, ne } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { higgsFieldProvider } from './providers/higgsfield';
 import { materializeGenerationAsset } from './materialization';
 import { failProductionJob, attemptProductionJobCompletion } from './terminal';
