@@ -16,6 +16,7 @@ import { qcAssetMetadataSkill } from './qc/asset-metadata';
 import { qcCreativeQualitySkill } from './qc/creative-quality';
 import { qcFacebookPolicyCheckSkill } from './qc/facebook-policy-check';
 import { whatsappClassifySkill } from './communication/whatsapp-classify';
+import { facebookPagePublishSkill } from './facebook/page-publish';
 import { utilityPromptOptimizeSkill } from './utility/prompt-optimize';
 import { utilityOutputFormatSkill } from './utility/output-format';
 import { utilityBatchCoordinateSkill } from './utility/batch-coordinator';
@@ -39,6 +40,7 @@ export const SKILL_REGISTRY: Record<SkillId, Skill<any, any>> = {
   'qc.creative.quality': qcCreativeQualitySkill,
   'qc.facebook_policy.check': qcFacebookPolicyCheckSkill,
   'communication.whatsapp.classify': whatsappClassifySkill,
+  'facebook.page.publish': facebookPagePublishSkill,
   'utility.prompt.optimize': utilityPromptOptimizeSkill,
   'utility.output.format': utilityOutputFormatSkill,
   'utility.batch.coordinate': utilityBatchCoordinateSkill,

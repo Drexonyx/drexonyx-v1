@@ -1,18 +1,22 @@
-// Marketing Campaign Specialist Agent — DR 0124
+// Marketing Campaign Specialist Agent — DR 0124 + DR 0126
 // Coordinates Facebook marketing campaign workflow:
 //   content quality check → brand alignment → platform policy check →
-//   mandatory human approval gate → completion notification.
+//   mandatory human approval gate → facebook.page.publish → completion notification.
 //
-// CONSTRAINTS (DR 0124):
-//   - No Meta/Facebook API calls — human approver performs actual publish
-//   - Human approval (OWNER or ADMIN_OPERATIONS) MANDATORY before any publish action
+// CONSTRAINTS (DR 0124 / DR 0126):
+//   - facebook.page.publish executes ONLY after HUMAN_GATE approval
+//   - Human approval (OWNER or ADMIN_OPERATIONS) MANDATORY before publish step
 //   - No autonomous publishing under any circumstances
 //   - No financial mutations of any kind
 //   - No content fabrication, invented metrics, or testimonials
 //   - Initiator roles: OWNER, ADMIN_OPERATIONS only
+//   - mediaUrl MUST originate from project R2 storage (enforced in skill)
+//   - Two-page allowlist enforced at skill runtime (META_PAGE_ID_1 / META_PAGE_ID_2)
+//   - Zero paid ads, boosts, or Ads Manager calls — organic only
 
 import { delegateSubTask } from '@/lib/orchestration/delegation';
 import type { InitiatorRole, TaskContext } from '@/lib/orchestration/types';
+import type { FacebookPageTarget, FacebookContentType, FacebookPublishMode } from '@/lib/skills/facebook/page-publish';
 
 export interface MarketingCampaignDelegationParams {
   parentTaskId: string;
@@ -21,14 +25,24 @@ export interface MarketingCampaignDelegationParams {
   initiatorRole: Extract<InitiatorRole, 'OWNER' | 'ADMIN_OPERATIONS'>;
   /** Campaign identifier for tracking and audit. */
   campaignId: string;
-  /** The post/ad caption text to be reviewed and approved. */
+  /** The post caption text to be reviewed and approved. Posted verbatim. */
   captionText: string;
   /** Optional ad headline (validated by facebook_policy.check). */
   headline?: string;
-  /** Facebook placement context. Defaults to 'feed'. */
+  /** Facebook placement context for policy check. Defaults to 'feed'. */
   placement?: 'feed' | 'story' | 'reel' | 'marketplace' | 'search';
   /** Optional brand guidelines for qc.brand.alignment. */
   brandGuidelines?: string;
+  /** Target page. Defaults to 'PAGE_1'. */
+  pageTarget?: FacebookPageTarget;
+  /** Content type. Defaults to 'TEXT'. */
+  contentType?: FacebookContentType;
+  /** R2 URL for media. Required when contentType is IMAGE or VIDEO. */
+  mediaUrl?: string;
+  /** Publish mode. Defaults to 'IMMEDIATE'. */
+  publishMode?: FacebookPublishMode;
+  /** ISO 8601 datetime. Required when publishMode is SCHEDULED. */
+  scheduledAt?: string;
   context?: TaskContext;
 }
 
@@ -49,6 +63,11 @@ export async function delegateMarketingCampaign(
     headline,
     placement,
     brandGuidelines,
+    pageTarget = 'PAGE_1',
+    contentType = 'TEXT',
+    mediaUrl,
+    publishMode = 'IMMEDIATE',
+    scheduledAt,
     context,
   } = params;
 
@@ -61,13 +80,23 @@ export async function delegateMarketingCampaign(
   if (!captionText || typeof captionText !== 'string') {
     return { ok: false, error: 'captionText must be a non-empty string' };
   }
+  if ((contentType === 'IMAGE' || contentType === 'VIDEO') && !mediaUrl) {
+    return { ok: false, error: `mediaUrl is required when contentType is ${contentType}` };
+  }
+  if (publishMode === 'SCHEDULED' && !scheduledAt) {
+    return { ok: false, error: 'scheduledAt is required when publishMode is SCHEDULED' };
+  }
+  if (scheduledAt && isNaN(Date.parse(scheduledAt))) {
+    return { ok: false, error: `scheduledAt '${scheduledAt}' is not a valid ISO 8601 date` };
+  }
 
-  // DR 0124 §2.2: fixed five-step plan
+  // DR 0124 + DR 0126: fixed six-step plan
   // Step 0: SKILL — qc.script.review: content quality (AI, AGENT_ALLOWLIST)
   // Step 1: SKILL — qc.brand.alignment: brand compliance (AI, AGENT_ALLOWLIST)
-  // Step 2: SKILL — qc.facebook_policy.check: platform policy (deterministic, AGENT_ALLOWLIST, DR 0124)
+  // Step 2: SKILL — qc.facebook_policy.check: platform policy (deterministic, AGENT_ALLOWLIST)
   // Step 3: HUMAN_GATE — mandatory publish approval (OWNER or ADMIN_OPERATIONS)
-  // Step 4: NOTIFICATION — campaign completion or failure alert
+  // Step 4: SKILL — facebook.page.publish: organic Graph API publish (post-gate, DR 0126)
+  // Step 5: NOTIFICATION — campaign completion or failure alert
   const plan = {
     steps: [
       {
@@ -106,14 +135,30 @@ export async function delegateMarketingCampaign(
         input: {
           gate: 'CAMPAIGN_PUBLISH_APPROVAL',
           campaignId,
+          pageTarget,
+          contentType,
+          publishMode,
+          ...(scheduledAt ? { scheduledAt } : {}),
+          ...(mediaUrl ? { mediaUrl } : {}),
           requiredRoles: ['OWNER', 'ADMIN_OPERATIONS'],
-          // NOTE: No Meta API integration. The approver performs the actual
-          // Facebook publish via native Meta tooling after granting approval.
-          publishNote: 'Meta API integration not yet configured. Approver must publish manually via Facebook Business Manager.',
         },
       },
       {
         step_index: 4,
+        step_type: 'SKILL' as const,
+        skill_id: 'facebook.page.publish',
+        input: {
+          pageTarget,
+          contentType,
+          message: captionText,
+          ...(mediaUrl ? { mediaUrl } : {}),
+          publishMode,
+          ...(scheduledAt ? { scheduledAt } : {}),
+          campaignId,
+        },
+      },
+      {
+        step_index: 5,
         step_type: 'NOTIFICATION' as const,
         input: { event: 'CAMPAIGN_WORKFLOW_COMPLETED', campaignId },
       },

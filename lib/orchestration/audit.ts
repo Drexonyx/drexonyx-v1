@@ -233,6 +233,33 @@ export async function auditTaskCancelled(params: {
   });
 }
 
+// DR 0126: Facebook organic publishing audit writers.
+export async function auditFacebookPostPublished(params: {
+  organizationId: string;
+  taskId: string;
+  postId: string;
+  pageId: string;
+  contentType: string;
+  publishMode: string;
+  scheduledAt?: string;
+  campaignId: string;
+}): Promise<void> {
+  const { organizationId, taskId, ...rest } = params;
+  await write(organizationId, taskId, 'FACEBOOK_POST_PUBLISHED', { task_id: taskId, ...rest });
+}
+
+export async function auditFacebookPublishFailed(params: {
+  organizationId: string;
+  taskId: string;
+  reason: string;
+  errorCode?: number;
+  errorMessage: string;
+  campaignId: string;
+}): Promise<void> {
+  const { organizationId, taskId, ...rest } = params;
+  await write(organizationId, taskId, 'FACEBOOK_PUBLISH_FAILED', { task_id: taskId, ...rest });
+}
+
 // BOUNDARY_VIOLATION must never be suppressed (Architecture v2 §5, §13).
 // Call this whenever the runner detects a prohibited action attempt.
 export async function auditBoundaryViolation(params: {

@@ -29,8 +29,9 @@ describe('AGENT_ALLOWLIST', () => {
   // DR 0123: expanded from 4 to 5 — qc.creative.quality added (brief fidelity check).
   // DR 0124: expanded from 5 to 6 — qc.facebook_policy.check added (deterministic, zero AI).
   // DR 0125: expanded from 6 to 7 — communication.whatsapp.classify added (deterministic, zero AI).
-  it('contains exactly the seven DR-approved skills', () => {
-    expect(AGENT_ALLOWLIST.size).toBe(7);
+  // DR 0126: expanded from 7 to 8 — facebook.page.publish added (post-HUMAN_GATE organic publish).
+  it('contains exactly the eight DR-approved skills', () => {
+    expect(AGENT_ALLOWLIST.size).toBe(8);
     expect(AGENT_ALLOWLIST.has('utility.prompt.optimize')).toBe(true);
     expect(AGENT_ALLOWLIST.has('qc.asset.metadata')).toBe(true);
     expect(AGENT_ALLOWLIST.has('qc.script.review')).toBe(true);
@@ -38,6 +39,7 @@ describe('AGENT_ALLOWLIST', () => {
     expect(AGENT_ALLOWLIST.has('qc.creative.quality')).toBe(true);
     expect(AGENT_ALLOWLIST.has('qc.facebook_policy.check')).toBe(true);
     expect(AGENT_ALLOWLIST.has('communication.whatsapp.classify')).toBe(true);
+    expect(AGENT_ALLOWLIST.has('facebook.page.publish')).toBe(true);
   });
 });
 
