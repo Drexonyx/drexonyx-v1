@@ -10,9 +10,9 @@ const { mockDb, mockGetZiinaPaymentIntent } = vi.hoisted(() => ({
 vi.mock('@/db/index', () => ({ db: mockDb }));
 vi.mock('@/lib/ziina', () => ({
   getZiinaPaymentIntent: mockGetZiinaPaymentIntent,
-  ZIINA_STATUS_SUCCESS: 'SUCCESS',
-  ZIINA_STATUS_FAILED: 'FAILED',
-  ZIINA_STATUS_CANCELLED: 'CANCELLED',
+  ZIINA_STATUS_SUCCESS: 'completed',
+  ZIINA_STATUS_FAILED: 'failed',
+  ZIINA_STATUS_CANCELLED: 'canceled',
 }));
 vi.mock('../portal/create-payment', () => ({
   writeLedgerEntry: vi.fn().mockResolvedValue(undefined),
@@ -107,11 +107,11 @@ describe('verifyZiinaPayment', () => {
     expect(['FAILED', 'ALREADY_PAID']).toContain(result.status);
   });
 
-  it('returns PAID and applies state transition when Ziina returns SUCCESS', async () => {
+  it('returns PAID and applies state transition when Ziina returns completed', async () => {
     mockDb.select
       .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
       .mockReturnValueOnce(selectChain([])); // no idempotency key yet
-    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'SUCCESS', amount: 50000 });
+    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'completed', amount: 50000 });
 
     const result = await verifyZiinaPayment('pay-1', 'org-1');
 
@@ -120,11 +120,11 @@ describe('verifyZiinaPayment', () => {
     expect(mockDb.transaction).toHaveBeenCalled();
   });
 
-  it('returns FAILED and applies state transition when Ziina returns FAILED', async () => {
+  it('returns FAILED and applies state transition when Ziina returns failed', async () => {
     mockDb.select
       .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
       .mockReturnValueOnce(selectChain([]));
-    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'FAILED', amount: 50000 });
+    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'failed', amount: 50000 });
 
     const result = await verifyZiinaPayment('pay-1', 'org-1');
 
@@ -132,22 +132,34 @@ describe('verifyZiinaPayment', () => {
     expect(mockDb.transaction).toHaveBeenCalled();
   });
 
-  it('returns FAILED when Ziina status is CANCELLED', async () => {
+  it('returns FAILED when Ziina status is canceled', async () => {
     mockDb.select
       .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
       .mockReturnValueOnce(selectChain([]));
-    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'CANCELLED', amount: 50000 });
+    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'canceled', amount: 50000 });
 
     const result = await verifyZiinaPayment('pay-1', 'org-1');
 
     expect(result.status).toBe('FAILED');
   });
 
-  it('returns PENDING when Ziina payment is still PENDING', async () => {
+  it('returns PENDING when Ziina status is pending', async () => {
     mockDb.select
       .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
       .mockReturnValueOnce(selectChain([]));
-    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'PENDING', amount: 50000 });
+    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'pending', amount: 50000 });
+
+    const result = await verifyZiinaPayment('pay-1', 'org-1');
+
+    expect(result.status).toBe('PENDING');
+    expect(mockDb.transaction).not.toHaveBeenCalled();
+  });
+
+  it('returns PENDING when Ziina status is requires_user_action', async () => {
+    mockDb.select
+      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
+      .mockReturnValueOnce(selectChain([]));
+    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'requires_user_action', amount: 50000 });
 
     const result = await verifyZiinaPayment('pay-1', 'org-1');
 
@@ -186,7 +198,7 @@ describe('verifyZiinaPayment', () => {
     mockGetZiinaPaymentIntent.mockResolvedValue({
       id: 'ziina-intent-abc',
       redirect_url: '',
-      status: 'SUCCESS',
+      status: 'completed',
       amount: 50000,
     });
 

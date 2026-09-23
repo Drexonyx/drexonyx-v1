@@ -7,11 +7,12 @@
 const ZIINA_KEY_ENV = 'ZIINA_API_KEY';
 export const ZIINA_BASE_URL = process.env.ZIINA_BASE_URL ?? 'https://api-v2.ziina.com/api';
 
-// Verified status value for a confirmed payment (GET /payment_intent/{id}).
-// Update this constant if the actual Ziina API uses a different status string.
-export const ZIINA_STATUS_SUCCESS = 'SUCCESS';
-export const ZIINA_STATUS_FAILED = 'FAILED';
-export const ZIINA_STATUS_CANCELLED = 'CANCELLED';
+// Ziina v2 API status strings (GET /payment_intent/{id}).
+// Confirmed from official Ziina docs: lowercase, 'canceled' with single 'l'.
+export const ZIINA_STATUS_SUCCESS = 'completed';
+export const ZIINA_STATUS_FAILED = 'failed';
+export const ZIINA_STATUS_CANCELLED = 'canceled'; // Ziina spells it with one 'l'
+// Other possible statuses: 'pending', 'requires_user_action' — fall through to PENDING (no state change)
 
 export const AED_TO_FILS = 100; // 1 AED = 100 fils
 
