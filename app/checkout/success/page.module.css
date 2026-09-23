@@ -1,0 +1,58 @@
+.page {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 1rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  max-width: 480px;
+  text-align: center;
+}
+
+.icon {
+  font-size: 2.5rem;
+  line-height: 1;
+  color: var(--drex-accent);
+}
+
+.heading {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--drex-text);
+}
+
+.body {
+  font-size: 1rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.7;
+}
+
+.link {
+  color: var(--drex-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.75rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #0a0a0a;
+  background: var(--drex-accent);
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  transition: opacity var(--drex-duration) var(--drex-ease);
+}
+
+.cta:hover {
+  opacity: 0.88;
+}

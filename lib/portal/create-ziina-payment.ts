@@ -19,10 +19,14 @@ export type CreateZiinaPaymentResult =
 export async function createZiinaCheckoutSession(params: {
   orderId: string;
   organizationId: string;
-  actorId: string;
+  actorId: string | null;
   baseUrl: string;
+  successPath?: string;
+  cancelPath?: string;
 }): Promise<CreateZiinaPaymentResult> {
   const { orderId, organizationId, actorId, baseUrl } = params;
+  const successPath = params.successPath ?? '/portal/payments/ziina/success';
+  const cancelPath = params.cancelPath ?? '/portal/payments/ziina/cancel';
 
   // Step 1: Fetch order (org-scoped)
   const orderRows = await db
@@ -116,8 +120,8 @@ export async function createZiinaCheckoutSession(params: {
   // Step 5: Call Ziina API (server-side only — API key never leaves server).
   // success_url carries drex_payment_id so the success page can look up our payment record,
   // retrieve provider_payment_id (Ziina's ID), and call GET /payment_intent/{id} server-side.
-  const successUrl = `${baseUrl}/portal/payments/ziina/success?drex_payment_id=${paymentId}`;
-  const cancelUrl = `${baseUrl}/portal/payments/ziina/cancel`;
+  const successUrl = `${baseUrl}${successPath}?drex_payment_id=${paymentId}`;
+  const cancelUrl = `${baseUrl}${cancelPath}`;
 
   let ziina: Awaited<ReturnType<typeof createZiinaPaymentIntent>>;
   try {

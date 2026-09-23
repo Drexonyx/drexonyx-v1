@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { PRODUCTION_PACKAGES } from '@/lib/pricing';
+import CheckoutForm from './CheckoutForm';
 import styles from './page.module.css';
 
 export const metadata: Metadata = {
@@ -66,19 +67,7 @@ export default async function CheckoutPage({ searchParams }: Props) {
                 </div>
               </div>
 
-              <div className={styles.paymentCard}>
-                <h2 className={styles.paymentHeading}>Payment</h2>
-                <p className={styles.paymentNote}>
-                  Online payment is coming soon. To move forward now, submit your project brief and
-                  our team will follow up with a payment link within one business day.
-                </p>
-                <button type="button" className={styles.proceedBtn} disabled>
-                  Proceed to Payment
-                </button>
-                <Link href="/start-project" className={styles.altLink}>
-                  Submit Project Brief Instead
-                </Link>
-              </div>
+              <CheckoutForm selectedPackage={selectedPackage} />
             </div>
           )}
         </div>
