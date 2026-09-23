@@ -1,11 +1,11 @@
 // Ziina payment provider client — DR 0110 / Owner-authorized 2026-09-17.
 // Verified API: POST /payment_intent, GET /payment_intent/{id}.
 // ZIINA_API_KEY is server-side only. Never expose to client or commit the value.
-// ZIINA_BASE_URL defaults to https://api.ziina.com — override per environment.
+// ZIINA_BASE_URL defaults to https://api-v2.ziina.com/api — override per environment.
 // ZIINA_TEST_MODE defaults to 'true' (test mode) unless explicitly set to 'false'.
 
 const ZIINA_KEY_ENV = 'ZIINA_API_KEY';
-export const ZIINA_BASE_URL = process.env.ZIINA_BASE_URL ?? 'https://api.ziina.com';
+export const ZIINA_BASE_URL = process.env.ZIINA_BASE_URL ?? 'https://api-v2.ziina.com/api';
 
 // Verified status value for a confirmed payment (GET /payment_intent/{id}).
 // Update this constant if the actual Ziina API uses a different status string.
@@ -50,14 +50,20 @@ export async function createZiinaPaymentIntent(
     test: isTestMode(),
   };
 
-  const response = await fetch(`${ZIINA_BASE_URL}/payment_intent`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(body),
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${ZIINA_BASE_URL}/payment_intent`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    throw new Error(`Ziina network error (POST /payment_intent): ${msg}`);
+  }
 
   if (!response.ok) {
     const text = await response.text().catch(() => '');
@@ -71,12 +77,18 @@ export async function createZiinaPaymentIntent(
 export async function getZiinaPaymentIntent(id: string): Promise<ZiinaPaymentIntent> {
   const apiKey = getZiinaApiKey();
 
-  const response = await fetch(`${ZIINA_BASE_URL}/payment_intent/${encodeURIComponent(id)}`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-    },
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${ZIINA_BASE_URL}/payment_intent/${encodeURIComponent(id)}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+      },
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    throw new Error(`Ziina network error (GET /payment_intent/${id}): ${msg}`);
+  }
 
   if (!response.ok) {
     const text = await response.text().catch(() => '');
