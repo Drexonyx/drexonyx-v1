@@ -88,6 +88,8 @@ export async function verifyZiinaPayment(
     return { status: 'ERROR', reason };
   }
 
+  console.log('[verify-ziina] payment_intent status from API:', JSON.stringify({ id: ziina.id, status: ziina.status }));
+
   const now = new Date();
 
   if (ziina.status === ZIINA_STATUS_SUCCESS) {
