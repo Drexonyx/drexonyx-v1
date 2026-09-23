@@ -18,6 +18,8 @@ vi.mock('../portal/create-payment', () => ({
   writeLedgerEntry: vi.fn().mockResolvedValue(undefined),
 }));
 
+import { writeLedgerEntry } from '../portal/create-payment';
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function selectChain(rows: unknown[]) {
@@ -30,10 +32,22 @@ function selectChain(rows: unknown[]) {
   return chain;
 }
 
-function makeTx() {
+// updateRows simulates what the DB's .returning() sends back.
+// Default [{ id: 'pay-1' }] = UPDATE matched a row (state transition succeeded).
+// Pass [] to simulate the concurrent-race case where another request won first.
+function makeTx(updateRows: { id: string }[] = [{ id: 'pay-1' }]) {
+  const whereResult = { returning: vi.fn().mockResolvedValue(updateRows) };
   return {
-    update: vi.fn().mockReturnValue({ set: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([]) }) }),
-    insert: vi.fn().mockReturnValue({ values: vi.fn().mockReturnValue({ onConflictDoNothing: vi.fn().mockResolvedValue([]) }) }),
+    update: vi.fn().mockReturnValue({
+      set: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue(whereResult),
+      }),
+    }),
+    insert: vi.fn().mockReturnValue({
+      values: vi.fn().mockReturnValue({
+        onConflictDoNothing: vi.fn().mockResolvedValue([]),
+      }),
+    }),
   };
 }
 
@@ -160,5 +174,32 @@ describe('verifyZiinaPayment', () => {
     expect(result.status).toBe('NOT_FOUND');
     // Verify that select was called (implying the where clause was applied)
     expect(mockDb.select).toHaveBeenCalled();
+  });
+
+  it('does not write ledger entry when UPDATE returns 0 rows (concurrent race)', async () => {
+    // Scenario: two concurrent success-page requests both reach the transaction.
+    // The second one's UPDATE matches 0 rows (payment already PAID by first request).
+    // writeLedgerEntry must NOT be called by the second request.
+    mockDb.select
+      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
+      .mockReturnValueOnce(selectChain([])); // no idempotency key yet
+    mockGetZiinaPaymentIntent.mockResolvedValue({
+      id: 'ziina-intent-abc',
+      redirect_url: '',
+      status: 'SUCCESS',
+      amount: 50000,
+    });
+
+    const mockWriteLedger = vi.mocked(writeLedgerEntry);
+
+    // Simulate the concurrent case: our UPDATE returns 0 rows
+    mockDb.transaction.mockImplementationOnce(async (fn: (tx: unknown) => Promise<void>) => {
+      await fn(makeTx([]));
+    });
+
+    const result = await verifyZiinaPayment('pay-1', 'org-1');
+
+    expect(result.status).toBe('PAID'); // still PAID from Ziina's perspective
+    expect(mockWriteLedger).not.toHaveBeenCalled(); // no duplicate ledger entry
   });
 });

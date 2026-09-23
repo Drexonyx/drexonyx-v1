@@ -165,7 +165,7 @@ describe('createZiinaCheckoutSession', () => {
     }
   });
 
-  it('constructs success_url with drex_payment_id (not Ziina ID)', async () => {
+  it('constructs success_url and cancel_url both carrying drex_payment_id', async () => {
     mockDb.select
       .mockReturnValueOnce(selectChain(ACTIVE_ORDER))
       .mockReturnValueOnce(selectChain(AED_QUOTE))
@@ -177,7 +177,9 @@ describe('createZiinaCheckoutSession', () => {
     const call = mockCreateZiinaPaymentIntent.mock.calls[0][0];
     expect(call.success_url).toContain('/portal/payments/ziina/success');
     expect(call.success_url).toContain('drex_payment_id=');
+    // Cancel URL must also carry drex_payment_id so the cancel page can call verifyZiinaPayment
     expect(call.cancel_url).toContain('/portal/payments/ziina/cancel');
+    expect(call.cancel_url).toContain('drex_payment_id=');
   });
 
   it('does not call Ziina API if PAID guard fires', async () => {
@@ -188,5 +190,21 @@ describe('createZiinaCheckoutSession', () => {
 
     await createZiinaCheckoutSession(BASE_PARAMS);
     expect(mockCreateZiinaPaymentIntent).not.toHaveBeenCalled();
+  });
+
+  it('runs PENDING→FAILED cleanup transaction when Ziina API call throws', async () => {
+    // Regression: a Ziina API failure after the PENDING insert must not strand the payment.
+    // The cleanup transaction must be attempted so the payment is marked FAILED.
+    mockDb.select
+      .mockReturnValueOnce(selectChain(ACTIVE_ORDER))
+      .mockReturnValueOnce(selectChain(AED_QUOTE))
+      .mockReturnValueOnce(selectChain(NO_PAID));
+    mockCreateZiinaPaymentIntent.mockRejectedValue(new Error('Ziina API error 500'));
+
+    const result = await createZiinaCheckoutSession(BASE_PARAMS);
+
+    expect(result.ok).toBe(false);
+    // transaction called twice: (1) PENDING insert, (2) FAILED cleanup
+    expect(mockDb.transaction).toHaveBeenCalledTimes(2);
   });
 });

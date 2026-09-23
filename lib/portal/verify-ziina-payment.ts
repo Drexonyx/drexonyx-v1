@@ -91,9 +91,12 @@ export async function verifyZiinaPayment(
   const now = new Date();
 
   if (ziina.status === ZIINA_STATUS_SUCCESS) {
-    // Step 5a: PROCESSING → PAID + ledger entry (atomic)
+    // Step 5a: PROCESSING → PAID + ledger entry (atomic).
+    // Uses .returning() to detect whether THIS transaction won the race — only the
+    // request that actually transitions the payment writes the ledger entry.
+    // DB-level guarantee: unique partial index on financial_ledger (migration 0021).
     await db.transaction(async (tx) => {
-      await tx
+      const updated = await tx
         .update(payments)
         .set({ status: 'PAID', paid_at: now })
         .where(
@@ -102,38 +105,43 @@ export async function verifyZiinaPayment(
             eq(payments.organization_id, organizationId),
             eq(payments.status, 'PROCESSING'),
           ),
-        );
+        )
+        .returning({ id: payments.id });
 
-      // DR 0052 §3.2: CLIENT_PAYMENT — exactly once per PAID payment
-      await writeLedgerEntry(tx, {
-        organizationId,
-        entryType: 'CLIENT_PAYMENT',
-        amount: payment.amount,
-        currency: payment.currency,
-        paymentId: payment.id,
-        description: `Ziina payment confirmed for order ${payment.order_id.slice(0, 8)}`,
-      });
-
-      await tx.insert(auditEvents).values({
-        id: uuidv7(),
-        organization_id: organizationId,
-        entity_type: 'payment',
-        entity_id: payment.id,
-        actor_id: null,
-        actor_role: 'SYSTEM',
-        action: 'PROCESSING_TO_PAID',
-        payload: {
-          payment_id: payment.id,
-          order_id: payment.order_id,
+      if (updated.length > 0) {
+        // DR 0052 §3.2: CLIENT_PAYMENT — exactly once per PAID payment
+        await writeLedgerEntry(tx, {
+          organizationId,
+          entryType: 'CLIENT_PAYMENT',
           amount: payment.amount,
           currency: payment.currency,
-          provider: 'ziina',
-          ziina_payment_intent_id: payment.provider_payment_id,
-          ziina_status: ziina.status,
-          ledger_entry_type: 'CLIENT_PAYMENT',
-        },
-      });
+          paymentId: payment.id,
+          description: `Ziina payment confirmed for order ${payment.order_id.slice(0, 8)}`,
+        });
 
+        await tx.insert(auditEvents).values({
+          id: uuidv7(),
+          organization_id: organizationId,
+          entity_type: 'payment',
+          entity_id: payment.id,
+          actor_id: null,
+          actor_role: 'SYSTEM',
+          action: 'PROCESSING_TO_PAID',
+          payload: {
+            payment_id: payment.id,
+            order_id: payment.order_id,
+            amount: payment.amount,
+            currency: payment.currency,
+            provider: 'ziina',
+            ziina_payment_intent_id: payment.provider_payment_id,
+            ziina_status: ziina.status,
+            ledger_entry_type: 'CLIENT_PAYMENT',
+          },
+        });
+      }
+
+      // Idempotency key insert is always attempted — ON CONFLICT DO NOTHING handles
+      // the case where another concurrent transaction already inserted it.
       await tx
         .insert(idempotencyKeys)
         .values({
@@ -154,9 +162,10 @@ export async function verifyZiinaPayment(
   }
 
   if (ziina.status === ZIINA_STATUS_FAILED || ziina.status === ZIINA_STATUS_CANCELLED) {
-    // Step 5b: PROCESSING → FAILED (no ledger entry for failures — DR 0052 §5)
+    // Step 5b: PROCESSING → FAILED (no ledger entry for failures — DR 0052 §5).
+    // Uses .returning() for consistency — audit event only fires if transition succeeded.
     await db.transaction(async (tx) => {
-      await tx
+      const updated = await tx
         .update(payments)
         .set({ status: 'FAILED', failure_reason: `ziina_status:${ziina.status}` })
         .where(
@@ -165,24 +174,27 @@ export async function verifyZiinaPayment(
             eq(payments.organization_id, organizationId),
             eq(payments.status, 'PROCESSING'),
           ),
-        );
+        )
+        .returning({ id: payments.id });
 
-      await tx.insert(auditEvents).values({
-        id: uuidv7(),
-        organization_id: organizationId,
-        entity_type: 'payment',
-        entity_id: payment.id,
-        actor_id: null,
-        actor_role: 'SYSTEM',
-        action: 'PROCESSING_TO_FAILED',
-        payload: {
-          payment_id: payment.id,
-          provider: 'ziina',
-          ziina_payment_intent_id: payment.provider_payment_id,
-          ziina_status: ziina.status,
-          failure_reason: `ziina_status:${ziina.status}`,
-        },
-      });
+      if (updated.length > 0) {
+        await tx.insert(auditEvents).values({
+          id: uuidv7(),
+          organization_id: organizationId,
+          entity_type: 'payment',
+          entity_id: payment.id,
+          actor_id: null,
+          actor_role: 'SYSTEM',
+          action: 'PROCESSING_TO_FAILED',
+          payload: {
+            payment_id: payment.id,
+            provider: 'ziina',
+            ziina_payment_intent_id: payment.provider_payment_id,
+            ziina_status: ziina.status,
+            failure_reason: `ziina_status:${ziina.status}`,
+          },
+        });
+      }
 
       await tx
         .insert(idempotencyKeys)
