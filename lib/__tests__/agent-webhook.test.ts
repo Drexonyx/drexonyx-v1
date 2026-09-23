@@ -8,6 +8,7 @@ const {
   mockRetryDispatch,
   mockAttemptProductionJobCompletion, mockFailProductionJob,
   mockMaterializeGenerationAsset,
+  mockRunAutomatedQcAndPipeline,
 } = vi.hoisted(() => ({
   mockSelect: vi.fn(),
   mockInsert: vi.fn(),
@@ -19,6 +20,7 @@ const {
   mockAttemptProductionJobCompletion: vi.fn(),
   mockFailProductionJob: vi.fn(),
   mockMaterializeGenerationAsset: vi.fn(),
+  mockRunAutomatedQcAndPipeline: vi.fn(),
 }));
 
 vi.mock('@/db/index', () => ({
@@ -47,6 +49,10 @@ vi.mock('@/lib/agent/terminal', () => ({
 
 vi.mock('@/lib/agent/materialization', () => ({
   materializeGenerationAsset: mockMaterializeGenerationAsset,
+}));
+
+vi.mock('@/lib/admin/automated-pipeline', () => ({
+  runAutomatedQcAndPipeline: mockRunAutomatedQcAndPipeline,
 }));
 
 import { type NextRequest } from 'next/server';
@@ -172,6 +178,7 @@ describe('POST /api/webhooks/higgsfield — correlation and tenant isolation', (
     });
     mockAttemptProductionJobCompletion.mockResolvedValue({ ok: true, transitioned: false });
     mockMaterializeGenerationAsset.mockResolvedValue({ ok: true, assetId: 'asset1' });
+    mockRunAutomatedQcAndPipeline.mockResolvedValue({ ok: true, verdict: 'PASS' });
 
     const req = makeRequest({}, { 'x-higgsfield-signature': 'sig' });
     await POST(req as unknown as NextRequest);
@@ -229,6 +236,7 @@ describe('POST /api/webhooks/higgsfield — SUCCEEDED path', () => {
     mockParseWebhookPayload.mockReturnValue({ ...validParsedPayload, status: 'SUCCEEDED' });
     mockAttemptProductionJobCompletion.mockResolvedValue({ ok: true, transitioned: false });
     mockMaterializeGenerationAsset.mockResolvedValue({ ok: true, assetId: 'asset1' });
+    mockRunAutomatedQcAndPipeline.mockResolvedValue({ ok: true, verdict: 'PASS' });
   });
 
   it('calls attemptProductionJobCompletion after SUCCEEDED transition', async () => {

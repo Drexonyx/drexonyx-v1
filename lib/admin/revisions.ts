@@ -33,8 +33,14 @@ export async function createRevisionJob(params: {
   metadata?: Record<string, unknown>;
   actorId: string;
   actorRole: AdminRole;
+  aiGenerationParams?: {
+    provider?: string | null;
+    model?: string | null;
+    prompt?: string | null;
+    params?: Record<string, unknown> | null;
+  };
 }): Promise<CreateRevisionJobResult> {
-  const { originalAssetId, orderId, organizationId, jobType, description, metadata, actorId, actorRole } = params;
+  const { originalAssetId, orderId, organizationId, jobType, description, metadata, actorId, actorRole, aiGenerationParams } = params;
 
   if (!REVISION_ROLES.includes(actorRole)) {
     return { ok: false, reason: 'Insufficient authority' };
@@ -162,6 +168,7 @@ export async function createRevisionJob(params: {
         metadata,
         actorId,
         actorRole,
+        aiGenerationParams,
       });
 
       // The only record linking the original REVISION_REQUIRED asset to the new job.

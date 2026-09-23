@@ -13,6 +13,7 @@ import { getZiinaPaymentIntent, ZIINA_STATUS_SUCCESS, ZIINA_STATUS_FAILED, ZIINA
 import { writeLedgerEntry } from './create-payment';
 import { createProductionJob } from '@/lib/admin/production-jobs';
 import { createManualUploadAsset } from '@/lib/admin/manual-upload';
+import { runGenerationDriver } from '@/lib/agent/driver';
 
 export type VerifyZiinaPaymentResult =
   | { status: 'PAID'; paymentId: string }
@@ -168,27 +169,50 @@ export async function verifyZiinaPayment(
     // transition (paymentTransitioned=true). Idempotent: a page refresh returns ALREADY_PAID
     // at step 1 above and never reaches this point, so duplicates are structurally impossible.
     if (paymentTransitioned) {
+      // Prefer AI_GENERATION when all required env vars are configured.
+      const aiProvider = process.env.PRODUCTION_AI_PROVIDER ?? null;
+      const aiModel = process.env.PRODUCTION_AI_MODEL ?? null;
+      const aiPrompt = process.env.PRODUCTION_AI_PROMPT ?? null;
+      const useAiGeneration = Boolean(aiProvider && aiModel && aiPrompt);
+      const jobType = useAiGeneration ? 'AI_GENERATION' : 'MANUAL_UPLOAD';
+
       const jobResult = await createProductionJob({
         orderId: payment.order_id,
         organizationId,
-        jobType: 'MANUAL_UPLOAD',
+        jobType,
         description: `Auto-queued after Ziina payment confirmed for order ${payment.order_id.slice(0, 8)}`,
         actorId: 'SYSTEM',
         actorRole: 'OWNER',
+        ...(useAiGeneration
+          ? { aiGenerationParams: { provider: aiProvider!, model: aiModel!, prompt: aiPrompt! } }
+          : {}),
       });
+
       if (jobResult.ok) {
-        // Auto-create the initial MANUAL_UPLOAD asset at UPLOADED status.
-        // Admin will upload the content file and then mark it READY_FOR_QC to start automated QC.
-        const assetResult = await createManualUploadAsset({
-          productionJobId: jobResult.jobId,
-          organizationId,
-          actorId: 'SYSTEM',
-          actorRole: 'OWNER',
-        });
-        if (!assetResult.ok) {
-          console.error(
-            `[verifyZiinaPayment] Asset creation failed for job ${jobResult.jobId}: ${assetResult.reason}`,
-          );
+        if (useAiGeneration) {
+          // AI_GENERATION: dispatch immediately; webhook + materialization + auto-QC handle the rest.
+          const driverResult = await runGenerationDriver({
+            productionJobId: jobResult.jobId,
+            organizationId,
+          });
+          if (!driverResult.ok) {
+            console.error(
+              `[verifyZiinaPayment] runGenerationDriver failed for job ${jobResult.jobId}: ${driverResult.reason}`,
+            );
+          }
+        } else {
+          // MANUAL_UPLOAD fallback: create placeholder asset; admin uploads file and marks ready.
+          const assetResult = await createManualUploadAsset({
+            productionJobId: jobResult.jobId,
+            organizationId,
+            actorId: 'SYSTEM',
+            actorRole: 'OWNER',
+          });
+          if (!assetResult.ok) {
+            console.error(
+              `[verifyZiinaPayment] Asset creation failed for job ${jobResult.jobId}: ${assetResult.reason}`,
+            );
+          }
         }
       } else {
         // Payment is confirmed — do not fail the response. Job can be created manually.

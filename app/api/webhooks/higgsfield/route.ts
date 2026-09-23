@@ -14,6 +14,7 @@ import { higgsFieldProvider } from '@/lib/agent/providers/higgsfield';
 import { retryDispatch } from '@/lib/agent/driver';
 import { attemptProductionJobCompletion, failProductionJob } from '@/lib/agent/terminal';
 import { materializeGenerationAsset } from '@/lib/agent/materialization';
+import { runAutomatedQcAndPipeline } from '@/lib/admin/automated-pipeline';
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   // Read raw body before any parsing — required for HMAC signature verification
@@ -199,6 +200,13 @@ async function handleSuccess(params: {
 
   // Check if ProductionJob can now complete (DR 0063 §2.2)
   await attemptProductionJobCompletion({ productionJobId, organizationId });
+
+  // Trigger automated QC immediately after the asset reaches READY_FOR_QC.
+  // Non-fatal: asset status is already committed regardless of QC outcome.
+  const qcResult = await runAutomatedQcAndPipeline({ assetId: matResult.assetId, organizationId });
+  if (!qcResult.ok) {
+    console.error(`[webhook] runAutomatedQcAndPipeline failed for asset ${matResult.assetId}: ${qcResult.reason}`);
+  }
 }
 
 async function handleFailure(params: {

@@ -12,6 +12,7 @@ import { uuidv7 } from 'uuidv7';
 import { createManualUploadAsset } from './manual-upload';
 import { createRevisionJob } from './revisions';
 import { createDelivery, sendDelivery } from './deliveries';
+import { runGenerationDriver } from '@/lib/agent/driver';
 import type { AdminRole } from './types';
 
 // Sentinel UUID for pipeline-automated audit events. No FK on actor_id so any UUID is valid.
@@ -228,11 +229,21 @@ export async function runAutomatedQcAndPipeline(params: {
     return { ok: true, verdict: 'FAIL', reviewId: committedReviewId, exhausted: true };
   }
 
+  // Prefer AI_GENERATION when all required env vars are configured; fall back to MANUAL_UPLOAD.
+  const aiProvider = process.env.PRODUCTION_AI_PROVIDER ?? null;
+  const aiModel = process.env.PRODUCTION_AI_MODEL ?? null;
+  const aiPrompt = process.env.PRODUCTION_AI_PROMPT ?? null;
+  const useAiGeneration = Boolean(aiProvider && aiModel && aiPrompt);
+  const revJobType = useAiGeneration ? 'AI_GENERATION' : 'MANUAL_UPLOAD';
+
   const revisionResult = await createRevisionJob({
     originalAssetId: assetId,
     orderId,
     organizationId,
-    jobType: 'MANUAL_UPLOAD',
+    jobType: revJobType,
+    ...(useAiGeneration
+      ? { aiGenerationParams: { provider: aiProvider!, model: aiModel!, prompt: aiPrompt! } }
+      : {}),
     description: `Auto-revision ${revisionCount + 1} after QC FAIL: ${failReason}`,
     actorId: PIPELINE_ACTOR_ID,
     actorRole: PIPELINE_ACTOR_ROLE,
@@ -243,15 +254,26 @@ export async function runAutomatedQcAndPipeline(params: {
     return { ok: true, verdict: 'FAIL', reviewId: committedReviewId };
   }
 
-  const revisionAssetResult = await createManualUploadAsset({
-    productionJobId: revisionResult.newProductionJobId,
-    organizationId,
-    actorId: PIPELINE_ACTOR_ID,
-    actorRole: PIPELINE_ACTOR_ROLE,
-  });
-
-  if (!revisionAssetResult.ok) {
-    console.error(`[automatedPipeline] Revision asset creation failed: ${revisionAssetResult.reason}`);
+  if (useAiGeneration) {
+    // AI_GENERATION revision: dispatch immediately; webhook + materialization + auto-QC handle the rest.
+    const driverResult = await runGenerationDriver({
+      productionJobId: revisionResult.newProductionJobId,
+      organizationId,
+    });
+    if (!driverResult.ok) {
+      console.error(`[automatedPipeline] Revision runGenerationDriver failed: ${driverResult.reason}`);
+    }
+  } else {
+    // MANUAL_UPLOAD revision: create placeholder asset for admin to upload file.
+    const revisionAssetResult = await createManualUploadAsset({
+      productionJobId: revisionResult.newProductionJobId,
+      organizationId,
+      actorId: PIPELINE_ACTOR_ID,
+      actorRole: PIPELINE_ACTOR_ROLE,
+    });
+    if (!revisionAssetResult.ok) {
+      console.error(`[automatedPipeline] Revision asset creation failed: ${revisionAssetResult.reason}`);
+    }
   }
 
   return { ok: true, verdict: 'FAIL', reviewId: committedReviewId, revisionJobId: revisionResult.newProductionJobId };

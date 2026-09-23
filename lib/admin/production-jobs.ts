@@ -32,9 +32,15 @@ export async function insertProductionJobInTx(
     metadata?: Record<string, unknown>;
     actorId: string;
     actorRole: AdminRole;
+    aiGenerationParams?: {
+      provider?: string | null;
+      model?: string | null;
+      prompt?: string | null;
+      params?: Record<string, unknown> | null;
+    };
   },
 ): Promise<void> {
-  const { jobId, orderId, organizationId, jobType, description, metadata, actorId, actorRole } = params;
+  const { jobId, orderId, organizationId, jobType, description, metadata, actorId, actorRole, aiGenerationParams } = params;
 
   await tx.insert(productionJobs).values({
     id: jobId,
@@ -52,6 +58,10 @@ export async function insertProductionJobInTx(
       production_job_id: jobId,
       organization_id: organizationId,
       status: 'REQUESTED',
+      provider: aiGenerationParams?.provider ?? null,
+      model: aiGenerationParams?.model ?? null,
+      prompt: aiGenerationParams?.prompt ?? null,
+      params: aiGenerationParams?.params ?? null,
     });
 
     await tx.insert(auditEvents).values({
@@ -90,8 +100,14 @@ export async function createProductionJob(params: {
   metadata?: Record<string, unknown>;
   actorId: string;
   actorRole: AdminRole;
+  aiGenerationParams?: {
+    provider?: string | null;
+    model?: string | null;
+    prompt?: string | null;
+    params?: Record<string, unknown> | null;
+  };
 }): Promise<CreateProductionJobResult> {
-  const { orderId, organizationId, jobType, description, metadata, actorId, actorRole } = params;
+  const { orderId, organizationId, jobType, description, metadata, actorId, actorRole, aiGenerationParams } = params;
 
   if (!CREATE_ROLES.includes(actorRole)) {
     return { ok: false, reason: 'Insufficient authority' };
@@ -166,7 +182,10 @@ export async function createProductionJob(params: {
         production_job_id: jobId,
         organization_id: organizationId,
         status: 'REQUESTED',
-        // DR 0053 §2.6: provider integration DEFERRED; provider fields remain null
+        provider: aiGenerationParams?.provider ?? null,
+        model: aiGenerationParams?.model ?? null,
+        prompt: aiGenerationParams?.prompt ?? null,
+        params: aiGenerationParams?.params ?? null,
       });
 
       await tx.insert(auditEvents).values({

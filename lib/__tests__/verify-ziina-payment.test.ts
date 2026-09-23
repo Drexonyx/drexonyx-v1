@@ -2,11 +2,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ─── Hoisted mocks ────────────────────────────────────────────────────────────
 
-const { mockDb, mockGetZiinaPaymentIntent, mockCreateProductionJob, mockCreateManualUploadAsset } = vi.hoisted(() => ({
+const { mockDb, mockGetZiinaPaymentIntent, mockCreateProductionJob, mockCreateManualUploadAsset, mockRunGenerationDriver } = vi.hoisted(() => ({
   mockDb: { select: vi.fn(), transaction: vi.fn() },
   mockGetZiinaPaymentIntent: vi.fn(),
   mockCreateProductionJob: vi.fn(),
   mockCreateManualUploadAsset: vi.fn(),
+  mockRunGenerationDriver: vi.fn(),
 }));
 
 vi.mock('@/db/index', () => ({ db: mockDb }));
@@ -24,6 +25,9 @@ vi.mock('@/lib/admin/production-jobs', () => ({
 }));
 vi.mock('@/lib/admin/manual-upload', () => ({
   createManualUploadAsset: mockCreateManualUploadAsset,
+}));
+vi.mock('@/lib/agent/driver', () => ({
+  runGenerationDriver: mockRunGenerationDriver,
 }));
 
 import { writeLedgerEntry } from '../portal/create-payment';
@@ -73,11 +77,15 @@ import { verifyZiinaPayment } from '../portal/verify-ziina-payment';
 describe('verifyZiinaPayment', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    delete process.env.PRODUCTION_AI_PROVIDER;
+    delete process.env.PRODUCTION_AI_MODEL;
+    delete process.env.PRODUCTION_AI_PROMPT;
     mockDb.transaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
       await fn(makeTx());
     });
     mockCreateProductionJob.mockResolvedValue({ ok: true, jobId: 'job-1' });
     mockCreateManualUploadAsset.mockResolvedValue({ ok: true, assetId: 'asset-1' });
+    mockRunGenerationDriver.mockResolvedValue({ ok: true, providerJobId: 'hf-job-1' });
   });
 
   it('returns NOT_FOUND when payment record does not exist', async () => {
@@ -362,5 +370,77 @@ describe('verifyZiinaPayment', () => {
     await verifyZiinaPayment('pay-1', 'org-1');
 
     expect(mockCreateManualUploadAsset).not.toHaveBeenCalled();
+  });
+
+  // ─── AI_GENERATION path (when PRODUCTION_AI_* env vars are set) ──────────────
+
+  it('creates an AI_GENERATION job and calls runGenerationDriver when AI env vars are set', async () => {
+    process.env.PRODUCTION_AI_PROVIDER = 'higgsfield';
+    process.env.PRODUCTION_AI_MODEL = 'text2image/soul';
+    process.env.PRODUCTION_AI_PROMPT = 'Generate a product showcase video';
+
+    mockDb.select
+      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
+      .mockReturnValueOnce(selectChain([]));
+    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'completed', amount: 50000 });
+
+    const result = await verifyZiinaPayment('pay-1', 'org-1');
+
+    expect(result.status).toBe('PAID');
+    expect(mockCreateProductionJob).toHaveBeenCalledWith(
+      expect.objectContaining({
+        jobType: 'AI_GENERATION',
+        aiGenerationParams: expect.objectContaining({
+          provider: 'higgsfield',
+          model: 'text2image/soul',
+          prompt: 'Generate a product showcase video',
+        }),
+      }),
+    );
+    expect(mockRunGenerationDriver).toHaveBeenCalledWith({ productionJobId: 'job-1', organizationId: 'org-1' });
+    expect(mockCreateManualUploadAsset).not.toHaveBeenCalled();
+  });
+
+  it('does not call runGenerationDriver when AI env vars are not set', async () => {
+    mockDb.select
+      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
+      .mockReturnValueOnce(selectChain([]));
+    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'completed', amount: 50000 });
+
+    await verifyZiinaPayment('pay-1', 'org-1');
+
+    expect(mockRunGenerationDriver).not.toHaveBeenCalled();
+    expect(mockCreateManualUploadAsset).toHaveBeenCalledOnce();
+  });
+
+  it('still returns PAID when runGenerationDriver fails (job is committed regardless)', async () => {
+    process.env.PRODUCTION_AI_PROVIDER = 'higgsfield';
+    process.env.PRODUCTION_AI_MODEL = 'text2image/soul';
+    process.env.PRODUCTION_AI_PROMPT = 'Generate a product showcase video';
+
+    mockDb.select
+      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
+      .mockReturnValueOnce(selectChain([]));
+    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'completed', amount: 50000 });
+    mockRunGenerationDriver.mockResolvedValue({ ok: false, reason: 'No approved route for provider' });
+
+    const result = await verifyZiinaPayment('pay-1', 'org-1');
+
+    expect(result.status).toBe('PAID');
+  });
+
+  it('does not call runGenerationDriver when only some AI env vars are set', async () => {
+    process.env.PRODUCTION_AI_PROVIDER = 'higgsfield';
+    // PRODUCTION_AI_MODEL and PRODUCTION_AI_PROMPT not set
+
+    mockDb.select
+      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
+      .mockReturnValueOnce(selectChain([]));
+    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'completed', amount: 50000 });
+
+    await verifyZiinaPayment('pay-1', 'org-1');
+
+    expect(mockRunGenerationDriver).not.toHaveBeenCalled();
+    expect(mockCreateProductionJob).toHaveBeenCalledWith(expect.objectContaining({ jobType: 'MANUAL_UPLOAD' }));
   });
 });

@@ -10,6 +10,7 @@ const {
   mockRetryDispatch,
   mockAttemptProductionJobCompletion, mockFailProductionJob,
   mockMaterializeGenerationAsset,
+  mockRunAutomatedQcAndPipeline,
   mockPutObject,
 } = vi.hoisted(() => ({
   mockSelect: vi.fn(),
@@ -22,6 +23,7 @@ const {
   mockAttemptProductionJobCompletion: vi.fn(),
   mockFailProductionJob: vi.fn(),
   mockMaterializeGenerationAsset: vi.fn(),
+  mockRunAutomatedQcAndPipeline: vi.fn(),
   mockPutObject: vi.fn(),
 }));
 
@@ -51,6 +53,10 @@ vi.mock('@/lib/agent/terminal', () => ({
 
 vi.mock('@/lib/agent/materialization', () => ({
   materializeGenerationAsset: mockMaterializeGenerationAsset,
+}));
+
+vi.mock('@/lib/admin/automated-pipeline', () => ({
+  runAutomatedQcAndPipeline: mockRunAutomatedQcAndPipeline,
 }));
 
 vi.mock('@/lib/infrastructure/object-storage', () => ({
@@ -119,6 +125,7 @@ describe('Webhook SUCCEEDED path — materialization integration', () => {
     mockVerifyWebhookSignature.mockReturnValue(true);
     mockParseWebhookPayload.mockReturnValue(succeededPayload);
     mockAttemptProductionJobCompletion.mockResolvedValue({ ok: true, transitioned: false });
+    mockRunAutomatedQcAndPipeline.mockResolvedValue({ ok: true, verdict: 'PASS' });
   });
 
   // DR 0078 §2.5: materializeGenerationAsset must be called BEFORE attemptProductionJobCompletion
@@ -145,6 +152,7 @@ describe('Webhook SUCCEEDED path — materialization integration', () => {
     expect(res.status).toBe(200); // DR 0078 §2.2: always 200 to prevent provider retries
     expect(mockAttemptProductionJobCompletion).not.toHaveBeenCalled();
     expect(mockFailProductionJob).not.toHaveBeenCalled();
+    expect(mockRunAutomatedQcAndPipeline).not.toHaveBeenCalled();
   });
 
   // DR 0078 §2.2: webhook must return 200 even on materialization failure
@@ -179,7 +187,7 @@ describe('Webhook SUCCEEDED path — materialization integration', () => {
     );
   });
 
-  // Full happy path: transaction → materialize → attempt completion
+  // Full happy path: transaction → materialize → attempt completion → QC
   it('full happy path: returns 200 with all steps called', async () => {
     selectSequence([[validGen], []]);
     makeSuccessfulTransaction();
@@ -192,5 +200,18 @@ describe('Webhook SUCCEEDED path — materialization integration', () => {
     expect(body.received).toBe(true);
     expect(mockMaterializeGenerationAsset).toHaveBeenCalledOnce();
     expect(mockAttemptProductionJobCompletion).toHaveBeenCalledOnce();
+    expect(mockRunAutomatedQcAndPipeline).toHaveBeenCalledWith({ assetId: 'asset1', organizationId: 'org1' });
+  });
+
+  // QC is skipped when materialization fails (no assetId to pass)
+  it('does not call runAutomatedQcAndPipeline when materialization fails', async () => {
+    selectSequence([[validGen], []]);
+    makeSuccessfulTransaction();
+    mockMaterializeGenerationAsset.mockResolvedValue({ ok: false, error: 'upload failed' });
+
+    const res = await POST(makeRequest({}, { 'x-higgsfield-signature': 'sig' }) as unknown as NextRequest);
+
+    expect(res.status).toBe(200);
+    expect(mockRunAutomatedQcAndPipeline).not.toHaveBeenCalled();
   });
 });

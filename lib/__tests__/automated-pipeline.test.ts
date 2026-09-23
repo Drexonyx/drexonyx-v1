@@ -6,6 +6,7 @@ const {
   mockDb,
   mockCreateRevisionJob,
   mockCreateManualUploadAsset,
+  mockRunGenerationDriver,
   mockCreateDelivery,
   mockSendDelivery,
 } = vi.hoisted(() => ({
@@ -17,6 +18,7 @@ const {
   },
   mockCreateRevisionJob: vi.fn(),
   mockCreateManualUploadAsset: vi.fn(),
+  mockRunGenerationDriver: vi.fn(),
   mockCreateDelivery: vi.fn(),
   mockSendDelivery: vi.fn(),
 }));
@@ -24,6 +26,7 @@ const {
 vi.mock('@/db/index', () => ({ db: mockDb }));
 vi.mock('@/lib/admin/revisions', () => ({ createRevisionJob: mockCreateRevisionJob }));
 vi.mock('@/lib/admin/manual-upload', () => ({ createManualUploadAsset: mockCreateManualUploadAsset }));
+vi.mock('@/lib/agent/driver', () => ({ runGenerationDriver: mockRunGenerationDriver }));
 vi.mock('@/lib/admin/deliveries', () => ({
   createDelivery: mockCreateDelivery,
   sendDelivery: mockSendDelivery,
@@ -153,12 +156,16 @@ describe('runAutomatedQcAndPipeline', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     delete process.env.AUTOMATED_QC_REQUIRE_FILE;
+    delete process.env.PRODUCTION_AI_PROVIDER;
+    delete process.env.PRODUCTION_AI_MODEL;
+    delete process.env.PRODUCTION_AI_PROMPT;
 
     mockDb.transaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
       await fn(makeTx());
     });
     mockCreateRevisionJob.mockResolvedValue({ ok: true, newProductionJobId: 'job-rev-1' });
     mockCreateManualUploadAsset.mockResolvedValue({ ok: true, assetId: 'rev-asset-1' });
+    mockRunGenerationDriver.mockResolvedValue({ ok: true, providerJobId: 'hf-rev-1' });
     mockCreateDelivery.mockResolvedValue({ ok: true, deliveryId: 'del-1' });
     mockSendDelivery.mockResolvedValue({ ok: true });
   });
@@ -199,7 +206,7 @@ describe('runAutomatedQcAndPipeline', () => {
     if (result.ok) expect(result.verdict).toBe('PASS');
   });
 
-  it('returns FAIL verdict and creates revision job when file is missing', async () => {
+  it('returns FAIL verdict and creates MANUAL_UPLOAD revision job when file is missing and AI env vars not set', async () => {
     mockDb.select
       .mockReturnValueOnce(selectChain([READY_ASSET_NO_FILE])) // asset
       .mockReturnValueOnce(selectChain([])) // idempotency key check
@@ -218,8 +225,72 @@ describe('runAutomatedQcAndPipeline', () => {
     if (result.ok) {
       expect(result.verdict).toBe('FAIL');
       expect(mockCreateRevisionJob).toHaveBeenCalledOnce();
+      expect(mockCreateRevisionJob).toHaveBeenCalledWith(expect.objectContaining({ jobType: 'MANUAL_UPLOAD' }));
       expect(mockCreateManualUploadAsset).toHaveBeenCalledOnce();
+      expect(mockRunGenerationDriver).not.toHaveBeenCalled();
     }
+  });
+
+  it('creates AI_GENERATION revision job and dispatches driver when AI env vars are set', async () => {
+    process.env.PRODUCTION_AI_PROVIDER = 'higgsfield';
+    process.env.PRODUCTION_AI_MODEL = 'hf-video-1';
+    process.env.PRODUCTION_AI_PROMPT = 'Generate a video';
+
+    mockDb.select
+      .mockReturnValueOnce(selectChain([READY_ASSET_NO_FILE])) // asset
+      .mockReturnValueOnce(selectChain([])) // idempotency key check
+      .mockReturnValueOnce(selectChain([{ total: 0 }])); // revision count
+
+    mockDb.update = vi.fn().mockReturnValue({
+      set: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([]) }),
+    });
+    mockDb.insert = vi.fn().mockReturnValue({
+      values: vi.fn().mockReturnValue({ onConflictDoNothing: vi.fn().mockResolvedValue([]) }),
+    });
+
+    const result = await runAutomatedQcAndPipeline({ assetId: 'asset-1', organizationId: 'org-1' });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.verdict).toBe('FAIL');
+      expect(mockCreateRevisionJob).toHaveBeenCalledOnce();
+      expect(mockCreateRevisionJob).toHaveBeenCalledWith(
+        expect.objectContaining({
+          jobType: 'AI_GENERATION',
+          aiGenerationParams: { provider: 'higgsfield', model: 'hf-video-1', prompt: 'Generate a video' },
+        }),
+      );
+      expect(mockRunGenerationDriver).toHaveBeenCalledWith({
+        productionJobId: 'job-rev-1',
+        organizationId: 'org-1',
+      });
+      expect(mockCreateManualUploadAsset).not.toHaveBeenCalled();
+    }
+  });
+
+  it('still returns FAIL verdict when revision driver dispatch fails (revision job committed)', async () => {
+    process.env.PRODUCTION_AI_PROVIDER = 'higgsfield';
+    process.env.PRODUCTION_AI_MODEL = 'hf-video-1';
+    process.env.PRODUCTION_AI_PROMPT = 'Generate a video';
+
+    mockDb.select
+      .mockReturnValueOnce(selectChain([READY_ASSET_NO_FILE]))
+      .mockReturnValueOnce(selectChain([]))
+      .mockReturnValueOnce(selectChain([{ total: 0 }]));
+
+    mockDb.update = vi.fn().mockReturnValue({
+      set: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([]) }),
+    });
+    mockDb.insert = vi.fn().mockReturnValue({
+      values: vi.fn().mockReturnValue({ onConflictDoNothing: vi.fn().mockResolvedValue([]) }),
+    });
+    mockRunGenerationDriver.mockResolvedValue({ ok: false, reason: 'provider error' });
+
+    const result = await runAutomatedQcAndPipeline({ assetId: 'asset-1', organizationId: 'org-1' });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.verdict).toBe('FAIL');
+    expect(mockRunGenerationDriver).toHaveBeenCalledOnce();
   });
 
   it('rejects asset and does not create revision when MAX_REVISION_COUNT reached', async () => {
