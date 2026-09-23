@@ -12,6 +12,7 @@ import { uuidv7 } from 'uuidv7';
 import { getZiinaPaymentIntent, ZIINA_STATUS_SUCCESS, ZIINA_STATUS_FAILED, ZIINA_STATUS_CANCELLED } from '@/lib/ziina';
 import { writeLedgerEntry } from './create-payment';
 import { createProductionJob } from '@/lib/admin/production-jobs';
+import { createManualUploadAsset } from '@/lib/admin/manual-upload';
 
 export type VerifyZiinaPaymentResult =
   | { status: 'PAID'; paymentId: string }
@@ -175,7 +176,21 @@ export async function verifyZiinaPayment(
         actorId: 'SYSTEM',
         actorRole: 'OWNER',
       });
-      if (!jobResult.ok) {
+      if (jobResult.ok) {
+        // Auto-create the initial MANUAL_UPLOAD asset at UPLOADED status.
+        // Admin will upload the content file and then mark it READY_FOR_QC to start automated QC.
+        const assetResult = await createManualUploadAsset({
+          productionJobId: jobResult.jobId,
+          organizationId,
+          actorId: 'SYSTEM',
+          actorRole: 'OWNER',
+        });
+        if (!assetResult.ok) {
+          console.error(
+            `[verifyZiinaPayment] Asset creation failed for job ${jobResult.jobId}: ${assetResult.reason}`,
+          );
+        }
+      } else {
         // Payment is confirmed — do not fail the response. Job can be created manually.
         console.error(
           `[verifyZiinaPayment] Production job creation failed for order ${payment.order_id}: ${jobResult.reason}`,

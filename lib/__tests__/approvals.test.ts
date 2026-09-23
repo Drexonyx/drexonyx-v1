@@ -2,11 +2,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ─── Hoisted mocks ────────────────────────────────────────────────────────────
 
-const { mockSelect, mockInsert, mockUpdate, mockTransaction } = vi.hoisted(() => ({
+const { mockSelect, mockInsert, mockUpdate, mockTransaction, mockOnClientApproval } = vi.hoisted(() => ({
   mockSelect: vi.fn(),
   mockInsert: vi.fn(),
   mockUpdate: vi.fn(),
   mockTransaction: vi.fn(),
+  mockOnClientApproval: vi.fn(),
 }));
 
 vi.mock('@/db/index', () => ({
@@ -16,6 +17,10 @@ vi.mock('@/db/index', () => ({
     update: mockUpdate,
     transaction: mockTransaction,
   },
+}));
+
+vi.mock('@/lib/admin/automated-pipeline', () => ({
+  onClientApproval: mockOnClientApproval,
 }));
 
 vi.mock('uuidv7', () => ({ uuidv7: () => 'test-uuid' }));
@@ -210,7 +215,10 @@ describe('decideApproval', () => {
     actorRole: 'CLIENT',
   };
 
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockOnClientApproval.mockResolvedValue({ ok: true, deliveryId: 'del-1' });
+  });
 
   it('returns ok:false for OWNER role (DR 0029 constraint 1)', async () => {
     const result = await decideApproval({ ...base, actorRole: 'OWNER' });
@@ -258,7 +266,7 @@ describe('decideApproval', () => {
   });
 
   it('decides APPROVED for a valid PENDING ASSET approval', async () => {
-    selectSequence([[{ id: 'approval1', status: 'PENDING', target_type: 'ASSET', expires_at: null }], []]);
+    selectSequence([[{ id: 'approval1', status: 'PENDING', target_type: 'ASSET', expires_at: null, order_id: 'order-1' }], []]);
     mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
       const tx = {
         insert: vi.fn().mockReturnValue({ values: vi.fn().mockReturnValue({ onConflictDoNothing: vi.fn().mockResolvedValue([]) }) }),

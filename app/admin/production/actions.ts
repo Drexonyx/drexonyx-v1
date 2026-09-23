@@ -7,6 +7,7 @@ import { createProductionJob, cancelProductionJob } from '@/lib/admin/production
 import { createManualUploadAsset, markManualAssetReadyForQc, completeManualUploadJob } from '@/lib/admin/manual-upload';
 import { createRevisionJob } from '@/lib/admin/revisions';
 import { runGenerationDriver } from '@/lib/agent/driver';
+import { runAutomatedQcAndPipeline } from '@/lib/admin/automated-pipeline';
 import type { AdminRole } from '@/lib/admin/types';
 
 export async function actionCreateProductionJob(
@@ -123,7 +124,25 @@ export async function actionMarkManualAssetReadyForQc(
     revalidatePath('/admin/qc');
     revalidatePath('/admin/assets');
   }
-  return completeResult.ok ? { ok: true } : { ok: false, reason: completeResult.reason };
+
+  if (!completeResult.ok) {
+    return { ok: false, reason: completeResult.reason };
+  }
+
+  // Trigger automated QC pipeline — runs deterministic checks and advances asset to
+  // CLIENT_PREVIEW (PASS) or REVISION_REQUIRED (FAIL). Failure is non-fatal: the admin
+  // can submit a manual QC review via the QC page.
+  const pipelineResult = await runAutomatedQcAndPipeline({ assetId, organizationId });
+  if (!pipelineResult.ok) {
+    console.error(`[actionMarkManualAssetReadyForQc] Pipeline failed for asset ${assetId}: ${pipelineResult.reason}`);
+  }
+
+  if (pipelineResult.ok) {
+    revalidatePath('/admin/qc');
+    revalidatePath('/admin/assets');
+  }
+
+  return { ok: true };
 }
 
 // DR 0088: Initiate a revision job for a REVISION_REQUIRED asset.

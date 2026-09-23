@@ -7,6 +7,7 @@ import { approvals } from '@/db/schema/production';
 import { auditEvents, idempotencyKeys } from '@/db/schema/system';
 import { and, eq, isNull } from 'drizzle-orm';
 import { uuidv7 } from 'uuidv7';
+import { onClientApproval } from '@/lib/admin/automated-pipeline';
 
 export type DecideApprovalResult =
   | { ok: true }
@@ -32,6 +33,7 @@ export async function decideApproval(params: {
       status: approvals.status,
       target_type: approvals.target_type,
       expires_at: approvals.expires_at,
+      order_id: approvals.order_id,
     })
     .from(approvals)
     .where(
@@ -146,6 +148,21 @@ export async function decideApproval(params: {
       return { ok: true };
     }
     throw e;
+  }
+
+  // After a successful CLIENT APPROVED decision, attempt to trigger automated delivery.
+  // Only fires for ASSET-type approvals (constraint 5 above already enforces this).
+  // createDelivery gates on all approvals being APPROVED — safe to call on every APPROVED event.
+  // Non-fatal: approval is already committed regardless of delivery outcome.
+  if (decision === 'APPROVED') {
+    try {
+      const deliveryResult = await onClientApproval({ orderId: approval.order_id, organizationId });
+      if (!deliveryResult.ok) {
+        console.error(`[decideApproval] onClientApproval failed for order ${approval.order_id}: ${deliveryResult.reason}`);
+      }
+    } catch (err) {
+      console.error(`[decideApproval] onClientApproval threw for order ${approval.order_id}:`, err);
+    }
   }
 
   return { ok: true };

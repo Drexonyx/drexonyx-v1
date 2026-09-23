@@ -2,10 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ─── Hoisted mocks ────────────────────────────────────────────────────────────
 
-const { mockDb, mockGetZiinaPaymentIntent, mockCreateProductionJob } = vi.hoisted(() => ({
+const { mockDb, mockGetZiinaPaymentIntent, mockCreateProductionJob, mockCreateManualUploadAsset } = vi.hoisted(() => ({
   mockDb: { select: vi.fn(), transaction: vi.fn() },
   mockGetZiinaPaymentIntent: vi.fn(),
   mockCreateProductionJob: vi.fn(),
+  mockCreateManualUploadAsset: vi.fn(),
 }));
 
 vi.mock('@/db/index', () => ({ db: mockDb }));
@@ -20,6 +21,9 @@ vi.mock('../portal/create-payment', () => ({
 }));
 vi.mock('@/lib/admin/production-jobs', () => ({
   createProductionJob: mockCreateProductionJob,
+}));
+vi.mock('@/lib/admin/manual-upload', () => ({
+  createManualUploadAsset: mockCreateManualUploadAsset,
 }));
 
 import { writeLedgerEntry } from '../portal/create-payment';
@@ -73,6 +77,7 @@ describe('verifyZiinaPayment', () => {
       await fn(makeTx());
     });
     mockCreateProductionJob.mockResolvedValue({ ok: true, jobId: 'job-1' });
+    mockCreateManualUploadAsset.mockResolvedValue({ ok: true, assetId: 'asset-1' });
   });
 
   it('returns NOT_FOUND when payment record does not exist', async () => {
@@ -304,5 +309,58 @@ describe('verifyZiinaPayment', () => {
     const result = await verifyZiinaPayment('pay-1', 'org-1');
 
     expect(result.status).toBe('PAID');
+  });
+
+  it('creates a MANUAL_UPLOAD asset after production job creation succeeds', async () => {
+    mockDb.select
+      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
+      .mockReturnValueOnce(selectChain([]));
+    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'completed', amount: 50000 });
+
+    await verifyZiinaPayment('pay-1', 'org-1');
+
+    expect(mockCreateManualUploadAsset).toHaveBeenCalledOnce();
+    expect(mockCreateManualUploadAsset).toHaveBeenCalledWith(
+      expect.objectContaining({ productionJobId: 'job-1', organizationId: 'org-1', actorRole: 'OWNER' }),
+    );
+  });
+
+  it('does not create asset when production job creation fails', async () => {
+    mockDb.select
+      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
+      .mockReturnValueOnce(selectChain([]));
+    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'completed', amount: 50000 });
+    mockCreateProductionJob.mockResolvedValue({ ok: false, reason: 'Order not found' });
+
+    await verifyZiinaPayment('pay-1', 'org-1');
+
+    expect(mockCreateManualUploadAsset).not.toHaveBeenCalled();
+  });
+
+  it('still returns PAID when asset creation fails after successful job creation', async () => {
+    mockDb.select
+      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
+      .mockReturnValueOnce(selectChain([]));
+    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'completed', amount: 50000 });
+    mockCreateManualUploadAsset.mockResolvedValue({ ok: false, reason: 'ProductionJob must be in QUEUED status' });
+
+    const result = await verifyZiinaPayment('pay-1', 'org-1');
+
+    expect(result.status).toBe('PAID');
+  });
+
+  it('does not create asset when UPDATE returns 0 rows (concurrent race — not the winner)', async () => {
+    mockDb.select
+      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
+      .mockReturnValueOnce(selectChain([]));
+    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'completed', amount: 50000 });
+
+    mockDb.transaction.mockImplementationOnce(async (fn: (tx: unknown) => Promise<void>) => {
+      await fn(makeTx([])); // 0 rows → this request did not own the transition
+    });
+
+    await verifyZiinaPayment('pay-1', 'org-1');
+
+    expect(mockCreateManualUploadAsset).not.toHaveBeenCalled();
   });
 });
