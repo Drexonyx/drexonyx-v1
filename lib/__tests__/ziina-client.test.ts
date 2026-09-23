@@ -90,6 +90,17 @@ describe('createZiinaPaymentIntent', () => {
     ).rejects.toThrow('Ziina API error 400');
   });
 
+  it('sends currency_code: "AED" in the request body', async () => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ id: 'x', redirect_url: 'https://y', status: 'PENDING', amount: 500 }), { status: 200 }),
+    );
+
+    await createZiinaPaymentIntent({ amount: 500, success_url: 'https://x.com/s', cancel_url: 'https://x.com/c' });
+
+    const body = JSON.parse((fetchSpy.mock.calls[0][1] as RequestInit).body as string);
+    expect(body.currency_code).toBe('AED');
+  });
+
   it('includes test=true when ZIINA_TEST_MODE is true', async () => {
     process.env.ZIINA_TEST_MODE = 'true';
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(

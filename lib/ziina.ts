@@ -27,6 +27,7 @@ function isTestMode(): boolean {
 
 export interface ZiinaPaymentIntentRequest {
   amount: number;    // fils (1 AED = 100 fils); minimum 200 fils (2 AED)
+  currency_code: string; // ISO 4217; Ziina only accepts 'AED'
   success_url: string;
   cancel_url: string;
   test?: boolean;
@@ -41,12 +42,14 @@ export interface ZiinaPaymentIntent {
 
 // POST /payment_intent — creates a Ziina payment intent.
 // Returns { id, redirect_url, status, amount }.
+// currency_code is always 'AED' — Ziina only accepts AED.
 export async function createZiinaPaymentIntent(
-  params: Omit<ZiinaPaymentIntentRequest, 'test'>,
+  params: Omit<ZiinaPaymentIntentRequest, 'test' | 'currency_code'>,
 ): Promise<ZiinaPaymentIntent> {
   const apiKey = getZiinaApiKey();
   const body: ZiinaPaymentIntentRequest = {
     ...params,
+    currency_code: 'AED',
     test: isTestMode(),
   };
 
