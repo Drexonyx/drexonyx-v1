@@ -26,7 +26,7 @@ vi.mock('@/lib/agent/providers/higgsfield', () => ({
   higgsFieldProvider: { name: 'higgsfield', dispatch: mockDispatch, verifyWebhookSignature: vi.fn(), parseWebhookPayload: vi.fn() },
 }));
 
-import { runGenerationDriver, retryDispatch } from '../agent/driver';
+import { runGenerationDriver, retryDispatch, recoverStuckGeneration } from '../agent/driver';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -143,6 +143,29 @@ describe('runGenerationDriver', () => {
     expect(result).toMatchObject({ ok: false, reason: expect.stringContaining('Dispatch failed') });
   });
 
+  it('records dispatch failure when provider.dispatch() throws (prevents permanent RUNNING state)', async () => {
+    selectSequence([[validJob], [validGen]]);
+    mockIssueServiceToken.mockResolvedValue({ ok: true, rawToken: 'tok', tokenId: 'tid', expiresAt: new Date() });
+    mockDispatch.mockRejectedValue(new Error('HIGGSFIELD_API_BASE_URL environment variable is not set'));
+
+    mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
+      const tx = {
+        insert: vi.fn().mockReturnValue({ values: vi.fn().mockReturnValue({ onConflictDoNothing: vi.fn().mockResolvedValue([]) }) }),
+        update: vi.fn().mockReturnValue({ set: vi.fn().mockReturnValue({ where: vi.fn().mockReturnValue({ returning: vi.fn().mockResolvedValue([{ id: 'gen1' }]) }) }) }),
+      };
+      await fn(tx);
+    });
+
+    mockUpdate.mockReturnValue({ set: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([]) }) });
+    mockInsert.mockReturnValue({ values: vi.fn().mockResolvedValue([]) });
+
+    const result = await runGenerationDriver(base);
+    expect(result).toMatchObject({ ok: false, reason: expect.stringContaining('Dispatch threw') });
+    // recordDispatchFailure must have been called (update + insert for audit event)
+    expect(mockUpdate).toHaveBeenCalled();
+    expect(mockInsert).toHaveBeenCalled();
+  });
+
   // Security: actor_id (production_job_id) must never be NULL in audit events
   it('uses productionJobId as actor_id in audit events (DR 0064)', async () => {
     selectSequence([[validJob], [validGen]]);
@@ -231,5 +254,81 @@ describe('retryDispatch', () => {
     // No insert should happen
     expect(mockInsert).not.toHaveBeenCalled();
     expect(result.ok).toBe(false);
+  });
+});
+
+// ─── recoverStuckGeneration ───────────────────────────────────────────────────
+
+describe('recoverStuckGeneration', () => {
+  const base = {
+    aiGenerationId: 'gen-stuck',
+    productionJobId: 'job1',
+    organizationId: 'org1',
+  };
+
+  beforeEach(() => { vi.clearAllMocks(); });
+
+  it('returns ok:false when AiGeneration not found', async () => {
+    mockSelect.mockReturnValue(makeSelectChain([]));
+    const result = await recoverStuckGeneration(base);
+    expect(result).toMatchObject({ ok: false, reason: 'AiGeneration not found' });
+  });
+
+  it('returns ok:false when generation is not RUNNING', async () => {
+    mockSelect.mockReturnValue(makeSelectChain([{ id: 'gen-stuck', status: 'FAILED', provider_job_id: null }]));
+    const result = await recoverStuckGeneration(base);
+    expect(result).toMatchObject({ ok: false, reason: expect.stringContaining('not RUNNING') });
+  });
+
+  it('returns ok:false when provider_job_id is already set (not stuck)', async () => {
+    mockSelect.mockReturnValue(makeSelectChain([{ id: 'gen-stuck', status: 'RUNNING', provider_job_id: 'hf-already-set' }]));
+    const result = await recoverStuckGeneration(base);
+    expect(result).toMatchObject({ ok: false, reason: expect.stringContaining('provider_job_id') });
+  });
+
+  it('marks stuck generation FAILED and re-dispatches via retryDispatch', async () => {
+    // First select: verify stuck state
+    let selectCall = 0;
+    mockSelect.mockImplementation(() => {
+      if (selectCall === 0) {
+        selectCall++;
+        return makeSelectChain([{ id: 'gen-stuck', status: 'RUNNING', provider_job_id: null }]);
+      }
+      // retryDispatch's select for previous gen
+      selectCall++;
+      return makeSelectChain([{
+        id: 'gen-stuck', provider: 'higgsfield', model: 'text2image/soul', prompt: 'p', params: {}, retry_count: 0,
+      }]);
+    });
+
+    // recordDispatchFailure: update + insert
+    mockUpdate.mockReturnValue({ set: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([]) }) });
+    mockInsert.mockReturnValue({ values: vi.fn().mockResolvedValue([]) });
+    mockDispatch.mockResolvedValue({ ok: true, providerJobId: 'hf-new-456' });
+
+    const result = await recoverStuckGeneration(base);
+    expect(result).toMatchObject({ ok: true, providerJobId: 'hf-new-456' });
+    // recordDispatchFailure must have fired (update on aiGenerations to FAILED)
+    expect(mockUpdate).toHaveBeenCalled();
+  });
+
+  it('returns ok:false when retryDispatch hits max retry_count', async () => {
+    let selectCall = 0;
+    mockSelect.mockImplementation(() => {
+      if (selectCall === 0) {
+        selectCall++;
+        return makeSelectChain([{ id: 'gen-stuck', status: 'RUNNING', provider_job_id: null }]);
+      }
+      selectCall++;
+      return makeSelectChain([{
+        id: 'gen-stuck', provider: 'higgsfield', model: 'text2image/soul', prompt: 'p', params: {}, retry_count: 2,
+      }]);
+    });
+
+    mockUpdate.mockReturnValue({ set: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([]) }) });
+    mockInsert.mockReturnValue({ values: vi.fn().mockResolvedValue([]) });
+
+    const result = await recoverStuckGeneration(base);
+    expect(result).toMatchObject({ ok: false, reason: expect.stringContaining('Maximum retry count') });
   });
 });

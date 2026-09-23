@@ -172,7 +172,12 @@ export class HiggsFieldProvider implements AiProvider {
   async dispatch(params: DispatchParams): Promise<DispatchResult> {
     const { aiGenerationId, model, prompt, params: genParams, fileKey } = params;
 
-    const baseUrl = getApiBaseUrl();
+    let baseUrl: string;
+    try {
+      baseUrl = getApiBaseUrl();
+    } catch (err) {
+      return { ok: false, error: String(err), isTransient: false };
+    }
 
     let endpointPath: string;
     try {

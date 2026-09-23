@@ -7,7 +7,7 @@
 import { db } from '@/db/index';
 import { productionJobs, aiGenerations } from '@/db/schema/production';
 import { auditEvents, idempotencyKeys } from '@/db/schema/system';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import { uuidv7 } from 'uuidv7';
 import { issueServiceToken } from './service-tokens';
 import { resolveProviderForModel } from './model-routing';
@@ -178,16 +178,29 @@ export async function runGenerationDriver(params: {
   }
 
   // Step 3: Dispatch to provider
-  const dispatchResult = await provider.dispatch({
-    productionJobId,
-    aiGenerationId: aiGenerationId!,
-    organizationId,
-    provider: gen.provider!,
-    model: gen.model!,
-    prompt: gen.prompt!,
-    params: (gen.params as Record<string, unknown>) ?? {},
-    fileKey: (gen.params as { input_file_key?: string } | null)?.input_file_key ?? '',
-  });
+  let dispatchResult: Awaited<ReturnType<typeof provider.dispatch>>;
+  try {
+    dispatchResult = await provider.dispatch({
+      productionJobId,
+      aiGenerationId: aiGenerationId!,
+      organizationId,
+      provider: gen.provider!,
+      model: gen.model!,
+      prompt: gen.prompt!,
+      params: (gen.params as Record<string, unknown>) ?? {},
+      fileKey: (gen.params as { input_file_key?: string } | null)?.input_file_key ?? '',
+    });
+  } catch (err) {
+    const error = err instanceof Error ? err.message : String(err);
+    await recordDispatchFailure({
+      aiGenerationId: aiGenerationId!,
+      productionJobId,
+      organizationId,
+      error,
+      isTransient: true,
+    });
+    return { ok: false, reason: `Dispatch threw: ${error}` };
+  }
 
   if (!dispatchResult.ok) {
     // Dispatch failed — record failure on AiGeneration
@@ -370,4 +383,60 @@ export async function retryDispatch(params: {
     );
 
   return { ok: true, providerJobId: dispatchResult.providerJobId, newAiGenerationId: newGenerationId };
+}
+
+export type RecoverStuckGenerationResult =
+  | { ok: true; newAiGenerationId: string; providerJobId: string }
+  | { ok: false; reason: string };
+
+// Recovers an AiGeneration stuck in RUNNING with no provider_job_id (e.g. config error at dispatch time).
+// Marks the stuck generation FAILED, then calls retryDispatch to create a fresh generation and re-dispatch.
+// Guard: only operates on a RUNNING generation with provider_job_id IS NULL to prevent double-recovery.
+export async function recoverStuckGeneration(params: {
+  aiGenerationId: string;
+  productionJobId: string;
+  organizationId: string;
+}): Promise<RecoverStuckGenerationResult> {
+  const { aiGenerationId, productionJobId, organizationId } = params;
+
+  // Verify the generation is RUNNING with no provider_job_id (stuck state guard)
+  const rows = await db
+    .select({ id: aiGenerations.id, status: aiGenerations.status, provider_job_id: aiGenerations.provider_job_id })
+    .from(aiGenerations)
+    .where(
+      and(
+        eq(aiGenerations.id, aiGenerationId),
+        eq(aiGenerations.organization_id, organizationId),
+      ),
+    )
+    .limit(1);
+
+  if (rows.length === 0) return { ok: false, reason: 'AiGeneration not found' };
+  const gen = rows[0];
+
+  if (gen.status !== 'RUNNING') {
+    return { ok: false, reason: `AiGeneration is not RUNNING (current: ${gen.status})` };
+  }
+  if (gen.provider_job_id !== null) {
+    return { ok: false, reason: 'AiGeneration already has a provider_job_id — not stuck' };
+  }
+
+  // Mark stuck generation as FAILED so retryDispatch can proceed
+  await recordDispatchFailure({
+    aiGenerationId,
+    productionJobId,
+    organizationId,
+    error: 'Recovered from stuck RUNNING state (provider_job_id was null)',
+    isTransient: true,
+  });
+
+  // Re-dispatch via canonical retry path (increments retry_count, creates new AiGeneration)
+  const retryResult = await retryDispatch({
+    previousAiGenerationId: aiGenerationId,
+    productionJobId,
+    organizationId,
+  });
+
+  if (!retryResult.ok) return { ok: false, reason: retryResult.reason };
+  return { ok: true, newAiGenerationId: retryResult.newAiGenerationId, providerJobId: retryResult.providerJobId };
 }
