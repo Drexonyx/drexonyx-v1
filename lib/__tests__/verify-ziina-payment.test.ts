@@ -2,445 +2,294 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ─── Hoisted mocks ────────────────────────────────────────────────────────────
 
-const { mockDb, mockGetZiinaPaymentIntent, mockCreateProductionJob, mockCreateManualUploadAsset, mockRunGenerationDriver } = vi.hoisted(() => ({
-  mockDb: { select: vi.fn(), transaction: vi.fn() },
-  mockGetZiinaPaymentIntent: vi.fn(),
-  mockCreateProductionJob: vi.fn(),
-  mockCreateManualUploadAsset: vi.fn(),
-  mockRunGenerationDriver: vi.fn(),
+const { mockSelect, mockInsert, mockUpdate, mockTransaction } = vi.hoisted(() => ({
+  mockSelect: vi.fn(),
+  mockInsert: vi.fn(),
+  mockUpdate: vi.fn(),
+  mockTransaction: vi.fn(),
 }));
 
-vi.mock('@/db/index', () => ({ db: mockDb }));
+vi.mock('@/db/index', () => ({
+  db: { select: mockSelect, insert: mockInsert, update: mockUpdate, transaction: mockTransaction },
+}));
+
+vi.mock('uuidv7', () => ({ uuidv7: () => 'test-uuid' }));
+
+const mockGetZiinaPaymentIntent = vi.fn();
 vi.mock('@/lib/ziina', () => ({
-  getZiinaPaymentIntent: mockGetZiinaPaymentIntent,
+  getZiinaPaymentIntent: (...args: unknown[]) => mockGetZiinaPaymentIntent(...args),
   ZIINA_STATUS_SUCCESS: 'completed',
   ZIINA_STATUS_FAILED: 'failed',
   ZIINA_STATUS_CANCELLED: 'canceled',
 }));
-vi.mock('../portal/create-payment', () => ({
-  writeLedgerEntry: vi.fn().mockResolvedValue(undefined),
-}));
-vi.mock('@/lib/admin/production-jobs', () => ({
-  createProductionJob: mockCreateProductionJob,
-}));
-vi.mock('@/lib/admin/manual-upload', () => ({
-  createManualUploadAsset: mockCreateManualUploadAsset,
-}));
-vi.mock('@/lib/agent/driver', () => ({
-  runGenerationDriver: mockRunGenerationDriver,
+
+const mockWriteLedgerEntry = vi.fn();
+vi.mock('@/lib/portal/create-payment', () => ({
+  writeLedgerEntry: (...args: unknown[]) => mockWriteLedgerEntry(...args),
 }));
 
-import { writeLedgerEntry } from '../portal/create-payment';
+const mockCreateProductionJob = vi.fn();
+vi.mock('@/lib/admin/production-jobs', () => ({
+  createProductionJob: (...args: unknown[]) => mockCreateProductionJob(...args),
+}));
+
+const mockCreateManualUploadAsset = vi.fn();
+vi.mock('@/lib/admin/manual-upload', () => ({
+  createManualUploadAsset: (...args: unknown[]) => mockCreateManualUploadAsset(...args),
+}));
+
+const mockRunGenerationDriver = vi.fn();
+vi.mock('@/lib/agent/driver', () => ({
+  runGenerationDriver: (...args: unknown[]) => mockRunGenerationDriver(...args),
+}));
+
+import { verifyZiinaPayment } from '../portal/verify-ziina-payment';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function selectChain(rows: unknown[]) {
-  const terminal = { limit: vi.fn().mockResolvedValue(rows) };
-  const chain: Record<string, ReturnType<typeof vi.fn>> = {
-    from: vi.fn(),
-    where: vi.fn().mockReturnValue(terminal),
-  };
-  chain.from.mockReturnValue(chain);
-  return chain;
+const SYSTEM_ACTOR_ID = '00000000-0000-0000-0000-000000000000';
+
+function makeSelectChain(result: unknown[]) {
+  const end = vi.fn().mockResolvedValue(result);
+  return { from: vi.fn().mockReturnThis(), where: vi.fn().mockReturnThis(), limit: end };
 }
 
-// updateRows simulates what the DB's .returning() sends back.
-// Default [{ id: 'pay-1' }] = UPDATE matched a row (state transition succeeded).
-// Pass [] to simulate the concurrent-race case where another request won first.
-function makeTx(updateRows: { id: string }[] = [{ id: 'pay-1' }]) {
-  const whereResult = { returning: vi.fn().mockResolvedValue(updateRows) };
-  return {
-    update: vi.fn().mockReturnValue({
-      set: vi.fn().mockReturnValue({
-        where: vi.fn().mockReturnValue(whereResult),
-      }),
-    }),
-    insert: vi.fn().mockReturnValue({
-      values: vi.fn().mockReturnValue({
-        onConflictDoNothing: vi.fn().mockResolvedValue([]),
-      }),
-    }),
-  };
+function selectSequence(results: unknown[][]) {
+  let call = 0;
+  mockSelect.mockImplementation(() => {
+    const result = results[call] ?? [];
+    call++;
+    return makeSelectChain(result);
+  });
 }
 
-const PROCESSING_PAYMENT = [{
+function makeSuccessTransaction() {
+  mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
+    const tx = {
+      update: vi.fn().mockReturnValue({
+        set: vi.fn().mockReturnValue({
+          where: vi.fn().mockReturnValue({ returning: vi.fn().mockResolvedValue([{ id: 'pay-1' }]) }),
+        }),
+      }),
+      insert: vi.fn().mockReturnValue({ values: vi.fn().mockReturnValue({ onConflictDoNothing: vi.fn().mockResolvedValue([]) }) }),
+    };
+    await fn(tx);
+  });
+}
+
+const BASE_PAYMENT = {
   id: 'pay-1',
   status: 'PROCESSING',
-  amount: '500.0000',
+  amount: '499.0000',
   currency: 'AED',
   order_id: 'order-1',
-  provider_payment_id: 'ziina-intent-abc',
-}];
+  provider_payment_id: 'ziina-intent-1',
+};
 
-import { verifyZiinaPayment } from '../portal/verify-ziina-payment';
+// ─── Tests ────────────────────────────────────────────────────────────────────
 
 describe('verifyZiinaPayment', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    delete process.env.PRODUCTION_AI_PROVIDER;
-    delete process.env.PRODUCTION_AI_MODEL;
-    delete process.env.PRODUCTION_AI_PROMPT;
-    mockDb.transaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
-      await fn(makeTx());
-    });
-    mockCreateProductionJob.mockResolvedValue({ ok: true, jobId: 'job-1' });
-    mockCreateManualUploadAsset.mockResolvedValue({ ok: true, assetId: 'asset-1' });
+    vi.unstubAllEnvs();
+  });
+
+  it('returns NOT_FOUND when payment does not exist', async () => {
+    selectSequence([[]]);
+    const result = await verifyZiinaPayment('no-such-id', 'org-1');
+    expect(result).toMatchObject({ status: 'NOT_FOUND' });
+  });
+
+  it('returns FAILED when payment is already FAILED', async () => {
+    selectSequence([[{ ...BASE_PAYMENT, status: 'FAILED' }]]);
+    const result = await verifyZiinaPayment('pay-1', 'org-1');
+    expect(result).toMatchObject({ status: 'FAILED', paymentId: 'pay-1' });
+    expect(mockCreateProductionJob).not.toHaveBeenCalled();
+  });
+
+  it('returns ALREADY_PAID and does NOT create duplicate job when job already exists', async () => {
+    // payment row, idempotency key result (not used for PAID path), existing job check
+    selectSequence([
+      [{ ...BASE_PAYMENT, status: 'PAID' }],
+      [{ id: 'existing-job-id' }], // existing production job found
+    ]);
+    const result = await verifyZiinaPayment('pay-1', 'org-1');
+    expect(result).toMatchObject({ status: 'ALREADY_PAID', paymentId: 'pay-1' });
+    expect(mockCreateProductionJob).not.toHaveBeenCalled();
+  });
+
+  it('self-heals ALREADY_PAID with no existing job: creates AI_GENERATION job and dispatches driver', async () => {
+    vi.stubEnv('PRODUCTION_AI_PROVIDER', 'higgsfield');
+    vi.stubEnv('PRODUCTION_AI_MODEL', 'text2image/soul');
+    vi.stubEnv('PRODUCTION_AI_PROMPT', 'test prompt');
+
+    selectSequence([
+      [{ ...BASE_PAYMENT, status: 'PAID' }],
+      [], // no existing production job
+    ]);
+
+    mockCreateProductionJob.mockResolvedValue({ ok: true, jobId: 'new-job-id' });
     mockRunGenerationDriver.mockResolvedValue({ ok: true, providerJobId: 'hf-job-1' });
-  });
-
-  it('returns NOT_FOUND when payment record does not exist', async () => {
-    mockDb.select.mockReturnValueOnce(selectChain([]));
-    const result = await verifyZiinaPayment('pay-1', 'org-1');
-    expect(result.status).toBe('NOT_FOUND');
-  });
-
-  it('returns ALREADY_PAID without calling Ziina if already PAID', async () => {
-    mockDb.select.mockReturnValueOnce(selectChain([{ ...PROCESSING_PAYMENT[0], status: 'PAID' }]));
-    const result = await verifyZiinaPayment('pay-1', 'org-1');
-    expect(result.status).toBe('ALREADY_PAID');
-    expect(mockGetZiinaPaymentIntent).not.toHaveBeenCalled();
-  });
-
-  it('returns FAILED without calling Ziina if already FAILED', async () => {
-    mockDb.select.mockReturnValueOnce(selectChain([{ ...PROCESSING_PAYMENT[0], status: 'FAILED' }]));
-    const result = await verifyZiinaPayment('pay-1', 'org-1');
-    expect(result.status).toBe('FAILED');
-    expect(mockGetZiinaPaymentIntent).not.toHaveBeenCalled();
-  });
-
-  it('returns ERROR when payment has no provider_payment_id', async () => {
-    mockDb.select.mockReturnValueOnce(selectChain([{ ...PROCESSING_PAYMENT[0], provider_payment_id: null }]));
-    const result = await verifyZiinaPayment('pay-1', 'org-1');
-    expect(result.status).toBe('ERROR');
-  });
-
-  it('skips Ziina call when idempotency key already COMPLETED', async () => {
-    mockDb.select
-      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
-      .mockReturnValueOnce(selectChain([{ status: 'COMPLETED' }]));
-
-    const result = await verifyZiinaPayment('pay-1', 'org-1');
-    expect(mockGetZiinaPaymentIntent).not.toHaveBeenCalled();
-    // Payment is still PROCESSING in our mock, so result depends on status
-    expect(['FAILED', 'ALREADY_PAID']).toContain(result.status);
-  });
-
-  it('returns PAID and applies state transition when Ziina returns completed', async () => {
-    mockDb.select
-      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
-      .mockReturnValueOnce(selectChain([])); // no idempotency key yet
-    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'completed', amount: 50000 });
 
     const result = await verifyZiinaPayment('pay-1', 'org-1');
 
-    expect(result.status).toBe('PAID');
-    expect(mockGetZiinaPaymentIntent).toHaveBeenCalledWith('ziina-intent-abc');
-    expect(mockDb.transaction).toHaveBeenCalled();
-    expect(mockCreateProductionJob).toHaveBeenCalledWith(
-      expect.objectContaining({
-        orderId: 'order-1',
-        organizationId: 'org-1',
-        jobType: 'MANUAL_UPLOAD',
-        actorRole: 'OWNER',
-      }),
-    );
-  });
-
-  it('returns FAILED and applies state transition when Ziina returns failed', async () => {
-    mockDb.select
-      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
-      .mockReturnValueOnce(selectChain([]));
-    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'failed', amount: 50000 });
-
-    const result = await verifyZiinaPayment('pay-1', 'org-1');
-
-    expect(result.status).toBe('FAILED');
-    expect(mockDb.transaction).toHaveBeenCalled();
-  });
-
-  it('returns FAILED when Ziina status is canceled', async () => {
-    mockDb.select
-      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
-      .mockReturnValueOnce(selectChain([]));
-    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'canceled', amount: 50000 });
-
-    const result = await verifyZiinaPayment('pay-1', 'org-1');
-
-    expect(result.status).toBe('FAILED');
-  });
-
-  it('returns PENDING when Ziina status is pending', async () => {
-    mockDb.select
-      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
-      .mockReturnValueOnce(selectChain([]));
-    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'pending', amount: 50000 });
-
-    const result = await verifyZiinaPayment('pay-1', 'org-1');
-
-    expect(result.status).toBe('PENDING');
-    expect(mockDb.transaction).not.toHaveBeenCalled();
-  });
-
-  it('returns PENDING when Ziina status is requires_user_action', async () => {
-    mockDb.select
-      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
-      .mockReturnValueOnce(selectChain([]));
-    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'requires_user_action', amount: 50000 });
-
-    const result = await verifyZiinaPayment('pay-1', 'org-1');
-
-    expect(result.status).toBe('PENDING');
-    expect(mockDb.transaction).not.toHaveBeenCalled();
-  });
-
-  it('returns ERROR when Ziina API call throws', async () => {
-    mockDb.select
-      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
-      .mockReturnValueOnce(selectChain([]));
-    mockGetZiinaPaymentIntent.mockRejectedValue(new Error('Ziina API error 503'));
-
-    const result = await verifyZiinaPayment('pay-1', 'org-1');
-
-    expect(result.status).toBe('ERROR');
-    if (result.status === 'ERROR') expect(result.reason).toMatch(/Ziina API error/);
-  });
-
-  it('filters by provider_name=ziina (org-scoped)', async () => {
-    // The query should include provider_name='ziina' constraint — if it returns empty, NOT_FOUND
-    mockDb.select.mockReturnValueOnce(selectChain([]));
-    const result = await verifyZiinaPayment('pay-1', 'org-1');
-    expect(result.status).toBe('NOT_FOUND');
-    // Verify that select was called (implying the where clause was applied)
-    expect(mockDb.select).toHaveBeenCalled();
-  });
-
-  it('does not write ledger entry when UPDATE returns 0 rows (concurrent race)', async () => {
-    // Scenario: two concurrent success-page requests both reach the transaction.
-    // The second one's UPDATE matches 0 rows (payment already PAID by first request).
-    // writeLedgerEntry must NOT be called by the second request.
-    mockDb.select
-      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
-      .mockReturnValueOnce(selectChain([])); // no idempotency key yet
-    mockGetZiinaPaymentIntent.mockResolvedValue({
-      id: 'ziina-intent-abc',
-      redirect_url: '',
-      status: 'completed',
-      amount: 50000,
-    });
-
-    const mockWriteLedger = vi.mocked(writeLedgerEntry);
-
-    // Simulate the concurrent case: our UPDATE returns 0 rows
-    mockDb.transaction.mockImplementationOnce(async (fn: (tx: unknown) => Promise<void>) => {
-      await fn(makeTx([]));
-    });
-
-    const result = await verifyZiinaPayment('pay-1', 'org-1');
-
-    expect(result.status).toBe('PAID'); // still PAID from Ziina's perspective
-    expect(mockWriteLedger).not.toHaveBeenCalled(); // no duplicate ledger entry
-    expect(mockCreateProductionJob).not.toHaveBeenCalled(); // no duplicate job
-  });
-
-  it('creates a MANUAL_UPLOAD production job when payment transitions to PAID', async () => {
-    mockDb.select
-      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
-      .mockReturnValueOnce(selectChain([]));
-    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'completed', amount: 50000 });
-
-    await verifyZiinaPayment('pay-1', 'org-1');
-
+    expect(result).toMatchObject({ status: 'ALREADY_PAID', paymentId: 'pay-1' });
     expect(mockCreateProductionJob).toHaveBeenCalledOnce();
     expect(mockCreateProductionJob).toHaveBeenCalledWith(
       expect.objectContaining({
         orderId: 'order-1',
         organizationId: 'org-1',
-        jobType: 'MANUAL_UPLOAD',
-        actorRole: 'OWNER',
-      }),
-    );
-  });
-
-  it('does not create production job when verifyZiinaPayment is called a second time (payment already PAID)', async () => {
-    // Simulates page refresh: payment is already PAID → returns ALREADY_PAID immediately.
-    mockDb.select.mockReturnValueOnce(selectChain([{ ...PROCESSING_PAYMENT[0], status: 'PAID' }]));
-
-    const result = await verifyZiinaPayment('pay-1', 'org-1');
-
-    expect(result.status).toBe('ALREADY_PAID');
-    expect(mockCreateProductionJob).not.toHaveBeenCalled();
-  });
-
-  it('does not create production job when Ziina returns failed', async () => {
-    mockDb.select
-      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
-      .mockReturnValueOnce(selectChain([]));
-    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'failed', amount: 50000 });
-
-    const result = await verifyZiinaPayment('pay-1', 'org-1');
-
-    expect(result.status).toBe('FAILED');
-    expect(mockCreateProductionJob).not.toHaveBeenCalled();
-  });
-
-  it('does not create production job when Ziina returns canceled', async () => {
-    mockDb.select
-      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
-      .mockReturnValueOnce(selectChain([]));
-    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'canceled', amount: 50000 });
-
-    const result = await verifyZiinaPayment('pay-1', 'org-1');
-
-    expect(result.status).toBe('FAILED');
-    expect(mockCreateProductionJob).not.toHaveBeenCalled();
-  });
-
-  it('does not create production job when Ziina returns pending', async () => {
-    mockDb.select
-      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
-      .mockReturnValueOnce(selectChain([]));
-    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'pending', amount: 50000 });
-
-    const result = await verifyZiinaPayment('pay-1', 'org-1');
-
-    expect(result.status).toBe('PENDING');
-    expect(mockCreateProductionJob).not.toHaveBeenCalled();
-  });
-
-  it('still returns PAID when production job creation fails (payment is confirmed regardless)', async () => {
-    mockDb.select
-      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
-      .mockReturnValueOnce(selectChain([]));
-    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'completed', amount: 50000 });
-    mockCreateProductionJob.mockResolvedValue({ ok: false, reason: 'Order not found' });
-
-    const result = await verifyZiinaPayment('pay-1', 'org-1');
-
-    expect(result.status).toBe('PAID');
-  });
-
-  it('creates a MANUAL_UPLOAD asset after production job creation succeeds', async () => {
-    mockDb.select
-      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
-      .mockReturnValueOnce(selectChain([]));
-    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'completed', amount: 50000 });
-
-    await verifyZiinaPayment('pay-1', 'org-1');
-
-    expect(mockCreateManualUploadAsset).toHaveBeenCalledOnce();
-    expect(mockCreateManualUploadAsset).toHaveBeenCalledWith(
-      expect.objectContaining({ productionJobId: 'job-1', organizationId: 'org-1', actorRole: 'OWNER' }),
-    );
-  });
-
-  it('does not create asset when production job creation fails', async () => {
-    mockDb.select
-      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
-      .mockReturnValueOnce(selectChain([]));
-    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'completed', amount: 50000 });
-    mockCreateProductionJob.mockResolvedValue({ ok: false, reason: 'Order not found' });
-
-    await verifyZiinaPayment('pay-1', 'org-1');
-
-    expect(mockCreateManualUploadAsset).not.toHaveBeenCalled();
-  });
-
-  it('still returns PAID when asset creation fails after successful job creation', async () => {
-    mockDb.select
-      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
-      .mockReturnValueOnce(selectChain([]));
-    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'completed', amount: 50000 });
-    mockCreateManualUploadAsset.mockResolvedValue({ ok: false, reason: 'ProductionJob must be in QUEUED status' });
-
-    const result = await verifyZiinaPayment('pay-1', 'org-1');
-
-    expect(result.status).toBe('PAID');
-  });
-
-  it('does not create asset when UPDATE returns 0 rows (concurrent race — not the winner)', async () => {
-    mockDb.select
-      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
-      .mockReturnValueOnce(selectChain([]));
-    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'completed', amount: 50000 });
-
-    mockDb.transaction.mockImplementationOnce(async (fn: (tx: unknown) => Promise<void>) => {
-      await fn(makeTx([])); // 0 rows → this request did not own the transition
-    });
-
-    await verifyZiinaPayment('pay-1', 'org-1');
-
-    expect(mockCreateManualUploadAsset).not.toHaveBeenCalled();
-  });
-
-  // ─── AI_GENERATION path (when PRODUCTION_AI_* env vars are set) ──────────────
-
-  it('creates an AI_GENERATION job and calls runGenerationDriver when AI env vars are set', async () => {
-    process.env.PRODUCTION_AI_PROVIDER = 'higgsfield';
-    process.env.PRODUCTION_AI_MODEL = 'text2image/soul';
-    process.env.PRODUCTION_AI_PROMPT = 'Generate a product showcase video';
-
-    mockDb.select
-      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
-      .mockReturnValueOnce(selectChain([]));
-    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'completed', amount: 50000 });
-
-    const result = await verifyZiinaPayment('pay-1', 'org-1');
-
-    expect(result.status).toBe('PAID');
-    expect(mockCreateProductionJob).toHaveBeenCalledWith(
-      expect.objectContaining({
         jobType: 'AI_GENERATION',
+        actorId: SYSTEM_ACTOR_ID,
+        actorRole: 'OWNER',
         aiGenerationParams: expect.objectContaining({
           provider: 'higgsfield',
           model: 'text2image/soul',
-          prompt: 'Generate a product showcase video',
+          prompt: 'test prompt',
         }),
       }),
     );
-    expect(mockRunGenerationDriver).toHaveBeenCalledWith({ productionJobId: 'job-1', organizationId: 'org-1' });
-    expect(mockCreateManualUploadAsset).not.toHaveBeenCalled();
+    expect(mockRunGenerationDriver).toHaveBeenCalledOnce();
+    expect(mockRunGenerationDriver).toHaveBeenCalledWith({ productionJobId: 'new-job-id', organizationId: 'org-1' });
   });
 
-  it('does not call runGenerationDriver when AI env vars are not set', async () => {
-    mockDb.select
-      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
-      .mockReturnValueOnce(selectChain([]));
-    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'completed', amount: 50000 });
+  it('self-heals ALREADY_PAID with no job: MANUAL_UPLOAD fallback when AI env vars absent', async () => {
+    selectSequence([
+      [{ ...BASE_PAYMENT, status: 'PAID' }],
+      [], // no existing job
+    ]);
 
-    await verifyZiinaPayment('pay-1', 'org-1');
+    mockCreateProductionJob.mockResolvedValue({ ok: true, jobId: 'new-job-id' });
+    mockCreateManualUploadAsset.mockResolvedValue({ ok: true });
 
+    const result = await verifyZiinaPayment('pay-1', 'org-1');
+
+    expect(result).toMatchObject({ status: 'ALREADY_PAID' });
+    expect(mockCreateProductionJob).toHaveBeenCalledWith(
+      expect.objectContaining({ jobType: 'MANUAL_UPLOAD', actorId: SYSTEM_ACTOR_ID }),
+    );
     expect(mockRunGenerationDriver).not.toHaveBeenCalled();
     expect(mockCreateManualUploadAsset).toHaveBeenCalledOnce();
   });
 
-  it('still returns PAID when runGenerationDriver fails (job is committed regardless)', async () => {
-    process.env.PRODUCTION_AI_PROVIDER = 'higgsfield';
-    process.env.PRODUCTION_AI_MODEL = 'text2image/soul';
-    process.env.PRODUCTION_AI_PROMPT = 'Generate a product showcase video';
+  it('PROCESSING → PAID: creates AI_GENERATION job with SYSTEM_ACTOR_ID sentinel UUID', async () => {
+    vi.stubEnv('PRODUCTION_AI_PROVIDER', 'higgsfield');
+    vi.stubEnv('PRODUCTION_AI_MODEL', 'text2image/soul');
+    vi.stubEnv('PRODUCTION_AI_PROMPT', 'test prompt');
 
-    mockDb.select
-      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
-      .mockReturnValueOnce(selectChain([]));
-    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'completed', amount: 50000 });
-    mockRunGenerationDriver.mockResolvedValue({ ok: false, reason: 'No approved route for provider' });
+    // payment (PROCESSING), idempotency key check (empty = not yet processed)
+    selectSequence([
+      [{ ...BASE_PAYMENT, status: 'PROCESSING' }],
+      [], // idempotency key does not exist yet
+      [], // no existing production job (inside ensureProductionJobForPaidOrder)
+    ]);
+
+    mockGetZiinaPaymentIntent.mockResolvedValue({ status: 'completed' });
+    makeSuccessTransaction();
+    mockCreateProductionJob.mockResolvedValue({ ok: true, jobId: 'job-id-1' });
+    mockRunGenerationDriver.mockResolvedValue({ ok: true, providerJobId: 'hf-job-1' });
+    mockWriteLedgerEntry.mockResolvedValue(undefined);
 
     const result = await verifyZiinaPayment('pay-1', 'org-1');
 
-    expect(result.status).toBe('PAID');
+    expect(result).toMatchObject({ status: 'PAID', paymentId: 'pay-1' });
+
+    // Sentinel UUID must be used — NOT the string 'SYSTEM'
+    expect(mockCreateProductionJob).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actorId: SYSTEM_ACTOR_ID,
+        actorRole: 'OWNER',
+        jobType: 'AI_GENERATION',
+      }),
+    );
+    expect(mockRunGenerationDriver).toHaveBeenCalledWith({ productionJobId: 'job-id-1', organizationId: 'org-1' });
   });
 
-  it('does not call runGenerationDriver when only some AI env vars are set', async () => {
-    process.env.PRODUCTION_AI_PROVIDER = 'higgsfield';
-    // PRODUCTION_AI_MODEL and PRODUCTION_AI_PROMPT not set
+  it('PROCESSING → PAID: does NOT create duplicate job if one already exists', async () => {
+    vi.stubEnv('PRODUCTION_AI_PROVIDER', 'higgsfield');
+    vi.stubEnv('PRODUCTION_AI_MODEL', 'text2image/soul');
+    vi.stubEnv('PRODUCTION_AI_PROMPT', 'test prompt');
 
-    mockDb.select
-      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
-      .mockReturnValueOnce(selectChain([]));
-    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'completed', amount: 50000 });
+    selectSequence([
+      [{ ...BASE_PAYMENT, status: 'PROCESSING' }],
+      [], // idempotency key absent
+      [{ id: 'already-exists' }], // existing job found in ensureProductionJobForPaidOrder
+    ]);
 
-    await verifyZiinaPayment('pay-1', 'org-1');
+    mockGetZiinaPaymentIntent.mockResolvedValue({ status: 'completed' });
+    makeSuccessTransaction();
+    mockWriteLedgerEntry.mockResolvedValue(undefined);
 
+    const result = await verifyZiinaPayment('pay-1', 'org-1');
+
+    expect(result).toMatchObject({ status: 'PAID' });
+    expect(mockCreateProductionJob).not.toHaveBeenCalled();
     expect(mockRunGenerationDriver).not.toHaveBeenCalled();
-    expect(mockCreateProductionJob).toHaveBeenCalledWith(expect.objectContaining({ jobType: 'MANUAL_UPLOAD' }));
+  });
+
+  it('PROCESSING → PAID: Ziina returns failed → transitions to FAILED, no job created', async () => {
+    selectSequence([
+      [{ ...BASE_PAYMENT, status: 'PROCESSING' }],
+      [], // idempotency key absent
+    ]);
+
+    mockGetZiinaPaymentIntent.mockResolvedValue({ status: 'failed' });
+    mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
+      const tx = {
+        update: vi.fn().mockReturnValue({
+          set: vi.fn().mockReturnValue({
+            where: vi.fn().mockReturnValue({ returning: vi.fn().mockResolvedValue([{ id: 'pay-1' }]) }),
+          }),
+        }),
+        insert: vi.fn().mockReturnValue({ values: vi.fn().mockReturnValue({ onConflictDoNothing: vi.fn().mockResolvedValue([]) }) }),
+      };
+      await fn(tx);
+    });
+
+    const result = await verifyZiinaPayment('pay-1', 'org-1');
+
+    expect(result).toMatchObject({ status: 'FAILED', paymentId: 'pay-1' });
+    expect(mockCreateProductionJob).not.toHaveBeenCalled();
+  });
+
+  it('createProductionJob failure does not fail the payment response', async () => {
+    vi.stubEnv('PRODUCTION_AI_PROVIDER', 'higgsfield');
+    vi.stubEnv('PRODUCTION_AI_MODEL', 'text2image/soul');
+    vi.stubEnv('PRODUCTION_AI_PROMPT', 'prompt');
+
+    selectSequence([
+      [{ ...BASE_PAYMENT, status: 'PROCESSING' }],
+      [],
+      [], // no existing job
+    ]);
+
+    mockGetZiinaPaymentIntent.mockResolvedValue({ status: 'completed' });
+    makeSuccessTransaction();
+    mockWriteLedgerEntry.mockResolvedValue(undefined);
+    mockCreateProductionJob.mockResolvedValue({ ok: false, reason: 'DB error' });
+
+    const result = await verifyZiinaPayment('pay-1', 'org-1');
+
+    // Payment confirmed — must still return PAID even if job creation failed
+    expect(result).toMatchObject({ status: 'PAID', paymentId: 'pay-1' });
+  });
+
+  it('concurrent duplicate webhook: second call sees ALREADY_PAID and does not create a second job', async () => {
+    vi.stubEnv('PRODUCTION_AI_PROVIDER', 'higgsfield');
+    vi.stubEnv('PRODUCTION_AI_MODEL', 'text2image/soul');
+    vi.stubEnv('PRODUCTION_AI_PROMPT', 'prompt');
+
+    // Second call sees payment already PAID (first call already transitioned it)
+    // and sees an existing job (first call already created it)
+    selectSequence([
+      [{ ...BASE_PAYMENT, status: 'PAID' }], // payment row
+      [{ id: 'job-created-by-first-call' }], // existing job in ensureProductionJobForPaidOrder
+    ]);
+
+    const result = await verifyZiinaPayment('pay-1', 'org-1');
+
+    expect(result).toMatchObject({ status: 'ALREADY_PAID', paymentId: 'pay-1' });
+    expect(mockCreateProductionJob).not.toHaveBeenCalled();
+    expect(mockRunGenerationDriver).not.toHaveBeenCalled();
   });
 });

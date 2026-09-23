@@ -6,14 +6,81 @@
 
 import { db } from '@/db/index';
 import { payments } from '@/db/schema/financial';
+import { productionJobs } from '@/db/schema/production';
 import { auditEvents, idempotencyKeys } from '@/db/schema/system';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import { uuidv7 } from 'uuidv7';
 import { getZiinaPaymentIntent, ZIINA_STATUS_SUCCESS, ZIINA_STATUS_FAILED, ZIINA_STATUS_CANCELLED } from '@/lib/ziina';
 import { writeLedgerEntry } from './create-payment';
 import { createProductionJob } from '@/lib/admin/production-jobs';
 import { createManualUploadAsset } from '@/lib/admin/manual-upload';
 import { runGenerationDriver } from '@/lib/agent/driver';
+
+// Sentinel UUID for system-automated audit events — matches automated-pipeline.ts convention.
+// actor_id is a uuid column; string 'SYSTEM' is not a valid UUID and would throw at the DB level.
+const SYSTEM_ACTOR_ID = '00000000-0000-0000-0000-000000000000';
+
+// Idempotent helper: creates a production job + dispatches the driver for a PAID order,
+// but only if no non-archived job exists for that order yet. Safe to call on every
+// PAID transition and on every ALREADY_PAID self-heal call — no duplicates possible.
+async function ensureProductionJobForPaidOrder(orderId: string, organizationId: string): Promise<void> {
+  const existing = await db
+    .select({ id: productionJobs.id })
+    .from(productionJobs)
+    .where(
+      and(
+        eq(productionJobs.order_id, orderId),
+        eq(productionJobs.organization_id, organizationId),
+        isNull(productionJobs.archived_at),
+      ),
+    )
+    .limit(1);
+
+  if (existing.length > 0) return;
+
+  const aiProvider = process.env.PRODUCTION_AI_PROVIDER ?? null;
+  const aiModel = process.env.PRODUCTION_AI_MODEL ?? null;
+  const aiPrompt = process.env.PRODUCTION_AI_PROMPT ?? null;
+  const useAiGeneration = Boolean(aiProvider && aiModel && aiPrompt);
+  const jobType = useAiGeneration ? 'AI_GENERATION' : 'MANUAL_UPLOAD';
+
+  const jobResult = await createProductionJob({
+    orderId,
+    organizationId,
+    jobType,
+    description: `Auto-queued after Ziina payment confirmed for order ${orderId.slice(0, 8)}`,
+    actorId: SYSTEM_ACTOR_ID,
+    actorRole: 'OWNER',
+    ...(useAiGeneration
+      ? { aiGenerationParams: { provider: aiProvider!, model: aiModel!, prompt: aiPrompt! } }
+      : {}),
+  });
+
+  if (!jobResult.ok) {
+    console.error(`[verifyZiinaPayment] createProductionJob failed for order ${orderId}: ${jobResult.reason}`);
+    return;
+  }
+
+  if (useAiGeneration) {
+    const driverResult = await runGenerationDriver({
+      productionJobId: jobResult.jobId,
+      organizationId,
+    });
+    if (!driverResult.ok) {
+      console.error(`[verifyZiinaPayment] runGenerationDriver failed for job ${jobResult.jobId}: ${driverResult.reason}`);
+    }
+  } else {
+    const assetResult = await createManualUploadAsset({
+      productionJobId: jobResult.jobId,
+      organizationId,
+      actorId: SYSTEM_ACTOR_ID,
+      actorRole: 'OWNER',
+    });
+    if (!assetResult.ok) {
+      console.error(`[verifyZiinaPayment] createManualUploadAsset failed for job ${jobResult.jobId}: ${assetResult.reason}`);
+    }
+  }
+}
 
 export type VerifyZiinaPaymentResult =
   | { status: 'PAID'; paymentId: string }
@@ -54,8 +121,15 @@ export async function verifyZiinaPayment(
 
   const payment = paymentRows[0];
 
-  // Idempotent: already at a terminal state
-  if (payment.status === 'PAID') return { status: 'ALREADY_PAID', paymentId: payment.id };
+  // Idempotent: already at a terminal state.
+  // Self-heal: if payment is PAID but no production job exists (e.g. a prior job-creation error),
+  // attempt job creation now so a page refresh or a recovery call completes the pipeline.
+  if (payment.status === 'PAID') {
+    await ensureProductionJobForPaidOrder(payment.order_id, organizationId).catch((err) => {
+      console.error('[verifyZiinaPayment] Self-heal job creation failed for order', payment.order_id, err);
+    });
+    return { status: 'ALREADY_PAID', paymentId: payment.id };
+  }
   if (payment.status === 'FAILED') return { status: 'FAILED', paymentId: payment.id };
 
   // Step 2: Must have a Ziina payment intent ID to verify
@@ -166,60 +240,13 @@ export async function verifyZiinaPayment(
     });
 
     // Step 5b: Auto-queue production job. Only runs when THIS request owns the PROCESSING→PAID
-    // transition (paymentTransitioned=true). Idempotent: a page refresh returns ALREADY_PAID
-    // at step 1 above and never reaches this point, so duplicates are structurally impossible.
+    // transition (paymentTransitioned=true). The helper checks for an existing job first, so
+    // even if called redundantly it will not create duplicates.
     if (paymentTransitioned) {
-      // Prefer AI_GENERATION when all required env vars are configured.
-      const aiProvider = process.env.PRODUCTION_AI_PROVIDER ?? null;
-      const aiModel = process.env.PRODUCTION_AI_MODEL ?? null;
-      const aiPrompt = process.env.PRODUCTION_AI_PROMPT ?? null;
-      const useAiGeneration = Boolean(aiProvider && aiModel && aiPrompt);
-      const jobType = useAiGeneration ? 'AI_GENERATION' : 'MANUAL_UPLOAD';
-
-      const jobResult = await createProductionJob({
-        orderId: payment.order_id,
-        organizationId,
-        jobType,
-        description: `Auto-queued after Ziina payment confirmed for order ${payment.order_id.slice(0, 8)}`,
-        actorId: 'SYSTEM',
-        actorRole: 'OWNER',
-        ...(useAiGeneration
-          ? { aiGenerationParams: { provider: aiProvider!, model: aiModel!, prompt: aiPrompt! } }
-          : {}),
+      await ensureProductionJobForPaidOrder(payment.order_id, organizationId).catch((err) => {
+        // Payment is confirmed — do not fail the response. Log for ops visibility.
+        console.error('[verifyZiinaPayment] Post-payment job creation failed for order', payment.order_id, err);
       });
-
-      if (jobResult.ok) {
-        if (useAiGeneration) {
-          // AI_GENERATION: dispatch immediately; webhook + materialization + auto-QC handle the rest.
-          const driverResult = await runGenerationDriver({
-            productionJobId: jobResult.jobId,
-            organizationId,
-          });
-          if (!driverResult.ok) {
-            console.error(
-              `[verifyZiinaPayment] runGenerationDriver failed for job ${jobResult.jobId}: ${driverResult.reason}`,
-            );
-          }
-        } else {
-          // MANUAL_UPLOAD fallback: create placeholder asset; admin uploads file and marks ready.
-          const assetResult = await createManualUploadAsset({
-            productionJobId: jobResult.jobId,
-            organizationId,
-            actorId: 'SYSTEM',
-            actorRole: 'OWNER',
-          });
-          if (!assetResult.ok) {
-            console.error(
-              `[verifyZiinaPayment] Asset creation failed for job ${jobResult.jobId}: ${assetResult.reason}`,
-            );
-          }
-        }
-      } else {
-        // Payment is confirmed — do not fail the response. Job can be created manually.
-        console.error(
-          `[verifyZiinaPayment] Production job creation failed for order ${payment.order_id}: ${jobResult.reason}`,
-        );
-      }
     }
 
     return { status: 'PAID', paymentId: payment.id };
