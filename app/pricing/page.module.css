@@ -39,20 +39,6 @@
   border-bottom: 1px solid var(--drex-border);
 }
 
-.pricingNotice {
-  padding: 1rem 1.5rem;
-  background: rgba(200, 152, 10, 0.06);
-  border: 1px solid rgba(200, 152, 10, 0.2);
-  border-radius: 8px;
-  font-size: 0.9375rem;
-  color: var(--drex-text-secondary);
-  margin-bottom: 3rem;
-}
-
-.pricingNotice strong {
-  color: var(--drex-accent);
-}
-
 .sectionLabel {
   font-size: 0.75rem;
   font-weight: 700;
@@ -123,6 +109,14 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+.packageCategory {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--drex-text-muted);
 }
 
 .packageName {
