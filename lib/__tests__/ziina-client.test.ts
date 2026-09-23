@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 // ZIINA_API_KEY env var is set for tests; value is never printed.
 
 const TEST_API_KEY = 'test-ziina-key-placeholder';
-const TEST_BASE_URL = 'https://api.ziina.com';
+const TEST_BASE_URL = 'https://api-v2.ziina.com/api';
 
 beforeEach(() => {
   process.env.ZIINA_API_KEY = TEST_API_KEY;
@@ -19,11 +19,18 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-import { createZiinaPaymentIntent, getZiinaPaymentIntent, AED_TO_FILS } from '../ziina';
+import { createZiinaPaymentIntent, getZiinaPaymentIntent, AED_TO_FILS, ZIINA_BASE_URL } from '../ziina';
 
 describe('AED_TO_FILS constant', () => {
   it('is 100 (1 AED = 100 fils)', () => {
     expect(AED_TO_FILS).toBe(100);
+  });
+});
+
+describe('ZIINA_BASE_URL constant', () => {
+  it('defaults to the official Ziina v2 API when ZIINA_BASE_URL env var is not set', () => {
+    // Module is loaded before beforeEach sets ZIINA_BASE_URL; this tests the frozen default.
+    expect(ZIINA_BASE_URL).toBe('https://api-v2.ziina.com/api');
   });
 });
 
@@ -106,6 +113,14 @@ describe('createZiinaPaymentIntent', () => {
     const body = JSON.parse((fetchSpy.mock.calls[0][1] as RequestInit).body as string);
     expect(body.test).toBe(false);
   });
+
+  it('throws a descriptive network error when the connection to Ziina fails', async () => {
+    vi.spyOn(globalThis, 'fetch').mockRejectedValue(new TypeError('fetch failed'));
+
+    await expect(
+      createZiinaPaymentIntent({ amount: 500, success_url: 'https://x.com/s', cancel_url: 'https://x.com/c' }),
+    ).rejects.toThrow('Ziina network error (POST /payment_intent): fetch failed');
+  });
 });
 
 describe('getZiinaPaymentIntent', () => {
@@ -159,5 +174,13 @@ describe('getZiinaPaymentIntent', () => {
     await getZiinaPaymentIntent('id/with/slash');
 
     expect((fetchSpy.mock.calls[0][0] as string)).toContain('id%2Fwith%2Fslash');
+  });
+
+  it('throws a descriptive network error when the connection to Ziina fails', async () => {
+    vi.spyOn(globalThis, 'fetch').mockRejectedValue(new TypeError('fetch failed'));
+
+    await expect(getZiinaPaymentIntent('ziina-123')).rejects.toThrow(
+      'Ziina network error (GET /payment_intent/ziina-123): fetch failed',
+    );
   });
 });
