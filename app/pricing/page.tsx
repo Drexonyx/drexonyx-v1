@@ -62,7 +62,7 @@ export default function PricingPage() {
                   ))}
                 </ul>
                 <Link
-                  href="/start-project"
+                  href={`/checkout?pkg=${pkg.id}`}
                   className={pkg.highlight ? styles.ctaPrimary : styles.ctaSecondary}
                 >
                   Get Started

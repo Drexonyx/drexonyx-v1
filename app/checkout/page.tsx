@@ -8,9 +8,16 @@ export const metadata: Metadata = {
   description: 'Complete your DREXONYX project order.',
 };
 
-const defaultPackage = PRODUCTION_PACKAGES.find((p) => p.highlight) ?? PRODUCTION_PACKAGES[0];
+type Props = {
+  searchParams: Promise<{ pkg?: string }>;
+};
 
-export default function CheckoutPage() {
+export default async function CheckoutPage({ searchParams }: Props) {
+  const { pkg } = await searchParams;
+  const selectedPackage = pkg
+    ? (PRODUCTION_PACKAGES.find((p) => p.id === pkg) ?? null)
+    : null;
+
   return (
     <>
       <section className={styles.hero} aria-labelledby="checkout-heading">
@@ -27,41 +34,53 @@ export default function CheckoutPage() {
 
       <section className={styles.checkoutSection} aria-label="Order details">
         <div className="container">
-          <div className={styles.checkoutLayout}>
-            <div className={styles.orderCard}>
-              <h2 className={styles.orderHeading}>Selected Package</h2>
-              <div className={styles.pkgHeader}>
-                <p className={styles.pkgName}>{defaultPackage.name}</p>
-                <p className={styles.pkgPrice}>{defaultPackage.priceLabel}</p>
-              </div>
-              <p className={styles.pkgDesc}>{defaultPackage.description}</p>
-              <ul className={styles.pkgIncludes} aria-label="Package inclusions">
-                {defaultPackage.includes.map((item) => (
-                  <li key={item} className={styles.pkgItem}>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <div className={styles.totalRow}>
-                <span className={styles.totalLabel}>Total</span>
-                <span className={styles.totalPrice}>{defaultPackage.priceLabel}</span>
-              </div>
-            </div>
-
-            <div className={styles.paymentCard}>
-              <h2 className={styles.paymentHeading}>Payment</h2>
-              <p className={styles.paymentNote}>
-                Online payment is coming soon. To move forward now, submit your project brief and
-                our team will follow up with a payment link within one business day.
+          {selectedPackage === null ? (
+            <div className={styles.noPackage} role="status">
+              <p className={styles.noPackageHeading}>No package selected</p>
+              <p className={styles.noPackageText}>
+                Please select a package from the pricing page to continue.
               </p>
-              <button type="button" className={styles.proceedBtn} disabled>
-                Proceed to Payment
-              </button>
-              <Link href="/start-project" className={styles.altLink}>
-                Submit Project Brief Instead
+              <Link href="/pricing" className={styles.noPackageCta}>
+                View Pricing
               </Link>
             </div>
-          </div>
+          ) : (
+            <div className={styles.checkoutLayout}>
+              <div className={styles.orderCard}>
+                <h2 className={styles.orderHeading}>Selected Package</h2>
+                <div className={styles.pkgHeader}>
+                  <p className={styles.pkgName}>{selectedPackage.name}</p>
+                  <p className={styles.pkgPrice}>{selectedPackage.priceLabel}</p>
+                </div>
+                <p className={styles.pkgDesc}>{selectedPackage.description}</p>
+                <ul className={styles.pkgIncludes} aria-label="Package inclusions">
+                  {selectedPackage.includes.map((item) => (
+                    <li key={item} className={styles.pkgItem}>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <div className={styles.totalRow}>
+                  <span className={styles.totalLabel}>Total</span>
+                  <span className={styles.totalPrice}>{selectedPackage.priceLabel}</span>
+                </div>
+              </div>
+
+              <div className={styles.paymentCard}>
+                <h2 className={styles.paymentHeading}>Payment</h2>
+                <p className={styles.paymentNote}>
+                  Online payment is coming soon. To move forward now, submit your project brief and
+                  our team will follow up with a payment link within one business day.
+                </p>
+                <button type="button" className={styles.proceedBtn} disabled>
+                  Proceed to Payment
+                </button>
+                <Link href="/start-project" className={styles.altLink}>
+                  Submit Project Brief Instead
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
       </section>
     </>
