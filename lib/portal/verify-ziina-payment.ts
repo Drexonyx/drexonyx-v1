@@ -11,6 +11,7 @@ import { and, eq } from 'drizzle-orm';
 import { uuidv7 } from 'uuidv7';
 import { getZiinaPaymentIntent, ZIINA_STATUS_SUCCESS, ZIINA_STATUS_FAILED, ZIINA_STATUS_CANCELLED } from '@/lib/ziina';
 import { writeLedgerEntry } from './create-payment';
+import { createProductionJob } from '@/lib/admin/production-jobs';
 
 export type VerifyZiinaPaymentResult =
   | { status: 'PAID'; paymentId: string }
@@ -95,6 +96,8 @@ export async function verifyZiinaPayment(
     // Uses .returning() to detect whether THIS transaction won the race — only the
     // request that actually transitions the payment writes the ledger entry.
     // DB-level guarantee: unique partial index on financial_ledger (migration 0021).
+    let paymentTransitioned = false;
+
     await db.transaction(async (tx) => {
       const updated = await tx
         .update(payments)
@@ -109,6 +112,8 @@ export async function verifyZiinaPayment(
         .returning({ id: payments.id });
 
       if (updated.length > 0) {
+        paymentTransitioned = true;
+
         // DR 0052 §3.2: CLIENT_PAYMENT — exactly once per PAID payment
         await writeLedgerEntry(tx, {
           organizationId,
@@ -157,6 +162,26 @@ export async function verifyZiinaPayment(
         })
         .onConflictDoNothing();
     });
+
+    // Step 5b: Auto-queue production job. Only runs when THIS request owns the PROCESSING→PAID
+    // transition (paymentTransitioned=true). Idempotent: a page refresh returns ALREADY_PAID
+    // at step 1 above and never reaches this point, so duplicates are structurally impossible.
+    if (paymentTransitioned) {
+      const jobResult = await createProductionJob({
+        orderId: payment.order_id,
+        organizationId,
+        jobType: 'MANUAL_UPLOAD',
+        description: `Auto-queued after Ziina payment confirmed for order ${payment.order_id.slice(0, 8)}`,
+        actorId: 'SYSTEM',
+        actorRole: 'OWNER',
+      });
+      if (!jobResult.ok) {
+        // Payment is confirmed — do not fail the response. Job can be created manually.
+        console.error(
+          `[verifyZiinaPayment] Production job creation failed for order ${payment.order_id}: ${jobResult.reason}`,
+        );
+      }
+    }
 
     return { status: 'PAID', paymentId: payment.id };
   }

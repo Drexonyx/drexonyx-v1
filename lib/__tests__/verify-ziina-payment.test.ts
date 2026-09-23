@@ -2,9 +2,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ─── Hoisted mocks ────────────────────────────────────────────────────────────
 
-const { mockDb, mockGetZiinaPaymentIntent } = vi.hoisted(() => ({
+const { mockDb, mockGetZiinaPaymentIntent, mockCreateProductionJob } = vi.hoisted(() => ({
   mockDb: { select: vi.fn(), transaction: vi.fn() },
   mockGetZiinaPaymentIntent: vi.fn(),
+  mockCreateProductionJob: vi.fn(),
 }));
 
 vi.mock('@/db/index', () => ({ db: mockDb }));
@@ -16,6 +17,9 @@ vi.mock('@/lib/ziina', () => ({
 }));
 vi.mock('../portal/create-payment', () => ({
   writeLedgerEntry: vi.fn().mockResolvedValue(undefined),
+}));
+vi.mock('@/lib/admin/production-jobs', () => ({
+  createProductionJob: mockCreateProductionJob,
 }));
 
 import { writeLedgerEntry } from '../portal/create-payment';
@@ -68,6 +72,7 @@ describe('verifyZiinaPayment', () => {
     mockDb.transaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
       await fn(makeTx());
     });
+    mockCreateProductionJob.mockResolvedValue({ ok: true, jobId: 'job-1' });
   });
 
   it('returns NOT_FOUND when payment record does not exist', async () => {
@@ -118,6 +123,14 @@ describe('verifyZiinaPayment', () => {
     expect(result.status).toBe('PAID');
     expect(mockGetZiinaPaymentIntent).toHaveBeenCalledWith('ziina-intent-abc');
     expect(mockDb.transaction).toHaveBeenCalled();
+    expect(mockCreateProductionJob).toHaveBeenCalledWith(
+      expect.objectContaining({
+        orderId: 'order-1',
+        organizationId: 'org-1',
+        jobType: 'MANUAL_UPLOAD',
+        actorRole: 'OWNER',
+      }),
+    );
   });
 
   it('returns FAILED and applies state transition when Ziina returns failed', async () => {
@@ -213,5 +226,83 @@ describe('verifyZiinaPayment', () => {
 
     expect(result.status).toBe('PAID'); // still PAID from Ziina's perspective
     expect(mockWriteLedger).not.toHaveBeenCalled(); // no duplicate ledger entry
+    expect(mockCreateProductionJob).not.toHaveBeenCalled(); // no duplicate job
+  });
+
+  it('creates a MANUAL_UPLOAD production job when payment transitions to PAID', async () => {
+    mockDb.select
+      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
+      .mockReturnValueOnce(selectChain([]));
+    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'completed', amount: 50000 });
+
+    await verifyZiinaPayment('pay-1', 'org-1');
+
+    expect(mockCreateProductionJob).toHaveBeenCalledOnce();
+    expect(mockCreateProductionJob).toHaveBeenCalledWith(
+      expect.objectContaining({
+        orderId: 'order-1',
+        organizationId: 'org-1',
+        jobType: 'MANUAL_UPLOAD',
+        actorRole: 'OWNER',
+      }),
+    );
+  });
+
+  it('does not create production job when verifyZiinaPayment is called a second time (payment already PAID)', async () => {
+    // Simulates page refresh: payment is already PAID → returns ALREADY_PAID immediately.
+    mockDb.select.mockReturnValueOnce(selectChain([{ ...PROCESSING_PAYMENT[0], status: 'PAID' }]));
+
+    const result = await verifyZiinaPayment('pay-1', 'org-1');
+
+    expect(result.status).toBe('ALREADY_PAID');
+    expect(mockCreateProductionJob).not.toHaveBeenCalled();
+  });
+
+  it('does not create production job when Ziina returns failed', async () => {
+    mockDb.select
+      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
+      .mockReturnValueOnce(selectChain([]));
+    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'failed', amount: 50000 });
+
+    const result = await verifyZiinaPayment('pay-1', 'org-1');
+
+    expect(result.status).toBe('FAILED');
+    expect(mockCreateProductionJob).not.toHaveBeenCalled();
+  });
+
+  it('does not create production job when Ziina returns canceled', async () => {
+    mockDb.select
+      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
+      .mockReturnValueOnce(selectChain([]));
+    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'canceled', amount: 50000 });
+
+    const result = await verifyZiinaPayment('pay-1', 'org-1');
+
+    expect(result.status).toBe('FAILED');
+    expect(mockCreateProductionJob).not.toHaveBeenCalled();
+  });
+
+  it('does not create production job when Ziina returns pending', async () => {
+    mockDb.select
+      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
+      .mockReturnValueOnce(selectChain([]));
+    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'pending', amount: 50000 });
+
+    const result = await verifyZiinaPayment('pay-1', 'org-1');
+
+    expect(result.status).toBe('PENDING');
+    expect(mockCreateProductionJob).not.toHaveBeenCalled();
+  });
+
+  it('still returns PAID when production job creation fails (payment is confirmed regardless)', async () => {
+    mockDb.select
+      .mockReturnValueOnce(selectChain(PROCESSING_PAYMENT))
+      .mockReturnValueOnce(selectChain([]));
+    mockGetZiinaPaymentIntent.mockResolvedValue({ id: 'ziina-intent-abc', redirect_url: '', status: 'completed', amount: 50000 });
+    mockCreateProductionJob.mockResolvedValue({ ok: false, reason: 'Order not found' });
+
+    const result = await verifyZiinaPayment('pay-1', 'org-1');
+
+    expect(result.status).toBe('PAID');
   });
 });

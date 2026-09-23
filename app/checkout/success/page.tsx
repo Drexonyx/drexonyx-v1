@@ -45,7 +45,7 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
           <p className={styles.icon}>✓</p>
           <h1 className={styles.heading}>Payment confirmed</h1>
           <p className={styles.body}>
-            Your payment has been verified and your project is now queued for production.
+            Your payment has been confirmed and your project has been queued for production.
             Our team will reach out within one business day to confirm next steps.
           </p>
           <Link href="/" className={styles.cta}>Back to Home</Link>
