@@ -37,6 +37,43 @@
   padding: 5rem 0;
 }
 
+.noPackage {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 3rem 0;
+  max-width: 480px;
+}
+
+.noPackageHeading {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--drex-text);
+}
+
+.noPackageText {
+  font-size: 0.9375rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.65;
+}
+
+.noPackageCta {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--drex-accent);
+  border-radius: 8px;
+  transition: background var(--drex-duration) var(--drex-ease);
+}
+
+.noPackageCta:hover {
+  background: var(--drex-accent-dim);
+}
+
 .checkoutLayout {
   display: grid;
   grid-template-columns: 1fr 360px;
@@ -155,6 +192,53 @@
   line-height: 1.65;
 }
 
+.paymentField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.paymentLabel {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--drex-text);
+}
+
+.paymentInput {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  color: var(--drex-text);
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: 8px;
+  transition: border-color var(--drex-duration) var(--drex-ease);
+}
+
+.paymentInput::placeholder {
+  color: var(--drex-text-muted);
+}
+
+.paymentInput:focus {
+  outline: none;
+  border-color: var(--drex-accent);
+}
+
+.paymentInput:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.paymentError {
+  padding: 0.75rem 1rem;
+  background: rgba(220, 38, 38, 0.06);
+  border: 1px solid rgba(220, 38, 38, 0.25);
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  color: #dc2626;
+}
+
 .proceedBtn {
   display: flex;
   align-items: center;
@@ -166,9 +250,17 @@
   color: #0a0a0a;
   background: var(--drex-accent);
   border-radius: 8px;
-  cursor: not-allowed;
-  opacity: 0.5;
+  cursor: pointer;
   transition: opacity var(--drex-duration) var(--drex-ease);
+}
+
+.proceedBtn:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.proceedBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .altLink {

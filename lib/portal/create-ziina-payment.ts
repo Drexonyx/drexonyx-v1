@@ -19,10 +19,14 @@ export type CreateZiinaPaymentResult =
 export async function createZiinaCheckoutSession(params: {
   orderId: string;
   organizationId: string;
-  actorId: string;
+  actorId: string | null;
   baseUrl: string;
+  successPath?: string;
+  cancelPath?: string;
 }): Promise<CreateZiinaPaymentResult> {
   const { orderId, organizationId, actorId, baseUrl } = params;
+  const successPath = params.successPath ?? '/portal/payments/ziina/success';
+  const cancelPath = params.cancelPath ?? '/portal/payments/ziina/cancel';
 
   // Step 1: Fetch order (org-scoped)
   const orderRows = await db
@@ -114,10 +118,10 @@ export async function createZiinaCheckoutSession(params: {
   });
 
   // Step 5: Call Ziina API (server-side only — API key never leaves server).
-  // success_url carries drex_payment_id so the success page can look up our payment record,
-  // retrieve provider_payment_id (Ziina's ID), and call GET /payment_intent/{id} server-side.
-  const successUrl = `${baseUrl}/portal/payments/ziina/success?drex_payment_id=${paymentId}`;
-  const cancelUrl = `${baseUrl}/portal/payments/ziina/cancel`;
+  // Both URLs carry drex_payment_id so success and cancel pages can look up the payment
+  // server-side and call GET /payment_intent/{id} to confirm the actual Ziina status.
+  const successUrl = `${baseUrl}${successPath}?drex_payment_id=${paymentId}`;
+  const cancelUrl = `${baseUrl}${cancelPath}?drex_payment_id=${paymentId}`;
 
   let ziina: Awaited<ReturnType<typeof createZiinaPaymentIntent>>;
   try {
@@ -128,6 +132,29 @@ export async function createZiinaCheckoutSession(params: {
     });
   } catch (err) {
     const reason = err instanceof Error ? err.message : 'Ziina API call failed';
+    // Clean up: mark the PENDING payment as FAILED so it does not strand permanently.
+    await db.transaction(async (tx) => {
+      await tx
+        .update(payments)
+        .set({ status: 'FAILED', failure_reason: 'ziina_api_error' })
+        .where(
+          and(
+            eq(payments.id, paymentId),
+            eq(payments.organization_id, organizationId),
+            eq(payments.status, 'PENDING'),
+          ),
+        );
+      await tx.insert(auditEvents).values({
+        id: uuidv7(),
+        organization_id: organizationId,
+        entity_type: 'payment',
+        entity_id: paymentId,
+        actor_id: actorId,
+        actor_role: 'SYSTEM',
+        action: 'PENDING_TO_FAILED',
+        payload: { payment_id: paymentId, order_id: orderId, failure_reason: 'ziina_api_error', provider: 'ziina' },
+      });
+    }).catch(() => {}); // Don't let cleanup failure mask the original error
     return { ok: false, reason };
   }
 

@@ -45,6 +45,11 @@ export default function PricingPage() {
                   </div>
                 )}
                 <div className={styles.packageHeader}>
+                  {pkg.category && (
+                    <div className={styles.packageCategory}>
+                      {pkg.category === 'standard-ugc' ? 'Standard UGC' : 'Cinematic UGC'}
+                    </div>
+                  )}
                   <h3 className={styles.packageName}>{pkg.name}</h3>
                   <div className={styles.packagePrice}>{pkg.priceLabel}</div>
                 </div>
@@ -57,7 +62,7 @@ export default function PricingPage() {
                   ))}
                 </ul>
                 <Link
-                  href="/start-project"
+                  href={`/checkout?pkg=${pkg.id}`}
                   className={pkg.highlight ? styles.ctaPrimary : styles.ctaSecondary}
                 >
                   Get Started

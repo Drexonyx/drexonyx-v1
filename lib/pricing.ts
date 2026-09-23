@@ -8,6 +8,7 @@ export type Package = {
   scopeNote?: string;
   highlight?: boolean;
   badge?: string;
+  category?: 'standard-ugc' | 'cinematic-ugc';
 };
 
 export type CustomTier = {
@@ -65,10 +66,11 @@ export const PRODUCTION_PACKAGES: Package[] = [
     name: 'Spark',
     price: 499,
     priceLabel: 'AED 499',
+    category: 'standard-ugc',
     description:
-      'Your first DREXONYX production. One AI UGC video — concept to delivery in 48 hours.',
+      'One Standard UGC video — concept, production, and QC delivered in 48 hours.',
     includes: [
-      '1 × AI UGC video (15–30 sec)',
+      '1 × Standard UGC video (15–30 sec)',
       'Creative concept & script',
       'Production & QC',
       '1 minor revision round',
@@ -80,10 +82,11 @@ export const PRODUCTION_PACKAGES: Package[] = [
     name: 'Starter',
     price: 1500,
     priceLabel: 'AED 1,500',
+    category: 'standard-ugc',
     description:
-      'A full-length UGC video ad for brands launching their first performance creative campaign.',
+      'One full-length Standard UGC video — creative brief, script, production, and QC in 5 business days.',
     includes: [
-      '1 × UGC video ad (up to 60 sec)',
+      '1 × Standard UGC video (up to 60 sec)',
       'Creative brief + script',
       '1 revision round',
       '5 business days',
@@ -95,11 +98,12 @@ export const PRODUCTION_PACKAGES: Package[] = [
     name: 'Growth',
     price: 3500,
     priceLabel: 'AED 3,500',
+    category: 'standard-ugc',
     description:
-      'Scale your performance creative with multi-video production and A/B variant testing.',
+      'Multi-video Standard UGC production with A/B creative variants — scale your content output efficiently.',
     includes: [
-      '3 × UGC video ads',
-      'A/B variant production',
+      '3 × Standard UGC videos',
+      'A/B creative variants',
       'Full creative strategy brief',
       '2 revision rounds',
       '7 business days',
@@ -112,11 +116,12 @@ export const PRODUCTION_PACKAGES: Package[] = [
     name: 'Scale',
     price: 6500,
     priceLabel: 'AED 6,500',
+    category: 'standard-ugc',
     description:
-      'High-volume creative production for performance-led brands running multiple campaigns simultaneously.',
+      'High-volume Standard UGC production for brands scaling creative output.',
     includes: [
-      '6 × UGC video ads',
-      'Multi-format variant production',
+      '6 × Standard UGC videos',
+      'Multi-format creative variants',
       'Full creative strategy',
       '3 revision rounds',
       '10 business days',
@@ -128,11 +133,11 @@ export const PRODUCTION_PACKAGES: Package[] = [
     name: 'Production',
     price: 14500,
     priceLabel: 'AED 14,500',
+    category: 'cinematic-ugc',
     description:
-      'Premium creative production for hero content, product launches, and cinematic brand storytelling.',
+      'Cinematic UGC production for hero content, product launches, and brand storytelling.',
     includes: [
-      '1 × cinematic product commercial (30–60 sec)',
-      'or up to 12 mixed video/static deliverables — one scope per engagement, agreed at brief',
+      'Cinematic video commercial (30–60 sec) — or mixed deliverable scope, agreed at brief',
       'Full creative direction',
       '3 revision rounds',
       '15 business days',

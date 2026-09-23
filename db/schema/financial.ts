@@ -20,6 +20,8 @@ export const financialSchema = pgSchema('financial');
 // ─── Financial Ledger ─────────────────────────────────────────────────────────
 // Append-only. Records all financial entries.
 // DR 0002 §7: immutable financial records.
+// DR 0111: unique partial index (reference_entity_id) WHERE entry_type='CLIENT_PAYMENT'
+//   AND reference_entity_type='payment' enforced in migration 0021.
 
 export const financialLedger = financialSchema.table(
   'financial_ledger',

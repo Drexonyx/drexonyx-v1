@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import Link from 'next/link';
 import { submitBrief } from './actions';
 import { PRODUCTION_PACKAGES } from '@/lib/pricing';
 import styles from './page.module.css';
@@ -257,7 +258,7 @@ export default function ProjectFlowForm() {
 
       {step === 3 && (
         <>
-          <h3 className={styles.stepHeading}>Your recommended package</h3>
+          <h3 className={styles.stepHeading}>Confirm your package</h3>
 
           {recommendedPkg && (
             <div className={styles.recommendCard}>
@@ -283,15 +284,21 @@ export default function ProjectFlowForm() {
             >
               Back
             </button>
-            <button
-              type="button"
+            <Link
+              href={recommendedPkg ? `/checkout?pkg=${recommendedPkg.id}` : '/pricing'}
               className={styles.submitBtn}
-              onClick={handleSubmit}
-              disabled={isPending}
             >
-              {isPending ? 'Submitting…' : 'Submit Brief'}
-            </button>
+              Proceed to Checkout
+            </Link>
           </div>
+          <button
+            type="button"
+            className={styles.submitBriefOnly}
+            onClick={handleSubmit}
+            disabled={isPending}
+          >
+            {isPending ? 'Submitting…' : 'Submit Brief Only'}
+          </button>
         </>
       )}
     </div>

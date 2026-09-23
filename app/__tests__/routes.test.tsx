@@ -157,13 +157,56 @@ describe("Start Project page", () => {
 });
 
 describe("Checkout page", () => {
-  it("renders an h1 heading", () => {
-    render(<CheckoutPage />);
+  it("renders an h1 heading for a valid package", async () => {
+    render(await CheckoutPage({ searchParams: Promise.resolve({ pkg: "growth" }) }));
     expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
   });
 
-  it("renders the proceed to payment button", () => {
-    render(<CheckoutPage />);
+  it("renders the proceed to payment button when a package is selected", async () => {
+    render(await CheckoutPage({ searchParams: Promise.resolve({ pkg: "growth" }) }));
     expect(screen.getByRole("button", { name: /proceed to payment/i })).toBeInTheDocument();
+  });
+
+  it("shows Spark and AED 499 for pkg=spark", async () => {
+    render(await CheckoutPage({ searchParams: Promise.resolve({ pkg: "spark" }) }));
+    expect(screen.getByText("Spark")).toBeInTheDocument();
+    expect(screen.getAllByText("AED 499").length).toBeGreaterThan(0);
+  });
+
+  it("shows Starter and AED 1,500 for pkg=starter", async () => {
+    render(await CheckoutPage({ searchParams: Promise.resolve({ pkg: "starter" }) }));
+    expect(screen.getByText("Starter")).toBeInTheDocument();
+    expect(screen.getAllByText("AED 1,500").length).toBeGreaterThan(0);
+  });
+
+  it("shows Growth and AED 3,500 for pkg=growth", async () => {
+    render(await CheckoutPage({ searchParams: Promise.resolve({ pkg: "growth" }) }));
+    expect(screen.getByText("Growth")).toBeInTheDocument();
+    expect(screen.getAllByText("AED 3,500").length).toBeGreaterThan(0);
+  });
+
+  it("shows Scale and AED 6,500 for pkg=scale", async () => {
+    render(await CheckoutPage({ searchParams: Promise.resolve({ pkg: "scale" }) }));
+    expect(screen.getByText("Scale")).toBeInTheDocument();
+    expect(screen.getAllByText("AED 6,500").length).toBeGreaterThan(0);
+  });
+
+  it("shows Production and AED 14,500 for pkg=production", async () => {
+    render(await CheckoutPage({ searchParams: Promise.resolve({ pkg: "production" }) }));
+    expect(screen.getByText("Production")).toBeInTheDocument();
+    expect(screen.getAllByText("AED 14,500").length).toBeGreaterThan(0);
+  });
+
+  it("shows no-package state and does not fall back to Growth when pkg is missing", async () => {
+    render(await CheckoutPage({ searchParams: Promise.resolve({}) }));
+    expect(screen.getByText(/no package selected/i)).toBeInTheDocument();
+    expect(screen.queryByText("Growth")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /proceed to payment/i })).not.toBeInTheDocument();
+  });
+
+  it("shows no-package state and does not fall back to Growth for an invalid pkg", async () => {
+    render(await CheckoutPage({ searchParams: Promise.resolve({ pkg: "invalid-id" }) }));
+    expect(screen.getByText(/no package selected/i)).toBeInTheDocument();
+    expect(screen.queryByText("Growth")).not.toBeInTheDocument();
   });
 });

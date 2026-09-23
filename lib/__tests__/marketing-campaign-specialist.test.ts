@@ -1,4 +1,4 @@
-// DR 0124: Marketing Campaign Specialist agent unit tests.
+// DR 0124 + DR 0126: Marketing Campaign Specialist agent unit tests.
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // ─── Hoisted mocks ────────────────────────────────────────────────────────────
@@ -63,6 +63,34 @@ describe('delegateMarketingCampaign', () => {
     expect(mockDelegateSubTask).not.toHaveBeenCalled();
   });
 
+  it('returns error when contentType is IMAGE and mediaUrl is absent', async () => {
+    const result = await delegateMarketingCampaign({ ...BASE, contentType: 'IMAGE' });
+    expect(result).toMatchObject({ ok: false, error: expect.stringContaining('mediaUrl') });
+    expect(mockDelegateSubTask).not.toHaveBeenCalled();
+  });
+
+  it('returns error when contentType is VIDEO and mediaUrl is absent', async () => {
+    const result = await delegateMarketingCampaign({ ...BASE, contentType: 'VIDEO' });
+    expect(result).toMatchObject({ ok: false, error: expect.stringContaining('mediaUrl') });
+    expect(mockDelegateSubTask).not.toHaveBeenCalled();
+  });
+
+  it('returns error when publishMode is SCHEDULED and scheduledAt is absent', async () => {
+    const result = await delegateMarketingCampaign({ ...BASE, publishMode: 'SCHEDULED' });
+    expect(result).toMatchObject({ ok: false, error: expect.stringContaining('scheduledAt') });
+    expect(mockDelegateSubTask).not.toHaveBeenCalled();
+  });
+
+  it('returns error when scheduledAt is not a valid date', async () => {
+    const result = await delegateMarketingCampaign({
+      ...BASE,
+      publishMode: 'SCHEDULED',
+      scheduledAt: 'not-a-date',
+    });
+    expect(result).toMatchObject({ ok: false, error: expect.stringContaining('scheduledAt') });
+    expect(mockDelegateSubTask).not.toHaveBeenCalled();
+  });
+
   // ─── Happy path ───────────────────────────────────────────────────────────
 
   it('delegates successfully and returns subTaskId', async () => {
@@ -77,11 +105,11 @@ describe('delegateMarketingCampaign', () => {
     expect(call.intentType).toBe('COORDINATE_MARKETING_CAMPAIGN');
   });
 
-  it('plan has exactly 5 steps', async () => {
+  it('plan has exactly 6 steps', async () => {
     await delegateMarketingCampaign(BASE);
     const call = mockDelegateSubTask.mock.calls[0][0] as Record<string, unknown>;
     const plan = call.plan as { steps: unknown[] };
-    expect(plan.steps).toHaveLength(5);
+    expect(plan.steps).toHaveLength(6);
   });
 
   it('step 0 is SKILL qc.script.review', async () => {
@@ -119,11 +147,19 @@ describe('delegateMarketingCampaign', () => {
     expect(input.requiredRoles).toContain('ADMIN_OPERATIONS');
   });
 
-  it('step 4 is NOTIFICATION', async () => {
+  it('step 4 is SKILL facebook.page.publish', async () => {
     await delegateMarketingCampaign(BASE);
     const call = mockDelegateSubTask.mock.calls[0][0] as Record<string, unknown>;
     const steps = (call.plan as { steps: Record<string, unknown>[] }).steps;
-    expect(steps[4].step_type).toBe('NOTIFICATION');
+    expect(steps[4].step_type).toBe('SKILL');
+    expect(steps[4].skill_id).toBe('facebook.page.publish');
+  });
+
+  it('step 5 is NOTIFICATION', async () => {
+    await delegateMarketingCampaign(BASE);
+    const call = mockDelegateSubTask.mock.calls[0][0] as Record<string, unknown>;
+    const steps = (call.plan as { steps: Record<string, unknown>[] }).steps;
+    expect(steps[5].step_type).toBe('NOTIFICATION');
   });
 
   // ─── Human gate is mandatory ──────────────────────────────────────────────
@@ -134,6 +170,87 @@ describe('delegateMarketingCampaign', () => {
     const steps = (call.plan as { steps: Record<string, unknown>[] }).steps;
     const gates = steps.filter((s) => s.step_type === 'HUMAN_GATE');
     expect(gates.length).toBe(1);
+  });
+
+  it('facebook.page.publish step always follows the HUMAN_GATE step', async () => {
+    await delegateMarketingCampaign(BASE);
+    const call = mockDelegateSubTask.mock.calls[0][0] as Record<string, unknown>;
+    const steps = (call.plan as { steps: Record<string, unknown>[] }).steps;
+    const gateIdx = steps.findIndex((s) => s.step_type === 'HUMAN_GATE');
+    expect(gateIdx).toBeGreaterThan(-1);
+    expect(steps[gateIdx + 1].skill_id).toBe('facebook.page.publish');
+  });
+
+  // ─── New params — defaults ─────────────────────────────────────────────────
+
+  it('defaults pageTarget to PAGE_1', async () => {
+    await delegateMarketingCampaign(BASE);
+    const call = mockDelegateSubTask.mock.calls[0][0] as Record<string, unknown>;
+    const steps = (call.plan as { steps: Record<string, unknown>[] }).steps;
+    const publishInput = steps[4].input as Record<string, unknown>;
+    expect(publishInput.pageTarget).toBe('PAGE_1');
+  });
+
+  it('defaults contentType to TEXT', async () => {
+    await delegateMarketingCampaign(BASE);
+    const call = mockDelegateSubTask.mock.calls[0][0] as Record<string, unknown>;
+    const steps = (call.plan as { steps: Record<string, unknown>[] }).steps;
+    const publishInput = steps[4].input as Record<string, unknown>;
+    expect(publishInput.contentType).toBe('TEXT');
+  });
+
+  it('defaults publishMode to IMMEDIATE', async () => {
+    await delegateMarketingCampaign(BASE);
+    const call = mockDelegateSubTask.mock.calls[0][0] as Record<string, unknown>;
+    const steps = (call.plan as { steps: Record<string, unknown>[] }).steps;
+    const publishInput = steps[4].input as Record<string, unknown>;
+    expect(publishInput.publishMode).toBe('IMMEDIATE');
+  });
+
+  // ─── New params — explicit values ─────────────────────────────────────────
+
+  it('passes pageTarget PAGE_2 to publish step', async () => {
+    await delegateMarketingCampaign({ ...BASE, pageTarget: 'PAGE_2' });
+    const call = mockDelegateSubTask.mock.calls[0][0] as Record<string, unknown>;
+    const steps = (call.plan as { steps: Record<string, unknown>[] }).steps;
+    const publishInput = steps[4].input as Record<string, unknown>;
+    expect(publishInput.pageTarget).toBe('PAGE_2');
+  });
+
+  it('passes IMAGE contentType and mediaUrl to publish step', async () => {
+    const mediaUrl = 'https://test.r2.cloudflarestorage.com/img.jpg';
+    await delegateMarketingCampaign({ ...BASE, contentType: 'IMAGE', mediaUrl });
+    const call = mockDelegateSubTask.mock.calls[0][0] as Record<string, unknown>;
+    const steps = (call.plan as { steps: Record<string, unknown>[] }).steps;
+    const publishInput = steps[4].input as Record<string, unknown>;
+    expect(publishInput.contentType).toBe('IMAGE');
+    expect(publishInput.mediaUrl).toBe(mediaUrl);
+  });
+
+  it('passes SCHEDULED publishMode and scheduledAt to publish step', async () => {
+    const scheduledAt = new Date(Date.now() + 30 * 60 * 1000).toISOString();
+    await delegateMarketingCampaign({ ...BASE, publishMode: 'SCHEDULED', scheduledAt });
+    const call = mockDelegateSubTask.mock.calls[0][0] as Record<string, unknown>;
+    const steps = (call.plan as { steps: Record<string, unknown>[] }).steps;
+    const publishInput = steps[4].input as Record<string, unknown>;
+    expect(publishInput.publishMode).toBe('SCHEDULED');
+    expect(publishInput.scheduledAt).toBe(scheduledAt);
+  });
+
+  it('publish step input includes campaignId', async () => {
+    await delegateMarketingCampaign(BASE);
+    const call = mockDelegateSubTask.mock.calls[0][0] as Record<string, unknown>;
+    const steps = (call.plan as { steps: Record<string, unknown>[] }).steps;
+    const publishInput = steps[4].input as Record<string, unknown>;
+    expect(publishInput.campaignId).toBe(BASE.campaignId);
+  });
+
+  it('publish step input includes message (captionText)', async () => {
+    await delegateMarketingCampaign(BASE);
+    const call = mockDelegateSubTask.mock.calls[0][0] as Record<string, unknown>;
+    const steps = (call.plan as { steps: Record<string, unknown>[] }).steps;
+    const publishInput = steps[4].input as Record<string, unknown>;
+    expect(publishInput.message).toBe(BASE.captionText);
   });
 
   // ─── Context ──────────────────────────────────────────────────────────────
