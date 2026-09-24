@@ -84,7 +84,7 @@ export const PORTFOLIO_ITEMS: PortfolioItem[] = [
     description:
       'Internal production sample. Daytime aerial cinematic production — sweeping Dubai skyline footage built for high-production brand campaigns.',
     mediaType: 'video',
-    src: 'https://d8j0ntlcm91z4.cloudfront.net/user_3Izyfje7jJqdLL9etPVfaNlUscM/hf_20260924_181806_3c86fb24-b94d-4c3a-8180-5de7e5761593.mp4',
+    src: '/portfolio/cinematic-dubai.mp4',
     thumbnailSrc: '/portfolio/ugc-demo-reel-thumb.svg',
     featured: false,
     industry: 'Consumer Goods',
