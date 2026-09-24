@@ -7,7 +7,7 @@
 import { db } from '@/db/index';
 import { productionJobs, aiGenerations } from '@/db/schema/production';
 import { auditEvents, idempotencyKeys } from '@/db/schema/system';
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { uuidv7 } from 'uuidv7';
 import { issueServiceToken } from './service-tokens';
 import { resolveProviderForModel } from './model-routing';
