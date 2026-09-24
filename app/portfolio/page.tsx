@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import styles from "./page.module.css";
 import PortfolioFilter from "./PortfolioFilter";
@@ -16,6 +17,17 @@ export default function PortfolioPage() {
       <section className={styles.hero} aria-labelledby="portfolio-hero-heading">
         <div className={styles.heroGoldLine} aria-hidden="true" />
         <div className={styles.heroGlow} aria-hidden="true" />
+        <div className={styles.heroImgWrap} aria-hidden="true">
+          <Image
+            src="/images/drexonyx-creative-crew-hero.png"
+            alt=""
+            fill
+            className={styles.heroImg}
+            priority
+            sizes="55vw"
+          />
+          <div className={styles.heroImgFade} />
+        </div>
         <div className="container">
           <div className={styles.heroContent}>
             <div className={styles.heroBadge}>Dubai · Portfolio</div>
