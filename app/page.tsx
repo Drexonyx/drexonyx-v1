@@ -123,7 +123,7 @@ export default function HomePage() {
               preload="none"
               className={styles.heroVideoPanelVideo}
             >
-              <source src="https://d8j0ntlcm91z4.cloudfront.net/user_3Izyfje7jJqdLL9etPVfaNlUscM/hf_20260924_181806_3c86fb24-b94d-4c3a-8180-5de7e5761593.mp4" type="video/mp4" />
+              <source src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Izyfje7jJqdLL9etPVfaNlUscM/45e55142-6e6d-480b-bb3e-e9bdb6daa80d.mp4" type="video/mp4" />
             </video>
           </div>
           <div className={styles.heroCred}>
