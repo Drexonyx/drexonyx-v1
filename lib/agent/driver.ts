@@ -11,6 +11,7 @@ import { and, eq, isNull } from 'drizzle-orm';
 import { uuidv7 } from 'uuidv7';
 import { issueServiceToken } from './service-tokens';
 import { resolveProviderForModel } from './model-routing';
+import { boundedPollUntilTerminal } from './polling';
 
 export type RunDriverResult =
   | { ok: true; providerJobId: string }
@@ -226,7 +227,20 @@ export async function runGenerationDriver(params: {
       ),
     );
 
-  // Step 6: HALT — ProductionJob stays RUNNING; webhook/polling continues the flow.
+  // Step 6: Fire polling fallback — non-blocking.
+  // Webhook is the primary completion path; bounded polling is the fallback so a job
+  // cannot be stuck RUNNING forever if the webhook is missing or delayed.
+  // Idempotency in pollGenerationStatus / handleSuccess prevents duplicate work
+  // if both paths reach the same AiGeneration.
+  void boundedPollUntilTerminal({
+    aiGenerationId: aiGenerationId!,
+    productionJobId,
+    organizationId,
+  }).catch((err: unknown) => {
+    console.error(`[driver] Polling fallback error for gen ${aiGenerationId}: ${err instanceof Error ? err.message : String(err)}`);
+  });
+
+  // HALT — ProductionJob stays RUNNING; webhook or polling continues the flow.
   return { ok: true, providerJobId: dispatchResult.providerJobId };
 }
 

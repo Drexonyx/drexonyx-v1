@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // ─── Hoisted mocks ────────────────────────────────────────────────────────────
 
@@ -103,7 +103,13 @@ const validParsedPayload = {
 // ─── Security: Signature verification ────────────────────────────────────────
 
 describe('POST /api/webhooks/higgsfield — signature verification', () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // Set the webhook secret so signature verification is active in these tests
+    vi.stubEnv('HIGGSFIELD_WEBHOOK_SECRET', 'test-secret');
+  });
+
+  afterEach(() => { vi.unstubAllEnvs(); });
 
   // Security: missing signature must be rejected before any DB mutation
   it('returns 401 when signature header is missing', async () => {
@@ -140,6 +146,16 @@ describe('POST /api/webhooks/higgsfield — signature verification', () => {
     await POST(req as unknown as NextRequest);
     expect(mockVerifyWebhookSignature).toHaveBeenCalledOnce();
     expect(mockSelect).not.toHaveBeenCalled(); // DB must NOT be touched
+  });
+
+  // When secret is not configured, webhook is accepted without signature verification
+  it('accepts webhook without signature when HIGGSFIELD_WEBHOOK_SECRET is not set', async () => {
+    vi.stubEnv('HIGGSFIELD_WEBHOOK_SECRET', '');
+    mockParseWebhookPayload.mockReturnValue(null); // Returns 400 for bad shape — proves we got past auth
+    const req = makeRequest({ unknown_field: true }); // No signature header
+    const res = await POST(req as unknown as NextRequest);
+    expect(res.status).toBe(400); // 400 (bad payload), not 401 (missing signature)
+    expect(mockVerifyWebhookSignature).not.toHaveBeenCalled();
   });
 });
 

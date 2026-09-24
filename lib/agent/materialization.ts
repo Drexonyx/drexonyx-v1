@@ -147,6 +147,8 @@ export async function materializeGenerationAsset(params: {
         order_id: orderId,
         status: 'PROCESSING',
         file_key: fileKey,
+        file_type: download.contentType,
+        file_size: download.body.length,
         content_url: null,
       });
 
