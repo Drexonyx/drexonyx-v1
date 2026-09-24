@@ -20,13 +20,26 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   // Read raw body before any parsing — required for HMAC signature verification
   const rawBody = Buffer.from(await request.arrayBuffer());
 
-  // DR 0059 §2.3: Signature verification is mandatory before any mutation
+  // DR 0059 §2.3: Signature verification is mandatory. Reject any webhook when the secret is
+  // not configured — an unauthenticated payload must never mutate production state.
+  // The Vercel Cron at /api/internal/poll-generations is the durable completion fallback.
+  if (!process.env.HIGGSFIELD_WEBHOOK_SECRET) {
+    console.warn('[webhook] HIGGSFIELD_WEBHOOK_SECRET not set — rejecting unauthenticated webhook');
+    return NextResponse.json({ error: 'Webhook authentication not configured' }, { status: 401 });
+  }
+
   const signature = request.headers.get('x-higgsfield-signature') ?? '';
   if (!signature) {
     return NextResponse.json({ error: 'Missing signature' }, { status: 401 });
   }
-
-  if (!higgsFieldProvider.verifyWebhookSignature(rawBody, signature)) {
+  let verified = false;
+  try {
+    verified = higgsFieldProvider.verifyWebhookSignature(rawBody, signature);
+  } catch {
+    // verifyWebhookSignature threw — treat as verification failure
+    verified = false;
+  }
+  if (!verified) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
   }
 

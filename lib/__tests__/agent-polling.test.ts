@@ -8,12 +8,14 @@ const {
   mockMaterializeGenerationAsset,
   mockAttemptProductionJobCompletion,
   mockFailProductionJob,
+  mockRunAutomatedQcAndPipeline,
 } = vi.hoisted(() => ({
   mockSelect: vi.fn(),
   mockPollJobStatus: vi.fn(),
   mockMaterializeGenerationAsset: vi.fn(),
   mockAttemptProductionJobCompletion: vi.fn(),
   mockFailProductionJob: vi.fn(),
+  mockRunAutomatedQcAndPipeline: vi.fn(),
 }));
 
 vi.mock('@/db/index', () => ({
@@ -34,6 +36,10 @@ vi.mock('@/lib/agent/materialization', () => ({
 vi.mock('@/lib/agent/terminal', () => ({
   attemptProductionJobCompletion: mockAttemptProductionJobCompletion,
   failProductionJob: mockFailProductionJob,
+}));
+
+vi.mock('@/lib/admin/automated-pipeline', () => ({
+  runAutomatedQcAndPipeline: mockRunAutomatedQcAndPipeline,
 }));
 
 import { pollGenerationStatus, boundedPollUntilTerminal } from '../agent/polling';
@@ -60,7 +66,10 @@ const pollParams = {
 // ─── pollGenerationStatus ─────────────────────────────────────────────────────
 
 describe('pollGenerationStatus', () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockRunAutomatedQcAndPipeline.mockResolvedValue({ ok: true });
+  });
 
   it('returns error when AiGeneration not found', async () => {
     mockSelect.mockReturnValue(makeSelectChain([]));
@@ -161,7 +170,10 @@ describe('pollGenerationStatus', () => {
 // ─── boundedPollUntilTerminal ─────────────────────────────────────────────────
 
 describe('boundedPollUntilTerminal', () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockRunAutomatedQcAndPipeline.mockResolvedValue({ ok: true });
+  });
 
   it('returns immediately when first poll is done', async () => {
     mockSelect.mockReturnValue(makeSelectChain([genRunning]));

@@ -7,7 +7,7 @@
 import { db } from '@/db/index';
 import { productionJobs, aiGenerations } from '@/db/schema/production';
 import { auditEvents, idempotencyKeys } from '@/db/schema/system';
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { uuidv7 } from 'uuidv7';
 import { issueServiceToken } from './service-tokens';
 import { resolveProviderForModel } from './model-routing';
@@ -226,7 +226,10 @@ export async function runGenerationDriver(params: {
       ),
     );
 
-  // Step 6: HALT — ProductionJob stays RUNNING; webhook/polling continues the flow.
+  // Step 6: HALT — ProductionJob stays RUNNING.
+  // Webhook is the primary completion path. The Vercel Cron at /api/internal/poll-generations
+  // is the durable fallback — it runs every 2 minutes and polls all RUNNING generations with a
+  // provider_job_id, ensuring completion without admin intervention even if the webhook is absent.
   return { ok: true, providerJobId: dispatchResult.providerJobId };
 }
 

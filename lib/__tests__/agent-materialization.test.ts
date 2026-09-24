@@ -305,6 +305,39 @@ describe('materializeGenerationAsset — happy path', () => {
     expect(capturedAssetInsert!.content_url).toBeNull();
   });
 
+  // Regression: file_type and file_size must be persisted in the asset row so automated QC can pass
+  it('persists file_type and file_size from downloaded content in the asset row', async () => {
+    selectSequence([[], [], [{ order_id: 'order1' }]]);
+
+    let capturedAssetInsert: Record<string, unknown> | null = null;
+    mockTransaction.mockImplementation(async (fn: (tx: unknown) => Promise<void>) => {
+      const tx = {
+        insert: vi.fn().mockImplementation(() => ({
+          values: vi.fn().mockImplementation((vals: unknown) => {
+            const v = vals as Record<string, unknown>;
+            if (v.file_key) capturedAssetInsert = v;
+            return { onConflictDoNothing: vi.fn().mockResolvedValue([]) };
+          }),
+        })),
+        update: vi.fn().mockReturnValue({
+          set: vi.fn().mockReturnValue({
+            where: vi.fn().mockReturnValue({ returning: vi.fn().mockResolvedValue([]) }),
+          }),
+        }),
+      };
+      await fn(tx);
+    });
+
+    await materializeGenerationAsset(params);
+
+    expect(capturedAssetInsert).not.toBeNull();
+    // makeSuccessfulFetch() uses contentType='video/mp4'
+    expect(capturedAssetInsert!.file_type).toBe('video/mp4');
+    // file_size must be a positive number derived from the downloaded body
+    expect(typeof capturedAssetInsert!.file_size).toBe('number');
+    expect((capturedAssetInsert!.file_size as number)).toBeGreaterThan(0);
+  });
+
   // DR 0079: AI_GENERATION_ASSET_CREATED audit event must be emitted
   it('emits AI_GENERATION_ASSET_CREATED audit event in transaction', async () => {
     selectSequence([[], [], [{ order_id: 'order1' }]]);

@@ -8,6 +8,7 @@ import { and, eq } from 'drizzle-orm';
 import { higgsFieldProvider } from './providers/higgsfield';
 import { materializeGenerationAsset } from './materialization';
 import { failProductionJob, attemptProductionJobCompletion } from './terminal';
+import { runAutomatedQcAndPipeline } from '@/lib/admin/automated-pipeline';
 
 const POLL_MAX_ATTEMPTS = 5;
 const POLL_INTERVAL_MS = 10_000;
@@ -70,6 +71,11 @@ export async function pollGenerationStatus(params: {
 
     if (matResult.ok) {
       await attemptProductionJobCompletion({ productionJobId, organizationId });
+      // Trigger automated QC — non-fatal; asset status is already committed.
+      const qcResult = await runAutomatedQcAndPipeline({ assetId: matResult.assetId, organizationId });
+      if (!qcResult.ok) {
+        console.error(`[polling] runAutomatedQcAndPipeline failed for asset ${matResult.assetId}: ${qcResult.reason}`);
+      }
     }
 
     return { ok: true, done: true, status: 'SUCCEEDED' };
