@@ -23,8 +23,7 @@ import { HiggsFieldProvider } from '../agent/providers/higgsfield';
 function setEnv(overrides: Record<string, string | undefined> = {}) {
   const base = {
     HIGGSFIELD_API_BASE_URL: 'https://platform.higgsfield.ai',
-    HIGGSFIELD_API_KEY_ID: 'test-key-id',
-    HIGGSFIELD_API_KEY_SECRET: 'test-key-secret',
+    HIGGSFIELD_API_KEY: 'test-key-id:test-key-secret',
     HIGGSFIELD_WEBHOOK_SECRET: 'webhook-secret',
     HIGGSFIELD_WEBHOOK_URL: undefined,
   };
@@ -36,7 +35,7 @@ function setEnv(overrides: Record<string, string | undefined> = {}) {
 }
 
 function clearEnv() {
-  for (const k of ['HIGGSFIELD_API_BASE_URL', 'HIGGSFIELD_API_KEY_ID', 'HIGGSFIELD_API_KEY_SECRET', 'HIGGSFIELD_WEBHOOK_SECRET', 'HIGGSFIELD_WEBHOOK_URL']) {
+  for (const k of ['HIGGSFIELD_API_BASE_URL', 'HIGGSFIELD_API_KEY', 'HIGGSFIELD_WEBHOOK_SECRET', 'HIGGSFIELD_WEBHOOK_URL']) {
     delete process.env[k];
   }
 }
@@ -76,18 +75,29 @@ describe('dispatch — authentication', () => {
     expect(headers['Authorization']).toBe('Key test-key-id:test-key-secret');
   });
 
-  it('throws when HIGGSFIELD_API_KEY_ID is missing', async () => {
-    setEnv({ HIGGSFIELD_API_KEY_ID: undefined });
+  it('returns ok:false when HIGGSFIELD_API_KEY is missing', async () => {
+    setEnv({ HIGGSFIELD_API_KEY: undefined });
     const result = await provider.dispatch(baseDispatchParams);
     expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error).toContain('HIGGSFIELD_API_KEY_ID');
+    if (!result.ok) expect(result.error).toContain('HIGGSFIELD_API_KEY');
   });
 
-  it('throws when HIGGSFIELD_API_KEY_SECRET is missing', async () => {
-    setEnv({ HIGGSFIELD_API_KEY_SECRET: undefined });
+  it('returns ok:false when HIGGSFIELD_API_KEY has no colon separator', async () => {
+    setEnv({ HIGGSFIELD_API_KEY: 'invalidsinglevalue' });
     const result = await provider.dispatch(baseDispatchParams);
     expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.error).toContain('HIGGSFIELD_API_KEY_SECRET');
+    if (!result.ok) expect(result.error).toContain('KEY_ID:KEY_SECRET');
+  });
+
+  it('returns ok:false (isTransient:false) when HIGGSFIELD_API_BASE_URL is missing', async () => {
+    setEnv({ HIGGSFIELD_API_BASE_URL: undefined });
+    const result = await provider.dispatch(baseDispatchParams);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.isTransient).toBe(false);
+      expect(result.error).toContain('HIGGSFIELD_API_BASE_URL');
+    }
+    expect(mockFetch).not.toHaveBeenCalled();
   });
 
   it('returns ok:false (isTransient:false) when HIGGSFIELD_API_BASE_URL is missing', async () => {

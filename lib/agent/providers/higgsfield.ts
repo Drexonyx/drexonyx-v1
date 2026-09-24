@@ -8,21 +8,18 @@ import { getObject } from '@/lib/infrastructure/object-storage';
 
 // ─── Credential helpers ───────────────────────────────────────────────────────
 
-// VERIFIED: Authorization: Key {ID}:{SECRET} scheme (from official Higgsfield SDK / docs).
-function getApiKeyId(): string {
-  const v = process.env.HIGGSFIELD_API_KEY_ID;
-  if (!v) throw new Error('HIGGSFIELD_API_KEY_ID environment variable is not set');
-  return v;
-}
-
-function getApiKeySecret(): string {
-  const v = process.env.HIGGSFIELD_API_KEY_SECRET;
-  if (!v) throw new Error('HIGGSFIELD_API_KEY_SECRET environment variable is not set');
+// VERIFIED: Authorization: Key {ID}:{SECRET} scheme (from official Higgsfield SDK v2).
+// The console now issues a single composite string "KEY_ID:KEY_SECRET"; stored as
+// HIGGSFIELD_API_KEY and used verbatim after the "Key " prefix.
+function getApiKey(): string {
+  const v = process.env.HIGGSFIELD_API_KEY;
+  if (!v) throw new Error('HIGGSFIELD_API_KEY environment variable is not set');
+  if (!v.includes(':')) throw new Error('HIGGSFIELD_API_KEY must be in KEY_ID:KEY_SECRET format');
   return v;
 }
 
 function authHeader(): string {
-  return `Key ${getApiKeyId()}:${getApiKeySecret()}`;
+  return `Key ${getApiKey()}`;
 }
 
 function getApiBaseUrl(): string {
@@ -175,6 +172,12 @@ export class HiggsFieldProvider implements AiProvider {
     let baseUrl: string;
     try {
       baseUrl = getApiBaseUrl();
+    } catch (err) {
+      return { ok: false, error: String(err), isTransient: false };
+    }
+
+    try {
+      getApiKey(); // validate credentials before the network call
     } catch (err) {
       return { ok: false, error: String(err), isTransient: false };
     }
