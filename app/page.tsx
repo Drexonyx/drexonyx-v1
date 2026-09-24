@@ -113,6 +113,17 @@ export default function HomePage() {
             priority
             sizes="55vw"
           />
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            poster="/images/drexonyx-creative-crew-hero.png"
+            className={styles.heroVideo}
+          >
+            <source src="https://d8j0ntlcm91z4.cloudfront.net/user_3Izyfje7jJqdLL9etPVfaNlUscM/hf_20260924_071605_87b4f9e4-de43-4674-a812-c44cc5b41af4.mp4" type="video/mp4" />
+          </video>
           <div className={styles.heroRightEdge} />
           <div className={styles.heroCred}>
             <span className={styles.heroCredCity}>Dubai</span>
@@ -191,6 +202,18 @@ export default function HomePage() {
                         className={styles.featuredCardImg}
                         sizes="(max-width: 900px) 100vw, (max-width: 1200px) 65vw, 800px"
                       />
+                    )}
+                    {item.mediaType === 'video' && item.src && (
+                      <video
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        preload="none"
+                        className={styles.featuredCardVideo}
+                      >
+                        <source src={item.src} type="video/mp4" />
+                      </video>
                     )}
                     <div className={styles.featuredCardOverlay} />
                     <div className={styles.featuredCardText}>

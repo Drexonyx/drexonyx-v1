@@ -47,9 +47,34 @@ export const PORTFOLIO_ITEMS: PortfolioItem[] = [
     description:
       'Internal production sample. Product-launch UGC format with testimonial-style hook and benefit-first structure, optimised for Meta and TikTok conversion campaigns.',
     mediaType: 'video',
+    src: 'https://d8j0ntlcm91z4.cloudfront.net/user_3Izyfje7jJqdLL9etPVfaNlUscM/hf_20260924_071606_0114cc0e-56b9-4d38-9127-93bc3f74300c.mp4',
     thumbnailSrc: '/portfolio/ugc-ecommerce-launch-thumb.svg',
     featured: false,
     industry: 'E-Commerce',
+  },
+  {
+    id: 'ugc-fitness-ad-2025',
+    category: 'UGC Video',
+    title: 'Performance UGC — Fitness',
+    description:
+      'Internal production sample. Creator-style fitness supplement ad with direct-to-camera testimonial hook, product reveal, and benefit-led structure for Meta and TikTok.',
+    mediaType: 'video',
+    src: 'https://d8j0ntlcm91z4.cloudfront.net/user_3Izyfje7jJqdLL9etPVfaNlUscM/hf_20260924_071606_c3121b61-f4b1-4f72-b62a-60e7f41da398.mp4',
+    thumbnailSrc: '/portfolio/ugc-ecommerce-launch-thumb.svg',
+    featured: false,
+    industry: 'Health & Wellness',
+  },
+  {
+    id: 'cinematic-commercial-2025',
+    category: 'UGC Video',
+    title: 'Cinematic Product Commercial',
+    description:
+      'Internal production sample. High-production commercial with dramatic side lighting, slow camera push-in, and premium brand aesthetic for luxury product launch campaigns.',
+    mediaType: 'video',
+    src: 'https://d8j0ntlcm91z4.cloudfront.net/user_3Izyfje7jJqdLL9etPVfaNlUscM/hf_20260924_071606_1208709c-df3d-447a-833b-1ee604dff5c7.mp4',
+    thumbnailSrc: '/portfolio/ugc-demo-reel-thumb.svg',
+    featured: false,
+    industry: 'Consumer Goods',
   },
   {
     id: 'static-feed-ad-product-2025',

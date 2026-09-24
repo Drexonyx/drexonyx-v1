@@ -97,6 +97,16 @@
   object-position: 55% center;
 }
 
+.heroVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 55% center;
+  z-index: 0;
+}
+
 /* Full-bleed gradient: dark on left for readability, image visible throughout */
 .heroRightEdge {
   position: absolute;
@@ -430,6 +440,15 @@
 
 .featuredCard:hover .featuredCardImg {
   transform: scale(1.04);
+}
+
+.featuredCardVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
 }
 
 .featuredCardOverlay {

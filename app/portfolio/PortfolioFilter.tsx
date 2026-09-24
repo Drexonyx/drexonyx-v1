@@ -162,6 +162,7 @@ export default function PortfolioFilter({ items }: PortfolioFilterProps) {
               playsInline
               preload="metadata"
               autoPlay
+              muted
               className={styles.videoPlayer}
             >
               Your browser does not support the video element.
