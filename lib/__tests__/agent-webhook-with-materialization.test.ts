@@ -1,6 +1,6 @@
 // DR 0078: Tests that materializeGenerationAsset is called correctly in the SUCCEEDED webhook path,
 // and that failures are handled without failing the job or crashing the webhook.
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // ─── Hoisted mocks ────────────────────────────────────────────────────────────
 
@@ -122,11 +122,14 @@ const succeededPayload = {
 describe('Webhook SUCCEEDED path — materialization integration', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv('HIGGSFIELD_WEBHOOK_SECRET', 'test-secret');
     mockVerifyWebhookSignature.mockReturnValue(true);
     mockParseWebhookPayload.mockReturnValue(succeededPayload);
     mockAttemptProductionJobCompletion.mockResolvedValue({ ok: true, transitioned: false });
     mockRunAutomatedQcAndPipeline.mockResolvedValue({ ok: true, verdict: 'PASS' });
   });
+
+  afterEach(() => { vi.unstubAllEnvs(); });
 
   // DR 0078 §2.5: materializeGenerationAsset must be called BEFORE attemptProductionJobCompletion
   it('calls materializeGenerationAsset before attemptProductionJobCompletion', async () => {

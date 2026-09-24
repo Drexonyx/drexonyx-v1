@@ -148,14 +148,15 @@ describe('POST /api/webhooks/higgsfield — signature verification', () => {
     expect(mockSelect).not.toHaveBeenCalled(); // DB must NOT be touched
   });
 
-  // When secret is not configured, webhook is accepted without signature verification
-  it('accepts webhook without signature when HIGGSFIELD_WEBHOOK_SECRET is not set', async () => {
+  // Security: unauthenticated webhook must NEVER mutate production state
+  it('returns 401 when HIGGSFIELD_WEBHOOK_SECRET is not set', async () => {
     vi.stubEnv('HIGGSFIELD_WEBHOOK_SECRET', '');
-    mockParseWebhookPayload.mockReturnValue(null); // Returns 400 for bad shape — proves we got past auth
     const req = makeRequest({ unknown_field: true }); // No signature header
     const res = await POST(req as unknown as NextRequest);
-    expect(res.status).toBe(400); // 400 (bad payload), not 401 (missing signature)
+    expect(res.status).toBe(401); // Rejected — no auth configured
     expect(mockVerifyWebhookSignature).not.toHaveBeenCalled();
+    expect(mockSelect).not.toHaveBeenCalled(); // No DB access whatsoever
+    expect(mockTransaction).not.toHaveBeenCalled();
   });
 });
 
@@ -164,9 +165,12 @@ describe('POST /api/webhooks/higgsfield — signature verification', () => {
 describe('POST /api/webhooks/higgsfield — correlation and tenant isolation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv('HIGGSFIELD_WEBHOOK_SECRET', 'test-secret');
     mockVerifyWebhookSignature.mockReturnValue(true);
     mockParseWebhookPayload.mockReturnValue(validParsedPayload);
   });
+
+  afterEach(() => { vi.unstubAllEnvs(); });
 
   // DR 0059 §2.5: Unknown provider_job_id → acknowledge without mutation
   it('returns 200 received:true when correlation not found (no mutation)', async () => {
@@ -209,9 +213,12 @@ describe('POST /api/webhooks/higgsfield — correlation and tenant isolation', (
 describe('POST /api/webhooks/higgsfield — idempotency (replay protection)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv('HIGGSFIELD_WEBHOOK_SECRET', 'test-secret');
     mockVerifyWebhookSignature.mockReturnValue(true);
     mockParseWebhookPayload.mockReturnValue(validParsedPayload);
   });
+
+  afterEach(() => { vi.unstubAllEnvs(); });
 
   // DR 0048 pattern: replayed webhook with COMPLETED idempotency key → acknowledge, no mutation
   it('returns 200 without mutation when idempotency key already COMPLETED (replayed webhook)', async () => {
@@ -248,12 +255,15 @@ describe('POST /api/webhooks/higgsfield — idempotency (replay protection)', ()
 describe('POST /api/webhooks/higgsfield — SUCCEEDED path', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv('HIGGSFIELD_WEBHOOK_SECRET', 'test-secret');
     mockVerifyWebhookSignature.mockReturnValue(true);
     mockParseWebhookPayload.mockReturnValue({ ...validParsedPayload, status: 'SUCCEEDED' });
     mockAttemptProductionJobCompletion.mockResolvedValue({ ok: true, transitioned: false });
     mockMaterializeGenerationAsset.mockResolvedValue({ ok: true, assetId: 'asset1' });
     mockRunAutomatedQcAndPipeline.mockResolvedValue({ ok: true, verdict: 'PASS' });
   });
+
+  afterEach(() => { vi.unstubAllEnvs(); });
 
   it('calls attemptProductionJobCompletion after SUCCEEDED transition', async () => {
     selectSequence([[validGen], []]); // gen found, no idempotency key
@@ -313,9 +323,12 @@ describe('POST /api/webhooks/higgsfield — SUCCEEDED path', () => {
 describe('POST /api/webhooks/higgsfield — FAILED transient path', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv('HIGGSFIELD_WEBHOOK_SECRET', 'test-secret');
     mockVerifyWebhookSignature.mockReturnValue(true);
     mockRetryDispatch.mockResolvedValue({ ok: true, providerJobId: 'hf-retry' });
   });
+
+  afterEach(() => { vi.unstubAllEnvs(); });
 
   it('calls retryDispatch when FAILED transient + retry_count < 2', async () => {
     mockParseWebhookPayload.mockReturnValue({
@@ -380,9 +393,12 @@ describe('POST /api/webhooks/higgsfield — FAILED transient path', () => {
 describe('POST /api/webhooks/higgsfield — FAILED permanent path', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv('HIGGSFIELD_WEBHOOK_SECRET', 'test-secret');
     mockVerifyWebhookSignature.mockReturnValue(true);
     mockFailProductionJob.mockResolvedValue({ ok: true, transitioned: true });
   });
+
+  afterEach(() => { vi.unstubAllEnvs(); });
 
   // DR 0061: permanent failures go directly to failProductionJob, no retry
   it('calls failProductionJob and NOT retryDispatch on permanent failure', async () => {

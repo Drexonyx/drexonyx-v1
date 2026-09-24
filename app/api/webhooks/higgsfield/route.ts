@@ -20,27 +20,27 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   // Read raw body before any parsing — required for HMAC signature verification
   const rawBody = Buffer.from(await request.arrayBuffer());
 
-  // DR 0059 §2.3: Verify webhook signature when HIGGSFIELD_WEBHOOK_SECRET is configured.
-  // When the secret is not set, signature verification is skipped and the webhook is accepted.
-  // Polling is the authoritative completion fallback, so an unverified webhook is still
-  // idempotent and safe — it cannot cause state transitions that polling would not also cause.
-  if (process.env.HIGGSFIELD_WEBHOOK_SECRET) {
-    const signature = request.headers.get('x-higgsfield-signature') ?? '';
-    if (!signature) {
-      return NextResponse.json({ error: 'Missing signature' }, { status: 401 });
-    }
-    let verified = false;
-    try {
-      verified = higgsFieldProvider.verifyWebhookSignature(rawBody, signature);
-    } catch {
-      // verifyWebhookSignature threw — treat as verification failure
-      verified = false;
-    }
-    if (!verified) {
-      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
-    }
-  } else {
-    console.warn('[webhook] HIGGSFIELD_WEBHOOK_SECRET not set — skipping signature verification');
+  // DR 0059 §2.3: Signature verification is mandatory. Reject any webhook when the secret is
+  // not configured — an unauthenticated payload must never mutate production state.
+  // The Vercel Cron at /api/internal/poll-generations is the durable completion fallback.
+  if (!process.env.HIGGSFIELD_WEBHOOK_SECRET) {
+    console.warn('[webhook] HIGGSFIELD_WEBHOOK_SECRET not set — rejecting unauthenticated webhook');
+    return NextResponse.json({ error: 'Webhook authentication not configured' }, { status: 401 });
+  }
+
+  const signature = request.headers.get('x-higgsfield-signature') ?? '';
+  if (!signature) {
+    return NextResponse.json({ error: 'Missing signature' }, { status: 401 });
+  }
+  let verified = false;
+  try {
+    verified = higgsFieldProvider.verifyWebhookSignature(rawBody, signature);
+  } catch {
+    // verifyWebhookSignature threw — treat as verification failure
+    verified = false;
+  }
+  if (!verified) {
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
   }
 
   let rawPayload: unknown;
