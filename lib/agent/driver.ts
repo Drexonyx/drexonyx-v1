@@ -227,9 +227,9 @@ export async function runGenerationDriver(params: {
     );
 
   // Step 6: HALT — ProductionJob stays RUNNING.
-  // Webhook is the primary completion path. The Vercel Cron at /api/internal/poll-generations
-  // is the durable fallback — it runs every 2 minutes and polls all RUNNING generations with a
-  // provider_job_id, ensuring completion without admin intervention even if the webhook is absent.
+  // Webhook is the primary completion path. The GitHub Actions workflow at
+  // .github/workflows/poll-generations.yml calls /api/internal/poll-generations every 5 minutes
+  // as the durable fallback, ensuring completion without admin intervention if the webhook is absent.
   return { ok: true, providerJobId: dispatchResult.providerJobId };
 }
 
