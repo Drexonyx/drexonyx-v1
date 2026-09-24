@@ -99,6 +99,17 @@ describe('dispatch — authentication', () => {
     }
     expect(mockFetch).not.toHaveBeenCalled();
   });
+
+  it('returns ok:false (isTransient:false) when HIGGSFIELD_API_BASE_URL is missing', async () => {
+    setEnv({ HIGGSFIELD_API_BASE_URL: undefined });
+    const result = await provider.dispatch(baseDispatchParams);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.isTransient).toBe(false);
+      expect(result.error).toContain('HIGGSFIELD_API_BASE_URL');
+    }
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
 });
 
 // ─── Model endpoint mapping ───────────────────────────────────────────────────
