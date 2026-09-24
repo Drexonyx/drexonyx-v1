@@ -113,18 +113,20 @@ export default function HomePage() {
             priority
             sizes="55vw"
           />
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            poster="/images/drexonyx-creative-crew-hero.png"
-            className={styles.heroVideo}
-          >
-            <source src="https://d8j0ntlcm91z4.cloudfront.net/user_3Izyfje7jJqdLL9etPVfaNlUscM/hf_20260924_071605_87b4f9e4-de43-4674-a812-c44cc5b41af4.mp4" type="video/mp4" />
-          </video>
           <div className={styles.heroRightEdge} />
+          {/* Cinematic video panel — right side inset, above gradient */}
+          <div className={styles.heroVideoPanel}>
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="none"
+              className={styles.heroVideoPanelVideo}
+            >
+              <source src="https://d8j0ntlcm91z4.cloudfront.net/user_3Izyfje7jJqdLL9etPVfaNlUscM/hf_20260924_160511_c0180e93-b491-4d93-9e99-c8fe978de172.mp4" type="video/mp4" />
+            </video>
+          </div>
           <div className={styles.heroCred}>
             <span className={styles.heroCredCity}>Dubai</span>
             <span className={styles.heroCredSub}>A Global Stage<br />for Bolder Ideas</span>
