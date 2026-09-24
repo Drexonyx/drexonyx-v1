@@ -114,18 +114,6 @@ export default function HomePage() {
             sizes="55vw"
           />
           <div className={styles.heroRightEdge} />
-          <div className={styles.heroVideoPanel}>
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="none"
-              className={styles.heroVideoPanelVideo}
-            >
-              <source src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Izyfje7jJqdLL9etPVfaNlUscM/45e55142-6e6d-480b-bb3e-e9bdb6daa80d.mp4" type="video/mp4" />
-            </video>
-          </div>
           <div className={styles.heroCred}>
             <span className={styles.heroCredCity}>Dubai</span>
             <span className={styles.heroCredSub}>A Global Stage<br />for Bolder Ideas</span>
