@@ -21,6 +21,10 @@ const FORMAT_DESCRIPTIONS: Record<PortfolioCategory, { cat: string; desc: string
     cat: 'Creative Strategy',
     desc: 'Brief development, hook frameworks, and creative direction aligned to campaign objectives.',
   },
+  'Cinematic Video': {
+    cat: 'Cinematic Video',
+    desc: 'High-production cinematic content — sweeping visuals and premium brand storytelling for global campaign launches.',
+  },
 };
 
 interface PortfolioFilterProps {

@@ -1,4 +1,4 @@
-export type PortfolioCategory = 'UGC Video' | 'Static Creative' | 'Creative Strategy';
+export type PortfolioCategory = 'UGC Video' | 'Static Creative' | 'Creative Strategy' | 'Cinematic Video';
 export type PortfolioMediaType = 'video' | 'image';
 
 export interface PortfolioItem {
@@ -19,6 +19,7 @@ export const PORTFOLIO_CATEGORIES: readonly PortfolioCategory[] = [
   'UGC Video',
   'Static Creative',
   'Creative Strategy',
+  'Cinematic Video',
 ];
 
 /**
@@ -78,13 +79,13 @@ export const PORTFOLIO_ITEMS: PortfolioItem[] = [
   },
   {
     id: 'static-feed-ad-product-2025',
-    category: 'Static Creative',
-    title: 'Feed Ad — Product Feature',
+    category: 'Cinematic Video',
+    title: 'Cinematic Production — Dubai',
     description:
-      'Internal production sample. High-contrast static feed ad in 1:1 format for Instagram and Facebook feed placements, built for scroll-stop performance.',
-    mediaType: 'image',
-    src: '/portfolio/static-feed-ad-product-feature.svg',
-    thumbnailSrc: '/portfolio/static-feed-ad-product-feature.svg',
+      'Internal production sample. Daytime aerial cinematic production — sweeping Dubai skyline footage built for high-production brand campaigns.',
+    mediaType: 'video',
+    src: 'https://d8j0ntlcm91z4.cloudfront.net/user_3Izyfje7jJqdLL9etPVfaNlUscM/hf_20260924_181806_3c86fb24-b94d-4c3a-8180-5de7e5761593.mp4',
+    thumbnailSrc: '/portfolio/ugc-demo-reel-thumb.svg',
     featured: false,
     industry: 'Consumer Goods',
   },
