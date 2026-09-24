@@ -98,7 +98,18 @@ export default function PortfolioFilter({ items }: PortfolioFilterProps) {
           {filtered.map((item) => (
             <article key={item.id} className={styles.portfolioCard}>
               <div className={styles.cardMedia}>
-                {item.thumbnailSrc ? (
+                {item.mediaType === 'video' && item.src ? (
+                  <video
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="none"
+                    className={styles.cardVideo}
+                  >
+                    <source src={item.src} type="video/mp4" />
+                  </video>
+                ) : item.thumbnailSrc ? (
                   <Image
                     src={item.thumbnailSrc}
                     alt={item.title}
@@ -114,12 +125,10 @@ export default function PortfolioFilter({ items }: PortfolioFilterProps) {
                 </div>
                 {item.mediaType === 'video' && item.src ? (
                   <button
-                    className={styles.playButton}
+                    className={styles.expandButton}
                     onClick={() => openVideo(item)}
-                    aria-label={`Play ${item.title}`}
-                  >
-                    <span className={styles.playIcon} aria-hidden="true" />
-                  </button>
+                    aria-label={`Expand ${item.title}`}
+                  />
                 ) : item.mediaType === 'video' ? (
                   <div className={styles.playOverlay} aria-hidden="true">
                     <div className={styles.playIcon} />

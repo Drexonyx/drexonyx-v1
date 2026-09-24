@@ -97,21 +97,30 @@
   object-position: 55% center;
 }
 
-/* Cinematic video panel: contained right-side element, above gradient */
+/* Cinematic video panel: embedded right-side composition — no TV-screen look */
 .heroVideoPanel {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translateY(-50%);
-  width: 44%;
+  width: 48%;
   aspect-ratio: 16 / 9;
   z-index: 2;
   overflow: hidden;
-  border-radius: 2px;
-  box-shadow:
-    0 0 0 1px rgba(200, 160, 70, 0.14),
-    0 32px 64px rgba(0, 0, 0, 0.7),
-    0 8px 20px rgba(0, 0, 0, 0.45);
+}
+
+/* Multi-directional gradient blend — video dissolves into hero composition */
+.heroVideoPanel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(to right, rgba(6, 6, 6, 0.92) 0%, rgba(6, 6, 6, 0.22) 18%, transparent 36%),
+    linear-gradient(to left, rgba(6, 6, 6, 0.60) 0%, rgba(6, 6, 6, 0.05) 14%, transparent 26%),
+    linear-gradient(to bottom, rgba(6, 6, 6, 0.72) 0%, transparent 28%),
+    linear-gradient(to top, rgba(6, 6, 6, 0.72) 0%, transparent 28%);
 }
 
 .heroVideoPanelVideo {
@@ -119,6 +128,8 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  position: relative;
+  z-index: 0;
 }
 
 /* Full-bleed gradient: dark on left for readability, image visible throughout */

@@ -124,18 +124,12 @@ export default function HomePage() {
               preload="none"
               className={styles.heroVideoPanelVideo}
             >
-              <source src="https://d8j0ntlcm91z4.cloudfront.net/user_3Izyfje7jJqdLL9etPVfaNlUscM/hf_20260924_160511_c0180e93-b491-4d93-9e99-c8fe978de172.mp4" type="video/mp4" />
+              <source src="https://d8j0ntlcm91z4.cloudfront.net/user_3Izyfje7jJqdLL9etPVfaNlUscM/hf_20260924_181806_3c86fb24-b94d-4c3a-8180-5de7e5761593.mp4" type="video/mp4" />
             </video>
           </div>
           <div className={styles.heroCred}>
             <span className={styles.heroCredCity}>Dubai</span>
             <span className={styles.heroCredSub}>A Global Stage<br />for Bolder Ideas</span>
-          </div>
-          <div className={styles.heroPlay}>
-            <span className={styles.heroPlayRing}>
-              <span className={styles.heroPlayIcon}>▶</span>
-            </span>
-            <span className={styles.heroPlayLabel}>Watch Our Story</span>
           </div>
         </div>
       </section>
