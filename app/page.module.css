@@ -554,31 +554,130 @@
 .whyGrid {
   display: grid;
   grid-template-columns: 44fr 56fr;
-  min-height: 560px;
+  min-height: 600px;
 }
 
 .whyLeft {
-  background: var(--drex-surface);
+  background: var(--drex-bg);
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 1.5rem;
+  gap: 2rem;
   padding: 5rem 4rem 5rem max(var(--drex-pad), calc((100vw - var(--drex-container)) / 2 + var(--drex-pad)));
 }
 
+.whyEyebrowRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.whyEyebrowLine {
+  height: 1px;
+  width: 2.5rem;
+  background: var(--drex-accent);
+}
+
 .whyHeading {
-  font-size: clamp(1.75rem, 3vw, 2.5rem);
-  font-weight: 800;
-  letter-spacing: -0.035em;
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
   color: var(--drex-text);
-  line-height: 1.15;
+  line-height: 1.08;
+}
+
+.whyHeadingAccent {
+  color: var(--drex-accent);
 }
 
 .whyBody {
   font-size: 0.9375rem;
   color: var(--drex-text-muted);
-  line-height: 1.75;
-  max-width: 42ch;
+  line-height: 1.7;
+  max-width: 44ch;
+}
+
+.whyFeatures {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.whyFeature {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding: 1.25rem 0;
+  border-top: 1px solid var(--drex-border);
+}
+
+.whyFeature:last-child {
+  border-bottom: 1px solid var(--drex-border);
+}
+
+.whyFeatureIcon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--drex-border);
+  border-radius: 6px;
+  color: var(--drex-accent);
+  background: var(--drex-surface);
+  margin-top: 0.125rem;
+}
+
+.whyFeatureContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.whyFeatureNum {
+  font-size: 0.5625rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  color: var(--drex-accent);
+  font-family: var(--font-geist-mono), monospace;
+}
+
+.whyFeatureTitle {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--drex-text);
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.whyFeatureDesc {
+  font-size: 0.8125rem;
+  color: var(--drex-text-muted);
+  line-height: 1.65;
+}
+
+.whyCta {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  padding: 0.9375rem 2rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #000;
+  background: var(--drex-accent);
+  border-radius: 8px;
+  transition: background var(--drex-duration) var(--drex-ease),
+    transform var(--drex-duration) var(--drex-ease),
+    box-shadow var(--drex-duration) var(--drex-ease);
+}
+
+.whyCta:hover {
+  background: var(--drex-accent-dim);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(200, 152, 10, 0.35);
 }
 
 .whyRight {
@@ -595,37 +694,8 @@
 .whyOverlay {
   position: absolute;
   inset: 0;
-  background: rgba(6, 6, 6, 0.55);
+  background: rgba(6, 6, 6, 0.35);
   z-index: 1;
-}
-
-.whyChecklist {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 1.125rem;
-  padding: 3rem 2.5rem;
-  list-style: none;
-}
-
-.whyCheckItem {
-  display: flex;
-  align-items: center;
-  gap: 0.875rem;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.88);
-  letter-spacing: -0.01em;
-}
-
-.whyCheckMark {
-  font-size: 0.75rem;
-  font-weight: 800;
-  color: var(--drex-accent);
-  flex-shrink: 0;
 }
 
 /* ── Industries: horizontal strip ─────────────────────────────────────── */
@@ -789,11 +859,6 @@
   .whyRight {
     order: 1;
     height: 340px;
-  }
-
-  .whyChecklist {
-    padding: 2rem 1.5rem;
-    gap: 0.75rem;
   }
 
   .processSteps {
