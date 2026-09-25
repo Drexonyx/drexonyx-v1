@@ -27,7 +27,7 @@ export async function actionPortalBuyCredits(
   const result = await createCreditPurchaseCheckout({
     creditPackageId,
     organizationId,
-    actorId: session.user.id,
+    actorId: session.user.id ?? null,
     baseUrl,
     successPath: '/portal/credits/buy/success',
     cancelPath: '/portal/credits/buy',

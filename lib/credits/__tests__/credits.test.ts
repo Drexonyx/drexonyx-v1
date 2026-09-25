@@ -60,7 +60,7 @@ beforeEach(() => {
 describe('allocateCredits', () => {
   it('writes PURCHASE ledger entry and returns ok:true', async () => {
     const tx = makeTx();
-    mockDb.transaction.mockImplementation(async (fn: (tx: typeof tx) => Promise<void>) => fn(tx));
+    mockDb.transaction.mockImplementation(async (fn: (t: ReturnType<typeof makeTx>) => Promise<void>) => fn(tx));
 
     const { allocateCredits } = await import('../ledger');
     const result = await allocateCredits({
@@ -75,7 +75,7 @@ describe('allocateCredits', () => {
 
   it('returns ok:true on idempotent re-run (0 rows inserted)', async () => {
     const tx = makeTx([]);
-    mockDb.transaction.mockImplementation(async (fn: (tx: typeof tx) => Promise<void>) => fn(tx));
+    mockDb.transaction.mockImplementation(async (fn: (t: ReturnType<typeof makeTx>) => Promise<void>) => fn(tx));
 
     const { allocateCredits } = await import('../ledger');
     const result = await allocateCredits({
@@ -127,7 +127,7 @@ describe('reserveCredits', () => {
       .mockReturnValueOnce(selectChain([{ total: '1000' }]));        // balance check
 
     const tx = makeTx();
-    mockDb.transaction.mockImplementation(async (fn: (tx: typeof tx) => Promise<void>) => fn(tx));
+    mockDb.transaction.mockImplementation(async (fn: (t: ReturnType<typeof makeTx>) => Promise<void>) => fn(tx));
 
     const { reserveCredits } = await import('../ledger');
     const result = await reserveCredits({
@@ -176,7 +176,7 @@ describe('reserveCredits', () => {
       .mockReturnValueOnce(selectChain([{ total: '500' }]));
 
     const tx = makeTx();
-    mockDb.transaction.mockImplementation(async (fn: (tx: typeof tx) => Promise<void>) => fn(tx));
+    mockDb.transaction.mockImplementation(async (fn: (t: ReturnType<typeof makeTx>) => Promise<void>) => fn(tx));
 
     const { reserveCredits } = await import('../ledger');
     const result = await reserveCredits({
@@ -194,7 +194,7 @@ describe('reserveCredits', () => {
 describe('releaseCredits', () => {
   it('writes RELEASE ledger entry and returns ok:true', async () => {
     const tx = makeTx();
-    mockDb.transaction.mockImplementation(async (fn: (tx: typeof tx) => Promise<void>) => fn(tx));
+    mockDb.transaction.mockImplementation(async (fn: (t: ReturnType<typeof makeTx>) => Promise<void>) => fn(tx));
 
     const { releaseCredits } = await import('../ledger');
     const result = await releaseCredits({
@@ -209,7 +209,7 @@ describe('releaseCredits', () => {
 
   it('is idempotent — does not error when release already exists', async () => {
     const tx = makeTx([]);
-    mockDb.transaction.mockImplementation(async (fn: (tx: typeof tx) => Promise<void>) => fn(tx));
+    mockDb.transaction.mockImplementation(async (fn: (t: ReturnType<typeof makeTx>) => Promise<void>) => fn(tx));
 
     const { releaseCredits } = await import('../ledger');
     const result = await releaseCredits({
@@ -242,7 +242,7 @@ describe('adjustCredits', () => {
 
   it('writes ADJUSTMENT entry for positive delta', async () => {
     const tx = makeTx();
-    mockDb.transaction.mockImplementation(async (fn: (tx: typeof tx) => Promise<void>) => fn(tx));
+    mockDb.transaction.mockImplementation(async (fn: (t: ReturnType<typeof makeTx>) => Promise<void>) => fn(tx));
 
     const { adjustCredits } = await import('../ledger');
     const result = await adjustCredits({
@@ -259,7 +259,7 @@ describe('adjustCredits', () => {
 
   it('writes ADJUSTMENT entry for negative delta', async () => {
     const tx = makeTx();
-    mockDb.transaction.mockImplementation(async (fn: (tx: typeof tx) => Promise<void>) => fn(tx));
+    mockDb.transaction.mockImplementation(async (fn: (t: ReturnType<typeof makeTx>) => Promise<void>) => fn(tx));
 
     const { adjustCredits } = await import('../ledger');
     const result = await adjustCredits({
@@ -280,7 +280,7 @@ describe('adjustCredits', () => {
 describe('refundCredits', () => {
   it('writes REFUND entry (negative delta) and returns ok:true', async () => {
     const tx = makeTx();
-    mockDb.transaction.mockImplementation(async (fn: (tx: typeof tx) => Promise<void>) => fn(tx));
+    mockDb.transaction.mockImplementation(async (fn: (t: ReturnType<typeof makeTx>) => Promise<void>) => fn(tx));
 
     const { refundCredits } = await import('../ledger');
     const result = await refundCredits({
@@ -295,7 +295,7 @@ describe('refundCredits', () => {
 
   it('is idempotent on duplicate refund', async () => {
     const tx = makeTx([]);
-    mockDb.transaction.mockImplementation(async (fn: (tx: typeof tx) => Promise<void>) => fn(tx));
+    mockDb.transaction.mockImplementation(async (fn: (t: ReturnType<typeof makeTx>) => Promise<void>) => fn(tx));
 
     const { refundCredits } = await import('../ledger');
     const result = await refundCredits({

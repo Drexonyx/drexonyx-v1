@@ -1,5 +1,5 @@
-// DR 0120: Admin credit ledger view — read-only visibility into customer credit balances,
-// purchase history, and ledger entries. No mutation from this page.
+// DR 0120: Admin credit ledger view + manual credit adjustment.
+// Read access: all admin roles. Write (adjust): OWNER and ADMIN_OPERATIONS only.
 
 import { getAdminSession } from '@/lib/admin/session';
 import { redirect } from 'next/navigation';
@@ -9,6 +9,7 @@ import {
   getAdminCreditLedger,
   getAdminCreditPackages,
 } from '@/lib/admin/queries';
+import { CreditAdjustForm } from './CreditAdjustForm';
 import s from '../admin.module.css';
 
 export const metadata = { title: 'Credits — Admin' };
@@ -16,6 +17,8 @@ export const metadata = { title: 'Credits — Admin' };
 export default async function AdminCreditsPage() {
   const session = await getAdminSession();
   if (!session) redirect('/admin/login');
+
+  const canAdjust = session.role === 'OWNER' || session.role === 'ADMIN_OPERATIONS';
 
   const [balance, purchases, ledger, packages] = await Promise.all([
     getAdminCreditBalance(session.organizationId),
@@ -29,7 +32,7 @@ export default async function AdminCreditsPage() {
       <div className={s.pageHeader}>
         <h1 className={s.pageTitle}>Credits</h1>
         <p className={s.pageSubtitle}>
-          Credit balance, packages, purchases, and ledger — read-only
+          Credit balance, packages, purchases, and ledger
         </p>
       </div>
 
@@ -50,6 +53,18 @@ export default async function AdminCreditsPage() {
           <div className={s.statValue}>{ledger.length}</div>
         </div>
       </div>
+
+      {/* Manual credit adjustment */}
+      {canAdjust && (
+        <>
+          <h2 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--drex-text)', marginBottom: '0.75rem' }}>
+            Manual Credit Adjustment
+          </h2>
+          <div style={{ marginBottom: '2rem', padding: '1.25rem', background: 'var(--drex-surface-2)', borderRadius: 8, border: '1px solid var(--drex-border)' }}>
+            <CreditAdjustForm />
+          </div>
+        </>
+      )}
 
       {/* Credit packages catalog */}
       <h2 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--drex-text)', marginBottom: '1rem' }}>

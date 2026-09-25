@@ -127,8 +127,8 @@ export async function actionStartProduction(
     organizationId,
     jobType,
     description: `${pkg.name} production — ${creditCost} credits`,
-    actorId,
-    actorRole: 'CLIENT',
+    actorId: actorId ?? SYSTEM_ACTOR_ID,
+    actorRole: 'OWNER',
     ...(useAiGeneration
       ? { aiGenerationParams: { provider: aiProvider!, model: aiModel!, prompt: aiPrompt! } }
       : {}),

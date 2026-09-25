@@ -2,7 +2,7 @@
 
 import { db } from '@/db/index';
 import { creditPackages } from '@/db/schema/financial';
-import { asc, isNull, eq } from 'drizzle-orm';
+import { asc, isNull, eq, and } from 'drizzle-orm';
 
 export type CreditPackageRow = {
   id: string;
@@ -22,7 +22,7 @@ export async function getActiveCreditPackages(): Promise<CreditPackageRow[]> {
       display_order: creditPackages.display_order,
     })
     .from(creditPackages)
-    .where(isNull(creditPackages.archived_at))
+    .where(and(eq(creditPackages.is_active, true), isNull(creditPackages.archived_at)))
     .orderBy(asc(creditPackages.display_order));
 }
 

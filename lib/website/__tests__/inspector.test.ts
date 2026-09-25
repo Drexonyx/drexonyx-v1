@@ -38,6 +38,7 @@ const cleanPackage: Package = {
   priceLabel: 'AED 499',
   description: 'A proper description.',
   includes: ['Item one', 'Item two'],
+  creditCost: 499,
 };
 
 const cleanCustomTier: CustomTier = {
