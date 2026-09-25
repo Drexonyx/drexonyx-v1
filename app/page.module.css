@@ -549,7 +549,7 @@
 /* ── Why DREXONYX: full-bleed cinematic overlay ─────────────────────────── */
 .why {
   position: relative;
-  min-height: 640px;
+  min-height: 580px;
   display: flex;
   align-items: center;
   overflow: hidden;
@@ -586,8 +586,8 @@
   max-width: 540px;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  padding: 6rem 0;
+  gap: 1.375rem;
+  padding: 3.5rem 0;
 }
 
 .whyEyebrowRow {
@@ -603,7 +603,7 @@
 }
 
 .whyHeading {
-  font-size: clamp(2rem, 3.5vw, 3rem);
+  font-size: clamp(1.875rem, 3vw, 2.75rem);
   font-weight: 900;
   letter-spacing: -0.04em;
   color: #fff;
@@ -633,7 +633,7 @@
   display: flex;
   align-items: flex-start;
   gap: 1.25rem;
-  padding: 1.25rem 0;
+  padding: 0.8rem 0;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -646,8 +646,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2rem;
+  height: 2rem;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 6px;
   color: var(--drex-accent);
@@ -687,8 +687,8 @@
   display: inline-flex;
   align-items: center;
   align-self: flex-start;
-  padding: 0.9375rem 2rem;
-  font-size: 0.9375rem;
+  padding: 0.75rem 1.75rem;
+  font-size: 0.875rem;
   font-weight: 700;
   color: #000;
   background: var(--drex-accent);
@@ -854,7 +854,7 @@
 
   .whyContent {
     max-width: 100%;
-    padding: 5rem 0;
+    padding: 3rem 0;
   }
 
   .whyOverlay {
