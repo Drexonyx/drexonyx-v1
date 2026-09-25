@@ -692,3 +692,51 @@ async function markTaskFailed(
 
   await auditTaskFailed({ organizationId, taskId, failedStepIndex, errorSummary });
 }
+
+// ── autoAdvanceTask ───────────────────────────────────────────────────────────
+// Loops advanceTask() until a terminal outcome (TASK_COMPLETED, AWAITING_GATE,
+// TASK_FAILED, BOUNDARY_VIOLATED) or the safety ceiling is reached.
+// Used by admin server actions to run DREXONYX autonomous plans end-to-end.
+
+export type AutoAdvanceResult =
+  | { ok: true; outcome: 'TASK_COMPLETED' | 'AWAITING_GATE' | 'RETRY_PENDING'; stepsAdvanced: number }
+  | { ok: false; outcome: 'TASK_FAILED' | 'BOUNDARY_VIOLATED' | 'INVALID_STATE'; stepsAdvanced: number; reason: string };
+
+export async function autoAdvanceTask(params: {
+  taskId: string;
+  organizationId: string;
+  /** Safety ceiling — prevents infinite loops. Defaults to 20 (longest plan has 7 steps). */
+  maxSteps?: number;
+}): Promise<AutoAdvanceResult> {
+  const { taskId, organizationId, maxSteps = 20 } = params;
+  let stepsAdvanced = 0;
+
+  while (stepsAdvanced < maxSteps) {
+    const result = await advanceTask({ taskId, organizationId });
+
+    if (!result.ok) {
+      return { ok: false, outcome: result.outcome, stepsAdvanced, reason: result.reason };
+    }
+
+    stepsAdvanced++;
+
+    if (result.outcome === 'TASK_COMPLETED') {
+      return { ok: true, outcome: 'TASK_COMPLETED', stepsAdvanced };
+    }
+    if (result.outcome === 'AWAITING_GATE') {
+      return { ok: true, outcome: 'AWAITING_GATE', stepsAdvanced };
+    }
+    if (result.outcome === 'RETRY_PENDING') {
+      // Step is already dispatched/running — nothing more to do synchronously
+      return { ok: true, outcome: 'RETRY_PENDING', stepsAdvanced };
+    }
+    // STEP_SUCCEEDED — continue to next step
+  }
+
+  return {
+    ok: false,
+    outcome: 'INVALID_STATE',
+    stepsAdvanced,
+    reason: `autoAdvanceTask exceeded maxSteps ceiling (${maxSteps})`,
+  };
+}

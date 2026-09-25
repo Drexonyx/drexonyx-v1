@@ -2,6 +2,7 @@ import { getAdminSession } from '@/lib/admin/session';
 import { redirect } from 'next/navigation';
 import { getAdminCampaigns } from '@/lib/admin/queries';
 import { CreateCampaignForm } from './CreateCampaignForm';
+import { LaunchFacebookPostForm } from './LaunchFacebookPostForm';
 import s from '../admin.module.css';
 
 export const metadata = { title: 'Campaigns — Admin' };
@@ -28,6 +29,15 @@ export default async function AdminCampaignsPage() {
             New Campaign
           </h2>
           <CreateCampaignForm />
+        </div>
+      )}
+
+      {canCreate && campaigns.length > 0 && (
+        <div style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ fontSize: '0.875rem', fontWeight: 700, marginBottom: '1rem', color: 'var(--drex-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            Publish to Facebook
+          </h2>
+          <LaunchFacebookPostForm campaigns={campaigns.map((c) => ({ id: c.id, name: c.name }))} />
         </div>
       )}
 
