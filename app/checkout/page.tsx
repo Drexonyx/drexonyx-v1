@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getActiveCreditPackages } from '@/lib/credits/packages';
+import { PRODUCTION_PACKAGES, MICRO_PACKAGES } from '@/lib/pricing';
 import CreditCheckoutForm from './CreditCheckoutForm';
 import styles from './page.module.css';
 
@@ -10,13 +11,28 @@ export const metadata: Metadata = {
 };
 
 type Props = {
-  searchParams: Promise<{ pkg?: string }>;
+  searchParams: Promise<{ service?: string }>;
 };
 
+const ALL_SERVICE_PACKAGES = [...PRODUCTION_PACKAGES, ...MICRO_PACKAGES];
+
 export default async function CheckoutPage({ searchParams }: Props) {
-  const { pkg } = await searchParams;
+  const { service } = await searchParams;
   const packages = await getActiveCreditPackages();
-  const preSelected = pkg ? packages.find((p) => p.id === pkg) ?? null : null;
+
+  // Resolve a service identifier (from /start-project) to the smallest DB credit
+  // package that covers the service's credit cost. Falls back to null (first package
+  // selected by form default) when no match exists or the identifier is unknown.
+  let preSelected: (typeof packages)[number] | null = null;
+  if (service) {
+    const servicePkg = ALL_SERVICE_PACKAGES.find((p) => p.id === service);
+    if (servicePkg) {
+      preSelected =
+        packages
+          .filter((p) => p.credits >= servicePkg.creditCost)
+          .sort((a, b) => a.credits - b.credits)[0] ?? null;
+    }
+  }
 
   return (
     <>

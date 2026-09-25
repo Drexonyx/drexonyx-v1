@@ -264,7 +264,7 @@ export default function ProjectFlowForm() {
             <div className={styles.recommendCard}>
               <p className={styles.recommendLabel}>Recommended based on your scope</p>
               <p className={styles.recommendName}>{recommendedPkg.name}</p>
-              <p className={styles.recommendPrice}>{recommendedPkg.priceLabel}</p>
+              <p className={styles.recommendPrice}>{recommendedPkg.creditCost.toLocaleString('en-US')} Credits</p>
               <p className={styles.recommendDesc}>{recommendedPkg.description}</p>
             </div>
           )}
@@ -285,7 +285,7 @@ export default function ProjectFlowForm() {
               Back
             </button>
             <Link
-              href={recommendedPkg ? `/checkout?pkg=${recommendedPkg.id}` : '/pricing'}
+              href={recommendedPkg ? `/checkout?service=${recommendedPkg.id}` : '/pricing'}
               className={styles.submitBtn}
             >
               Proceed to Checkout

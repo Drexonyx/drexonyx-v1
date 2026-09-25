@@ -200,15 +200,47 @@ describe("Checkout page", () => {
     expect(screen.getAllByText(/500 credits/i).length).toBeGreaterThan(0);
   });
 
-  it("pre-selects the package matching the pkg search param", async () => {
-    render(await CheckoutPage({ searchParams: Promise.resolve({ pkg: "pkg-value" }) }));
-    // Value package's radio should be checked (found in DOM)
+  it("pre-selects the smallest DB package covering the service credit cost", async () => {
+    // service=spark needs 2,500 credits; mock pkg-growth has exactly 2,500 → selected
+    render(await CheckoutPage({ searchParams: Promise.resolve({ service: "spark" }) }));
+    const radios = screen.getAllByRole("radio");
+    const growthRadio = radios.find(
+      (r) => (r as HTMLInputElement).value === "pkg-growth"
+    );
+    expect(growthRadio).toBeDefined();
+    expect(growthRadio as HTMLInputElement).toBeChecked();
+  });
+
+  it("selects the correct package when service needs fewer credits than top tier", async () => {
+    // service=micro-creative needs 1,000 credits; pkg-value (1,000) is the smallest match
+    render(await CheckoutPage({ searchParams: Promise.resolve({ service: "micro-creative" }) }));
     const radios = screen.getAllByRole("radio");
     const valueRadio = radios.find(
       (r) => (r as HTMLInputElement).value === "pkg-value"
     );
     expect(valueRadio).toBeDefined();
     expect(valueRadio as HTMLInputElement).toBeChecked();
+  });
+
+  it("defaults to first package when service needs more credits than any DB package covers", async () => {
+    // service=production needs 72,500 credits; mock max is 2,500 → no match → first package
+    render(await CheckoutPage({ searchParams: Promise.resolve({ service: "production" }) }));
+    const radios = screen.getAllByRole("radio");
+    const starterRadio = radios.find(
+      (r) => (r as HTMLInputElement).value === "pkg-starter"
+    );
+    expect(starterRadio).toBeDefined();
+    expect(starterRadio as HTMLInputElement).toBeChecked();
+  });
+
+  it("defaults to first package when service identifier is unknown", async () => {
+    render(await CheckoutPage({ searchParams: Promise.resolve({ service: "nonexistent-service" }) }));
+    const radios = screen.getAllByRole("radio");
+    const starterRadio = radios.find(
+      (r) => (r as HTMLInputElement).value === "pkg-starter"
+    );
+    expect(starterRadio).toBeDefined();
+    expect(starterRadio as HTMLInputElement).toBeChecked();
   });
 
   it("shows no packages state when credit packages list is empty", async () => {
