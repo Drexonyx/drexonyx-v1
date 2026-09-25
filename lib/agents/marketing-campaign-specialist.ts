@@ -1,28 +1,42 @@
 // Marketing Campaign Specialist Agent — DR 0124 + DR 0126
-// Coordinates Facebook marketing campaign workflow:
-//   content quality check → brand alignment → platform policy check →
-//   mandatory human approval gate → facebook.page.publish → completion notification.
+// Coordinates Facebook marketing campaign workflow.
+//
+// DREXONYX content (contentOwner: 'DREXONYX') — 5-step autonomous plan:
+//   content QC → brand alignment → platform policy → facebook.page.publish → notification
+//   Autonomous publish: no HUMAN_GATE required after all automated checks pass.
+//
+// EXTERNAL content (contentOwner: 'EXTERNAL') — 6-step gated plan:
+//   content QC → brand alignment → platform policy → HUMAN_GATE → facebook.page.publish → notification
+//   OWNER or ADMIN_OPERATIONS approval required before publish.
 //
 // CONSTRAINTS (DR 0124 / DR 0126):
-//   - facebook.page.publish executes ONLY after HUMAN_GATE approval
-//   - Human approval (OWNER or ADMIN_OPERATIONS) MANDATORY before publish step
-//   - No autonomous publishing under any circumstances
+//   - EXTERNAL: facebook.page.publish executes ONLY after HUMAN_GATE approval
+//   - DREXONYX: autonomous publish allowed after all QC and policy checks pass
 //   - No financial mutations of any kind
 //   - No content fabrication, invented metrics, or testimonials
 //   - Initiator roles: OWNER, ADMIN_OPERATIONS only
 //   - mediaUrl MUST originate from project R2 storage (enforced in skill)
-//   - Two-page allowlist enforced at skill runtime (META_PAGE_ID_1 / META_PAGE_ID_2)
+//   - pageTarget must be PAGE_1 or PAGE_2 (validated at delegation layer and skill runtime)
 //   - Zero paid ads, boosts, or Ads Manager calls — organic only
 
 import { delegateSubTask } from '@/lib/orchestration/delegation';
 import type { InitiatorRole, TaskContext } from '@/lib/orchestration/types';
 import type { FacebookPageTarget, FacebookContentType, FacebookPublishMode } from '@/lib/skills/facebook/page-publish';
 
+// Runtime allowlist mirrors the two authorized DREXONYX Facebook Pages.
+const ALLOWED_PAGE_TARGETS: ReadonlySet<string> = new Set(['PAGE_1', 'PAGE_2']);
+
 export interface MarketingCampaignDelegationParams {
   parentTaskId: string;
   organizationId: string;
   initiatedByUserId: string;
   initiatorRole: Extract<InitiatorRole, 'OWNER' | 'ADMIN_OPERATIONS'>;
+  /**
+   * Content ownership determines the publish authorization path.
+   * 'DREXONYX' — own company content; autonomous publish after all QC/policy checks pass.
+   * 'EXTERNAL' — client or third-party content; HUMAN_GATE required before publish.
+   */
+  contentOwner: 'DREXONYX' | 'EXTERNAL';
   /** Campaign identifier for tracking and audit. */
   campaignId: string;
   /** The post caption text to be reviewed and approved. Posted verbatim. */
@@ -58,6 +72,7 @@ export async function delegateMarketingCampaign(
     organizationId,
     initiatedByUserId,
     initiatorRole,
+    contentOwner,
     campaignId,
     captionText,
     headline,
@@ -73,6 +88,12 @@ export async function delegateMarketingCampaign(
 
   if (initiatorRole !== 'OWNER' && initiatorRole !== 'ADMIN_OPERATIONS') {
     return { ok: false, error: 'Marketing campaign may only be initiated by OWNER or ADMIN_OPERATIONS' };
+  }
+  if (contentOwner !== 'DREXONYX' && contentOwner !== 'EXTERNAL') {
+    return { ok: false, error: "contentOwner must be 'DREXONYX' or 'EXTERNAL'" };
+  }
+  if (!ALLOWED_PAGE_TARGETS.has(pageTarget)) {
+    return { ok: false, error: `pageTarget '${pageTarget}' is not an authorized Facebook page` };
   }
   if (!campaignId || typeof campaignId !== 'string') {
     return { ok: false, error: 'campaignId must be a non-empty string' };
@@ -90,81 +111,90 @@ export async function delegateMarketingCampaign(
     return { ok: false, error: `scheduledAt '${scheduledAt}' is not a valid ISO 8601 date` };
   }
 
-  // DR 0124 + DR 0126: fixed six-step plan
-  // Step 0: SKILL — qc.script.review: content quality (AI, AGENT_ALLOWLIST)
-  // Step 1: SKILL — qc.brand.alignment: brand compliance (AI, AGENT_ALLOWLIST)
-  // Step 2: SKILL — qc.facebook_policy.check: platform policy (deterministic, AGENT_ALLOWLIST)
-  // Step 3: HUMAN_GATE — mandatory publish approval (OWNER or ADMIN_OPERATIONS)
-  // Step 4: SKILL — facebook.page.publish: organic Graph API publish (post-gate, DR 0126)
-  // Step 5: NOTIFICATION — campaign completion or failure alert
-  const plan = {
-    steps: [
-      {
-        step_index: 0,
-        step_type: 'SKILL' as const,
-        skill_id: 'qc.script.review',
-        input: {
-          script: captionText,
-          ...(brandGuidelines ? { brandGuidelines } : {}),
-          objectives: `Facebook ${placement ?? 'feed'} campaign: ${campaignId}`,
-        },
+  // Steps 0–2 are identical for both content ownership paths.
+  const qcSteps = [
+    {
+      step_index: 0,
+      step_type: 'SKILL' as const,
+      skill_id: 'qc.script.review',
+      input: {
+        script: captionText,
+        ...(brandGuidelines ? { brandGuidelines } : {}),
+        objectives: `Facebook ${placement ?? 'feed'} campaign: ${campaignId}`,
       },
-      {
-        step_index: 1,
-        step_type: 'SKILL' as const,
-        skill_id: 'qc.brand.alignment',
-        input: {
-          content: captionText,
-          ...(brandGuidelines ? { brandGuidelines } : {}),
-          campaignId,
-        },
+    },
+    {
+      step_index: 1,
+      step_type: 'SKILL' as const,
+      skill_id: 'qc.brand.alignment',
+      input: {
+        content: captionText,
+        ...(brandGuidelines ? { brandGuidelines } : {}),
+        campaignId,
       },
-      {
-        step_index: 2,
-        step_type: 'SKILL' as const,
-        skill_id: 'qc.facebook_policy.check',
-        input: {
-          text: captionText,
-          ...(headline ? { headline } : {}),
-          placement: placement ?? 'feed',
-        },
+    },
+    {
+      step_index: 2,
+      step_type: 'SKILL' as const,
+      skill_id: 'qc.facebook_policy.check',
+      input: {
+        text: captionText,
+        ...(headline ? { headline } : {}),
+        placement: placement ?? 'feed',
       },
-      {
-        step_index: 3,
-        step_type: 'HUMAN_GATE' as const,
-        input: {
-          gate: 'CAMPAIGN_PUBLISH_APPROVAL',
-          campaignId,
-          pageTarget,
-          contentType,
-          publishMode,
-          ...(scheduledAt ? { scheduledAt } : {}),
-          ...(mediaUrl ? { mediaUrl } : {}),
-          requiredRoles: ['OWNER', 'ADMIN_OPERATIONS'],
-        },
-      },
-      {
-        step_index: 4,
-        step_type: 'SKILL' as const,
-        skill_id: 'facebook.page.publish',
-        input: {
-          pageTarget,
-          contentType,
-          message: captionText,
-          ...(mediaUrl ? { mediaUrl } : {}),
-          publishMode,
-          ...(scheduledAt ? { scheduledAt } : {}),
-          campaignId,
-        },
-      },
-      {
-        step_index: 5,
-        step_type: 'NOTIFICATION' as const,
-        input: { event: 'CAMPAIGN_WORKFLOW_COMPLETED', campaignId },
-      },
-    ],
-    generated_at: new Date().toISOString(),
+    },
+  ] as const;
+
+  const publishInput = {
+    pageTarget,
+    contentType,
+    message: captionText,
+    ...(mediaUrl ? { mediaUrl } : {}),
+    publishMode,
+    ...(scheduledAt ? { scheduledAt } : {}),
+    campaignId,
   };
+
+  const notificationStep = {
+    step_type: 'NOTIFICATION' as const,
+    input: { event: 'CAMPAIGN_WORKFLOW_COMPLETED', campaignId },
+  };
+
+  // DR 0124 + DR 0126: plan shape depends on content ownership.
+  // DREXONYX — 5-step autonomous plan (no HUMAN_GATE):
+  //   0: qc.script.review  1: qc.brand.alignment  2: qc.facebook_policy.check
+  //   3: facebook.page.publish  4: NOTIFICATION
+  // EXTERNAL — 6-step gated plan:
+  //   0: qc.script.review  1: qc.brand.alignment  2: qc.facebook_policy.check
+  //   3: HUMAN_GATE  4: facebook.page.publish  5: NOTIFICATION
+  const steps =
+    contentOwner === 'DREXONYX'
+      ? [
+          ...qcSteps,
+          { step_index: 3, step_type: 'SKILL' as const, skill_id: 'facebook.page.publish', input: publishInput },
+          { step_index: 4, ...notificationStep },
+        ]
+      : [
+          ...qcSteps,
+          {
+            step_index: 3,
+            step_type: 'HUMAN_GATE' as const,
+            input: {
+              gate: 'CAMPAIGN_PUBLISH_APPROVAL',
+              campaignId,
+              pageTarget,
+              contentType,
+              publishMode,
+              ...(scheduledAt ? { scheduledAt } : {}),
+              ...(mediaUrl ? { mediaUrl } : {}),
+              requiredRoles: ['OWNER', 'ADMIN_OPERATIONS'],
+            },
+          },
+          { step_index: 4, step_type: 'SKILL' as const, skill_id: 'facebook.page.publish', input: publishInput },
+          { step_index: 5, ...notificationStep },
+        ];
+
+  const plan = { steps, generated_at: new Date().toISOString() };
 
   const result = await delegateSubTask({
     parentTaskId,

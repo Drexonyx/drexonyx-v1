@@ -75,13 +75,15 @@ const PLAN_TEMPLATES: Record<TaskIntent['intent_type'], readonly Omit<PlanStep, 
     { step_type: 'HUMAN_GATE', skill_id: undefined },
     { step_type: 'NOTIFICATION', skill_id: undefined },
   ],
-  // DR 0124 + DR 0126: Marketing Campaign Agent — content QC → brand alignment → platform policy →
-  // mandatory human publish gate → facebook.page.publish (post-gate) → completion notification
+  // DR 0124 + DR 0126: Marketing Campaign Agent — two plan variants based on contentOwner:
+  // DREXONYX (5 steps, autonomous): QC → brand alignment → platform policy → facebook.page.publish → notification
+  // EXTERNAL  (6 steps, gated):    QC → brand alignment → platform policy → HUMAN_GATE → facebook.page.publish → notification
+  // NOTE: delegateMarketingCampaign() builds plans inline; this template documents the EXTERNAL (gated) variant.
   COORDINATE_MARKETING_CAMPAIGN: [
     { step_type: 'SKILL', skill_id: 'qc.script.review' },
     { step_type: 'SKILL', skill_id: 'qc.brand.alignment' },
     { step_type: 'SKILL', skill_id: 'qc.facebook_policy.check' },
-    { step_type: 'HUMAN_GATE', skill_id: undefined },
+    { step_type: 'HUMAN_GATE', skill_id: undefined },  // EXTERNAL only — omitted for DREXONYX
     { step_type: 'SKILL', skill_id: 'facebook.page.publish' },
     { step_type: 'NOTIFICATION', skill_id: undefined },
   ],
