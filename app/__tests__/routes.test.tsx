@@ -74,41 +74,34 @@ describe("Portfolio page", () => {
 });
 
 describe("Pricing page", () => {
-  it("renders an h1 heading", () => {
-    render(<PricingPage />);
+  it("renders an h1 heading", async () => {
+    render(await PricingPage());
     expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
   });
 
-  it("renders all five production package cards", () => {
-    render(<PricingPage />);
-    expect(screen.getByText("Spark")).toBeInTheDocument();
+  it("renders credit packages from DB", async () => {
+    render(await PricingPage());
     expect(screen.getByText("Starter")).toBeInTheDocument();
+    expect(screen.getByText("Value")).toBeInTheDocument();
     expect(screen.getByText("Growth")).toBeInTheDocument();
-    expect(screen.getByText("Scale")).toBeInTheDocument();
-    expect(screen.getByText("Production")).toBeInTheDocument();
   });
 
-  it("renders the two micro entry products", () => {
-    render(<PricingPage />);
+  it("renders the two micro entry products", async () => {
+    render(await PricingPage());
     expect(screen.getByText("Micro Creative")).toBeInTheDocument();
     expect(screen.getByText("Creative Brief")).toBeInTheDocument();
   });
 
-  it("renders custom tiers", () => {
-    render(<PricingPage />);
+  it("renders custom tiers", async () => {
+    render(await PricingPage());
     expect(screen.getByText("Brand Film")).toBeInTheDocument();
     expect(screen.getByText("Enterprise & Custom")).toBeInTheDocument();
   });
 
-  it("renders AED prices", () => {
-    render(<PricingPage />);
+  it("renders AED prices for credit packages", async () => {
+    render(await PricingPage());
     expect(screen.getByText("AED 499")).toBeInTheDocument();
-    expect(screen.getByText("AED 3,500")).toBeInTheDocument();
-  });
-
-  it("marks Growth as Most Popular", () => {
-    render(<PricingPage />);
-    expect(screen.getByText("Most Popular")).toBeInTheDocument();
+    expect(screen.getByText("AED 1,999")).toBeInTheDocument();
   });
 });
 

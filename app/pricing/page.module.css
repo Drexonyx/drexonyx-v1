@@ -48,6 +48,55 @@
   margin-bottom: 2rem;
 }
 
+.sectionDesc {
+  font-size: 1rem;
+  color: var(--drex-text-secondary);
+  max-width: 60ch;
+  line-height: 1.65;
+  margin-bottom: 2.5rem;
+}
+
+/* 7-tier credit packages grid */
+.creditGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+
+.creditCard {
+  position: relative;
+  padding: 1.75rem;
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  transition: border-color var(--drex-duration) var(--drex-ease);
+}
+
+.creditCard:hover {
+  border-color: rgba(200, 152, 10, 0.3);
+}
+
+.creditCredits {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--drex-text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.creditCreditsLabel {
+  font-size: 0.75rem;
+  color: var(--drex-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  margin-top: 0.125rem;
+}
+
 .packagesGrid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);

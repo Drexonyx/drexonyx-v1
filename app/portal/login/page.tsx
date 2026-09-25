@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import s from '../portal.module.css';
 
 export default function LoginPage() {
@@ -77,6 +78,13 @@ export default function LoginPage() {
             {loading ? 'Signing in…' : 'Sign in'}
           </button>
         </form>
+
+        <div className={s.loginAuthSwitch}>
+          Don&apos;t have an account?{' '}
+          <Link href="/portal/signup" className={s.loginAuthLink}>
+            Create account
+          </Link>
+        </div>
       </div>
     </div>
   );
