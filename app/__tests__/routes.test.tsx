@@ -105,7 +105,7 @@ describe("Pricing page", () => {
   it("renders custom tiers", async () => {
     render(await PricingPage());
     expect(screen.getByText("Brand Film")).toBeInTheDocument();
-    expect(screen.getByText("Enterprise & Custom")).toBeInTheDocument();
+    expect(screen.getByText("Custom Credits")).toBeInTheDocument();
   });
 
   it("renders AED prices for credit packages", async () => {

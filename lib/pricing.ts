@@ -159,7 +159,7 @@ export const CUSTOM_TIERS: CustomTier[] = [
   {
     id: 'brand-film',
     name: 'Brand Film',
-    priceLabel: 'From AED 35,000',
+    priceLabel: '350,000 Credits',
     description:
       'Full brand film production for campaigns that demand cinematic quality, multi-platform deliverables, and a bespoke creative approach.',
     attributes: [
@@ -174,7 +174,7 @@ export const CUSTOM_TIERS: CustomTier[] = [
   },
   {
     id: 'enterprise',
-    name: 'Enterprise & Custom',
+    name: 'Custom Credits',
     priceLabel: 'Custom Quote',
     description:
       'For luxury brands, large campaigns, multi-campaign programs, and institutional projects. Scoped and priced to your production requirements.',
