@@ -15,11 +15,13 @@ vi.mock('uuidv7', () => ({ uuidv7: () => 'test-uuid' }));
 
 import { delegateMarketingCampaign } from '../agents/marketing-campaign-specialist';
 
+// BASE uses contentOwner: 'EXTERNAL' so all existing step-index assertions remain valid.
 const BASE = {
   parentTaskId: 'task-001',
   organizationId: 'org-001',
   initiatedByUserId: 'user-001',
   initiatorRole: 'OWNER' as const,
+  contentOwner: 'EXTERNAL' as const,
   campaignId: 'camp-001',
   captionText: 'Check out our amazing new product line! Quality you can trust.',
 };
@@ -105,7 +107,7 @@ describe('delegateMarketingCampaign', () => {
     expect(call.intentType).toBe('COORDINATE_MARKETING_CAMPAIGN');
   });
 
-  it('plan has exactly 6 steps', async () => {
+  it('EXTERNAL plan has exactly 6 steps', async () => {
     await delegateMarketingCampaign(BASE);
     const call = mockDelegateSubTask.mock.calls[0][0] as Record<string, unknown>;
     const plan = call.plan as { steps: unknown[] };
@@ -162,9 +164,9 @@ describe('delegateMarketingCampaign', () => {
     expect(steps[5].step_type).toBe('NOTIFICATION');
   });
 
-  // ─── Human gate is mandatory ──────────────────────────────────────────────
+  // ─── EXTERNAL: human gate is required ────────────────────────────────────
 
-  it('plan always includes a HUMAN_GATE step (no skip path)', async () => {
+  it('EXTERNAL plan includes exactly one HUMAN_GATE step', async () => {
     await delegateMarketingCampaign(BASE);
     const call = mockDelegateSubTask.mock.calls[0][0] as Record<string, unknown>;
     const steps = (call.plan as { steps: Record<string, unknown>[] }).steps;
@@ -172,7 +174,7 @@ describe('delegateMarketingCampaign', () => {
     expect(gates.length).toBe(1);
   });
 
-  it('facebook.page.publish step always follows the HUMAN_GATE step', async () => {
+  it('EXTERNAL: facebook.page.publish step follows the HUMAN_GATE step', async () => {
     await delegateMarketingCampaign(BASE);
     const call = mockDelegateSubTask.mock.calls[0][0] as Record<string, unknown>;
     const steps = (call.plan as { steps: Record<string, unknown>[] }).steps;
@@ -309,5 +311,124 @@ describe('delegateMarketingCampaign', () => {
     mockDelegateSubTask.mockResolvedValue({ ok: false, error: 'DB connection failed' });
     const result = await delegateMarketingCampaign(BASE);
     expect(result).toMatchObject({ ok: false, error: 'DB connection failed' });
+  });
+});
+
+// ─── contentOwner business rules ────────────────────────────────────────────
+
+describe('contentOwner — DREXONYX autonomous publishing', () => {
+  const DREX = { ...BASE, contentOwner: 'DREXONYX' as const };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockDelegateSubTask.mockResolvedValue({ ok: true, subTaskId: 'subtask-drex' });
+  });
+
+  // Test 1: DREXONYX content — autonomous publish allowed (no HUMAN_GATE)
+  it('DREXONYX content: plan has 5 steps and no HUMAN_GATE', async () => {
+    const result = await delegateMarketingCampaign({
+      ...DREX,
+      captionText: 'Introducing DREXONYX Studio — premium video production in Dubai.',
+    });
+    expect(result).toMatchObject({ ok: true });
+    const steps = (mockDelegateSubTask.mock.calls[0][0] as Record<string, unknown>).plan as { steps: Record<string, unknown>[] };
+    expect(steps.steps).toHaveLength(5);
+    expect(steps.steps.every((s) => s.step_type !== 'HUMAN_GATE')).toBe(true);
+  });
+
+  // Test 2: DREXONYX promotional offer — autonomous publish allowed (no HUMAN_GATE)
+  it('DREXONYX promotional offer: no HUMAN_GATE in plan', async () => {
+    const result = await delegateMarketingCampaign({
+      ...DREX,
+      captionText: 'Limited-time offer: AED 499 starter package. Book now.',
+    });
+    expect(result).toMatchObject({ ok: true });
+    const steps = (mockDelegateSubTask.mock.calls[0][0] as Record<string, unknown>).plan as { steps: Record<string, unknown>[] };
+    const gates = steps.steps.filter((s) => s.step_type === 'HUMAN_GATE');
+    expect(gates).toHaveLength(0);
+  });
+
+  // Test 3: DREXONYX campaign — autonomous publish allowed (no HUMAN_GATE)
+  it('DREXONYX campaign: no HUMAN_GATE in plan, publish at step 3', async () => {
+    const result = await delegateMarketingCampaign({
+      ...DREX,
+      captionText: 'Q4 campaign — DREXONYX corporate video packages now available.',
+    });
+    expect(result).toMatchObject({ ok: true });
+    const steps = (mockDelegateSubTask.mock.calls[0][0] as Record<string, unknown>).plan as { steps: Record<string, unknown>[] };
+    expect(steps.steps).toHaveLength(5);
+    expect(steps.steps[3].step_type).toBe('SKILL');
+    expect(steps.steps[3].skill_id).toBe('facebook.page.publish');
+    expect(steps.steps[4].step_type).toBe('NOTIFICATION');
+  });
+
+  // Test 5a: Both authorized Facebook Pages — PAGE_1 autonomous publishing allowed
+  it('DREXONYX with PAGE_1: autonomous publish allowed (no HUMAN_GATE)', async () => {
+    const result = await delegateMarketingCampaign({ ...DREX, pageTarget: 'PAGE_1' });
+    expect(result).toMatchObject({ ok: true });
+    const steps = (mockDelegateSubTask.mock.calls[0][0] as Record<string, unknown>).plan as { steps: Record<string, unknown>[] };
+    expect(steps.steps.every((s) => s.step_type !== 'HUMAN_GATE')).toBe(true);
+    const publishInput = steps.steps[3].input as Record<string, unknown>;
+    expect(publishInput.pageTarget).toBe('PAGE_1');
+  });
+
+  // Test 5b: Both authorized Facebook Pages — PAGE_2 autonomous publishing allowed
+  it('DREXONYX with PAGE_2: autonomous publish allowed (no HUMAN_GATE)', async () => {
+    const result = await delegateMarketingCampaign({ ...DREX, pageTarget: 'PAGE_2' });
+    expect(result).toMatchObject({ ok: true });
+    const steps = (mockDelegateSubTask.mock.calls[0][0] as Record<string, unknown>).plan as { steps: Record<string, unknown>[] };
+    expect(steps.steps.every((s) => s.step_type !== 'HUMAN_GATE')).toBe(true);
+    const publishInput = steps.steps[3].input as Record<string, unknown>;
+    expect(publishInput.pageTarget).toBe('PAGE_2');
+  });
+});
+
+describe('contentOwner — EXTERNAL requires HUMAN_GATE', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockDelegateSubTask.mockResolvedValue({ ok: true, subTaskId: 'subtask-ext' });
+  });
+
+  // Test 4: External company/client content — HUMAN_GATE required
+  it('EXTERNAL company content: HUMAN_GATE at step 3 with required roles', async () => {
+    const result = await delegateMarketingCampaign({
+      ...BASE,
+      contentOwner: 'EXTERNAL',
+      captionText: 'ClientCo announces their new product launch this November.',
+    });
+    expect(result).toMatchObject({ ok: true });
+    const steps = (mockDelegateSubTask.mock.calls[0][0] as Record<string, unknown>).plan as { steps: Record<string, unknown>[] };
+    expect(steps.steps).toHaveLength(6);
+    const gate = steps.steps[3] as Record<string, unknown>;
+    expect(gate.step_type).toBe('HUMAN_GATE');
+    const gateInput = gate.input as Record<string, unknown>;
+    expect(gateInput.requiredRoles).toContain('OWNER');
+    expect(gateInput.requiredRoles).toContain('ADMIN_OPERATIONS');
+  });
+});
+
+describe('contentOwner — page target validation', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockDelegateSubTask.mockResolvedValue({ ok: true, subTaskId: 'subtask-001' });
+  });
+
+  // Test 6: Any unauthorized page ID → rejected
+  it('unauthorized pageTarget is rejected before delegation', async () => {
+    const result = await delegateMarketingCampaign({
+      ...BASE,
+      pageTarget: 'PAGE_EXTERNAL_HACK' as never,
+    });
+    expect(result).toMatchObject({ ok: false, error: expect.stringContaining('not an authorized Facebook page') });
+    expect(mockDelegateSubTask).not.toHaveBeenCalled();
+  });
+
+  it('invalid contentOwner value is rejected', async () => {
+    const result = await delegateMarketingCampaign({
+      ...BASE,
+      contentOwner: 'UNKNOWN' as never,
+    });
+    expect(result).toMatchObject({ ok: false, error: expect.stringContaining('contentOwner') });
+    expect(mockDelegateSubTask).not.toHaveBeenCalled();
   });
 });
