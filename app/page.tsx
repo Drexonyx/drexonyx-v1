@@ -235,8 +235,18 @@ export default function HomePage() {
 
       {/* ── Why DREXONYX ──────────────────────────────────────────────── */}
       <section className={styles.why} aria-labelledby="why-heading">
-        <div className={styles.whyGrid}>
-          <div className={styles.whyLeft}>
+        <div className={styles.whyBg} aria-hidden="true">
+          <Image
+            src="/images/drexonyx-hero-final.webp"
+            alt=""
+            fill
+            className={styles.whyImg}
+            sizes="100vw"
+          />
+          <div className={styles.whyOverlay} />
+        </div>
+        <div className="container">
+          <div className={styles.whyContent}>
             <div className={styles.whyEyebrowRow}>
               <p className={styles.sectionEyebrow}>Why DREXONYX</p>
               <div className={styles.whyEyebrowLine} aria-hidden="true" />
@@ -295,16 +305,6 @@ export default function HomePage() {
             <Link href="/start-project" className={styles.whyCta}>
               Start Your Project →
             </Link>
-          </div>
-          <div className={styles.whyRight} aria-hidden="true">
-            <Image
-              src="/images/drexonyx-hero-final.webp"
-              alt=""
-              fill
-              className={styles.whyImg}
-              sizes="50vw"
-            />
-            <div className={styles.whyOverlay} />
           </div>
         </div>
       </section>
