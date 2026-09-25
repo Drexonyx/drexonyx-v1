@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/internal/poll-generations",
-      "schedule": "0 * * * *"
+      "schedule": "0 0 * * *"
     }
   ]
 }
