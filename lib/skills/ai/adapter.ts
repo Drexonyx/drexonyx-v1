@@ -15,12 +15,21 @@ export type AiAdapterResult =
   | { ok: true; text: string }
   | { ok: false; error: string; isTransient: boolean };
 
+// Redact any credential-like values from provider error strings before surfacing them.
+function redactCredentials(text: string): string {
+  return text
+    .replace(/sk-ant-[A-Za-z0-9_-]{10,}/g, '[REDACTED]')
+    .replace(/Bearer\s+[A-Za-z0-9._-]{20,}/gi, 'Bearer [REDACTED]');
+}
+
 // Returns a sanitized error message — never the raw API key or full provider error chain.
+// Includes err.type and err.message from Anthropic so callers can diagnose the exact cause.
 function safeErrorMessage(err: unknown): { message: string; isTransient: boolean } {
   if (err instanceof Anthropic.APIError) {
     // 529 = overloaded; 5xx = server-side transient
     const isTransient = err.status === 529 || err.status >= 500;
-    return { message: `AI provider error (status ${err.status})`, isTransient };
+    const detail = redactCredentials(err.message ?? '');
+    return { message: `AI provider error (status ${err.status}): ${detail}`, isTransient };
   }
   if (err instanceof Error) {
     return { message: 'AI adapter error', isTransient: false };

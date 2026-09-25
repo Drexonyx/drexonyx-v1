@@ -126,6 +126,26 @@ describe('callAi', () => {
     if (!result.ok) expect(result.isTransient).toBe(false);
   });
 
+  it('includes Anthropic error detail in error message for APIError', async () => {
+    mockCreate.mockRejectedValue(new MockAPIError(400, 'invalid_request_error: max_tokens: 2049 > 2048'));
+    const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).toContain('status 400');
+      expect(result.error).toContain('invalid_request_error');
+    }
+  });
+
+  it('redacts API key patterns from Anthropic error detail', async () => {
+    mockCreate.mockRejectedValue(new MockAPIError(401, 'Invalid API key sk-ant-api03-ABCDEFGHIJKLMNOPQRSTUVWXYZ'));
+    const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).not.toContain('sk-ant-api03-ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+      expect(result.error).toContain('[REDACTED]');
+    }
+  });
+
   it('non-APIError exceptions are non-transient', async () => {
     mockCreate.mockRejectedValue(new Error('network failure'));
     const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
