@@ -28,7 +28,7 @@ export const MICRO_PACKAGES: Package[] = [
     id: 'micro-creative',
     name: 'Micro Creative',
     price: 199,
-    priceLabel: 'AED 199',
+    priceLabel: '1,000 Credits',
     creditCost: 1000,
     description:
       'Professional creative direction for brands with focused budgets. One concept, one hook, one clear direction — delivered as a concise digital document.',
@@ -45,7 +45,7 @@ export const MICRO_PACKAGES: Package[] = [
     id: 'creative-brief',
     name: 'Creative Brief',
     price: 299,
-    priceLabel: 'AED 299',
+    priceLabel: '1,500 Credits',
     creditCost: 1500,
     description:
       'A complete campaign creative brief — everything you need to confidently brief a creator, an agency, or an in-house production team.',

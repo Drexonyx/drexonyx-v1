@@ -81,15 +81,25 @@ describe("Pricing page", () => {
 
   it("renders credit packages from DB", async () => {
     render(await PricingPage());
-    expect(screen.getByText("Starter")).toBeInTheDocument();
+    // "Value" is unique to the DB mock packages (not in PRODUCTION_PACKAGES)
     expect(screen.getByText("Value")).toBeInTheDocument();
-    expect(screen.getByText("Growth")).toBeInTheDocument();
+    // "Growth" appears in both DB packages and PRODUCTION_PACKAGES — check count
+    expect(screen.getAllByText("Growth").length).toBeGreaterThanOrEqual(1);
   });
 
-  it("renders the two micro entry products", async () => {
+  it("renders production services with credit costs", async () => {
+    render(await PricingPage());
+    expect(screen.getByText("Spark")).toBeInTheDocument();
+    expect(screen.getByText("2,500 Credits")).toBeInTheDocument();
+    expect(screen.getByText("17,500 Credits")).toBeInTheDocument();
+  });
+
+  it("renders creative direction services with credit costs", async () => {
     render(await PricingPage());
     expect(screen.getByText("Micro Creative")).toBeInTheDocument();
     expect(screen.getByText("Creative Brief")).toBeInTheDocument();
+    expect(screen.getByText("1,000 Credits")).toBeInTheDocument();
+    expect(screen.getByText("1,500 Credits")).toBeInTheDocument();
   });
 
   it("renders custom tiers", async () => {

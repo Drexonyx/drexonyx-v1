@@ -326,6 +326,42 @@
   margin-bottom: 1.375rem;
 }
 
+/* Production services section */
+.servicesSection {
+  padding: 5rem 0;
+  border-bottom: 1px solid var(--drex-border);
+}
+
+.servicesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.serviceCard {
+  position: relative;
+  padding: 1.75rem;
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: border-color var(--drex-duration) var(--drex-ease);
+}
+
+.serviceCard:hover {
+  border-color: rgba(200, 152, 10, 0.25);
+}
+
+.serviceCreditCost {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--drex-accent);
+  font-family: var(--font-geist-mono), monospace;
+  font-variant-numeric: tabular-nums;
+}
+
 /* Micro section */
 .microSection {
   padding: 4rem 0;

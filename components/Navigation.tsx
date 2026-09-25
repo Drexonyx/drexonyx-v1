@@ -52,8 +52,11 @@ export default function Navigation() {
           </ul>
 
           <div className={styles.navActions}>
-            <Link href="/portal/login" className={styles.portalLink}>
-              Client Portal
+            <Link href="/portal/login" className={styles.signInLink}>
+              Sign In
+            </Link>
+            <Link href="/portal/signup" className={styles.createAccountBtn}>
+              Create Account
             </Link>
             <Link href="/start-project" className={styles.cta}>
               Start Project
@@ -101,7 +104,17 @@ export default function Navigation() {
                 onClick={closeMenu}
                 tabIndex={menuOpen ? 0 : -1}
               >
-                Client Portal
+                Sign In
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/portal/signup"
+                className={styles.drawerCreateAccount}
+                onClick={closeMenu}
+                tabIndex={menuOpen ? 0 : -1}
+              >
+                Create Account
               </Link>
             </li>
             <li>
