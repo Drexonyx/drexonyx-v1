@@ -416,6 +416,23 @@
   cursor: not-allowed;
 }
 
+.loginAuthSwitch {
+  margin-top: 1.25rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--drex-text-secondary);
+}
+
+.loginAuthLink {
+  color: var(--drex-accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.loginAuthLink:hover {
+  text-decoration: underline;
+}
+
 /* ── Action buttons ───────────────────────────────────────────────────────── */
 .btnPrimary {
   background: var(--drex-accent);

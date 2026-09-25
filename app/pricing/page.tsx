@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { MICRO_PACKAGES, PRODUCTION_PACKAGES, CUSTOM_TIERS } from "@/lib/pricing";
+import { MICRO_PACKAGES, CUSTOM_TIERS } from "@/lib/pricing";
+import { getActiveCreditPackages } from "@/lib/credits/packages";
 import styles from "./page.module.css";
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: "Pricing",
@@ -9,7 +12,18 @@ export const metadata: Metadata = {
     "DREXONYX pricing and packages — performance UGC creative production. Campaign-based packages tailored to your brand's production needs.",
 };
 
-export default function PricingPage() {
+function formatCredits(n: number): string {
+  return n.toLocaleString('en-US');
+}
+
+function formatAed(priceStr: string): string {
+  const n = parseFloat(priceStr);
+  return 'AED ' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+
+export default async function PricingPage() {
+  const creditPackages = await getActiveCreditPackages();
+
   return (
     <>
       <section className={styles.hero} aria-labelledby="pricing-hero-heading">
@@ -19,57 +33,42 @@ export default function PricingPage() {
             Packages & Pricing
           </h1>
           <p className={styles.heroSub}>
-            Campaign-based creative packages built around your production needs.
+            Purchase credits to produce performance UGC at scale.
             All prices in UAE Dirham.
           </p>
         </div>
       </section>
 
-      {/* ── Production packages ────────────────────────────────────────────── */}
-      <section className={styles.packagesSection} aria-labelledby="production-heading">
+      {/* ── Credit packages ───────────────────────────────────────────────── */}
+      <section className={styles.packagesSection} aria-labelledby="credits-heading">
         <div className="container">
-          <h2 id="production-heading" className={styles.sectionLabel}>
-            Production Packages
+          <h2 id="credits-heading" className={styles.sectionLabel}>
+            Credit Packages
           </h2>
+          <p className={styles.sectionDesc}>
+            Buy credits to spend across DREXONYX production services. Credits never expire.
+            Volume discounts apply at higher tiers.
+          </p>
 
-          <div className={styles.packagesGrid}>
-            {PRODUCTION_PACKAGES.map((pkg) => (
-              <article
-                key={pkg.id}
-                className={`${styles.packageCard} ${pkg.highlight ? styles.packageCardHighlight : ""}`}
-                aria-label={pkg.name}
-              >
-                {pkg.badge && (
-                  <div className={styles.packageBadge} aria-label="Most popular package">
-                    {pkg.badge}
+          {creditPackages.length > 0 ? (
+            <div className={styles.creditGrid}>
+              {creditPackages.map((pkg) => (
+                <article key={pkg.id} className={styles.creditCard} aria-label={pkg.name}>
+                  <div className={styles.packageHeader}>
+                    <h3 className={styles.packageName}>{pkg.name}</h3>
                   </div>
-                )}
-                <div className={styles.packageHeader}>
-                  {pkg.category && (
-                    <div className={styles.packageCategory}>
-                      {pkg.category === 'standard-ugc' ? 'Standard UGC' : 'Cinematic UGC'}
-                    </div>
-                  )}
-                  <h3 className={styles.packageName}>{pkg.name}</h3>
-                  <div className={styles.packagePrice}>{pkg.priceLabel}</div>
-                </div>
-                <p className={styles.packageDesc}>{pkg.description}</p>
-                <ul className={styles.packageIncludes} aria-label={`${pkg.name} inclusions`}>
-                  {pkg.includes.map((item) => (
-                    <li key={item} className={styles.packageItem}>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href={`/checkout?pkg=${pkg.id}`}
-                  className={pkg.highlight ? styles.ctaPrimary : styles.ctaSecondary}
-                >
-                  Get Started
-                </Link>
-              </article>
-            ))}
-          </div>
+                  <div>
+                    <div className={styles.creditCredits}>{formatCredits(pkg.credits)}</div>
+                    <div className={styles.creditCreditsLabel}>Credits</div>
+                  </div>
+                  <div className={styles.packagePrice}>{formatAed(pkg.price_aed)}</div>
+                  <Link href="/portal/credits/buy" className={styles.ctaSecondary}>
+                    Buy Credits
+                  </Link>
+                </article>
+              ))}
+            </div>
+          ) : null}
         </div>
       </section>
 
@@ -163,8 +162,8 @@ export default function PricingPage() {
                 a: "Yes. If your campaign requirements don't fit a standard package, submit your brief and we'll scope a custom engagement.",
               },
               {
-                q: "What's the difference between the micro products and full production?",
-                a: "Micro Creative and Creative Brief are creative direction documents — they give you a professional concept and strategy to work from. Spark and above include actual video production and delivery.",
+                q: "What's the difference between the micro products and credit-based production?",
+                a: "Micro Creative and Creative Brief are creative direction documents — they give you a professional concept and strategy to work from. Credit packages give you access to actual video production and delivery.",
               },
               {
                 q: "How are revisions handled?",
@@ -176,7 +175,7 @@ export default function PricingPage() {
               },
               {
                 q: "How long does production take?",
-                a: "Turnaround times are shown per package — from 48 hours for Spark to 15 business days for Production. Custom timelines are agreed at project scope.",
+                a: "Turnaround times vary by production type. Timeline and credit cost are confirmed at project start. Custom timelines are agreed at project scope.",
               },
               {
                 q: "Do you manage ad campaigns or media buying?",
@@ -196,13 +195,13 @@ export default function PricingPage() {
       <section className={styles.ctaBand} aria-labelledby="pricing-cta-heading">
         <div className="container">
           <h2 id="pricing-cta-heading" className={styles.ctaBandHeading}>
-            Not sure which package fits?
+            Ready to get started?
           </h2>
           <p className={styles.ctaBandSub}>
-            Submit your campaign brief and we&apos;ll recommend the right scope for your goals.
+            Create your account and buy your first credit package to start producing.
           </p>
-          <Link href="/start-project" className={styles.ctaPrimary}>
-            Start Project
+          <Link href="/portal/signup" className={styles.ctaPrimary}>
+            Create Account
           </Link>
         </div>
       </section>

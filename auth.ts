@@ -104,8 +104,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     authorized({ auth: session, request }) {
       const { pathname } = request.nextUrl;
-      // Public sign-in pages
+      // Public auth pages
       if (pathname === '/portal/login') return true;
+      if (pathname === '/portal/signup') return true;
       if (pathname === '/admin/login') return true;
       // Portal: require any valid session (CLIENT gate enforced at provider level)
       if (pathname.startsWith('/portal')) return !!session;
