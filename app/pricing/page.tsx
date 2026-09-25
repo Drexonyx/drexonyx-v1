@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { MICRO_PACKAGES, CUSTOM_TIERS } from "@/lib/pricing";
+import { MICRO_PACKAGES, PRODUCTION_PACKAGES, CUSTOM_TIERS } from "@/lib/pricing";
 import { getActiveCreditPackages } from "@/lib/credits/packages";
 import styles from "./page.module.css";
 
@@ -72,16 +72,53 @@ export default async function PricingPage() {
         </div>
       </section>
 
+      {/* ── Production services ───────────────────────────────────────────── */}
+      <section className={styles.servicesSection} aria-labelledby="services-heading">
+        <div className="container">
+          <h2 id="services-heading" className={styles.sectionLabel}>
+            Production Services
+          </h2>
+          <p className={styles.sectionDesc}>
+            Spend Credits on video production services. Each service costs a fixed number of Credits —
+            buy the Credit Package that matches your production volume.
+          </p>
+
+          <div className={styles.servicesGrid}>
+            {PRODUCTION_PACKAGES.map((pkg) => (
+              <article key={pkg.id} className={styles.serviceCard} aria-label={pkg.name}>
+                <div className={styles.packageHeader}>
+                  <h3 className={styles.packageName}>{pkg.name}</h3>
+                  <div className={styles.serviceCreditCost}>
+                    {formatCredits(pkg.creditCost)} Credits
+                  </div>
+                </div>
+                <p className={styles.packageDesc}>{pkg.description}</p>
+                <ul className={styles.packageIncludes} aria-label={`${pkg.name} inclusions`}>
+                  {pkg.includes.map((item) => (
+                    <li key={item} className={styles.packageItem}>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <Link href="/portal/credits/buy" className={styles.ctaSecondary}>
+                  Buy Credits
+                </Link>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Micro / entry products ─────────────────────────────────────────── */}
       <section className={styles.microSection} aria-labelledby="micro-heading">
         <div className="container">
           <h2 id="micro-heading" className={styles.microSectionHeading}>
-            Need Something Smaller?
+            Creative Direction Services
           </h2>
           <p className={styles.microSectionDesc}>
-            Professional DREXONYX creative guidance accessible to everyone — individuals,
-            creators, solo entrepreneurs, and businesses of any size. The same strategic
-            thinking and creative quality, without a full production commitment.
+            Professional creative strategy and direction — accessible to individuals, solo
+            entrepreneurs, and businesses of any size. Pay with Credits; no full production
+            commitment required.
           </p>
 
           <div className={styles.microGrid}>
@@ -89,7 +126,7 @@ export default async function PricingPage() {
               <article key={pkg.id} className={styles.microCard} aria-label={pkg.name}>
                 <div className={styles.packageHeader}>
                   <h3 className={styles.packageName}>{pkg.name}</h3>
-                  <div className={styles.packagePrice}>{pkg.priceLabel}</div>
+                  <div className={styles.serviceCreditCost}>{pkg.priceLabel}</div>
                 </div>
                 <p className={styles.packageDesc}>{pkg.description}</p>
                 <ul className={styles.packageIncludes} aria-label={`${pkg.name} inclusions`}>

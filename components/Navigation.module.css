@@ -86,8 +86,8 @@
   flex-shrink: 0;
 }
 
-/* Client Portal discrete link */
-.portalLink {
+/* Sign In discrete link */
+.signInLink {
   display: inline-flex;
   align-items: center;
   padding: 0.4rem 0.75rem;
@@ -99,9 +99,30 @@
     background var(--drex-duration) var(--drex-ease);
 }
 
-.portalLink:hover {
+.signInLink:hover {
   color: var(--drex-text-secondary);
   background: var(--drex-elevated);
+}
+
+/* Create Account outlined button */
+.createAccountBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--drex-accent);
+  border: 1px solid rgba(200, 152, 10, 0.5);
+  border-radius: 6px;
+  flex-shrink: 0;
+  transition: background var(--drex-duration) var(--drex-ease),
+    border-color var(--drex-duration) var(--drex-ease),
+    color var(--drex-duration) var(--drex-ease);
+}
+
+.createAccountBtn:hover {
+  background: rgba(200, 152, 10, 0.08);
+  border-color: var(--drex-accent);
 }
 
 /* CTA button */
@@ -228,6 +249,25 @@
 .drawerPortalLink:hover {
   color: var(--drex-text-secondary);
   background: var(--drex-elevated);
+}
+
+.drawerCreateAccount {
+  display: block;
+  margin-top: 0.25rem;
+  padding: 0.65rem 1rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--drex-accent);
+  border: 1px solid rgba(200, 152, 10, 0.4);
+  border-radius: 6px;
+  text-align: center;
+  transition: background var(--drex-duration) var(--drex-ease),
+    border-color var(--drex-duration) var(--drex-ease);
+}
+
+.drawerCreateAccount:hover {
+  background: rgba(200, 152, 10, 0.08);
+  border-color: var(--drex-accent);
 }
 
 .drawerCta {

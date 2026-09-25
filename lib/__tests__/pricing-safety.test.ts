@@ -65,13 +65,13 @@ describe('Pricing — exact credit costs for v2 economy', () => {
 });
 
 describe('Pricing — server-side price authority (prices are static in source)', () => {
-  // Verifies that the priceLabel accurately reflects the price field.
-  // This guards against a label and price drifting out of sync.
-  it.each(MICRO_PACKAGES)('$name: priceLabel contains the AED price', ({ price, priceLabel }) => {
-    const formatted = price.toLocaleString('en-US');
+  // Micro packages display as credit costs — priceLabel should contain the creditCost formatted.
+  it.each(MICRO_PACKAGES)('$name: priceLabel contains the credit cost', ({ creditCost, priceLabel }) => {
+    const formatted = creditCost.toLocaleString('en-US');
     expect(priceLabel).toContain(formatted);
   });
 
+  // Production packages still carry AED priceLbels for internal reference.
   it.each(PRODUCTION_PACKAGES)('$name: priceLabel contains the AED price', ({ price, priceLabel }) => {
     const formatted = price.toLocaleString('en-US');
     expect(priceLabel).toContain(formatted);
