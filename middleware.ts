@@ -22,7 +22,7 @@ export function proxy(request: NextRequest) {
     return new NextResponse(null, { status: 404 });
   }
 
-  if (pathname.startsWith('/portal') && pathname !== '/portal/login') {
+  if (pathname.startsWith('/portal') && pathname !== '/portal/login' && pathname !== '/portal/signup') {
     const hasSession =
       request.cookies.has('__Secure-authjs.session-token') ||
       request.cookies.has('authjs.session-token');
