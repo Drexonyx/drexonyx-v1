@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import ServicesPage from "../services/page";
 import HowItWorksPage from "../how-it-works/page";
@@ -7,6 +7,17 @@ import PricingPage from "../pricing/page";
 import AboutPage from "../about/page";
 import StartCampaignPage from "../start-project/page";
 import CheckoutPage from "../checkout/page";
+
+// Credit packages — the checkout page fetches these from the DB.
+// Factory is hoisted, so data is inlined directly (no top-level const).
+vi.mock('@/lib/credits/packages', () => ({
+  getActiveCreditPackages: vi.fn().mockResolvedValue([
+    { id: 'pkg-starter', name: 'Starter', credits: 500, price_aed: '499.0000', display_order: 0 },
+    { id: 'pkg-value', name: 'Value', credits: 1000, price_aed: '899.0000', display_order: 1 },
+    { id: 'pkg-growth', name: 'Growth', credits: 2500, price_aed: '1999.0000', display_order: 2 },
+  ]),
+  getCreditPackageById: vi.fn().mockResolvedValue(null),
+}));
 
 describe("Services page", () => {
   it("renders an h1 heading", () => {
@@ -157,56 +168,51 @@ describe("Start Project page", () => {
 });
 
 describe("Checkout page", () => {
-  it("renders an h1 heading for a valid package", async () => {
-    render(await CheckoutPage({ searchParams: Promise.resolve({ pkg: "growth" }) }));
+  it("renders a Buy Credits h1 heading", async () => {
+    render(await CheckoutPage({ searchParams: Promise.resolve({}) }));
     expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(/buy credits/i);
   });
 
-  it("renders the proceed to payment button when a package is selected", async () => {
-    render(await CheckoutPage({ searchParams: Promise.resolve({ pkg: "growth" }) }));
+  it("renders the proceed to payment button when packages are available", async () => {
+    render(await CheckoutPage({ searchParams: Promise.resolve({}) }));
     expect(screen.getByRole("button", { name: /proceed to payment/i })).toBeInTheDocument();
   });
 
-  it("shows Spark and AED 499 for pkg=spark", async () => {
-    render(await CheckoutPage({ searchParams: Promise.resolve({ pkg: "spark" }) }));
-    expect(screen.getByText("Spark")).toBeInTheDocument();
+  it("renders all mock credit package names", async () => {
+    render(await CheckoutPage({ searchParams: Promise.resolve({}) }));
+    expect(screen.getAllByText("Starter").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Value").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Growth").length).toBeGreaterThan(0);
+  });
+
+  it("shows Starter package with AED 499 price", async () => {
+    render(await CheckoutPage({ searchParams: Promise.resolve({}) }));
+    expect(screen.getAllByText("Starter").length).toBeGreaterThan(0);
     expect(screen.getAllByText("AED 499").length).toBeGreaterThan(0);
   });
 
-  it("shows Starter and AED 1,500 for pkg=starter", async () => {
-    render(await CheckoutPage({ searchParams: Promise.resolve({ pkg: "starter" }) }));
-    expect(screen.getByText("Starter")).toBeInTheDocument();
-    expect(screen.getAllByText("AED 1,500").length).toBeGreaterThan(0);
-  });
-
-  it("shows Growth and AED 3,500 for pkg=growth", async () => {
-    render(await CheckoutPage({ searchParams: Promise.resolve({ pkg: "growth" }) }));
-    expect(screen.getByText("Growth")).toBeInTheDocument();
-    expect(screen.getAllByText("AED 3,500").length).toBeGreaterThan(0);
-  });
-
-  it("shows Scale and AED 6,500 for pkg=scale", async () => {
-    render(await CheckoutPage({ searchParams: Promise.resolve({ pkg: "scale" }) }));
-    expect(screen.getByText("Scale")).toBeInTheDocument();
-    expect(screen.getAllByText("AED 6,500").length).toBeGreaterThan(0);
-  });
-
-  it("shows Production and AED 14,500 for pkg=production", async () => {
-    render(await CheckoutPage({ searchParams: Promise.resolve({ pkg: "production" }) }));
-    expect(screen.getByText("Production")).toBeInTheDocument();
-    expect(screen.getAllByText("AED 14,500").length).toBeGreaterThan(0);
-  });
-
-  it("shows no-package state and does not fall back to Growth when pkg is missing", async () => {
+  it("shows 500 credits label for Starter package", async () => {
     render(await CheckoutPage({ searchParams: Promise.resolve({}) }));
-    expect(screen.getByText(/no package selected/i)).toBeInTheDocument();
-    expect(screen.queryByText("Growth")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /proceed to payment/i })).not.toBeInTheDocument();
+    expect(screen.getAllByText(/500 credits/i).length).toBeGreaterThan(0);
   });
 
-  it("shows no-package state and does not fall back to Growth for an invalid pkg", async () => {
-    render(await CheckoutPage({ searchParams: Promise.resolve({ pkg: "invalid-id" }) }));
-    expect(screen.getByText(/no package selected/i)).toBeInTheDocument();
-    expect(screen.queryByText("Growth")).not.toBeInTheDocument();
+  it("pre-selects the package matching the pkg search param", async () => {
+    render(await CheckoutPage({ searchParams: Promise.resolve({ pkg: "pkg-value" }) }));
+    // Value package's radio should be checked (found in DOM)
+    const radios = screen.getAllByRole("radio");
+    const valueRadio = radios.find(
+      (r) => (r as HTMLInputElement).value === "pkg-value"
+    );
+    expect(valueRadio).toBeDefined();
+    expect(valueRadio as HTMLInputElement).toBeChecked();
+  });
+
+  it("shows no packages state when credit packages list is empty", async () => {
+    const { getActiveCreditPackages } = await import('@/lib/credits/packages');
+    vi.mocked(getActiveCreditPackages).mockResolvedValueOnce([]);
+    render(await CheckoutPage({ searchParams: Promise.resolve({}) }));
+    expect(screen.getByText(/no packages available/i)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /proceed to payment/i })).not.toBeInTheDocument();
   });
 });

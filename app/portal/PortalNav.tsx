@@ -31,6 +31,14 @@ const NAV_SECTIONS = [
     ],
   },
   {
+    label: 'Credits',
+    items: [
+      { href: '/portal/credits', label: 'Credit Balance' },
+      { href: '/portal/credits/buy', label: 'Buy Credits' },
+      { href: '/portal/production/new', label: 'Start Production' },
+    ],
+  },
+  {
     label: 'Billing',
     items: [{ href: '/portal/payments', label: 'Payments' }],
   },

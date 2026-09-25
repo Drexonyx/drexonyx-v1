@@ -1,9 +1,9 @@
-import { and, desc, eq, inArray, isNull } from 'drizzle-orm';
+import { and, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
 import { db } from '@/db/index';
 import { organizations } from '@/db/schema/core';
 import { users, orgMemberships } from '@/db/schema/identity';
 import { campaigns, quotes, orders, orderBudgets, pricingConfigs, inquiries, briefs } from '@/db/schema/commercial';
-import { payments, financialLedger, expenses } from '@/db/schema/financial';
+import { payments, financialLedger, expenses, creditPackages, creditPurchases, customerCreditLedger } from '@/db/schema/financial';
 import { assets, qcReviews, approvals, deliveries, productionJobs, aiGenerations, deliveryAssets } from '@/db/schema/production';
 import { auditEvents } from '@/db/schema/system';
 
@@ -453,4 +453,70 @@ export async function getAdminOrderBudgets(organizationId: string) {
     .from(orderBudgets)
     .where(eq(orderBudgets.organization_id, organizationId))
     .orderBy(desc(orderBudgets.created_at));
+}
+
+// DR 0120: Credit packages — global catalog (no org filter).
+export async function getAdminCreditPackages() {
+  return db
+    .select({
+      id: creditPackages.id,
+      name: creditPackages.name,
+      credits: creditPackages.credits,
+      price_aed: creditPackages.price_aed,
+      is_active: creditPackages.is_active,
+      display_order: creditPackages.display_order,
+      created_at: creditPackages.created_at,
+    })
+    .from(creditPackages)
+    .orderBy(creditPackages.display_order);
+}
+
+// DR 0120: Credit purchases — org-scoped, most recent first (last 200).
+export async function getAdminCreditPurchases(organizationId: string) {
+  return db
+    .select({
+      id: creditPurchases.id,
+      credit_package_id: creditPurchases.credit_package_id,
+      credits: creditPurchases.credits,
+      amount_aed: creditPurchases.amount_aed,
+      status: creditPurchases.status,
+      provider_name: creditPurchases.provider_name,
+      provider_payment_id: creditPurchases.provider_payment_id,
+      paid_at: creditPurchases.paid_at,
+      created_at: creditPurchases.created_at,
+    })
+    .from(creditPurchases)
+    .where(eq(creditPurchases.organization_id, organizationId))
+    .orderBy(desc(creditPurchases.created_at))
+    .limit(200);
+}
+
+// DR 0120: Credit ledger — org-scoped, most recent first (last 200).
+export async function getAdminCreditLedger(organizationId: string) {
+  return db
+    .select({
+      id: customerCreditLedger.id,
+      entry_type: customerCreditLedger.entry_type,
+      credits_delta: customerCreditLedger.credits_delta,
+      reference_entity_type: customerCreditLedger.reference_entity_type,
+      reference_entity_id: customerCreditLedger.reference_entity_id,
+      idempotency_key: customerCreditLedger.idempotency_key,
+      description: customerCreditLedger.description,
+      actor_id: customerCreditLedger.actor_id,
+      actor_role: customerCreditLedger.actor_role,
+      created_at: customerCreditLedger.created_at,
+    })
+    .from(customerCreditLedger)
+    .where(eq(customerCreditLedger.organization_id, organizationId))
+    .orderBy(desc(customerCreditLedger.created_at))
+    .limit(200);
+}
+
+// DR 0120: Credit balance — sum of all ledger deltas.
+export async function getAdminCreditBalance(organizationId: string): Promise<number> {
+  const rows = await db
+    .select({ total: sql<string>`COALESCE(SUM(${customerCreditLedger.credits_delta}), 0)` })
+    .from(customerCreditLedger)
+    .where(eq(customerCreditLedger.organization_id, organizationId));
+  return parseInt(rows[0]?.total ?? '0', 10);
 }

@@ -6,10 +6,12 @@
 
 import { db } from '@/db/index';
 import { productionJobs, aiGenerations, assets, assetAiGenerations } from '@/db/schema/production';
+import { customerCreditLedger } from '@/db/schema/financial';
 import { auditEvents, idempotencyKeys } from '@/db/schema/system';
 import { and, eq, ne } from 'drizzle-orm';
 import { uuidv7 } from 'uuidv7';
 import { revokeServiceTokensForJob } from './service-tokens';
+import { releaseCredits } from '@/lib/credits/ledger';
 
 export type TerminalTransitionResult =
   | { ok: true; transitioned: boolean }
@@ -220,6 +222,29 @@ export async function failProductionJob(params: {
 
     if (transitioned) {
       await revokeServiceTokensForJob({ productionJobId, organizationId });
+
+      // Release reserved credits on failure — look up the reservation entry.
+      const reservationKey = `reservation:${productionJobId}`;
+      const reservationRows = await db
+        .select({ credits_delta: customerCreditLedger.credits_delta })
+        .from(customerCreditLedger)
+        .where(
+          and(
+            eq(customerCreditLedger.organization_id, organizationId),
+            eq(customerCreditLedger.idempotency_key, reservationKey),
+          ),
+        )
+        .limit(1);
+
+      if (reservationRows.length > 0) {
+        const reservedAmount = Math.abs(reservationRows[0].credits_delta);
+        await releaseCredits({
+          organizationId,
+          productionJobId,
+          credits: reservedAmount,
+          description: `Credits released — production job failed (${reason.slice(0, 120)})`,
+        });
+      }
     }
 
     return { ok: true, transitioned };

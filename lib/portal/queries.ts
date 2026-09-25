@@ -1,8 +1,8 @@
-import { and, desc, eq, isNull, inArray } from 'drizzle-orm';
+import { and, desc, eq, isNull, inArray, sql } from 'drizzle-orm';
 import { db } from '@/db/index';
 import { organizations, brandDna } from '@/db/schema/core';
 import { campaigns, quotes, orders } from '@/db/schema/commercial';
-import { payments } from '@/db/schema/financial';
+import { payments, customerCreditLedger } from '@/db/schema/financial';
 import { assets, approvals, deliveries, deliveryAssets } from '@/db/schema/production';
 import { auditEvents } from '@/db/schema/system';
 import { isClientQuoteStatus } from './types';
@@ -343,19 +343,30 @@ export async function getRevisionInitiatedAssetIds(organizationId: string): Prom
   return ids;
 }
 
+// DR 0120: Credit balance — computed from append-only ledger.
+export async function getCreditBalance(organizationId: string): Promise<number> {
+  const rows = await db
+    .select({ total: sql<string>`COALESCE(SUM(${customerCreditLedger.credits_delta}), 0)` })
+    .from(customerCreditLedger)
+    .where(eq(customerCreditLedger.organization_id, organizationId));
+  return parseInt(rows[0]?.total ?? '0', 10);
+}
+
 // Dashboard summary counts — derived from CLIENT-safe data only.
 export async function getDashboardCounts(organizationId: string) {
-  const [allCampaigns, allAssets, allQuotes, allApprovals, allDeliveries] =
+  const [allCampaigns, allAssets, allQuotes, allApprovals, allDeliveries, creditBalance] =
     await Promise.all([
       getCampaigns(organizationId),
       getClientAssets(organizationId),
       getQuotes(organizationId),
       getApprovals(organizationId),
       getDeliveries(organizationId),
+      getCreditBalance(organizationId),
     ]);
 
   return {
     campaigns: allCampaigns.length,
+    creditBalance,
     assetsReadyForReview: allAssets.filter((a) => a.status === 'CLIENT_PREVIEW')
       .length,
     assetsInRevision: allAssets.filter((a) => a.status === 'REVISION_REQUIRED')
