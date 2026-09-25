@@ -29,7 +29,7 @@ export const MICRO_PACKAGES: Package[] = [
     name: 'Micro Creative',
     price: 199,
     priceLabel: 'AED 199',
-    creditCost: 199,
+    creditCost: 1000,
     description:
       'Professional creative direction for brands with focused budgets. One concept, one hook, one clear direction — delivered as a concise digital document.',
     includes: [
@@ -46,7 +46,7 @@ export const MICRO_PACKAGES: Package[] = [
     name: 'Creative Brief',
     price: 299,
     priceLabel: 'AED 299',
-    creditCost: 299,
+    creditCost: 1500,
     description:
       'A complete campaign creative brief — everything you need to confidently brief a creator, an agency, or an in-house production team.',
     includes: [
@@ -69,7 +69,7 @@ export const PRODUCTION_PACKAGES: Package[] = [
     name: 'Spark',
     price: 499,
     priceLabel: 'AED 499',
-    creditCost: 499,
+    creditCost: 2500,
     category: 'standard-ugc',
     description:
       'One Standard UGC video — concept, production, and QC delivered in 48 hours.',
@@ -86,7 +86,7 @@ export const PRODUCTION_PACKAGES: Package[] = [
     name: 'Starter',
     price: 1500,
     priceLabel: 'AED 1,500',
-    creditCost: 1500,
+    creditCost: 7500,
     category: 'standard-ugc',
     description:
       'One full-length Standard UGC video — creative brief, script, production, and QC in 5 business days.',
@@ -103,7 +103,7 @@ export const PRODUCTION_PACKAGES: Package[] = [
     name: 'Growth',
     price: 3500,
     priceLabel: 'AED 3,500',
-    creditCost: 3500,
+    creditCost: 17500,
     category: 'standard-ugc',
     description:
       'Multi-video Standard UGC production with A/B creative variants — scale your content output efficiently.',
@@ -122,7 +122,7 @@ export const PRODUCTION_PACKAGES: Package[] = [
     name: 'Scale',
     price: 6500,
     priceLabel: 'AED 6,500',
-    creditCost: 6500,
+    creditCost: 32500,
     category: 'standard-ugc',
     description:
       'High-volume Standard UGC production for brands scaling creative output.',
@@ -140,7 +140,7 @@ export const PRODUCTION_PACKAGES: Package[] = [
     name: 'Production',
     price: 14500,
     priceLabel: 'AED 14,500',
-    creditCost: 14500,
+    creditCost: 72500,
     category: 'cinematic-ugc',
     description:
       'Cinematic UGC production for hero content, product launches, and brand storytelling.',
