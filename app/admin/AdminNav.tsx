@@ -39,6 +39,7 @@ const NAV_SECTIONS = [
     items: [
       { href: '/admin/payments', label: 'Payments' },
       { href: '/admin/financial', label: 'Ledger & Expenses' },
+      { href: '/admin/credits', label: 'Credits' },
     ],
   },
   {

@@ -106,8 +106,11 @@ export async function createProductionJob(params: {
     prompt?: string | null;
     params?: Record<string, unknown> | null;
   };
+  // DR 0120: Credit-based flows authorize production via customer_credit_ledger RESERVATION,
+  // not financial.payments. Set true only from credit-authorized server actions.
+  creditAuthorized?: boolean;
 }): Promise<CreateProductionJobResult> {
-  const { orderId, organizationId, jobType, description, metadata, actorId, actorRole, aiGenerationParams } = params;
+  const { orderId, organizationId, jobType, description, metadata, actorId, actorRole, aiGenerationParams, creditAuthorized } = params;
 
   if (!CREATE_ROLES.includes(actorRole)) {
     return { ok: false, reason: 'Insufficient authority' };
@@ -134,19 +137,22 @@ export async function createProductionJob(params: {
   }
 
   // DR 0053 §2.7: Production must not start without confirmed payment.
-  const paidPayments = await db
-    .select({ id: payments.id })
-    .from(payments)
-    .where(
-      and(
-        eq(payments.order_id, orderId),
-        eq(payments.status, 'PAID'),
-      ),
-    )
-    .limit(1);
+  // DR 0120: Credit-based flows are authorized by customer_credit_ledger RESERVATION instead.
+  if (!creditAuthorized) {
+    const paidPayments = await db
+      .select({ id: payments.id })
+      .from(payments)
+      .where(
+        and(
+          eq(payments.order_id, orderId),
+          eq(payments.status, 'PAID'),
+        ),
+      )
+      .limit(1);
 
-  if (paidPayments.length === 0) {
-    return { ok: false, reason: 'Cannot start production: no confirmed payment on record for this order.' };
+    if (paidPayments.length === 0) {
+      return { ok: false, reason: 'Cannot start production: no confirmed payment on record for this order.' };
+    }
   }
 
   const jobId = uuidv7();

@@ -34,6 +34,8 @@ export function proxy(request: NextRequest) {
   }
 }
 
+export default proxy;
+
 export const config = {
   matcher: ['/portal/:path*', '/admin/:path*', '/api/admin/:path*'],
 };

@@ -16,7 +16,7 @@ describe("Home page", () => {
 
   it("renders a link to how it works", () => {
     render(<Home />);
-    expect(screen.getByRole("link", { name: /how it works/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /see full process/i })).toBeInTheDocument();
   });
 
   it("renders a link to services", () => {

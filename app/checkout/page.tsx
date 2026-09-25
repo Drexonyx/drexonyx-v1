@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { PRODUCTION_PACKAGES } from '@/lib/pricing';
-import CheckoutForm from './CheckoutForm';
+import { getActiveCreditPackages } from '@/lib/credits/packages';
+import CreditCheckoutForm from './CreditCheckoutForm';
 import styles from './page.module.css';
 
 export const metadata: Metadata = {
-  title: 'Checkout',
-  description: 'Complete your DREXONYX project order.',
+  title: 'Buy Credits',
+  description: 'Purchase production credits to start your DREXONYX project.',
 };
 
 type Props = {
@@ -15,60 +15,37 @@ type Props = {
 
 export default async function CheckoutPage({ searchParams }: Props) {
   const { pkg } = await searchParams;
-  const selectedPackage = pkg
-    ? (PRODUCTION_PACKAGES.find((p) => p.id === pkg) ?? null)
-    : null;
+  const packages = await getActiveCreditPackages();
+  const preSelected = pkg ? packages.find((p) => p.id === pkg) ?? null : null;
 
   return (
     <>
       <section className={styles.hero} aria-labelledby="checkout-heading">
         <div className="container">
-          <div className={styles.heroBadge}>Checkout</div>
+          <div className={styles.heroBadge}>Get Started</div>
           <h1 id="checkout-heading" className={styles.heroHeading}>
-            Order Summary
+            Buy Credits
           </h1>
           <p className={styles.heroSub}>
-            Review your selected package and proceed to confirm your order.
+            Purchase production credits. Use them in your client portal to start productions — at your own pace.
           </p>
         </div>
       </section>
 
-      <section className={styles.checkoutSection} aria-label="Order details">
+      <section className={styles.checkoutSection} aria-label="Credit package selection">
         <div className="container">
-          {selectedPackage === null ? (
+          {packages.length === 0 ? (
             <div className={styles.noPackage} role="status">
-              <p className={styles.noPackageHeading}>No package selected</p>
+              <p className={styles.noPackageHeading}>No packages available</p>
               <p className={styles.noPackageText}>
-                Please select a package from the pricing page to continue.
+                Please contact us to discuss your production requirements.
               </p>
-              <Link href="/pricing" className={styles.noPackageCta}>
-                View Pricing
+              <Link href="/start-project" className={styles.noPackageCta}>
+                Contact Us
               </Link>
             </div>
           ) : (
-            <div className={styles.checkoutLayout}>
-              <div className={styles.orderCard}>
-                <h2 className={styles.orderHeading}>Selected Package</h2>
-                <div className={styles.pkgHeader}>
-                  <p className={styles.pkgName}>{selectedPackage.name}</p>
-                  <p className={styles.pkgPrice}>{selectedPackage.priceLabel}</p>
-                </div>
-                <p className={styles.pkgDesc}>{selectedPackage.description}</p>
-                <ul className={styles.pkgIncludes} aria-label="Package inclusions">
-                  {selectedPackage.includes.map((item) => (
-                    <li key={item} className={styles.pkgItem}>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                <div className={styles.totalRow}>
-                  <span className={styles.totalLabel}>Total</span>
-                  <span className={styles.totalPrice}>{selectedPackage.priceLabel}</span>
-                </div>
-              </div>
-
-              <CheckoutForm selectedPackage={selectedPackage} />
-            </div>
+            <CreditCheckoutForm packages={packages} preSelectedId={preSelected?.id ?? null} />
           )}
         </div>
       </section>

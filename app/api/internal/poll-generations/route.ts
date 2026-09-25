@@ -9,6 +9,7 @@ import { db } from '@/db/index';
 import { aiGenerations } from '@/db/schema/production';
 import { and, eq, isNotNull } from 'drizzle-orm';
 import { pollGenerationStatus } from '@/lib/agent/polling';
+import { recoverProcessingCreditPurchases } from '@/lib/credits/recover-processing';
 
 // Cap per invocation to stay within the serverless execution budget.
 const POLL_BATCH_LIMIT = 50;
@@ -71,5 +72,16 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
   }
 
-  return NextResponse.json({ polled: runningGens.length, done, still_running, errors });
+  // Also recover PROCESSING credit_purchases that are stuck (user paid but never hit success page).
+  const organizationId = process.env.DREXONYX_ORG_ID?.trim();
+  let creditRecovery = { checked: 0, completed: 0, failed: 0, errors: 0 };
+  if (organizationId) {
+    try {
+      creditRecovery = await recoverProcessingCreditPurchases(organizationId);
+    } catch (err) {
+      console.error('[cron/poll-generations] recoverProcessingCreditPurchases threw:', err);
+    }
+  }
+
+  return NextResponse.json({ polled: runningGens.length, done, still_running, errors, creditRecovery });
 }

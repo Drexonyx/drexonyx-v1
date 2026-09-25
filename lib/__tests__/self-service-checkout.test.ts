@@ -2,20 +2,15 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // ─── Hoisted mocks ────────────────────────────────────────────────────────────
 
-const { mockDb, mockCreateSelfServiceOrder, mockCreateZiinaCheckoutSession, mockRedirect } =
-  vi.hoisted(() => ({
-    mockDb: { insert: vi.fn(), select: vi.fn(), update: vi.fn() },
-    mockCreateSelfServiceOrder: vi.fn(),
-    mockCreateZiinaCheckoutSession: vi.fn(),
-    mockRedirect: vi.fn(),
-  }));
+const { mockDb, mockCreateCreditPurchaseCheckout, mockRedirect } = vi.hoisted(() => ({
+  mockDb: { insert: vi.fn(), select: vi.fn(), update: vi.fn() },
+  mockCreateCreditPurchaseCheckout: vi.fn(),
+  mockRedirect: vi.fn(),
+}));
 
 vi.mock('@/db/index', () => ({ db: mockDb }));
-vi.mock('@/lib/self-service/create-checkout-order', () => ({
-  createSelfServiceOrder: mockCreateSelfServiceOrder,
-}));
-vi.mock('@/lib/portal/create-ziina-payment', () => ({
-  createZiinaCheckoutSession: mockCreateZiinaCheckoutSession,
+vi.mock('@/lib/credits/create-credit-purchase', () => ({
+  createCreditPurchaseCheckout: mockCreateCreditPurchaseCheckout,
 }));
 vi.mock('next/navigation', () => ({ redirect: mockRedirect }));
 vi.mock('next/headers', () => ({
@@ -27,10 +22,10 @@ vi.mock('next/headers', () => ({
     },
   }),
 }));
+vi.mock('uuidv7', () => ({ uuidv7: () => 'test-uuid-0000' }));
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-// insert().values().onConflictDoNothing().returning()
 function insertConflict(rows: { id: string }[]) {
   return {
     values: vi.fn().mockReturnValue({
@@ -41,7 +36,6 @@ function insertConflict(rows: { id: string }[]) {
   };
 }
 
-// select({...}).from(...).where(...).limit(1)
 function selectFromWhere(rows: unknown[]) {
   return {
     from: vi.fn().mockReturnValue({
@@ -52,7 +46,6 @@ function selectFromWhere(rows: unknown[]) {
   };
 }
 
-// update(...).set(...).where(...).returning({id})
 function updateReturning(rows: { id: string }[]) {
   return {
     set: vi.fn().mockReturnValue({
@@ -63,7 +56,6 @@ function updateReturning(rows: { id: string }[]) {
   };
 }
 
-// update(...).set(...).where(...)  (no returning — fire-and-forget)
 function updateSimple() {
   return {
     set: vi.fn().mockReturnValue({
@@ -84,147 +76,118 @@ describe('actionInitiateCheckout', () => {
     vi.unstubAllEnvs();
   });
 
-  // ─── Input validation ──────────────────────────────────────────────────────
+  // ─── Config guard ──────────────────────────────────────────────────────────
 
   it('returns error when DREXONYX_ORG_ID is not set', async () => {
-    vi.unstubAllEnvs(); // clears the stubbed value
-    const result = await actionInitiateCheckout('pkg-1', 'user@example.com');
+    vi.unstubAllEnvs();
+    const result = await actionInitiateCheckout('pkg-1');
     expect(result).toEqual({ ok: false, reason: expect.stringContaining('configuration') });
   });
 
-  it('returns error for empty email', async () => {
-    const result = await actionInitiateCheckout('pkg-1', '');
-    expect(result).toEqual({ ok: false, reason: expect.stringContaining('valid email') });
-  });
+  // ─── Idempotency: slot already held ───────────────────────────────────────
 
-  it('returns error for invalid email (no @)', async () => {
-    const result = await actionInitiateCheckout('pkg-1', 'notanemail');
-    expect(result).toEqual({ ok: false, reason: expect.stringContaining('valid email') });
-  });
-
-  it('returns error for invalid email (no TLD)', async () => {
-    const result = await actionInitiateCheckout('pkg-1', 'user@domain');
-    expect(result).toEqual({ ok: false, reason: expect.stringContaining('valid email') });
-  });
-
-  // ─── BLOCKER 1 regression: idempotency on duplicate concurrent submission ──
-
-  it('returns in-progress error when slot is already PENDING (duplicate submission)', async () => {
-    // Slot conflict: another request holds the idempotency key in PENDING state.
-    // This is the core BLOCKER 1 regression: duplicate concurrent checkout must not
-    // create a second order.
-    mockDb.insert.mockReturnValueOnce(insertConflict([])); // conflict
+  it('returns in-progress error when slot is already PENDING', async () => {
+    mockDb.insert.mockReturnValueOnce(insertConflict([]));
     mockDb.select.mockReturnValueOnce(
       selectFromWhere([{ status: 'PENDING', response_payload: null }]),
     );
 
-    const result = await actionInitiateCheckout('pkg-1', 'user@example.com');
+    const result = await actionInitiateCheckout('pkg-1');
 
     expect(result).toEqual({ ok: false, reason: expect.stringContaining('already in progress') });
-    expect(mockCreateSelfServiceOrder).not.toHaveBeenCalled();
+    expect(mockCreateCreditPurchaseCheckout).not.toHaveBeenCalled();
   });
 
-  it('reuses in-progress checkout redirect URL when slot is PROCESSING', async () => {
-    // An in-progress checkout already has a Ziina redirect URL stored.
-    // Duplicate request must redirect to that URL instead of creating a new order.
-    const existingRedirectUrl = 'https://pay.ziina.com/existing-session';
+  it('reuses in-progress redirect URL when slot is PROCESSING with stored URL', async () => {
+    const existingUrl = 'https://pay.ziina.com/existing-session';
     mockDb.insert.mockReturnValueOnce(insertConflict([]));
     mockDb.select.mockReturnValueOnce(
-      selectFromWhere([
-        { status: 'PROCESSING', response_payload: { redirectUrl: existingRedirectUrl } },
-      ]),
+      selectFromWhere([{ status: 'PROCESSING', response_payload: { redirectUrl: existingUrl } }]),
     );
 
-    await actionInitiateCheckout('pkg-1', 'user@example.com').catch(() => {});
+    await actionInitiateCheckout('pkg-1').catch(() => {});
 
-    expect(mockRedirect).toHaveBeenCalledWith(existingRedirectUrl);
-    expect(mockCreateSelfServiceOrder).not.toHaveBeenCalled();
+    expect(mockRedirect).toHaveBeenCalledWith(existingUrl);
+    expect(mockCreateCreditPurchaseCheckout).not.toHaveBeenCalled();
   });
 
   it('resets FAILED slot and proceeds when concurrent reset wins the race', async () => {
-    // Previous checkout failed and this request wins the conditional FAILED→PENDING reset.
     mockDb.insert.mockReturnValueOnce(insertConflict([]));
     mockDb.select.mockReturnValueOnce(
       selectFromWhere([{ status: 'FAILED', response_payload: null }]),
     );
-    // FAILED→PENDING reset succeeds (this request won the race)
     mockDb.update
       .mockReturnValueOnce(updateReturning([{ id: 'idem-1' }]))
-      // PROCESSING update after successful checkout
       .mockReturnValueOnce(updateSimple());
 
-    mockCreateSelfServiceOrder.mockResolvedValue({ ok: true, orderId: 'order-1' });
-    mockCreateZiinaCheckoutSession.mockResolvedValue({
+    mockCreateCreditPurchaseCheckout.mockResolvedValue({
       ok: true,
+      creditPurchaseId: 'cp-1',
       redirectUrl: 'https://pay.ziina.com/z',
-      paymentId: 'pay-1',
     });
 
-    await actionInitiateCheckout('pkg-1', 'user@example.com').catch(() => {});
+    await actionInitiateCheckout('pkg-1').catch(() => {});
 
-    expect(mockCreateSelfServiceOrder).toHaveBeenCalledOnce();
+    expect(mockCreateCreditPurchaseCheckout).toHaveBeenCalledOnce();
     expect(mockRedirect).toHaveBeenCalledWith('https://pay.ziina.com/z');
   });
 
   it('returns conflict error when concurrent request wins the FAILED slot reset', async () => {
-    // Another concurrent request already reset the FAILED slot — our conditional UPDATE
-    // returns 0 rows. We must not proceed; ask user to retry.
     mockDb.insert.mockReturnValueOnce(insertConflict([]));
     mockDb.select.mockReturnValueOnce(
       selectFromWhere([{ status: 'FAILED', response_payload: null }]),
     );
-    // FAILED→PENDING reset: returns empty = another request won
     mockDb.update.mockReturnValueOnce(updateReturning([]));
 
-    const result = await actionInitiateCheckout('pkg-1', 'user@example.com');
+    const result = await actionInitiateCheckout('pkg-1');
 
     expect(result).toEqual({ ok: false, reason: expect.stringContaining('conflict') });
-    expect(mockCreateSelfServiceOrder).not.toHaveBeenCalled();
+    expect(mockCreateCreditPurchaseCheckout).not.toHaveBeenCalled();
   });
 
   // ─── Happy path ────────────────────────────────────────────────────────────
 
-  it('creates order, calls Ziina, stores PROCESSING key, and redirects on success', async () => {
+  it('calls createCreditPurchaseCheckout, stores PROCESSING key, and redirects on success', async () => {
     mockDb.insert.mockReturnValueOnce(insertConflict([{ id: 'idem-1' }]));
     mockDb.update.mockReturnValueOnce(updateSimple()); // PROCESSING update
-    mockCreateSelfServiceOrder.mockResolvedValue({ ok: true, orderId: 'order-1' });
-    mockCreateZiinaCheckoutSession.mockResolvedValue({
+
+    mockCreateCreditPurchaseCheckout.mockResolvedValue({
       ok: true,
+      creditPurchaseId: 'cp-1',
       redirectUrl: 'https://pay.ziina.com/z',
-      paymentId: 'pay-1',
     });
 
-    await actionInitiateCheckout('pkg-1', 'user@example.com').catch(() => {});
+    await actionInitiateCheckout('pkg-1').catch(() => {});
 
-    expect(mockCreateSelfServiceOrder).toHaveBeenCalledWith(
-      expect.objectContaining({ pkgId: 'pkg-1', contactEmail: 'user@example.com' }),
+    expect(mockCreateCreditPurchaseCheckout).toHaveBeenCalledWith(
+      expect.objectContaining({
+        creditPackageId: 'pkg-1',
+        organizationId: 'org-test',
+        actorId: null,
+      }),
     );
-    expect(mockCreateZiinaCheckoutSession).toHaveBeenCalledOnce();
     expect(mockRedirect).toHaveBeenCalledWith('https://pay.ziina.com/z');
   });
 
-  // ─── Stranded PENDING cleanup ──────────────────────────────────────────────
+  // ─── Failure cleanup ───────────────────────────────────────────────────────
 
-  it('marks idempotency key FAILED when order creation fails', async () => {
+  it('marks idempotency key FAILED when credit purchase checkout fails', async () => {
     mockDb.insert.mockReturnValueOnce(insertConflict([{ id: 'idem-1' }]));
     mockDb.update.mockReturnValueOnce(updateSimple()); // FAILED update
-    mockCreateSelfServiceOrder.mockResolvedValue({ ok: false, reason: 'Package not found' });
+    mockCreateCreditPurchaseCheckout.mockResolvedValue({ ok: false, reason: 'Package not found' });
 
-    const result = await actionInitiateCheckout('pkg-1', 'user@example.com');
+    const result = await actionInitiateCheckout('pkg-1');
 
     expect(result).toEqual({ ok: false, reason: 'Package not found' });
-    // DB update must be called to mark the key FAILED (prevents permanent PENDING strand)
     expect(mockDb.update).toHaveBeenCalledOnce();
-    expect(mockCreateZiinaCheckoutSession).not.toHaveBeenCalled();
   });
 
-  it('marks idempotency key FAILED when Ziina session creation fails', async () => {
+  it('marks idempotency key FAILED when Ziina is unavailable', async () => {
     mockDb.insert.mockReturnValueOnce(insertConflict([{ id: 'idem-1' }]));
     mockDb.update.mockReturnValueOnce(updateSimple()); // FAILED update
-    mockCreateSelfServiceOrder.mockResolvedValue({ ok: true, orderId: 'order-1' });
-    mockCreateZiinaCheckoutSession.mockResolvedValue({ ok: false, reason: 'Ziina unavailable' });
+    mockCreateCreditPurchaseCheckout.mockResolvedValue({ ok: false, reason: 'Ziina unavailable' });
 
-    const result = await actionInitiateCheckout('pkg-1', 'user@example.com');
+    const result = await actionInitiateCheckout('pkg-1');
 
     expect(result).toEqual({ ok: false, reason: 'Ziina unavailable' });
     expect(mockDb.update).toHaveBeenCalledOnce();

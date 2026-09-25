@@ -37,14 +37,6 @@ const SERVICES = [
   },
 ] as const;
 
-const WHY_ITEMS = [
-  "Global Mindset",
-  "AI-Powered Production",
-  "Scalable for Any Business",
-  "Fast & Reliable Delivery",
-  "Creative Excellence",
-  "Dedicated Support",
-];
 
 const INDUSTRIES = [
   "Startups",
@@ -103,7 +95,7 @@ export default function HomePage() {
           <p className={styles.heroLocation}>Dubai, UAE · Global</p>
         </div>
 
-        {/* Right: cinematic image panel */}
+        {/* Right: static background panel */}
         <div className={styles.heroRight} aria-hidden="true">
           <Image
             src="/images/drexonyx-creative-crew-hero.png"
@@ -117,12 +109,6 @@ export default function HomePage() {
           <div className={styles.heroCred}>
             <span className={styles.heroCredCity}>Dubai</span>
             <span className={styles.heroCredSub}>A Global Stage<br />for Bolder Ideas</span>
-          </div>
-          <div className={styles.heroPlay}>
-            <span className={styles.heroPlayRing}>
-              <span className={styles.heroPlayIcon}>▶</span>
-            </span>
-            <span className={styles.heroPlayLabel}>Watch Our Story</span>
           </div>
         </div>
       </section>
@@ -192,6 +178,18 @@ export default function HomePage() {
                         sizes="(max-width: 900px) 100vw, (max-width: 1200px) 65vw, 800px"
                       />
                     )}
+                    {item.mediaType === 'video' && item.src && (
+                      <video
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        preload="none"
+                        className={styles.featuredCardVideo}
+                      >
+                        <source src={item.src} type="video/mp4" />
+                      </video>
+                    )}
                     <div className={styles.featuredCardOverlay} />
                     <div className={styles.featuredCardText}>
                       <p className={styles.featuredCategory}>{item.category}</p>
@@ -237,38 +235,76 @@ export default function HomePage() {
 
       {/* ── Why DREXONYX ──────────────────────────────────────────────── */}
       <section className={styles.why} aria-labelledby="why-heading">
-        <div className={styles.whyGrid}>
-          <div className={styles.whyLeft}>
-            <p className={styles.sectionEyebrow}>Why DREXONYX</p>
+        <div className={styles.whyBg} aria-hidden="true">
+          <Image
+            src="/images/drexonyx-hero-final.webp"
+            alt=""
+            fill
+            className={styles.whyImg}
+            sizes="100vw"
+          />
+          <div className={styles.whyOverlay} />
+        </div>
+        <div className="container">
+          <div className={styles.whyContent}>
+            <div className={styles.whyEyebrowRow}>
+              <p className={styles.sectionEyebrow}>Why DREXONYX</p>
+              <div className={styles.whyEyebrowLine} aria-hidden="true" />
+            </div>
             <h2 id="why-heading" className={styles.whyHeading}>
-              More Than Content.<br />A Global Creative Partner.
+              AI Speed.<br />
+              <span className={styles.whyHeadingAccent}>Human Creative<br />Direction.</span>
             </h2>
             <p className={styles.whyBody}>
-              DREXONYX combines AI-assisted production, creative strategy, and rigorous QC
-              into one studio built specifically for performance UGC advertising.
-              Dubai-based and globally active.
+              AI-assisted production built for UGC that looks intentional — not generated.
             </p>
-            <Link href="/start-project" className={styles.ctaPrimary}>
+            <ul className={styles.whyFeatures}>
+              <li className={styles.whyFeature}>
+                <div className={styles.whyFeatureIcon} aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <rect x="2" y="10" width="3.5" height="8" rx="0.5" stroke="currentColor" strokeWidth="1.5" />
+                    <rect x="8.25" y="6" width="3.5" height="12" rx="0.5" stroke="currentColor" strokeWidth="1.5" />
+                    <rect x="14.5" y="2" width="3.5" height="16" rx="0.5" stroke="currentColor" strokeWidth="1.5" />
+                  </svg>
+                </div>
+                <div className={styles.whyFeatureContent}>
+                  <span className={styles.whyFeatureNum}>01</span>
+                  <p className={styles.whyFeatureTitle}>UGC That Sells</p>
+                  <p className={styles.whyFeatureDesc}>Creator-led creative designed around hooks, benefits and conversion.</p>
+                </div>
+              </li>
+              <li className={styles.whyFeature}>
+                <div className={styles.whyFeatureIcon} aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <rect x="1.5" y="5.5" width="11" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.5" />
+                    <path d="M12.5 8.5L18 6v8l-5.5-2.5V8.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+                  </svg>
+                </div>
+                <div className={styles.whyFeatureContent}>
+                  <span className={styles.whyFeatureNum}>02</span>
+                  <p className={styles.whyFeatureTitle}>Cinematic When It Matters</p>
+                  <p className={styles.whyFeatureDesc}>Premium visual storytelling when the product needs more than standard UGC.</p>
+                </div>
+              </li>
+              <li className={styles.whyFeature}>
+                <div className={styles.whyFeatureIcon} aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <circle cx="7" cy="7" r="2.75" stroke="currentColor" strokeWidth="1.5" />
+                    <circle cx="13" cy="7" r="2.75" stroke="currentColor" strokeWidth="1.5" />
+                    <path d="M1 17c0-3.314 2.686-5.5 6-5.5h.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                    <path d="M19 17c0-3.314-2.686-5.5-6-5.5H8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                  </svg>
+                </div>
+                <div className={styles.whyFeatureContent}>
+                  <span className={styles.whyFeatureNum}>03</span>
+                  <p className={styles.whyFeatureTitle}>Built for Brands</p>
+                  <p className={styles.whyFeatureDesc}>Fast production, consistent quality, and creative built around the brief.</p>
+                </div>
+              </li>
+            </ul>
+            <Link href="/start-project" className={styles.whyCta}>
               Start Your Project →
             </Link>
-          </div>
-          <div className={styles.whyRight} aria-hidden="true">
-            <Image
-              src="/images/drexonyx-hero-final.webp"
-              alt=""
-              fill
-              className={styles.whyImg}
-              sizes="50vw"
-            />
-            <div className={styles.whyOverlay} />
-            <ul className={styles.whyChecklist}>
-              {WHY_ITEMS.map((item) => (
-                <li key={item} className={styles.whyCheckItem}>
-                  <span className={styles.whyCheckMark}>✓</span>
-                  {item}
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
       </section>

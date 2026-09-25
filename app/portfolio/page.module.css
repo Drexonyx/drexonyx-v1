@@ -40,6 +40,29 @@
   z-index: 0;
 }
 
+.heroImgWrap {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 55%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.heroImg {
+  object-fit: cover;
+  object-position: 55% center;
+}
+
+.heroImgFade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(to right, var(--drex-bg) 0%, transparent 40%);
+}
+
 .heroContent {
   position: relative;
   z-index: 1;
@@ -276,6 +299,27 @@
 
 .portfolioCard:hover .cardImg {
   transform: scale(1.03);
+}
+
+/* Inline autoplay video — fills card media zone like the thumbnail image */
+.cardVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Invisible click target over autoplay video — opens lightbox on click */
+.expandButton {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 2;
+  padding: 0;
 }
 
 /* Bottom-up gradient for badge legibility */

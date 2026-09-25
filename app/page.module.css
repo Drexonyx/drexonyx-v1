@@ -432,6 +432,15 @@
   transform: scale(1.04);
 }
 
+.featuredCardVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
 .featuredCardOverlay {
   position: absolute;
   inset: 0;
@@ -537,86 +546,162 @@
   line-height: 1.65;
 }
 
-/* ── Why DREXONYX: editorial two-panel ─────────────────────────────────── */
+/* ── Why DREXONYX: full-bleed cinematic overlay ─────────────────────────── */
 .why {
+  position: relative;
+  min-height: 580px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
   border-bottom: 1px solid var(--drex-border);
 }
 
-.whyGrid {
-  display: grid;
-  grid-template-columns: 44fr 56fr;
-  min-height: 560px;
-}
-
-.whyLeft {
-  background: var(--drex-surface);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 1.5rem;
-  padding: 5rem 4rem 5rem max(var(--drex-pad), calc((100vw - var(--drex-container)) / 2 + var(--drex-pad)));
-}
-
-.whyHeading {
-  font-size: clamp(1.75rem, 3vw, 2.5rem);
-  font-weight: 800;
-  letter-spacing: -0.035em;
-  color: var(--drex-text);
-  line-height: 1.15;
-}
-
-.whyBody {
-  font-size: 0.9375rem;
-  color: var(--drex-text-muted);
-  line-height: 1.75;
-  max-width: 42ch;
-}
-
-.whyRight {
-  position: relative;
-  overflow: hidden;
-  background: #060606;
+.whyBg {
+  position: absolute;
+  inset: 0;
 }
 
 .whyImg {
   object-fit: cover;
-  object-position: 65% center;
+  object-position: 68% center;
 }
 
 .whyOverlay {
   position: absolute;
   inset: 0;
-  background: rgba(6, 6, 6, 0.55);
-  z-index: 1;
+  background: linear-gradient(
+    to right,
+    rgba(6, 6, 6, 0.97) 0%,
+    rgba(6, 6, 6, 0.90) 26%,
+    rgba(6, 6, 6, 0.66) 48%,
+    rgba(6, 6, 6, 0.28) 68%,
+    rgba(6, 6, 6, 0.06) 86%,
+    transparent 100%
+  );
 }
 
-.whyChecklist {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
+.whyContent {
+  position: relative;
+  z-index: 1;
+  max-width: 540px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 1.125rem;
-  padding: 3rem 2.5rem;
-  list-style: none;
+  gap: 1.375rem;
+  padding: 3.5rem 0;
 }
 
-.whyCheckItem {
+.whyEyebrowRow {
   display: flex;
   align-items: center;
-  gap: 0.875rem;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.88);
-  letter-spacing: -0.01em;
+  gap: 1rem;
 }
 
-.whyCheckMark {
-  font-size: 0.75rem;
-  font-weight: 800;
+.whyEyebrowLine {
+  height: 1px;
+  width: 2.5rem;
+  background: var(--drex-accent);
+}
+
+.whyHeading {
+  font-size: clamp(1.875rem, 3vw, 2.75rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: #fff;
+  line-height: 1.08;
+}
+
+.whyHeadingAccent {
   color: var(--drex-accent);
+}
+
+.whyBody {
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.7;
+  max-width: 44ch;
+}
+
+.whyFeatures {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.whyFeature {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding: 0.8rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.whyFeature:last-child {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.whyFeatureIcon {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  color: var(--drex-accent);
+  background: rgba(255, 255, 255, 0.04);
+  margin-top: 0.125rem;
+}
+
+.whyFeatureContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.whyFeatureNum {
+  font-size: 0.5625rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  color: var(--drex-accent);
+  font-family: var(--font-geist-mono), monospace;
+}
+
+.whyFeatureTitle {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.whyFeatureDesc {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.52);
+  line-height: 1.65;
+}
+
+.whyCta {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  padding: 0.75rem 1.75rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #000;
+  background: var(--drex-accent);
+  border-radius: 8px;
+  transition: background var(--drex-duration) var(--drex-ease),
+    transform var(--drex-duration) var(--drex-ease),
+    box-shadow var(--drex-duration) var(--drex-ease);
+}
+
+.whyCta:hover {
+  background: var(--drex-accent-dim);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(200, 152, 10, 0.35);
 }
 
 /* ── Industries: horizontal strip ─────────────────────────────────────── */
@@ -767,24 +852,18 @@
     border-radius: 10px;
   }
 
-  .whyGrid {
-    grid-template-columns: 1fr;
-    min-height: auto;
+  .whyContent {
+    max-width: 100%;
+    padding: 3rem 0;
   }
 
-  .whyLeft {
-    padding: 4rem var(--drex-pad);
-    order: 2;
-  }
-
-  .whyRight {
-    order: 1;
-    height: 340px;
-  }
-
-  .whyChecklist {
-    padding: 2rem 1.5rem;
-    gap: 0.75rem;
+  .whyOverlay {
+    background: linear-gradient(
+      to right,
+      rgba(6, 6, 6, 0.97) 0%,
+      rgba(6, 6, 6, 0.90) 40%,
+      rgba(6, 6, 6, 0.70) 100%
+    );
   }
 
   .processSteps {
@@ -845,10 +924,6 @@
 
   .processStep:first-child {
     border-top: none;
-  }
-
-  .whyRight {
-    height: 280px;
   }
 
   .ctaBand {

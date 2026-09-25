@@ -4,11 +4,15 @@ import {
   text,
   timestamp,
   numeric,
+  bigint,
+  boolean,
+  integer,
   jsonb,
   check,
   foreignKey,
   index,
   primaryKey,
+  unique,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 import { uuidv7 } from 'uuidv7';
@@ -218,6 +222,175 @@ export const ownerSettlements = financialSchema.table(
     }),
     index('owner_settlements_org_idx').on(t.organization_id),
     index('owner_settlements_status_idx').on(t.status),
+  ],
+);
+
+// ─── Credit Packages ──────────────────────────────────────────────────────────
+// DR 0120: DREXONYX's global credit product catalog. Owner-managed via admin interface.
+// No organization FK — these are DREXONYX's products, not per-client entities.
+
+export const creditPackages = financialSchema.table(
+  'credit_packages',
+  {
+    id: uuid('id').primaryKey().$defaultFn(() => uuidv7()),
+    name: text('name').notNull(),
+    credits: bigint('credits', { mode: 'number' }).notNull(),
+    price_aed: numeric('price_aed', { precision: 19, scale: 4 }).notNull(),
+    is_active: boolean('is_active').notNull().default(true),
+    display_order: integer('display_order').notNull().default(0),
+    archived_at: timestamp('archived_at', { withTimezone: true }),
+    created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updated_at: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    check('credit_packages_credits_positive', sql`${t.credits} > 0`),
+    check('credit_packages_price_positive', sql`${t.price_aed} > 0`),
+    index('credit_packages_active_idx').on(t.is_active, t.display_order),
+  ],
+);
+
+// ─── Credit Purchases ─────────────────────────────────────────────────────────
+// DR 0120: Per-client-org credit purchase attempts.
+// Status lifecycle: PENDING → PROCESSING → COMPLETED | FAILED | REFUNDED
+
+export const creditPurchases = financialSchema.table(
+  'credit_purchases',
+  {
+    id: uuid('id').primaryKey().$defaultFn(() => uuidv7()),
+    organization_id: uuid('organization_id').notNull(),
+    credit_package_id: uuid('credit_package_id').notNull(),
+    credits: bigint('credits', { mode: 'number' }).notNull(),
+    amount_aed: numeric('amount_aed', { precision: 19, scale: 4 }).notNull(),
+    status: text('status').notNull().default('PENDING'),
+    provider_name: text('provider_name'),
+    provider_payment_id: text('provider_payment_id'),
+    idempotency_key: text('idempotency_key'),
+    failure_reason: text('failure_reason'),
+    paid_at: timestamp('paid_at', { withTimezone: true }),
+    refunded_at: timestamp('refunded_at', { withTimezone: true }),
+    created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updated_at: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    check(
+      'credit_purchases_status_check',
+      sql`${t.status} IN ('PENDING','PROCESSING','COMPLETED','FAILED','REFUNDED')`,
+    ),
+    check('credit_purchases_credits_positive', sql`${t.credits} > 0`),
+    check('credit_purchases_amount_positive', sql`${t.amount_aed} > 0`),
+    foreignKey({
+      columns: [t.organization_id],
+      foreignColumns: [organizations.id],
+      name: 'credit_purchases_organization_id_fk',
+    }),
+    foreignKey({
+      columns: [t.credit_package_id],
+      foreignColumns: [creditPackages.id],
+      name: 'credit_purchases_credit_package_id_fk',
+    }),
+    unique('credit_purchases_idempotency_key_unique').on(t.idempotency_key),
+    index('credit_purchases_org_idx').on(t.organization_id),
+    index('credit_purchases_status_idx').on(t.status),
+    index('credit_purchases_provider_id_idx').on(t.provider_payment_id),
+  ],
+);
+
+// ─── Customer Credit Ledger ───────────────────────────────────────────────────
+// DR 0120: Append-only. Authoritative source of truth for customer credit balances.
+// Balance = SUM(credits_delta) for a given organization_id.
+// Entry types:
+//   PURCHASE    +N  credits added after successful payment
+//   RESERVATION -N  credits locked before production starts
+//   RELEASE     +N  credits returned on production failure
+//   ADJUSTMENT  ±N  manual admin adjustment (with audit trail)
+//   REFUND      -N  credits removed on payment refund
+
+export const customerCreditLedger = financialSchema.table(
+  'customer_credit_ledger',
+  {
+    id: uuid('id').primaryKey().$defaultFn(() => uuidv7()),
+    organization_id: uuid('organization_id').notNull(),
+    entry_type: text('entry_type').notNull(),
+    credits_delta: bigint('credits_delta', { mode: 'number' }).notNull(),
+    reference_entity_type: text('reference_entity_type'),
+    reference_entity_id: uuid('reference_entity_id'),
+    idempotency_key: text('idempotency_key'),
+    description: text('description'),
+    actor_id: uuid('actor_id'),
+    actor_role: text('actor_role'),
+    created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    check(
+      'customer_credit_ledger_entry_type_check',
+      sql`${t.entry_type} IN ('PURCHASE','RESERVATION','RELEASE','ADJUSTMENT','REFUND')`,
+    ),
+    foreignKey({
+      columns: [t.organization_id],
+      foreignColumns: [organizations.id],
+      name: 'customer_credit_ledger_organization_id_fk',
+    }),
+    unique('customer_credit_ledger_idempotency_key_unique').on(t.idempotency_key),
+    index('customer_credit_ledger_org_idx').on(t.organization_id),
+    index('customer_credit_ledger_entry_type_idx').on(t.entry_type),
+    index('customer_credit_ledger_reference_idx').on(t.reference_entity_type, t.reference_entity_id),
+    index('customer_credit_ledger_created_at_idx').on(t.organization_id, t.created_at),
+  ],
+);
+
+// ─── Production Credit Events ────────────────────────────────────────────────
+// DR 0120: Internal-only append-only audit log for production credit economics.
+// Records cost guard evaluations, reserve usage, and runaway events per job.
+// NEVER exposed to customers — admin/owner visibility only.
+// This is not the customer credit ledger; it is the internal economic audit trail.
+
+export const productionCreditEvents = financialSchema.table(
+  'production_credit_events',
+  {
+    id: uuid('id').primaryKey().$defaultFn(() => uuidv7()),
+    organization_id: uuid('organization_id').notNull(),
+    production_job_id: uuid('production_job_id').notNull(),
+    // credits consumed at this evaluation point (cumulative for the job)
+    credits_consumed: bigint('credits_consumed', { mode: 'number' }).notNull(),
+    // internal economic assessment
+    warning_level: text('warning_level').notNull().default('NORMAL'),
+    // AED rate used (derived from package tier at time of evaluation)
+    credit_rate_aed: numeric('credit_rate_aed', { precision: 19, scale: 8 }).notNull(),
+    // estimated AED cost at this evaluation
+    estimated_aed: numeric('estimated_aed', { precision: 19, scale: 4 }).notNull(),
+    // internal cost target for this production
+    cost_target_aed: numeric('cost_target_aed', { precision: 19, scale: 4 }).notNull(),
+    // internal safety reserve
+    safety_reserve_aed: numeric('safety_reserve_aed', { precision: 19, scale: 4 }).notNull(),
+    // hard runaway limit at evaluation time
+    hard_limit_aed: numeric('hard_limit_aed', { precision: 19, scale: 4 }).notNull(),
+    // credits that triggered this event (one of: PRODUCTION_START, RETRY, QC_FAIL, COMPLETION, RUNAWAY_REFUSED)
+    event_type: text('event_type').notNull(),
+    // whether production was allowed to proceed
+    proceeded: boolean('proceeded').notNull().default(true),
+    // internal audit note
+    reason: text('reason'),
+    created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    check(
+      'production_credit_events_warning_level_check',
+      sql`${t.warning_level} IN ('NORMAL','RESERVE_USED','OVER_TARGET','RUNAWAY')`,
+    ),
+    check(
+      'production_credit_events_event_type_check',
+      sql`${t.event_type} IN ('PRODUCTION_START','RETRY','QC_FAIL','COMPLETION','RUNAWAY_REFUSED')`,
+    ),
+    foreignKey({
+      columns: [t.organization_id],
+      foreignColumns: [organizations.id],
+      name: 'production_credit_events_organization_id_fk',
+    }),
+    index('production_credit_events_org_idx').on(t.organization_id),
+    index('production_credit_events_job_idx').on(t.production_job_id),
+    index('production_credit_events_warning_idx').on(t.warning_level),
+    index('production_credit_events_event_type_idx').on(t.event_type),
+    index('production_credit_events_created_at_idx').on(t.organization_id, t.created_at),
   ],
 );
 
