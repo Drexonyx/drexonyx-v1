@@ -8,6 +8,8 @@ import {
   getAdminCreditPurchases,
   getAdminCreditLedger,
   getAdminCreditPackages,
+  getAdminProductionCreditEvents,
+  getAdminCreditEconomicsSummary,
 } from '@/lib/admin/queries';
 import { CreditAdjustForm } from './CreditAdjustForm';
 import s from '../admin.module.css';
@@ -20,11 +22,13 @@ export default async function AdminCreditsPage() {
 
   const canAdjust = session.role === 'OWNER' || session.role === 'ADMIN_OPERATIONS';
 
-  const [balance, purchases, ledger, packages] = await Promise.all([
+  const [balance, purchases, ledger, packages, economicEvents, economicsSummary] = await Promise.all([
     getAdminCreditBalance(session.organizationId),
     getAdminCreditPurchases(session.organizationId),
     getAdminCreditLedger(session.organizationId),
     getAdminCreditPackages(),
+    getAdminProductionCreditEvents(session.organizationId, 50),
+    getAdminCreditEconomicsSummary(session.organizationId),
   ]);
 
   return (
@@ -63,6 +67,91 @@ export default async function AdminCreditsPage() {
           <div style={{ marginBottom: '2rem', padding: '1.25rem', background: 'var(--drex-surface-2)', borderRadius: 8, border: '1px solid var(--drex-border)' }}>
             <CreditAdjustForm />
           </div>
+        </>
+      )}
+
+      {/* INTERNAL: Production economics summary — not visible to customers */}
+      {canAdjust && (
+        <>
+          <h2 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--drex-text)', marginBottom: '0.5rem' }}>
+            Internal Economics (Owner / Ops only)
+          </h2>
+          <p style={{ fontSize: '0.75rem', color: 'var(--drex-text-muted)', marginBottom: '0.75rem' }}>
+            Internal cost guard events. Never exposed to customers. Provider costs are UNKNOWN — figures are internal operating targets only.
+          </p>
+          <div className={s.statGrid} style={{ marginBottom: '1.25rem' }}>
+            <div className={s.statCard}>
+              <div className={s.statLabel}>Total Guard Events</div>
+              <div className={s.statValue}>{economicsSummary.totalEvents}</div>
+            </div>
+            <div className={s.statCard}>
+              <div className={s.statLabel}>Reserve Used</div>
+              <div className={s.statValue}>{economicsSummary.reserveUsedEvents}</div>
+            </div>
+            <div className={s.statCard}>
+              <div className={s.statLabel}>Over Target</div>
+              <div className={s.statValue}>{economicsSummary.overTargetEvents}</div>
+            </div>
+            <div className={s.statCard}>
+              <div className={s.statLabel}>Runaway Refused</div>
+              <div className={s.statValue}>{economicsSummary.refusedProductions}</div>
+            </div>
+          </div>
+
+          {economicEvents.length > 0 && (
+            <div className={s.tableWrap} style={{ marginBottom: '2rem' }}>
+              <table className={s.table}>
+                <thead>
+                  <tr>
+                    <th>Job</th>
+                    <th>Event</th>
+                    <th>Warning</th>
+                    <th>Credits</th>
+                    <th>Est AED</th>
+                    <th>Target AED</th>
+                    <th>Proceeded</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {economicEvents.map((e) => (
+                    <tr key={e.id}>
+                      <td className={s.cellMono}>{e.production_job_id.slice(0, 8)}…</td>
+                      <td>
+                        <span className={`${s.badge} ${s.badgeNeutral}`}>{e.event_type}</span>
+                      </td>
+                      <td>
+                        <span
+                          className={`${s.badge} ${
+                            e.warning_level === 'NORMAL'
+                              ? s.badgeSuccess
+                              : e.warning_level === 'RESERVE_USED'
+                              ? s.badgeWarning
+                              : e.warning_level === 'OVER_TARGET'
+                              ? s.badgeWarning
+                              : s.badgeDanger
+                          }`}
+                        >
+                          {e.warning_level}
+                        </span>
+                      </td>
+                      <td className={s.cellMono}>{Number(e.credits_consumed).toLocaleString('en-US')}</td>
+                      <td className={s.cellMono}>{Number(e.estimated_aed).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                      <td className={s.cellMono}>{Number(e.cost_target_aed).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                      <td>
+                        <span className={`${s.badge} ${e.proceeded ? s.badgeSuccess : s.badgeDanger}`}>
+                          {e.proceeded ? 'Yes' : 'No'}
+                        </span>
+                      </td>
+                      <td className={s.cellMono}>
+                        {e.created_at ? new Date(e.created_at).toLocaleDateString() : '—'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </>
       )}
 

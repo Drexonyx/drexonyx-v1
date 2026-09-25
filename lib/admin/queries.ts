@@ -3,7 +3,7 @@ import { db } from '@/db/index';
 import { organizations } from '@/db/schema/core';
 import { users, orgMemberships } from '@/db/schema/identity';
 import { campaigns, quotes, orders, orderBudgets, pricingConfigs, inquiries, briefs } from '@/db/schema/commercial';
-import { payments, financialLedger, expenses, creditPackages, creditPurchases, customerCreditLedger } from '@/db/schema/financial';
+import { payments, financialLedger, expenses, creditPackages, creditPurchases, customerCreditLedger, productionCreditEvents } from '@/db/schema/financial';
 import { assets, qcReviews, approvals, deliveries, productionJobs, aiGenerations, deliveryAssets } from '@/db/schema/production';
 import { auditEvents } from '@/db/schema/system';
 
@@ -519,4 +519,76 @@ export async function getAdminCreditBalance(organizationId: string): Promise<num
     .from(customerCreditLedger)
     .where(eq(customerCreditLedger.organization_id, organizationId));
   return parseInt(rows[0]?.total ?? '0', 10);
+}
+
+// DR 0120: Internal production credit economics — admin/owner only.
+// Returns the most recent production credit events (internal cost guard audit log).
+// NEVER expose to customer-facing APIs.
+export async function getAdminProductionCreditEvents(organizationId: string, limit = 100) {
+  return db
+    .select({
+      id: productionCreditEvents.id,
+      production_job_id: productionCreditEvents.production_job_id,
+      credits_consumed: productionCreditEvents.credits_consumed,
+      warning_level: productionCreditEvents.warning_level,
+      credit_rate_aed: productionCreditEvents.credit_rate_aed,
+      estimated_aed: productionCreditEvents.estimated_aed,
+      cost_target_aed: productionCreditEvents.cost_target_aed,
+      safety_reserve_aed: productionCreditEvents.safety_reserve_aed,
+      hard_limit_aed: productionCreditEvents.hard_limit_aed,
+      event_type: productionCreditEvents.event_type,
+      proceeded: productionCreditEvents.proceeded,
+      reason: productionCreditEvents.reason,
+      created_at: productionCreditEvents.created_at,
+    })
+    .from(productionCreditEvents)
+    .where(eq(productionCreditEvents.organization_id, organizationId))
+    .orderBy(desc(productionCreditEvents.created_at))
+    .limit(limit);
+}
+
+// DR 0120: Internal credit economics summary for admin dashboard.
+// Returns aggregate counts for each warning level and refused productions.
+export async function getAdminCreditEconomicsSummary(organizationId: string) {
+  const [
+    totalEventsRows,
+    warningRows,
+    reserveRows,
+    overTargetRows,
+    runawyRows,
+    refusedRows,
+  ] = await Promise.all([
+    db
+      .select({ count: sql<string>`COUNT(*)` })
+      .from(productionCreditEvents)
+      .where(eq(productionCreditEvents.organization_id, organizationId)),
+    db
+      .select({ count: sql<string>`COUNT(*)` })
+      .from(productionCreditEvents)
+      .where(and(eq(productionCreditEvents.organization_id, organizationId), eq(productionCreditEvents.warning_level, 'RESERVE_USED'))),
+    db
+      .select({ count: sql<string>`COUNT(*)` })
+      .from(productionCreditEvents)
+      .where(and(eq(productionCreditEvents.organization_id, organizationId), eq(productionCreditEvents.warning_level, 'RESERVE_USED'))),
+    db
+      .select({ count: sql<string>`COUNT(*)` })
+      .from(productionCreditEvents)
+      .where(and(eq(productionCreditEvents.organization_id, organizationId), eq(productionCreditEvents.warning_level, 'OVER_TARGET'))),
+    db
+      .select({ count: sql<string>`COUNT(*)` })
+      .from(productionCreditEvents)
+      .where(and(eq(productionCreditEvents.organization_id, organizationId), eq(productionCreditEvents.warning_level, 'RUNAWAY'))),
+    db
+      .select({ count: sql<string>`COUNT(*)` })
+      .from(productionCreditEvents)
+      .where(and(eq(productionCreditEvents.organization_id, organizationId), eq(productionCreditEvents.proceeded, false))),
+  ]);
+
+  return {
+    totalEvents: parseInt(totalEventsRows[0]?.count ?? '0', 10),
+    reserveUsedEvents: parseInt(reserveRows[0]?.count ?? '0', 10),
+    overTargetEvents: parseInt(overTargetRows[0]?.count ?? '0', 10),
+    runawyEvents: parseInt(runawyRows[0]?.count ?? '0', 10),
+    refusedProductions: parseInt(refusedRows[0]?.count ?? '0', 10),
+  };
 }

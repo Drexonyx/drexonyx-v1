@@ -338,6 +338,62 @@ export const customerCreditLedger = financialSchema.table(
   ],
 );
 
+// ─── Production Credit Events ────────────────────────────────────────────────
+// DR 0120: Internal-only append-only audit log for production credit economics.
+// Records cost guard evaluations, reserve usage, and runaway events per job.
+// NEVER exposed to customers — admin/owner visibility only.
+// This is not the customer credit ledger; it is the internal economic audit trail.
+
+export const productionCreditEvents = financialSchema.table(
+  'production_credit_events',
+  {
+    id: uuid('id').primaryKey().$defaultFn(() => uuidv7()),
+    organization_id: uuid('organization_id').notNull(),
+    production_job_id: uuid('production_job_id').notNull(),
+    // credits consumed at this evaluation point (cumulative for the job)
+    credits_consumed: bigint('credits_consumed', { mode: 'number' }).notNull(),
+    // internal economic assessment
+    warning_level: text('warning_level').notNull().default('NORMAL'),
+    // AED rate used (derived from package tier at time of evaluation)
+    credit_rate_aed: numeric('credit_rate_aed', { precision: 19, scale: 8 }).notNull(),
+    // estimated AED cost at this evaluation
+    estimated_aed: numeric('estimated_aed', { precision: 19, scale: 4 }).notNull(),
+    // internal cost target for this production
+    cost_target_aed: numeric('cost_target_aed', { precision: 19, scale: 4 }).notNull(),
+    // internal safety reserve
+    safety_reserve_aed: numeric('safety_reserve_aed', { precision: 19, scale: 4 }).notNull(),
+    // hard runaway limit at evaluation time
+    hard_limit_aed: numeric('hard_limit_aed', { precision: 19, scale: 4 }).notNull(),
+    // credits that triggered this event (one of: PRODUCTION_START, RETRY, QC_FAIL, COMPLETION, RUNAWAY_REFUSED)
+    event_type: text('event_type').notNull(),
+    // whether production was allowed to proceed
+    proceeded: boolean('proceeded').notNull().default(true),
+    // internal audit note
+    reason: text('reason'),
+    created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    check(
+      'production_credit_events_warning_level_check',
+      sql`${t.warning_level} IN ('NORMAL','RESERVE_USED','OVER_TARGET','RUNAWAY')`,
+    ),
+    check(
+      'production_credit_events_event_type_check',
+      sql`${t.event_type} IN ('PRODUCTION_START','RETRY','QC_FAIL','COMPLETION','RUNAWAY_REFUSED')`,
+    ),
+    foreignKey({
+      columns: [t.organization_id],
+      foreignColumns: [organizations.id],
+      name: 'production_credit_events_organization_id_fk',
+    }),
+    index('production_credit_events_org_idx').on(t.organization_id),
+    index('production_credit_events_job_idx').on(t.production_job_id),
+    index('production_credit_events_warning_idx').on(t.warning_level),
+    index('production_credit_events_event_type_idx').on(t.event_type),
+    index('production_credit_events_created_at_idx').on(t.organization_id, t.created_at),
+  ],
+);
+
 // ─── Reserve Allocations (many-to-many) ───────────────────────────────────────
 // DR 0002 §5: Reserve + Owner Settlement many-to-many allocation.
 
