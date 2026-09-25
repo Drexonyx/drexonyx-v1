@@ -129,6 +129,7 @@ export async function actionStartProduction(
     description: `${pkg.name} production — ${creditCost} credits`,
     actorId: actorId ?? SYSTEM_ACTOR_ID,
     actorRole: 'OWNER',
+    creditAuthorized: true,
     ...(useAiGeneration
       ? { aiGenerationParams: { provider: aiProvider!, model: aiModel!, prompt: aiPrompt! } }
       : {}),
