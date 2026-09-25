@@ -174,7 +174,7 @@ export const CUSTOM_TIERS: CustomTier[] = [
   },
   {
     id: 'enterprise',
-    name: 'Custom Credits',
+    name: 'Custom Project',
     priceLabel: 'Custom Quote',
     description:
       'For luxury brands, large campaigns, multi-campaign programs, and institutional projects. Scoped and priced to your production requirements.',
