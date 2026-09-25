@@ -27,7 +27,8 @@ import type { FacebookPageTarget, FacebookContentType, FacebookPublishMode } fro
 const ALLOWED_PAGE_TARGETS: ReadonlySet<string> = new Set(['PAGE_1', 'PAGE_2']);
 
 export interface MarketingCampaignDelegationParams {
-  parentTaskId: string;
+  /** null when initiated directly from the admin UI (no parent agent task). */
+  parentTaskId: string | null;
   organizationId: string;
   initiatedByUserId: string;
   initiatorRole: Extract<InitiatorRole, 'OWNER' | 'ADMIN_OPERATIONS'>;

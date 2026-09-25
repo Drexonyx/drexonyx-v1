@@ -18,7 +18,8 @@ export type DelegationResult =
 // ── delegateSubTask ───────────────────────────────────────────────────────────
 
 export async function delegateSubTask(params: {
-  parentTaskId: string;
+  /** null for top-level admin-initiated tasks with no parent agent task. */
+  parentTaskId: string | null;
   organizationId: string;
   initiatedByUserId: string;
   initiatorRole: InitiatorRole;

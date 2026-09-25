@@ -49,7 +49,7 @@ vi.mock('../audit', () => ({
   auditBoundaryViolation: mockAuditBoundaryViolation,
 }));
 
-import { advanceTask } from '../runner';
+import { advanceTask, autoAdvanceTask } from '../runner';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -535,5 +535,95 @@ describe('advanceTask — task completion', () => {
     const result = await advanceTask(params);
     expect(result).toMatchObject({ ok: true, outcome: 'STEP_SUCCEEDED' });
     expect(mockExecuteSkillStep).toHaveBeenCalledOnce();
+  });
+});
+
+// ── autoAdvanceTask ───────────────────────────────────────────────────────────
+
+describe('autoAdvanceTask', () => {
+  const params = { taskId: 'task-001', organizationId: 'org-001' };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockAuditStepDispatched.mockResolvedValue(undefined);
+    mockAuditStepSucceeded.mockResolvedValue(undefined);
+    mockAuditStepFailed.mockResolvedValue(undefined);
+    mockAuditTaskCompleted.mockResolvedValue(undefined);
+    mockAuditTaskFailed.mockResolvedValue(undefined);
+  });
+
+  it('loops until TASK_COMPLETED and reports stepsAdvanced', async () => {
+    // 3-step plan: two STEP_SUCCEEDED then TASK_COMPLETED
+    let call = 0;
+    mockSelect.mockImplementation(() => {
+      call++;
+      // calls: load task, load steps (×3 iterations)
+      if (call === 1 || call === 3 || call === 5) return makeSelectChain([taskExecuting]);
+      if (call === 2) {
+        return makeSelectChain([{ ...pendingSkillStep, status: 'PENDING' }]);
+      }
+      if (call === 4) {
+        return makeSelectChain([{ ...pendingSkillStep, status: 'SUCCEEDED' }, { ...pendingSkillStep, id: 'step-2', step_index: 1, status: 'PENDING' }]);
+      }
+      // call === 6: all SUCCEEDED → TASK_COMPLETED
+      return makeSelectChain([
+        { ...pendingSkillStep, status: 'SUCCEEDED' },
+        { ...pendingSkillStep, id: 'step-2', step_index: 1, status: 'SUCCEEDED' },
+      ]);
+    });
+    mockUpdate.mockReturnValue(makeUpdateChain());
+    mockExecuteSkillStep.mockResolvedValue({ ok: true, output: {} });
+
+    const result = await autoAdvanceTask(params);
+    expect(result).toMatchObject({ ok: true, outcome: 'TASK_COMPLETED', stepsAdvanced: 3 });
+  });
+
+  it('stops at AWAITING_GATE and returns stepsAdvanced', async () => {
+    let call = 0;
+    mockSelect.mockImplementation(() => {
+      call++;
+      if (call % 2 === 1) return makeSelectChain([taskExecuting]);
+      if (call === 2) return makeSelectChain([{ ...pendingSkillStep, status: 'PENDING' }]);
+      // second advance: gate pending step
+      return makeSelectChain([
+        { ...pendingSkillStep, status: 'SUCCEEDED' },
+        { ...pendingSkillStep, id: 'gate-step', step_index: 1, step_type: 'HUMAN_GATE', status: 'GATE_PENDING' },
+      ]);
+    });
+    mockUpdate.mockReturnValue(makeUpdateChain());
+    mockExecuteSkillStep.mockResolvedValue({ ok: true, output: {} });
+
+    const result = await autoAdvanceTask(params);
+    expect(result).toMatchObject({ ok: true, outcome: 'AWAITING_GATE' });
+    expect((result as { stepsAdvanced: number }).stepsAdvanced).toBeGreaterThanOrEqual(1);
+  });
+
+  it('stops immediately on TASK_FAILED and propagates reason', async () => {
+    mockSelect.mockImplementation(() => makeSelectChain([taskExecuting]));
+    // advanceTask returns TASK_FAILED on first call
+    mockSelect
+      .mockReturnValueOnce(makeSelectChain([taskExecuting]))
+      .mockReturnValueOnce(makeSelectChain([{ ...pendingSkillStep, status: 'FAILED' }]));
+    mockUpdate.mockReturnValue(makeUpdateChain());
+
+    const result = await autoAdvanceTask(params);
+    expect(result).toMatchObject({ ok: false, outcome: 'TASK_FAILED' });
+    expect((result as { stepsAdvanced: number }).stepsAdvanced).toBe(0);
+  });
+
+  it('enforces maxSteps safety ceiling', async () => {
+    // Always returns STEP_SUCCEEDED — should hit ceiling
+    let call = 0;
+    mockSelect.mockImplementation(() => {
+      call++;
+      if (call % 2 === 1) return makeSelectChain([taskExecuting]);
+      return makeSelectChain([{ ...pendingSkillStep, status: 'PENDING' }]);
+    });
+    mockUpdate.mockReturnValue(makeUpdateChain());
+    mockExecuteSkillStep.mockResolvedValue({ ok: true, output: {} });
+
+    const result = await autoAdvanceTask({ ...params, maxSteps: 3 });
+    expect(result).toMatchObject({ ok: false, outcome: 'INVALID_STATE' });
+    expect((result as { stepsAdvanced: number }).stepsAdvanced).toBe(3);
   });
 });
