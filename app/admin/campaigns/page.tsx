@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { getAdminCampaigns } from '@/lib/admin/queries';
 import { CreateCampaignForm } from './CreateCampaignForm';
 import { LaunchFacebookPostForm } from './LaunchFacebookPostForm';
+import { DirectFacebookPublishForm } from './DirectFacebookPublishForm';
 import s from '../admin.module.css';
 
 export const metadata = { title: 'Campaigns — Admin' };
@@ -38,6 +39,18 @@ export default async function AdminCampaignsPage() {
             Publish to Facebook
           </h2>
           <LaunchFacebookPostForm campaigns={campaigns.map((c) => ({ id: c.id, name: c.name }))} />
+        </div>
+      )}
+
+      {canCreate && campaigns.length > 0 && (
+        <div style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ fontSize: '0.875rem', fontWeight: 700, marginBottom: '0.375rem', color: 'var(--drex-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            Direct Facebook Publish
+          </h2>
+          <p style={{ fontSize: '0.8rem', color: 'var(--drex-text-secondary)', marginBottom: '1rem', marginTop: 0 }}>
+            Skips AI review (qc.script.review, qc.brand.alignment). Runs Facebook policy check then publishes directly.
+          </p>
+          <DirectFacebookPublishForm campaigns={campaigns.map((c) => ({ id: c.id, name: c.name }))} />
         </div>
       )}
 
