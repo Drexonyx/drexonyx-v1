@@ -166,6 +166,11 @@ export async function actionAgentCampaignRun(formData: FormData): Promise<{
       campaignId = created.campaignId;
     }
 
+    const brandGuidelines =
+      preflight.strategyKeyMessages.length > 0
+        ? `DREXONYX is a premium video production studio. Key messages for this campaign: ${preflight.strategyKeyMessages.join(' | ')}. Campaign angles: ${preflight.strategyAngles.slice(0, 2).join(', ')}.`
+        : 'DREXONYX is a premium video production studio. Tone: professional, authoritative, and aspirational.';
+
     const delegation = await delegateMarketingCampaign({
       parentTaskId: null,
       organizationId: session.organizationId,
@@ -177,6 +182,7 @@ export async function actionAgentCampaignRun(formData: FormData): Promise<{
       pageTarget: preflight.pageTarget,
       placement: preflight.placement,
       publishMode: preflight.publishMode,
+      brandGuidelines,
       ...(preflight.scheduledAt ? { scheduledAt: preflight.scheduledAt } : {}),
       ...(preflight.headline ? { headline: preflight.headline } : {}),
     });
