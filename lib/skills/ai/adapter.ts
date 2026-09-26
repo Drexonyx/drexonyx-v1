@@ -44,6 +44,7 @@ export async function callAi(request: AiAdapterRequest): Promise<AiAdapterResult
         system_instruction: { parts: [{ text: request.systemPrompt }] },
         contents: [{ role: 'user', parts: [{ text: request.userPrompt }] }],
         generationConfig: {
+          responseMimeType: 'application/json',
           maxOutputTokens: request.maxTokens ?? 1600,
           candidateCount: 1,
         },
@@ -68,9 +69,14 @@ export async function callAi(request: AiAdapterRequest): Promise<AiAdapterResult
     }
 
     const data = await response.json() as {
-      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+      candidates?: Array<{
+        content?: { parts?: Array<{ text?: string; thought?: boolean }> };
+      }>;
     };
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+    const parts = data?.candidates?.[0]?.content?.parts ?? [];
+    // Gemini 2.5+ thinking models prepend thought:true reasoning parts before the
+    // actual response. Skip them to reach the generated text.
+    const text = parts.find(p => p.thought !== true && typeof p.text === 'string')?.text ?? '';
     if (!text) {
       return { ok: false, error: 'AI provider returned empty response', isTransient: false };
     }

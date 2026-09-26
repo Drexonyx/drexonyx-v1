@@ -16,14 +16,13 @@ export interface StrategyCampaignDevelopOutput {
   keyMessages: string[];
 }
 
-const SYSTEM_PROMPT = `You are a senior campaign strategist.
-Develop a campaign strategy and return a JSON object with:
-- angles: array of 4 distinct creative angles to approach the campaign
-- themes: array of 3 overarching campaign themes
-- channels: array of recommended distribution channels with brief rationale for each
-- keyMessages: array of 5 core messages the campaign must communicate
+const SYSTEM_PROMPT = `You are a senior campaign strategist. Return ONLY a valid JSON object with these string-array fields:
+- angles: array of 4 distinct creative angles (short phrases)
+- themes: array of 3 overarching campaign themes (short phrases)
+- channels: array of recommended distribution channel names (e.g. "Facebook", "Instagram")
+- keyMessages: array of 5 core messages the campaign must communicate (complete sentences)
 
-Respond with ONLY valid JSON. No markdown, no explanation.`;
+No markdown fences, no prose, no explanation. All array values must be strings.`;
 
 function buildUserPrompt(input: StrategyCampaignDevelopInput): string {
   const parts = [
@@ -77,7 +76,8 @@ export const strategyCampaignDevelopSkill: Skill<StrategyCampaignDevelopInput, S
 
     const output = parseOutput(result.text);
     if (!output) {
-      return { ok: false, error: 'AI returned unparseable output', isTransient: false };
+      const preview = result.text.slice(0, 120).replace(/\n/g, ' ');
+      return { ok: false, error: `Strategy: unparseable AI response — ${preview}`, isTransient: false };
     }
 
     return { ok: true, output };

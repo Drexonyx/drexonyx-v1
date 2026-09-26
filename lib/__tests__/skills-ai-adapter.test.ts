@@ -232,4 +232,73 @@ describe('callAi (Google Gemini)', () => {
     const body = JSON.parse((mockFetch.mock.calls[0] as [string, RequestInit])[1].body as string);
     expect(body.generationConfig.maxOutputTokens).toBe(512);
   });
+
+  it('sets responseMimeType to application/json in generationConfig', async () => {
+    mockSuccess('{"ok":true}');
+    await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    const body = JSON.parse((mockFetch.mock.calls[0] as [string, RequestInit])[1].body as string);
+    expect(body.generationConfig.responseMimeType).toBe('application/json');
+  });
+
+  it('skips thought:true parts and returns the actual response text', async () => {
+    const actualResponse = '{"angles":["a"],"themes":["t"],"channels":["Facebook"],"keyMessages":["m"]}';
+    mockFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        candidates: [{
+          content: {
+            parts: [
+              { thought: true, text: 'Let me think about this campaign strategy...' },
+              { text: actualResponse },
+            ],
+          },
+        }],
+      }),
+    });
+    const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.text).toBe(actualResponse);
+  });
+
+  it('returns ok:false when only thought:true parts are present (no actual response)', async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        candidates: [{
+          content: {
+            parts: [
+              { thought: true, text: 'Thinking about the strategy...' },
+            ],
+          },
+        }],
+      }),
+    });
+    const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.isTransient).toBe(false);
+  });
+
+  it('handles multiple thought parts before the actual response', async () => {
+    const actualResponse = '{"result":"value"}';
+    mockFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        candidates: [{
+          content: {
+            parts: [
+              { thought: true, text: 'First reasoning step...' },
+              { thought: true, text: 'Second reasoning step...' },
+              { text: actualResponse },
+            ],
+          },
+        }],
+      }),
+    });
+    const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.text).toBe(actualResponse);
+  });
 });
