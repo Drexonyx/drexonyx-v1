@@ -34,7 +34,7 @@ export default async function AdminCampaignsPage() {
               letterSpacing: '0.06em',
             }}
           >
-            Campaign Agent
+            Autonomous Campaign Agent
           </h2>
           <p
             style={{
@@ -44,9 +44,9 @@ export default async function AdminCampaignsPage() {
               marginTop: 0,
             }}
           >
-            Provide a brief and choose a path. The agent handles content QC, brand alignment, Facebook policy check, and publishing automatically.
+            Write a brief. The agent develops strategy, generates the caption, creates the campaign, runs content QC, brand alignment, and Facebook policy checks, then publishes automatically.
           </p>
-          <AgentCampaignForm campaigns={campaigns.map((c) => ({ id: c.id, name: c.name }))} />
+          <AgentCampaignForm />
         </div>
       )}
 
