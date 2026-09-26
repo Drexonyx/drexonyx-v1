@@ -1,6 +1,6 @@
 // DR 0073 §2.2: Sole location within lib/skills/ where any AI provider SDK or API key is accessed.
-// Provider: OpenRouter (OpenAI-compatible REST API).
-// DR 0073 §2.4: Model identifier read from SKILLS_AI_MODEL env var; default = openrouter/free.
+// Provider: Google Gemini (REST API via generativelanguage.googleapis.com).
+// DR 0073 §2.4: Model identifier read from SKILLS_AI_MODEL env var; default = gemini-2.5-flash.
 // DR 0073 §2.5: API key stored exclusively as server-side env var; never logged or returned to callers.
 // DR 0073 §2.6: Each skill.execute() makes at most ONE call to callAi().
 
@@ -14,44 +14,39 @@ export type AiAdapterResult =
   | { ok: true; text: string }
   | { ok: false; error: string; isTransient: boolean };
 
-const OPENROUTER_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions';
-const DEFAULT_MODEL = 'openrouter/free';
+const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
+const DEFAULT_MODEL = 'gemini-2.5-flash';
 
 // Redact any credential-like values from provider error strings before surfacing them.
 function redactCredentials(text: string): string {
   return text
-    .replace(/sk-or-[A-Za-z0-9_-]{10,}/g, '[REDACTED]')
+    .replace(/AIza[A-Za-z0-9_-]{30,}/g, '[REDACTED]')
     .replace(/Bearer\s+[A-Za-z0-9._-]{20,}/gi, 'Bearer [REDACTED]');
 }
 
 export async function callAi(request: AiAdapterRequest): Promise<AiAdapterResult> {
-  const apiKey = process.env.OPENROUTER_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    return { ok: false, error: 'OPENROUTER_API_KEY is not configured', isTransient: false };
+    return { ok: false, error: 'GEMINI_API_KEY is not configured', isTransient: false };
   }
 
-  // Normalize bare Anthropic model IDs (e.g. "claude-sonnet-4-6") to the
-  // OpenRouter provider-scoped format ("anthropic/claude-sonnet-4-6").
-  // IDs that already contain a "/" (e.g. "openrouter/free") are passed through unchanged.
-  const rawModel = process.env.SKILLS_AI_MODEL ?? DEFAULT_MODEL;
-  const model = rawModel.startsWith('claude-') && !rawModel.includes('/')
-    ? `anthropic/${rawModel}`
-    : rawModel;
+  const model = process.env.SKILLS_AI_MODEL ?? DEFAULT_MODEL;
+  const endpoint = `${GEMINI_BASE}/${model}:generateContent`;
 
   try {
-    const response = await fetch(OPENROUTER_ENDPOINT, {
+    const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
+        'x-goog-api-key': apiKey,
       },
       body: JSON.stringify({
-        model,
-        max_tokens: request.maxTokens ?? 1600,
-        messages: [
-          { role: 'system', content: request.systemPrompt },
-          { role: 'user', content: request.userPrompt },
-        ],
+        system_instruction: { parts: [{ text: request.systemPrompt }] },
+        contents: [{ role: 'user', parts: [{ text: request.userPrompt }] }],
+        generationConfig: {
+          maxOutputTokens: request.maxTokens ?? 1600,
+          candidateCount: 1,
+        },
       }),
     });
 
@@ -69,18 +64,13 @@ export async function callAi(request: AiAdapterRequest): Promise<AiAdapterResult
       } catch {
         // ignore JSON parse failure — detail already contains the status code
       }
-      // 402 = insufficient OpenRouter credits — surface a distinct prefix so callers
-      // can show a user-facing "top up your balance" message without parsing error text.
-      if (response.status === 402) {
-        return { ok: false, error: `AI credit limit reached: ${detail}`, isTransient: false };
-      }
       return { ok: false, error: `AI provider error (${detail})`, isTransient };
     }
 
     const data = await response.json() as {
-      choices?: Array<{ message?: { content?: string } }>;
+      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
     };
-    const text = data?.choices?.[0]?.message?.content ?? '';
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
     if (!text) {
       return { ok: false, error: 'AI provider returned empty response', isTransient: false };
     }

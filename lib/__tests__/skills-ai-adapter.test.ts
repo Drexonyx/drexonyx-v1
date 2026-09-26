@@ -10,8 +10,8 @@ import { callAi } from '../skills/ai/adapter';
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const BASE_ENV = {
-  OPENROUTER_API_KEY: 'sk-or-test-key-abcdefgh',
-  SKILLS_AI_MODEL: 'openrouter/free',
+  GEMINI_API_KEY: 'AIzaTestKeyAbcDefGhIjKlMnOpQrStUvWxYz0',
+  SKILLS_AI_MODEL: 'gemini-2.5-flash',
 };
 
 function setEnv(overrides: Record<string, string | undefined> = {}) {
@@ -26,7 +26,7 @@ function setEnv(overrides: Record<string, string | undefined> = {}) {
 }
 
 function clearEnv() {
-  delete process.env.OPENROUTER_API_KEY;
+  delete process.env.GEMINI_API_KEY;
   delete process.env.SKILLS_AI_MODEL;
 }
 
@@ -34,7 +34,9 @@ function mockSuccess(content: string) {
   mockFetch.mockResolvedValue({
     ok: true,
     status: 200,
-    json: async () => ({ choices: [{ message: { content } }] }),
+    json: async () => ({
+      candidates: [{ content: { parts: [{ text: content }] } }],
+    }),
   });
 }
 
@@ -48,7 +50,7 @@ function mockHttpError(status: number, message = 'error') {
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
-describe('callAi (OpenRouter)', () => {
+describe('callAi (Google Gemini)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     setEnv();
@@ -58,46 +60,30 @@ describe('callAi (OpenRouter)', () => {
     clearEnv();
   });
 
-  it('returns ok:false when OPENROUTER_API_KEY is missing', async () => {
-    setEnv({ OPENROUTER_API_KEY: undefined });
+  it('returns ok:false when GEMINI_API_KEY is missing', async () => {
+    setEnv({ GEMINI_API_KEY: undefined });
     const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.isTransient).toBe(false);
-      expect(result.error).toMatch(/OPENROUTER_API_KEY/);
+      expect(result.error).toMatch(/GEMINI_API_KEY/);
     }
   });
 
-  it('defaults to openrouter/free when SKILLS_AI_MODEL is not set', async () => {
+  it('defaults to gemini-2.5-flash when SKILLS_AI_MODEL is not set', async () => {
     setEnv({ SKILLS_AI_MODEL: undefined });
     mockSuccess('{"ok":true}');
     await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
-    const body = JSON.parse((mockFetch.mock.calls[0] as [string, RequestInit])[1].body as string);
-    expect(body.model).toBe('openrouter/free');
+    const url = (mockFetch.mock.calls[0] as [string, RequestInit])[0];
+    expect(url).toContain('gemini-2.5-flash');
   });
 
-  it('uses SKILLS_AI_MODEL env var as model (DR 0073 §2.4)', async () => {
-    setEnv({ SKILLS_AI_MODEL: 'meta-llama/llama-3.1-8b-instruct:free' });
+  it('uses SKILLS_AI_MODEL env var as the model in the request URL (DR 0073 §2.4)', async () => {
+    setEnv({ SKILLS_AI_MODEL: 'gemini-1.5-flash' });
     mockSuccess('text');
     await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
-    const body = JSON.parse((mockFetch.mock.calls[0] as [string, RequestInit])[1].body as string);
-    expect(body.model).toBe('meta-llama/llama-3.1-8b-instruct:free');
-  });
-
-  it('normalizes bare Anthropic model ID to OpenRouter provider-scoped format', async () => {
-    setEnv({ SKILLS_AI_MODEL: 'claude-sonnet-4-6' });
-    mockSuccess('text');
-    await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
-    const body = JSON.parse((mockFetch.mock.calls[0] as [string, RequestInit])[1].body as string);
-    expect(body.model).toBe('anthropic/claude-sonnet-4-6');
-  });
-
-  it('does not double-prefix an already scoped anthropic model ID', async () => {
-    setEnv({ SKILLS_AI_MODEL: 'anthropic/claude-sonnet-4-6' });
-    mockSuccess('text');
-    await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
-    const body = JSON.parse((mockFetch.mock.calls[0] as [string, RequestInit])[1].body as string);
-    expect(body.model).toBe('anthropic/claude-sonnet-4-6');
+    const url = (mockFetch.mock.calls[0] as [string, RequestInit])[0];
+    expect(url).toContain('gemini-1.5-flash');
   });
 
   it('returns ok:true with text on successful AI call', async () => {
@@ -114,13 +100,22 @@ describe('callAi (OpenRouter)', () => {
     expect(mockFetch).toHaveBeenCalledOnce();
   });
 
-  it('posts to the OpenRouter chat completions endpoint', async () => {
+  it('posts to the Gemini generateContent endpoint', async () => {
     mockSuccess('text');
     await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
     expect(mockFetch).toHaveBeenCalledWith(
-      'https://openrouter.ai/api/v1/chat/completions',
+      expect.stringContaining('generativelanguage.googleapis.com'),
       expect.objectContaining({ method: 'POST' }),
     );
+  });
+
+  it('sends the API key in the x-goog-api-key header, not in the URL', async () => {
+    mockSuccess('text');
+    await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    const [url, init] = mockFetch.mock.calls[0] as [string, RequestInit];
+    const headers = init.headers as Record<string, string>;
+    expect(headers['x-goog-api-key']).toBe(BASE_ENV.GEMINI_API_KEY);
+    expect(url).not.toContain(BASE_ENV.GEMINI_API_KEY);
   });
 
   it('never exposes the API key in the error message', async () => {
@@ -128,7 +123,7 @@ describe('callAi (OpenRouter)', () => {
     const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
     expect(result.ok).toBe(false);
     if (!result.ok) {
-      expect(result.error).not.toContain('sk-or-test-key-abcdefgh');
+      expect(result.error).not.toContain(BASE_ENV.GEMINI_API_KEY);
     }
   });
 
@@ -153,16 +148,6 @@ describe('callAi (OpenRouter)', () => {
     if (!result.ok) expect(result.isTransient).toBe(false);
   });
 
-  it('marks 402 as non-transient and prefixes error with "AI credit limit reached"', async () => {
-    mockHttpError(402, 'You requested up to 1024 tokens, but can only afford 800.');
-    const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
-    expect(result.ok).toBe(false);
-    if (!result.ok) {
-      expect(result.isTransient).toBe(false);
-      expect(result.error).toMatch(/^AI credit limit reached/);
-    }
-  });
-
   it('marks 401 unauthorized as non-transient', async () => {
     mockHttpError(401, 'unauthorized');
     const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
@@ -170,22 +155,29 @@ describe('callAi (OpenRouter)', () => {
     if (!result.ok) expect(result.isTransient).toBe(false);
   });
 
+  it('marks 403 forbidden as non-transient', async () => {
+    mockHttpError(403, 'forbidden');
+    const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.isTransient).toBe(false);
+  });
+
   it('includes status code in error message for HTTP errors', async () => {
-    mockHttpError(400, 'invalid_request_error: max_tokens too large');
+    mockHttpError(400, 'API key not valid. Please pass a valid API key.');
     const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.error).toContain('400');
-      expect(result.error).toContain('invalid_request_error');
+      expect(result.error).toContain('API key not valid');
     }
   });
 
-  it('redacts credential patterns from error messages', async () => {
-    mockHttpError(401, 'Invalid key sk-or-abcdefghijklmnopqrstuvwxyz provided');
+  it('redacts Gemini API key patterns from error messages', async () => {
+    mockHttpError(401, 'Invalid key AIzaAbcDefGhIjKlMnOpQrStUvWxYz01234 provided');
     const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
     expect(result.ok).toBe(false);
     if (!result.ok) {
-      expect(result.error).not.toContain('sk-or-abcdefghijklmnopqrstuvwxyz');
+      expect(result.error).not.toContain('AIzaAbcDefGhIjKlMnOpQrStUvWxYz01234');
       expect(result.error).toContain('[REDACTED]');
     }
   });
@@ -201,33 +193,43 @@ describe('callAi (OpenRouter)', () => {
     mockFetch.mockResolvedValue({
       ok: true,
       status: 200,
-      json: async () => ({ choices: [{ message: { content: '' } }] }),
+      json: async () => ({ candidates: [{ content: { parts: [{ text: '' }] } }] }),
     });
     const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
     expect(result.ok).toBe(false);
   });
 
-  it('sends system and user messages in the request body', async () => {
+  it('returns ok:false for missing candidates in response', async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ candidates: [] }),
+    });
+    const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    expect(result.ok).toBe(false);
+  });
+
+  it('sends system_instruction and user contents in the request body', async () => {
     mockSuccess('response');
     await callAi({ systemPrompt: 'system instruction', userPrompt: 'user query' });
     const body = JSON.parse((mockFetch.mock.calls[0] as [string, RequestInit])[1].body as string);
-    expect(body.messages).toEqual([
-      { role: 'system', content: 'system instruction' },
-      { role: 'user', content: 'user query' },
+    expect(body.system_instruction.parts[0].text).toBe('system instruction');
+    expect(body.contents).toEqual([
+      { role: 'user', parts: [{ text: 'user query' }] },
     ]);
   });
 
-  it('defaults max_tokens to 1600 when no override is given', async () => {
+  it('defaults maxOutputTokens to 1600 when no override is given', async () => {
     mockSuccess('response');
     await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
     const body = JSON.parse((mockFetch.mock.calls[0] as [string, RequestInit])[1].body as string);
-    expect(body.max_tokens).toBe(1600);
+    expect(body.generationConfig.maxOutputTokens).toBe(1600);
   });
 
   it('respects per-call maxTokens override', async () => {
     mockSuccess('response');
     await callAi({ systemPrompt: 'sys', userPrompt: 'user', maxTokens: 512 });
     const body = JSON.parse((mockFetch.mock.calls[0] as [string, RequestInit])[1].body as string);
-    expect(body.max_tokens).toBe(512);
+    expect(body.generationConfig.maxOutputTokens).toBe(512);
   });
 });
