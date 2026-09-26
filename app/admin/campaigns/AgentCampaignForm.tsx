@@ -1,11 +1,17 @@
 'use client';
 
 // Agent-first campaign interface.
-// 'full-qc' path: user writes a natural-language brief; the agent autonomously develops
-//   strategy, generates caption/headline, derives page/placement/schedule from the brief,
-//   then runs: qc.script.review → qc.brand.alignment → qc.facebook_policy.check → facebook.page.publish
-// 'direct' path: user writes the final caption manually; agent runs:
-//   qc.facebook_policy.check → facebook.page.publish (no AI QC, no generation)
+//
+// 'full-qc' (Autonomous Agent):
+//   User writes a natural-language brief → submit.
+//   The agent does everything: parse brief → strategy → caption/headline →
+//   auto-create campaign → qc.script.review → qc.brand.alignment →
+//   qc.facebook_policy.check → facebook.page.publish → NOTIFICATION.
+//   No campaign selection, no page/placement/schedule inputs — all derived from brief.
+//
+// 'direct' (Direct Publish):
+//   User selects/creates campaign, writes caption, sets publish options manually.
+//   Agent runs qc.facebook_policy.check → facebook.page.publish only.
 
 import { useState } from 'react';
 import { actionAgentCampaignRun } from './actions';
@@ -44,6 +50,7 @@ export function AgentCampaignForm({ campaigns }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [generatedCaption, setGeneratedCaption] = useState<string | null>(null);
+  const [generatedCampaignName, setGeneratedCampaignName] = useState<string | null>(null);
   const [agentPath, setAgentPath] = useState<AgentPath>('full-qc');
   const [campaignMode, setCampaignMode] = useState<CampaignMode>(
     campaigns.length > 0 ? 'existing' : 'new',
@@ -56,6 +63,7 @@ export function AgentCampaignForm({ campaigns }: Props) {
     setError(null);
     setSuccess(null);
     setGeneratedCaption(null);
+    setGeneratedCampaignName(null);
 
     const form = e.currentTarget;
     const result = await actionAgentCampaignRun(new FormData(form));
@@ -68,14 +76,13 @@ export function AgentCampaignForm({ campaigns }: Props) {
             ? 'Blocked — awaiting approval'
             : result.outcome ?? 'Done';
       setSuccess(
-        `${label} — Task ${result.taskId?.slice(0, 8)}… · Campaign ${result.campaignId?.slice(0, 8)}… · ${result.stepsRun ?? 0} steps run`,
+        `${label} · Campaign ${result.campaignId?.slice(0, 8)}… · Task ${result.taskId?.slice(0, 8)}… · ${result.stepsRun ?? 0} steps`,
       );
-      if (result.generatedCaption) {
-        setGeneratedCaption(result.generatedCaption);
-      }
+      if (result.generatedCaption) setGeneratedCaption(result.generatedCaption);
+      if (result.generatedCampaignName) setGeneratedCampaignName(result.generatedCampaignName);
       form.reset();
-      setCampaignMode(campaigns.length > 0 ? 'existing' : 'new');
       setAgentPath('full-qc');
+      setCampaignMode(campaigns.length > 0 ? 'existing' : 'new');
       setPublishMode('IMMEDIATE');
     } else {
       setError(result.reason ?? 'Unknown error');
@@ -91,24 +98,18 @@ export function AgentCampaignForm({ campaigns }: Props) {
       style={{ maxWidth: '560px', display: 'flex', flexDirection: 'column', gap: '1.125rem' }}
     >
       {/* ── Agent path selector ──────────────────────────────────────────── */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '0.5rem',
-        }}
-      >
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
         {(
           [
             {
               value: 'full-qc' as AgentPath,
               label: 'Autonomous Agent',
-              desc: 'Write a brief → Agent develops strategy, generates caption, runs full QC, then publishes',
+              desc: 'Write a brief → agent develops strategy, generates caption, QC, then publishes',
             },
             {
               value: 'direct' as AgentPath,
               label: 'Direct Publish',
-              desc: 'Write the final caption → Policy check only → Publish (no AI QC)',
+              desc: 'Write the final caption → policy check only → publish',
             },
           ] as const
         ).map(({ value, label, desc }) => (
@@ -180,6 +181,21 @@ export function AgentCampaignForm({ campaigns }: Props) {
           >
             {success}
           </div>
+          {generatedCampaignName && (
+            <div
+              style={{
+                padding: '0.5rem 0.75rem',
+                background: 'rgba(96,165,250,0.05)',
+                border: '1px solid rgba(96,165,250,0.15)',
+                borderRadius: '4px',
+                fontSize: '0.8rem',
+                color: 'var(--drex-text-secondary)',
+              }}
+            >
+              <span style={{ fontWeight: 700, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Campaign: </span>
+              {generatedCampaignName}
+            </div>
+          )}
           {generatedCaption && (
             <div
               style={{
@@ -200,61 +216,7 @@ export function AgentCampaignForm({ campaigns }: Props) {
         </div>
       )}
 
-      {/* ── Campaign ─────────────────────────────────────────────────────── */}
-      <div>
-        <p style={SECTION_LABEL}>Campaign</p>
-        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
-          {(['existing', 'new'] as CampaignMode[]).map((m) => (
-            <button
-              key={m}
-              type="button"
-              onClick={() => setCampaignMode(m)}
-              disabled={pending || (m === 'existing' && campaigns.length === 0)}
-              style={{
-                fontSize: '0.75rem',
-                padding: '0.25rem 0.625rem',
-                borderRadius: '3px',
-                border: `1px solid ${campaignMode === m ? 'var(--drex-accent, #60a5fa)' : 'var(--drex-border, #444)'}`,
-                background: campaignMode === m ? 'rgba(96,165,250,0.1)' : 'transparent',
-                color: campaignMode === m ? 'var(--drex-accent, #60a5fa)' : 'var(--drex-text-secondary)',
-                cursor:
-                  pending || (m === 'existing' && campaigns.length === 0)
-                    ? 'not-allowed'
-                    : 'pointer',
-                opacity: m === 'existing' && campaigns.length === 0 ? 0.4 : pending ? 0.6 : 1,
-              }}
-            >
-              {m === 'existing' ? 'Select existing' : 'Create new'}
-            </button>
-          ))}
-        </div>
-        <input type="hidden" name="campaignMode" value={campaignMode} />
-
-        {campaignMode === 'existing' ? (
-          <select name="campaignId" required disabled={pending} style={FIELD}>
-            <option value="">— select campaign —</option>
-            {campaigns.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        ) : (
-          <input
-            name="newCampaignName"
-            maxLength={255}
-            placeholder={
-              isFullQc
-                ? 'Campaign name (optional — agent will suggest one from your brief)'
-                : 'Campaign name, e.g. Q4 UGC Launch'
-            }
-            disabled={pending}
-            style={FIELD}
-          />
-        )}
-      </div>
-
-      {/* ── Full-QC: natural-language brief ─────────────────────────────── */}
+      {/* ── Full-QC: brief only ───────────────────────────────────────────── */}
       {isFullQc && (
         <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.875rem' }}>
           <span style={SECTION_LABEL}>Campaign Brief</span>
@@ -263,15 +225,14 @@ export function AgentCampaignForm({ campaigns }: Props) {
             required
             minLength={10}
             maxLength={2000}
-            rows={6}
+            rows={7}
             placeholder={
-              'Describe the campaign in natural language. Include:\n' +
-              '• What you want to promote and why\n' +
+              'Describe the campaign. The agent will handle everything else.\n\nInclude:\n' +
+              '• What to promote and why\n' +
               '• Target audience\n' +
-              '• Desired tone (e.g. professional, energetic, inspiring)\n' +
-              '• Timing — e.g. "publish immediately" or "schedule for next Friday at 10am"\n' +
-              '• Any specific page or placement preference\n\n' +
-              'The agent will develop strategy, write the caption, and handle publishing.'
+              '• Desired tone (professional, energetic, inspiring…)\n' +
+              '• Timing — e.g. "publish now" or "schedule for Friday at 10am"\n' +
+              '• Page or placement preference (optional)'
             }
             disabled={pending}
             style={{ ...FIELD, resize: 'vertical' }}
@@ -279,9 +240,60 @@ export function AgentCampaignForm({ campaigns }: Props) {
         </label>
       )}
 
-      {/* ── Direct: manual caption + controls ───────────────────────────── */}
+      {/* ── Direct: campaign + caption + controls ────────────────────────── */}
       {!isFullQc && (
         <>
+          {/* Campaign selection */}
+          <div>
+            <p style={SECTION_LABEL}>Campaign</p>
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+              {(['existing', 'new'] as CampaignMode[]).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => setCampaignMode(m)}
+                  disabled={pending || (m === 'existing' && campaigns.length === 0)}
+                  style={{
+                    fontSize: '0.75rem',
+                    padding: '0.25rem 0.625rem',
+                    borderRadius: '3px',
+                    border: `1px solid ${campaignMode === m ? 'var(--drex-accent, #60a5fa)' : 'var(--drex-border, #444)'}`,
+                    background: campaignMode === m ? 'rgba(96,165,250,0.1)' : 'transparent',
+                    color: campaignMode === m ? 'var(--drex-accent, #60a5fa)' : 'var(--drex-text-secondary)',
+                    cursor:
+                      pending || (m === 'existing' && campaigns.length === 0) ? 'not-allowed' : 'pointer',
+                    opacity: m === 'existing' && campaigns.length === 0 ? 0.4 : pending ? 0.6 : 1,
+                  }}
+                >
+                  {m === 'existing' ? 'Select existing' : 'Create new'}
+                </button>
+              ))}
+            </div>
+            <input type="hidden" name="campaignMode" value={campaignMode} />
+
+            {campaignMode === 'existing' ? (
+              <select name="campaignId" required disabled={pending} style={FIELD}>
+                <option value="">— select campaign —</option>
+                {campaigns.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                name="newCampaignName"
+                required
+                minLength={1}
+                maxLength={255}
+                placeholder="Campaign name"
+                disabled={pending}
+                style={FIELD}
+              />
+            )}
+          </div>
+
+          {/* Caption */}
           <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.875rem' }}>
             <span style={SECTION_LABEL}>Post Caption</span>
             <textarea
@@ -296,6 +308,7 @@ export function AgentCampaignForm({ campaigns }: Props) {
             />
           </label>
 
+          {/* Headline */}
           <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.875rem' }}>
             Headline <span style={{ opacity: 0.5, fontSize: '0.8rem' }}>(optional)</span>
             <input
@@ -307,6 +320,7 @@ export function AgentCampaignForm({ campaigns }: Props) {
             />
           </label>
 
+          {/* Page + Placement */}
           <div>
             <p style={SECTION_LABEL}>Publish Target</p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
@@ -330,6 +344,7 @@ export function AgentCampaignForm({ campaigns }: Props) {
             </div>
           </div>
 
+          {/* Publish mode */}
           <div>
             <p style={SECTION_LABEL}>Publish Mode</p>
             <div style={{ display: 'flex', gap: '1.25rem', fontSize: '0.875rem' }}>
@@ -353,13 +368,7 @@ export function AgentCampaignForm({ campaigns }: Props) {
             {publishMode === 'SCHEDULED' && (
               <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.875rem', marginTop: '0.625rem' }}>
                 Scheduled At
-                <input
-                  name="scheduledAt"
-                  type="datetime-local"
-                  required
-                  disabled={pending}
-                  style={FIELD}
-                />
+                <input name="scheduledAt" type="datetime-local" required disabled={pending} style={FIELD} />
               </label>
             )}
           </div>
@@ -381,12 +390,8 @@ export function AgentCampaignForm({ campaigns }: Props) {
           }}
         >
           {pending
-            ? isFullQc
-              ? 'Agent running…'
-              : 'Publishing…'
-            : isFullQc
-              ? 'Run Autonomous Agent'
-              : 'Run Direct Publish'}
+            ? isFullQc ? 'Agent running…' : 'Publishing…'
+            : isFullQc ? 'Run Autonomous Agent' : 'Run Direct Publish'}
         </button>
       </div>
     </form>
