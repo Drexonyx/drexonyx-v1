@@ -71,7 +71,7 @@ export const strategyCampaignDevelopSkill: Skill<StrategyCampaignDevelopInput, S
     const result = await callAi({
       systemPrompt: SYSTEM_PROMPT,
       userPrompt: buildUserPrompt(input),
-      maxTokens: 1024,
+      maxTokens: 2048,
       responseSchema: STRATEGY_SCHEMA,
     });
 
