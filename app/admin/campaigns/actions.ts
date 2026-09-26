@@ -10,6 +10,7 @@ import { createCampaign } from '@/lib/admin/create-campaign';
 import type { AdminRole } from '@/lib/admin/types';
 import { delegateMarketingCampaign } from '@/lib/agents/marketing-campaign-specialist';
 import { delegateDirectFacebookPublish } from '@/lib/agents/direct-facebook-publish';
+import { runAutonomousCampaignPreflight } from '@/lib/agents/autonomous-campaign';
 import { autoAdvanceTask } from '@/lib/orchestration/runner';
 import type { FacebookPageTarget, FacebookPublishMode } from '@/lib/skills/facebook/page-publish';
 
@@ -101,8 +102,8 @@ export async function actionLaunchFacebookPost(formData: FormData): Promise<{
 
 // Agent-first campaign run — creates campaign if needed, then delegates to the
 // appropriate specialist agent based on agentPath ('full-qc' or 'direct').
-// 'full-qc'  → delegateMarketingCampaign (qc.script.review + qc.brand.alignment + policy + publish)
-// 'direct'   → delegateDirectFacebookPublish (policy + publish, zero AI QC)
+// 'full-qc'  → runAutonomousCampaignPreflight (brief → strategy → caption) + delegateMarketingCampaign
+// 'direct'   → delegateDirectFacebookPublish (policy + publish, zero AI QC, manual caption)
 export async function actionAgentCampaignRun(formData: FormData): Promise<{
   ok: boolean;
   taskId?: string;
@@ -110,6 +111,7 @@ export async function actionAgentCampaignRun(formData: FormData): Promise<{
   outcome?: string;
   stepsRun?: number;
   reason?: string;
+  generatedCaption?: string;
 }> {
   const session = await getAdminSession();
   if (!session) redirect('/admin/login');
@@ -121,15 +123,88 @@ export async function actionAgentCampaignRun(formData: FormData): Promise<{
   const campaignMode = (formData.get('campaignMode') as string | null) ?? 'existing';
   const newCampaignName = (formData.get('newCampaignName') as string | null)?.trim() ?? '';
   const existingCampaignId = (formData.get('campaignId') as string | null)?.trim() ?? '';
-  const captionText = (formData.get('captionText') as string | null)?.trim() ?? '';
+  const brief = (formData.get('brief') as string | null)?.trim() ?? '';
   const agentPath = (formData.get('agentPath') as string | null) ?? 'full-qc';
-  const pageTarget = ((formData.get('pageTarget') as string | null) || 'PAGE_1') as FacebookPageTarget;
-  const placement = ((formData.get('placement') as string | null) || 'feed') as
-    | 'feed' | 'story' | 'reel' | 'marketplace' | 'search';
-  const publishMode = ((formData.get('publishMode') as string | null) || 'IMMEDIATE') as FacebookPublishMode;
-  const scheduledAt = (formData.get('scheduledAt') as string | null)?.trim() || undefined;
-  const headline = (formData.get('headline') as string | null)?.trim() || undefined;
 
+  // 'direct' path: manual caption + explicit publish controls
+  const directCaptionText = (formData.get('captionText') as string | null)?.trim() ?? '';
+  const directPageTarget = ((formData.get('pageTarget') as string | null) || 'PAGE_1') as FacebookPageTarget;
+  const directPlacement = ((formData.get('placement') as string | null) || 'feed') as
+    | 'feed' | 'story' | 'reel' | 'marketplace' | 'search';
+  const directPublishMode = ((formData.get('publishMode') as string | null) || 'IMMEDIATE') as FacebookPublishMode;
+  const directScheduledAt = (formData.get('scheduledAt') as string | null)?.trim() || undefined;
+  const directHeadline = (formData.get('headline') as string | null)?.trim() || undefined;
+
+  const initiatorRole = session.role as Extract<AdminRole, 'OWNER' | 'ADMIN_OPERATIONS'>;
+
+  // ── Full-QC path: autonomous preflight ──────────────────────────────────────
+  if (agentPath === 'full-qc') {
+    const preflight = await runAutonomousCampaignPreflight({
+      brief,
+      organizationId: session.organizationId,
+      initiatedByUserId: session.userId,
+      initiatorRole,
+    });
+
+    if (!preflight.ok) {
+      return { ok: false, reason: `Campaign Agent failed: ${preflight.error}` };
+    }
+
+    let campaignId = existingCampaignId;
+
+    if (campaignMode === 'new') {
+      const campaignName = newCampaignName || preflight.campaignNameSuggestion;
+      const created = await createCampaign({
+        name: campaignName,
+        organizationId: session.organizationId,
+        actorId: session.userId,
+        actorRole: session.role as AdminRole,
+      });
+      if (!created.ok) {
+        return { ok: false, reason: created.reason };
+      }
+      campaignId = created.campaignId;
+    }
+
+    const delegation = await delegateMarketingCampaign({
+      parentTaskId: null,
+      organizationId: session.organizationId,
+      initiatedByUserId: session.userId,
+      initiatorRole,
+      contentOwner: 'DREXONYX',
+      campaignId,
+      captionText: preflight.captionText,
+      pageTarget: preflight.pageTarget,
+      placement: preflight.placement,
+      publishMode: preflight.publishMode,
+      ...(preflight.scheduledAt ? { scheduledAt: preflight.scheduledAt } : {}),
+      ...(preflight.headline ? { headline: preflight.headline } : {}),
+    });
+
+    if (!delegation.ok) {
+      return { ok: false, campaignId, reason: delegation.error };
+    }
+
+    const taskId = delegation.subTaskId;
+    const run = await autoAdvanceTask({ taskId, organizationId: session.organizationId });
+
+    revalidatePath('/admin/campaigns');
+
+    if (!run.ok) {
+      return { ok: false, taskId, campaignId, reason: run.reason, stepsRun: run.stepsAdvanced };
+    }
+
+    return {
+      ok: true,
+      taskId,
+      campaignId,
+      outcome: run.outcome,
+      stepsRun: run.stepsAdvanced,
+      generatedCaption: preflight.captionText,
+    };
+  }
+
+  // ── Direct path: manual caption, explicit controls ───────────────────────────
   let campaignId = existingCampaignId;
 
   if (campaignMode === 'new') {
@@ -145,24 +220,19 @@ export async function actionAgentCampaignRun(formData: FormData): Promise<{
     campaignId = created.campaignId;
   }
 
-  const baseParams = {
-    parentTaskId: null as null,
+  const delegation = await delegateDirectFacebookPublish({
+    parentTaskId: null,
     organizationId: session.organizationId,
     initiatedByUserId: session.userId,
-    initiatorRole: session.role as Extract<AdminRole, 'OWNER' | 'ADMIN_OPERATIONS'>,
+    initiatorRole,
     campaignId,
-    captionText,
-    pageTarget,
-    placement,
-    publishMode,
-    ...(scheduledAt ? { scheduledAt } : {}),
-    ...(headline ? { headline } : {}),
-  };
-
-  const delegation =
-    agentPath === 'direct'
-      ? await delegateDirectFacebookPublish(baseParams)
-      : await delegateMarketingCampaign({ ...baseParams, contentOwner: 'DREXONYX' });
+    captionText: directCaptionText,
+    pageTarget: directPageTarget,
+    placement: directPlacement,
+    publishMode: directPublishMode,
+    ...(directScheduledAt ? { scheduledAt: directScheduledAt } : {}),
+    ...(directHeadline ? { headline: directHeadline } : {}),
+  });
 
   if (!delegation.ok) {
     return { ok: false, campaignId, reason: delegation.error };

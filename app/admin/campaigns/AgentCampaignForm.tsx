@@ -1,13 +1,11 @@
 'use client';
 
 // Agent-first campaign interface.
-// Replaces the three separate manual forms (CreateCampaignForm, LaunchFacebookPostForm,
-// DirectFacebookPublishForm) with a single orchestrated workflow.
-//
-// agentPath 'full-qc'  → marketing-campaign specialist
-//   (qc.script.review → qc.brand.alignment → qc.facebook_policy.check → facebook.page.publish)
-// agentPath 'direct'   → direct-facebook-publish specialist
-//   (qc.facebook_policy.check → facebook.page.publish)
+// 'full-qc' path: user writes a natural-language brief; the agent autonomously develops
+//   strategy, generates caption/headline, derives page/placement/schedule from the brief,
+//   then runs: qc.script.review → qc.brand.alignment → qc.facebook_policy.check → facebook.page.publish
+// 'direct' path: user writes the final caption manually; agent runs:
+//   qc.facebook_policy.check → facebook.page.publish (no AI QC, no generation)
 
 import { useState } from 'react';
 import { actionAgentCampaignRun } from './actions';
@@ -45,6 +43,7 @@ export function AgentCampaignForm({ campaigns }: Props) {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [generatedCaption, setGeneratedCaption] = useState<string | null>(null);
   const [agentPath, setAgentPath] = useState<AgentPath>('full-qc');
   const [campaignMode, setCampaignMode] = useState<CampaignMode>(
     campaigns.length > 0 ? 'existing' : 'new',
@@ -56,6 +55,7 @@ export function AgentCampaignForm({ campaigns }: Props) {
     setPending(true);
     setError(null);
     setSuccess(null);
+    setGeneratedCaption(null);
 
     const form = e.currentTarget;
     const result = await actionAgentCampaignRun(new FormData(form));
@@ -70,6 +70,9 @@ export function AgentCampaignForm({ campaigns }: Props) {
       setSuccess(
         `${label} — Task ${result.taskId?.slice(0, 8)}… · Campaign ${result.campaignId?.slice(0, 8)}… · ${result.stepsRun ?? 0} steps run`,
       );
+      if (result.generatedCaption) {
+        setGeneratedCaption(result.generatedCaption);
+      }
       form.reset();
       setCampaignMode(campaigns.length > 0 ? 'existing' : 'new');
       setAgentPath('full-qc');
@@ -79,6 +82,8 @@ export function AgentCampaignForm({ campaigns }: Props) {
     }
     setPending(false);
   }
+
+  const isFullQc = agentPath === 'full-qc';
 
   return (
     <form
@@ -97,13 +102,13 @@ export function AgentCampaignForm({ campaigns }: Props) {
           [
             {
               value: 'full-qc' as AgentPath,
-              label: 'Full AI Review',
-              desc: 'Script QC → Brand alignment → Policy check → Publish',
+              label: 'Autonomous Agent',
+              desc: 'Write a brief → Agent develops strategy, generates caption, runs full QC, then publishes',
             },
             {
               value: 'direct' as AgentPath,
               label: 'Direct Publish',
-              desc: 'Policy check only → Publish (no AI QC)',
+              desc: 'Write the final caption → Policy check only → Publish (no AI QC)',
             },
           ] as const
         ).map(({ value, label, desc }) => (
@@ -132,7 +137,7 @@ export function AgentCampaignForm({ campaigns }: Props) {
       </div>
       <input type="hidden" name="agentPath" value={agentPath} />
 
-      {agentPath === 'direct' && (
+      {!isFullQc && (
         <div
           style={{
             padding: '0.5rem 0.75rem',
@@ -162,17 +167,36 @@ export function AgentCampaignForm({ campaigns }: Props) {
         </div>
       )}
       {success && (
-        <div
-          style={{
-            padding: '0.625rem 0.875rem',
-            background: 'rgba(34,197,94,0.1)',
-            border: '1px solid rgba(34,197,94,0.3)',
-            borderRadius: '4px',
-            fontSize: '0.875rem',
-            fontWeight: 600,
-          }}
-        >
-          {success}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <div
+            style={{
+              padding: '0.625rem 0.875rem',
+              background: 'rgba(34,197,94,0.1)',
+              border: '1px solid rgba(34,197,94,0.3)',
+              borderRadius: '4px',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+            }}
+          >
+            {success}
+          </div>
+          {generatedCaption && (
+            <div
+              style={{
+                padding: '0.625rem 0.875rem',
+                background: 'rgba(96,165,250,0.06)',
+                border: '1px solid rgba(96,165,250,0.2)',
+                borderRadius: '4px',
+                fontSize: '0.8rem',
+                color: 'var(--drex-text-secondary)',
+              }}
+            >
+              <div style={{ fontWeight: 700, marginBottom: '0.25rem', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                Generated caption
+              </div>
+              <div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.5 }}>{generatedCaption}</div>
+            </div>
+          )}
         </div>
       )}
 
@@ -218,105 +242,129 @@ export function AgentCampaignForm({ campaigns }: Props) {
         ) : (
           <input
             name="newCampaignName"
-            required
-            minLength={1}
             maxLength={255}
-            placeholder="Campaign name, e.g. Q4 UGC Launch"
+            placeholder={
+              isFullQc
+                ? 'Campaign name (optional — agent will suggest one from your brief)'
+                : 'Campaign name, e.g. Q4 UGC Launch'
+            }
             disabled={pending}
             style={FIELD}
           />
         )}
       </div>
 
-      {/* ── Brief / caption ──────────────────────────────────────────────── */}
-      <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.875rem' }}>
-        <span style={SECTION_LABEL}>Campaign Brief / Caption</span>
-        <textarea
-          name="captionText"
-          required
-          minLength={1}
-          maxLength={2000}
-          rows={5}
-          placeholder={
-            agentPath === 'full-qc'
-              ? 'Describe the campaign or paste the post caption. The agent will QC the content, check brand alignment, verify Facebook policy, then publish.'
-              : 'Post caption — published verbatim after Facebook policy check.'
-          }
-          disabled={pending}
-          style={{ ...FIELD, resize: 'vertical' }}
-        />
-      </label>
+      {/* ── Full-QC: natural-language brief ─────────────────────────────── */}
+      {isFullQc && (
+        <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.875rem' }}>
+          <span style={SECTION_LABEL}>Campaign Brief</span>
+          <textarea
+            name="brief"
+            required
+            minLength={10}
+            maxLength={2000}
+            rows={6}
+            placeholder={
+              'Describe the campaign in natural language. Include:\n' +
+              '• What you want to promote and why\n' +
+              '• Target audience\n' +
+              '• Desired tone (e.g. professional, energetic, inspiring)\n' +
+              '• Timing — e.g. "publish immediately" or "schedule for next Friday at 10am"\n' +
+              '• Any specific page or placement preference\n\n' +
+              'The agent will develop strategy, write the caption, and handle publishing.'
+            }
+            disabled={pending}
+            style={{ ...FIELD, resize: 'vertical' }}
+          />
+        </label>
+      )}
 
-      {/* ── Headline ─────────────────────────────────────────────────────── */}
-      <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.875rem' }}>
-        Headline <span style={{ opacity: 0.5, fontSize: '0.8rem' }}>(optional)</span>
-        <input
-          name="headline"
-          maxLength={255}
-          placeholder="Ad headline (included in policy check)"
-          disabled={pending}
-          style={FIELD}
-        />
-      </label>
-
-      {/* ── Page + Placement ─────────────────────────────────────────────── */}
-      <div>
-        <p style={SECTION_LABEL}>Publish Target</p>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+      {/* ── Direct: manual caption + controls ───────────────────────────── */}
+      {!isFullQc && (
+        <>
           <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.875rem' }}>
-            Page
-            <select name="pageTarget" disabled={pending} style={FIELD}>
-              <option value="PAGE_1">PAGE_1</option>
-              <option value="PAGE_2">PAGE_2</option>
-            </select>
-          </label>
-          <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.875rem' }}>
-            Placement
-            <select name="placement" disabled={pending} style={FIELD}>
-              <option value="feed">Feed</option>
-              <option value="story">Story</option>
-              <option value="reel">Reel</option>
-              <option value="marketplace">Marketplace</option>
-              <option value="search">Search</option>
-            </select>
-          </label>
-        </div>
-      </div>
-
-      {/* ── Publish mode ─────────────────────────────────────────────────── */}
-      <div>
-        <p style={SECTION_LABEL}>Publish Mode</p>
-        <div style={{ display: 'flex', gap: '1.25rem', fontSize: '0.875rem' }}>
-          {(['IMMEDIATE', 'SCHEDULED'] as PublishMode[]).map((m) => (
-            <label
-              key={m}
-              style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', cursor: pending ? 'not-allowed' : 'pointer' }}
-            >
-              <input
-                type="radio"
-                name="publishMode"
-                value={m}
-                checked={publishMode === m}
-                onChange={() => setPublishMode(m)}
-                disabled={pending}
-              />
-              {m === 'IMMEDIATE' ? 'Immediate' : 'Scheduled'}
-            </label>
-          ))}
-        </div>
-        {publishMode === 'SCHEDULED' && (
-          <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.875rem', marginTop: '0.625rem' }}>
-            Scheduled At
-            <input
-              name="scheduledAt"
-              type="datetime-local"
+            <span style={SECTION_LABEL}>Post Caption</span>
+            <textarea
+              name="captionText"
               required
+              minLength={1}
+              maxLength={2000}
+              rows={5}
+              placeholder="Post caption — published verbatim after Facebook policy check."
+              disabled={pending}
+              style={{ ...FIELD, resize: 'vertical' }}
+            />
+          </label>
+
+          <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.875rem' }}>
+            Headline <span style={{ opacity: 0.5, fontSize: '0.8rem' }}>(optional)</span>
+            <input
+              name="headline"
+              maxLength={255}
+              placeholder="Ad headline (included in policy check)"
               disabled={pending}
               style={FIELD}
             />
           </label>
-        )}
-      </div>
+
+          <div>
+            <p style={SECTION_LABEL}>Publish Target</p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+              <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.875rem' }}>
+                Page
+                <select name="pageTarget" disabled={pending} style={FIELD}>
+                  <option value="PAGE_1">PAGE_1</option>
+                  <option value="PAGE_2">PAGE_2</option>
+                </select>
+              </label>
+              <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.875rem' }}>
+                Placement
+                <select name="placement" disabled={pending} style={FIELD}>
+                  <option value="feed">Feed</option>
+                  <option value="story">Story</option>
+                  <option value="reel">Reel</option>
+                  <option value="marketplace">Marketplace</option>
+                  <option value="search">Search</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <p style={SECTION_LABEL}>Publish Mode</p>
+            <div style={{ display: 'flex', gap: '1.25rem', fontSize: '0.875rem' }}>
+              {(['IMMEDIATE', 'SCHEDULED'] as PublishMode[]).map((m) => (
+                <label
+                  key={m}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', cursor: pending ? 'not-allowed' : 'pointer' }}
+                >
+                  <input
+                    type="radio"
+                    name="publishMode"
+                    value={m}
+                    checked={publishMode === m}
+                    onChange={() => setPublishMode(m)}
+                    disabled={pending}
+                  />
+                  {m === 'IMMEDIATE' ? 'Immediate' : 'Scheduled'}
+                </label>
+              ))}
+            </div>
+            {publishMode === 'SCHEDULED' && (
+              <label style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontSize: '0.875rem', marginTop: '0.625rem' }}>
+                Scheduled At
+                <input
+                  name="scheduledAt"
+                  type="datetime-local"
+                  required
+                  disabled={pending}
+                  style={FIELD}
+                />
+              </label>
+            )}
+          </div>
+        </>
+      )}
 
       {/* ── Submit ───────────────────────────────────────────────────────── */}
       <div>
@@ -333,9 +381,11 @@ export function AgentCampaignForm({ campaigns }: Props) {
           }}
         >
           {pending
-            ? 'Agent running…'
-            : agentPath === 'full-qc'
-              ? 'Run Campaign Agent'
+            ? isFullQc
+              ? 'Agent running…'
+              : 'Publishing…'
+            : isFullQc
+              ? 'Run Autonomous Agent'
               : 'Run Direct Publish'}
         </button>
       </div>
