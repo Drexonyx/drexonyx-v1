@@ -15,12 +15,13 @@ export interface ScriptSocialCaptionOutput {
   alternatives: string[];
 }
 
-const SYSTEM_PROMPT = `You are a social media copywriter.
-Generate platform-optimized captions and return a JSON object with:
-- caption: the primary caption (platform-appropriate length and style)
-- alternatives: array of 2 alternative caption versions with different angles
+const SYSTEM_PROMPT = `You are a social media copywriter. Respond with ONLY a raw JSON object — no markdown fences, no prose, no explanation.
+The JSON must have exactly these fields:
+- caption: string — the primary caption, platform-appropriate length and style
+- alternatives: array of 2 alternative caption strings with different angles
 
-Respond with ONLY valid JSON. No markdown, no explanation.`;
+Example output: {"caption":"Your primary caption here.","alternatives":["Alternative angle 1.","Alternative angle 2."]}`;
+
 
 function buildUserPrompt(input: ScriptSocialCaptionInput): string {
   const parts = [
@@ -38,10 +39,17 @@ function buildUserPrompt(input: ScriptSocialCaptionInput): string {
 function parseOutput(text: string): ScriptSocialCaptionOutput | null {
   try {
     const parsed = extractJson(text);
-    if (typeof parsed !== 'object' || parsed === null) return null;
-    const o = parsed as Record<string, unknown>;
-    if (typeof o.caption === 'string' && Array.isArray(o.alternatives)) {
-      return { caption: o.caption, alternatives: o.alternatives as string[] };
+    if (typeof parsed === 'object' && parsed !== null) {
+      const o = parsed as Record<string, unknown>;
+      if (typeof o.caption === 'string' && Array.isArray(o.alternatives)) {
+        return { caption: o.caption, alternatives: o.alternatives as string[] };
+      }
+    }
+    // Model returned plain text instead of JSON — treat the full text as the caption.
+    // alternatives is safely empty; the caller uses `alternatives[0] ?? undefined`.
+    const trimmed = text.trim();
+    if (trimmed.length > 0) {
+      return { caption: trimmed, alternatives: [] };
     }
     return null;
   } catch {
