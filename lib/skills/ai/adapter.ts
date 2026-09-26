@@ -1,6 +1,6 @@
 // DR 0073 §2.2: Sole location within lib/skills/ where any AI provider SDK or API key is accessed.
 // Provider: Google Gemini (REST API via generativelanguage.googleapis.com).
-// DR 0073 §2.4: Model identifier read from SKILLS_AI_MODEL env var; default = gemini-2.5-flash.
+// DR 0073 §2.4: Model identifier read from SKILLS_AI_MODEL env var; default = gemini-2.0-flash.
 // DR 0073 §2.5: API key stored exclusively as server-side env var; never logged or returned to callers.
 // DR 0073 §2.6: Each skill.execute() makes at most ONE call to callAi().
 
@@ -15,7 +15,9 @@ export type AiAdapterResult =
   | { ok: false; error: string; isTransient: boolean };
 
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
-const DEFAULT_MODEL = 'gemini-2.5-flash';
+// gemini-2.0-flash is a GA (generally available) model: stable capacity, JSON mode support,
+// no thinking-part overhead. gemini-2.5-flash is experimental and prone to sustained 503 overload.
+const DEFAULT_MODEL = 'gemini-2.0-flash';
 
 // Retry policy: up to 2 retries after the initial attempt (3 total), backoff in ms.
 // Only transient errors (429 / 5xx / network failure) are retried.

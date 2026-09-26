@@ -11,7 +11,7 @@ import { callAi } from '../skills/ai/adapter';
 
 const BASE_ENV = {
   GEMINI_API_KEY: 'AIzaTestKeyAbcDefGhIjKlMnOpQrStUvWxYz0',
-  SKILLS_AI_MODEL: 'gemini-2.5-flash',
+  SKILLS_AI_MODEL: 'gemini-2.0-flash',
 };
 
 function setEnv(overrides: Record<string, string | undefined> = {}) {
@@ -73,12 +73,12 @@ describe('callAi (Google Gemini)', () => {
     }
   });
 
-  it('defaults to gemini-2.5-flash when SKILLS_AI_MODEL is not set', async () => {
+  it('defaults to gemini-2.0-flash (GA model) when SKILLS_AI_MODEL is not set', async () => {
     setEnv({ SKILLS_AI_MODEL: undefined });
     mockSuccess('{"ok":true}');
     await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
     const url = (mockFetch.mock.calls[0] as [string, RequestInit])[0];
-    expect(url).toContain('gemini-2.5-flash');
+    expect(url).toContain('gemini-2.0-flash');
   });
 
   it('uses SKILLS_AI_MODEL env var as the model in the request URL (DR 0073 §2.4)', async () => {
