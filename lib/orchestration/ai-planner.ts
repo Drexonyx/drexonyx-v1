@@ -22,8 +22,12 @@ const APPROVED_STEP_TYPES: ReadonlySet<string> = new Set<StepType>([
 const APPROVED_SKILL_IDS: ReadonlySet<string> = new Set([
   'utility.prompt.optimize',
   'qc.asset.metadata',
-  'qc.script.review',    // DR 0115
-  'qc.brand.alignment',  // DR 0115
+  'qc.script.review',              // DR 0115
+  'qc.brand.alignment',            // DR 0115
+  'qc.facebook_policy.check',      // DR 0124
+  'facebook.page.publish',         // DR 0126
+  'script.social_caption.generate', // DR 0127
+  'strategy.campaign.develop',     // DR 0127
 ]);
 
 const APPROVED_INTENT_TYPES: ReadonlySet<string> = new Set([
@@ -40,6 +44,7 @@ const APPROVED_INTENT_TYPES: ReadonlySet<string> = new Set([
   'HUNT_LEADS',                         // DR 0120
   'COORDINATE_WEBSITE_PRODUCTION',      // DR 0121
   'AUDIT_WEBSITE_CONTENT',              // DR 0122
+  'COORDINATE_MARKETING_CAMPAIGN',      // DR 0124 — campaign + Facebook publish pipeline
 ]);
 
 // ── System prompt ─────────────────────────────────────────────────────────────
@@ -57,11 +62,11 @@ Given a task description, produce a JSON object with this exact structure:
   ]
 }
 
-Approved intent types: ROUTE_APPROVAL, INSPECT_ASSET_METADATA, OPTIMIZE_BRIEF_PROMPTS, COORDINATE_BATCH_OPERATION, COORDINATE_PRODUCTION_RUN, COORDINATE_QC_REVIEW, COORDINATE_FINANCIAL_MONITORING, GENERATE_OPERATIONAL_REPORT, GENERATE_INTELLIGENCE_REPORT, COORDINATE_INTERNAL_NOTIFICATION, HUNT_LEADS, COORDINATE_WEBSITE_PRODUCTION, AUDIT_WEBSITE_CONTENT
+Approved intent types: ROUTE_APPROVAL, INSPECT_ASSET_METADATA, OPTIMIZE_BRIEF_PROMPTS, COORDINATE_BATCH_OPERATION, COORDINATE_PRODUCTION_RUN, COORDINATE_QC_REVIEW, COORDINATE_FINANCIAL_MONITORING, GENERATE_OPERATIONAL_REPORT, GENERATE_INTELLIGENCE_REPORT, COORDINATE_INTERNAL_NOTIFICATION, HUNT_LEADS, COORDINATE_WEBSITE_PRODUCTION, AUDIT_WEBSITE_CONTENT, COORDINATE_MARKETING_CAMPAIGN
 
 Approved step types: SKILL, HUMAN_GATE, FINANCIAL_CHECK, PRODUCTION_JOB, STATUS_TRANSITION, QC_GATE, NOTIFICATION, VERIFY
 
-Approved skill IDs (only for SKILL steps): utility.prompt.optimize, qc.asset.metadata, qc.script.review, qc.brand.alignment
+Approved skill IDs (only for SKILL steps): utility.prompt.optimize, qc.asset.metadata, qc.script.review, qc.brand.alignment, qc.facebook_policy.check, facebook.page.publish, script.social_caption.generate, strategy.campaign.develop
 
 Rules:
 - skill_id must be one of the approved skill IDs when step_type is SKILL.

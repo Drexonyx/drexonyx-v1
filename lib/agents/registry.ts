@@ -2,6 +2,8 @@
 // Add entries only with explicit Owner approval + new/amended decision record.
 
 import { delegateQcMetadata, type QcMetadataDelegationParams, type QcMetadataDelegationResult } from './qc-metadata-specialist';
+import { delegateMarketingCampaign, type MarketingCampaignDelegationParams, type MarketingCampaignDelegationResult } from './marketing-campaign-specialist';
+import { delegateDirectFacebookPublish, type DirectFacebookPublishParams, type DirectFacebookPublishResult } from './direct-facebook-publish';
 import { delegatePromptOptimize, type PromptOptimizeDelegationParams, type PromptOptimizeDelegationResult } from './prompt-optimize-specialist';
 import { delegateProductionRun, type ProductionRunDelegationParams, type ProductionRunDelegationResult } from './production-run-specialist';
 import { delegateQcReview, type QcReviewDelegationParams, type QcReviewDelegationResult } from './qc-review-specialist';
@@ -106,6 +108,22 @@ export const SPECIALIST_AGENT_REGISTRY: ReadonlyMap<string, SpecialistAgentEntry
     {
       id: 'site-audit',
       delegate: delegateSiteAudit as (params: SiteAuditDelegationParams) => Promise<SiteAuditDelegationResult>,
+    },
+  ],
+  // DR 0124: Marketing Campaign Agent — full AI QC path (qc.script.review → qc.brand.alignment → qc.facebook_policy.check → facebook.page.publish)
+  [
+    'marketing-campaign',
+    {
+      id: 'marketing-campaign',
+      delegate: delegateMarketingCampaign as (params: MarketingCampaignDelegationParams) => Promise<MarketingCampaignDelegationResult>,
+    },
+  ],
+  // DR 0126: Direct Facebook Publish Agent — zero AI path (qc.facebook_policy.check → facebook.page.publish)
+  [
+    'direct-facebook-publish',
+    {
+      id: 'direct-facebook-publish',
+      delegate: delegateDirectFacebookPublish as (params: DirectFacebookPublishParams) => Promise<DirectFacebookPublishResult>,
     },
   ],
 ]);

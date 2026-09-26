@@ -30,8 +30,9 @@ describe('AGENT_ALLOWLIST', () => {
   // DR 0124: expanded from 5 to 6 — qc.facebook_policy.check added (deterministic, zero AI).
   // DR 0125: expanded from 6 to 7 — communication.whatsapp.classify added (deterministic, zero AI).
   // DR 0126: expanded from 7 to 8 — facebook.page.publish added (post-HUMAN_GATE organic publish).
-  it('contains exactly the eight DR-approved skills', () => {
-    expect(AGENT_ALLOWLIST.size).toBe(8);
+  // DR 0127: expanded from 8 to 10 — script.social_caption.generate and strategy.campaign.develop added.
+  it('contains exactly the ten DR-approved skills', () => {
+    expect(AGENT_ALLOWLIST.size).toBe(10);
     expect(AGENT_ALLOWLIST.has('utility.prompt.optimize')).toBe(true);
     expect(AGENT_ALLOWLIST.has('qc.asset.metadata')).toBe(true);
     expect(AGENT_ALLOWLIST.has('qc.script.review')).toBe(true);
@@ -40,6 +41,8 @@ describe('AGENT_ALLOWLIST', () => {
     expect(AGENT_ALLOWLIST.has('qc.facebook_policy.check')).toBe(true);
     expect(AGENT_ALLOWLIST.has('communication.whatsapp.classify')).toBe(true);
     expect(AGENT_ALLOWLIST.has('facebook.page.publish')).toBe(true);
+    expect(AGENT_ALLOWLIST.has('script.social_caption.generate')).toBe(true);
+    expect(AGENT_ALLOWLIST.has('strategy.campaign.develop')).toBe(true);
   });
 });
 
@@ -78,6 +81,9 @@ describe('isAgentAuthorized', () => {
       'qc.creative.quality',
       'qc.facebook_policy.check',
       'communication.whatsapp.classify',
+      'facebook.page.publish',
+      'script.social_caption.generate',  // DR 0127
+      'strategy.campaign.develop',        // DR 0127
     ]);
     const others = ALL_SKILL_IDS.filter((id) => !allowlisted.has(id));
     for (const skillId of others) {

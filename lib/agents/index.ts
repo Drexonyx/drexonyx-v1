@@ -22,6 +22,8 @@ export { delegateSiteAudit } from './site-audit-specialist';
 export type { SiteAuditDelegationParams, SiteAuditDelegationResult } from './site-audit-specialist';
 export { delegateMarketingCampaign } from './marketing-campaign-specialist';
 export type { MarketingCampaignDelegationParams, MarketingCampaignDelegationResult } from './marketing-campaign-specialist';
+export { delegateDirectFacebookPublish } from './direct-facebook-publish';
+export type { DirectFacebookPublishParams, DirectFacebookPublishResult } from './direct-facebook-publish';
 export { delegateWhatsAppInquiry } from './whatsapp-inquiry-specialist';
 export type { WhatsAppInquiryDelegationParams, WhatsAppInquiryDelegationResult } from './whatsapp-inquiry-specialist';
 export { SPECIALIST_AGENT_REGISTRY } from './registry';

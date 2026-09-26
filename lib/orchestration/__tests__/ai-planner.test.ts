@@ -81,7 +81,7 @@ describe('AI planner — output validation rejects unapproved values', () => {
   it('rejects unapproved skill_id on SKILL step', async () => {
     mockCallAi.mockResolvedValueOnce(aiOk({
       intent_type: 'OPTIMIZE_BRIEF_PROMPTS',
-      steps: [{ step_index: 0, step_type: 'SKILL', skill_id: 'strategy.campaign.develop' }],
+      steps: [{ step_index: 0, step_type: 'SKILL', skill_id: 'hook.video.generate' }],
     }));
     const result = await buildPlanFromDescription({ description: 'bad', context: BASE_CTX });
     expect(result.ok).toBe(false);

@@ -44,6 +44,8 @@ export const AGENT_ALLOWLIST: ReadonlySet<SkillId> = new Set([
   'qc.facebook_policy.check',          // DR 0124 — deterministic platform policy check, zero AI calls
   'communication.whatsapp.classify',   // DR 0125 — deterministic inbound classifier, zero AI calls
   'facebook.page.publish',             // DR 0126 — post-HUMAN_GATE-approval organic publish only
+  'script.social_caption.generate',   // DR 0127 — agent-driven caption generation for campaign workflow
+  'strategy.campaign.develop',         // DR 0127 — agent-driven campaign strategy for campaign workflow
 ]);
 
 // Returns true if the given human role is authorized to invoke the skill.
