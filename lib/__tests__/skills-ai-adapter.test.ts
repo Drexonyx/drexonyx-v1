@@ -54,10 +54,13 @@ describe('callAi (Google Gemini)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     setEnv();
+    // Fake timers prevent real sleeps in retry backoff from slowing tests.
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
     clearEnv();
+    vi.useRealTimers();
   });
 
   it('returns ok:false when GEMINI_API_KEY is missing', async () => {
@@ -94,7 +97,7 @@ describe('callAi (Google Gemini)', () => {
     if (result.ok) expect(result.text).toBe(responseText);
   });
 
-  it('makes exactly one fetch call per invocation (DR 0073 §2.6)', async () => {
+  it('makes exactly one fetch call on success (DR 0073 §2.6)', async () => {
     mockSuccess('text');
     await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
     expect(mockFetch).toHaveBeenCalledOnce();
@@ -129,16 +132,32 @@ describe('callAi (Google Gemini)', () => {
 
   it('marks 429 rate limit as transient', async () => {
     mockHttpError(429, 'rate limited');
-    const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    const promise = callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    await vi.runAllTimersAsync();
+    const result = await promise;
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.isTransient).toBe(true);
   });
 
   it('marks 500 server error as transient', async () => {
     mockHttpError(500, 'server error');
-    const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    const promise = callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    await vi.runAllTimersAsync();
+    const result = await promise;
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.isTransient).toBe(true);
+  });
+
+  it('marks 503 as transient', async () => {
+    mockHttpError(503, 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.');
+    const promise = callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    await vi.runAllTimersAsync();
+    const result = await promise;
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.isTransient).toBe(true);
+      expect(result.error).toContain('503');
+    }
   });
 
   it('marks 400 as non-transient', async () => {
@@ -160,6 +179,20 @@ describe('callAi (Google Gemini)', () => {
     const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.isTransient).toBe(false);
+  });
+
+  it('does not retry non-transient errors (400 = exactly one fetch call)', async () => {
+    mockHttpError(400, 'bad request');
+    const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    expect(result.ok).toBe(false);
+    expect(mockFetch).toHaveBeenCalledOnce();
+  });
+
+  it('does not retry non-transient errors (401 = exactly one fetch call)', async () => {
+    mockHttpError(401, 'unauthorized');
+    const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    expect(result.ok).toBe(false);
+    expect(mockFetch).toHaveBeenCalledOnce();
   });
 
   it('includes status code in error message for HTTP errors', async () => {
@@ -184,7 +217,9 @@ describe('callAi (Google Gemini)', () => {
 
   it('network failure is transient', async () => {
     mockFetch.mockRejectedValue(new Error('ECONNREFUSED'));
-    const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    const promise = callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    await vi.runAllTimersAsync();
+    const result = await promise;
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.isTransient).toBe(true);
   });
@@ -300,5 +335,111 @@ describe('callAi (Google Gemini)', () => {
     const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
     expect(result.ok).toBe(true);
     if (result.ok) expect(result.text).toBe(actualResponse);
+  });
+
+  // ─── Retry logic ─────────────────────────────────────────────────────────────
+
+  it('retries a 503 and succeeds on the second attempt', async () => {
+    const successText = '{"ok":true}';
+    mockFetch
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 503,
+        json: async () => ({ error: { message: 'Service unavailable' } }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ candidates: [{ content: { parts: [{ text: successText }] } }] }),
+      });
+
+    const promise = callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    await vi.runAllTimersAsync();
+    const result = await promise;
+
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.text).toBe(successText);
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('retries a 429 and succeeds on the second attempt', async () => {
+    const successText = '{"campaign":"ready"}';
+    mockFetch
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 429,
+        json: async () => ({ error: { message: 'Too many requests' } }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ candidates: [{ content: { parts: [{ text: successText }] } }] }),
+      });
+
+    const promise = callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    await vi.runAllTimersAsync();
+    const result = await promise;
+
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.text).toBe(successText);
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('retries a network failure and succeeds on the second attempt', async () => {
+    const successText = '{"ok":true}';
+    mockFetch
+      .mockRejectedValueOnce(new Error('ECONNREFUSED'))
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ candidates: [{ content: { parts: [{ text: successText }] } }] }),
+      });
+
+    const promise = callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    await vi.runAllTimersAsync();
+    const result = await promise;
+
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.text).toBe(successText);
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('exhausts all retries (3 total) and returns the last error for 503', async () => {
+    mockHttpError(503, 'Service unavailable');
+    const promise = callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    await vi.runAllTimersAsync();
+    const result = await promise;
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.isTransient).toBe(true);
+      expect(result.error).toContain('503');
+    }
+    // 1 initial + 2 retries = 3 total fetch calls
+    expect(mockFetch).toHaveBeenCalledTimes(3);
+  });
+
+  it('exhausts all retries for persistent network failure and preserves error', async () => {
+    mockFetch.mockRejectedValue(new Error('ECONNREFUSED'));
+    const promise = callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    await vi.runAllTimersAsync();
+    const result = await promise;
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.isTransient).toBe(true);
+    expect(mockFetch).toHaveBeenCalledTimes(3);
+  });
+
+  it('does not mislabel a provider error as an unparseable output error', async () => {
+    mockHttpError(503, 'Service temporarily unavailable');
+    const promise = callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    await vi.runAllTimersAsync();
+    const result = await promise;
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).toContain('AI provider error');
+      expect(result.error).not.toContain('unparseable');
+    }
   });
 });

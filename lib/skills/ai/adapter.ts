@@ -17,6 +17,11 @@ export type AiAdapterResult =
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 const DEFAULT_MODEL = 'gemini-2.5-flash';
 
+// Retry policy: up to 2 retries after the initial attempt (3 total), backoff in ms.
+// Only transient errors (429 / 5xx / network failure) are retried.
+const MAX_RETRIES = 2;
+const RETRY_BACKOFF_MS = [1000, 3000] as const;
+
 // Redact any credential-like values from provider error strings before surfacing them.
 function redactCredentials(text: string): string {
   return text
@@ -24,15 +29,15 @@ function redactCredentials(text: string): string {
     .replace(/Bearer\s+[A-Za-z0-9._-]{20,}/gi, 'Bearer [REDACTED]');
 }
 
-export async function callAi(request: AiAdapterRequest): Promise<AiAdapterResult> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    return { ok: false, error: 'GEMINI_API_KEY is not configured', isTransient: false };
-  }
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
-  const model = process.env.SKILLS_AI_MODEL ?? DEFAULT_MODEL;
-  const endpoint = `${GEMINI_BASE}/${model}:generateContent`;
-
+async function attemptAiCall(
+  endpoint: string,
+  apiKey: string,
+  request: AiAdapterRequest,
+): Promise<AiAdapterResult> {
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
@@ -84,6 +89,33 @@ export async function callAi(request: AiAdapterRequest): Promise<AiAdapterResult
     return { ok: true, text };
   } catch {
     // Network-level failures (DNS failure, connection refused, etc.) are transient.
-    return { ok: false, error: 'AI adapter error', isTransient: true };
+    return { ok: false, error: 'AI adapter network error', isTransient: true };
   }
+}
+
+export async function callAi(request: AiAdapterRequest): Promise<AiAdapterResult> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    return { ok: false, error: 'GEMINI_API_KEY is not configured', isTransient: false };
+  }
+
+  const model = process.env.SKILLS_AI_MODEL ?? DEFAULT_MODEL;
+  const endpoint = `${GEMINI_BASE}/${model}:generateContent`;
+
+  let lastResult: AiAdapterResult | undefined;
+
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    if (attempt > 0) {
+      await sleep(RETRY_BACKOFF_MS[attempt - 1] ?? RETRY_BACKOFF_MS[RETRY_BACKOFF_MS.length - 1]);
+    }
+
+    lastResult = await attemptAiCall(endpoint, apiKey, request);
+
+    if (lastResult.ok) return lastResult;
+    // Only retry transient failures; permanent errors fail immediately.
+    if (!lastResult.isTransient) return lastResult;
+  }
+
+  // All retries exhausted — return the last transient error as-is.
+  return lastResult!;
 }
