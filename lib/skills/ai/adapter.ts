@@ -69,6 +69,11 @@ export async function callAi(request: AiAdapterRequest): Promise<AiAdapterResult
       } catch {
         // ignore JSON parse failure — detail already contains the status code
       }
+      // 402 = insufficient OpenRouter credits — surface a distinct prefix so callers
+      // can show a user-facing "top up your balance" message without parsing error text.
+      if (response.status === 402) {
+        return { ok: false, error: `AI credit limit reached: ${detail}`, isTransient: false };
+      }
       return { ok: false, error: `AI provider error (${detail})`, isTransient };
     }
 

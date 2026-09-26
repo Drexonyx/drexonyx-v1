@@ -45,6 +45,9 @@ export async function actionAgentCampaignRun(formData: FormData): Promise<{
   });
 
   if (!preflight.ok) {
+    if (preflight.error.startsWith('AI credit limit reached')) {
+      return { ok: false, reason: 'AI credit limit reached — please top up your OpenRouter balance and try again.' };
+    }
     return { ok: false, reason: `Campaign Agent failed: ${preflight.error}` };
   }
 
@@ -96,7 +99,16 @@ export async function actionAgentCampaignRun(formData: FormData): Promise<{
   revalidatePath('/admin/campaigns');
 
   if (!run.ok) {
-    return { ok: false, taskId, campaignId, reason: run.reason, stepsRun: run.stepsAdvanced };
+    const isCreditLimit = typeof run.reason === 'string' && run.reason.includes('AI credit limit reached');
+    return {
+      ok: false,
+      taskId,
+      campaignId,
+      reason: isCreditLimit
+        ? 'AI credit limit reached — please top up your OpenRouter balance and try again.'
+        : run.reason,
+      stepsRun: run.stepsAdvanced,
+    };
   }
 
   return {

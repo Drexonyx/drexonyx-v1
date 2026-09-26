@@ -66,6 +66,7 @@ export const qcScriptReviewSkill: Skill<QcScriptReviewInput, QcScriptReviewOutpu
     const result = await callAi({
       systemPrompt: SYSTEM_PROMPT,
       userPrompt: buildUserPrompt(input),
+      maxTokens: 512,
     });
 
     if (!result.ok) {

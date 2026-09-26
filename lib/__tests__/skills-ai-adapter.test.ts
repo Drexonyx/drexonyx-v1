@@ -153,6 +153,16 @@ describe('callAi (OpenRouter)', () => {
     if (!result.ok) expect(result.isTransient).toBe(false);
   });
 
+  it('marks 402 as non-transient and prefixes error with "AI credit limit reached"', async () => {
+    mockHttpError(402, 'You requested up to 1024 tokens, but can only afford 800.');
+    const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.isTransient).toBe(false);
+      expect(result.error).toMatch(/^AI credit limit reached/);
+    }
+  });
+
   it('marks 401 unauthorized as non-transient', async () => {
     mockHttpError(401, 'unauthorized');
     const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
