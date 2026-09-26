@@ -75,11 +75,13 @@ function parseBriefOutput(text: string): ParsedBrief | null {
     const tone = typeof o.tone === 'string' ? o.tone.trim() : 'professional';
     const pageTarget = VALID_PAGE_TARGETS.has(String(o.pageTarget)) ? (o.pageTarget as 'PAGE_1' | 'PAGE_2') : 'PAGE_1';
     const placement = VALID_PLACEMENTS.has(String(o.placement)) ? (o.placement as ParsedBrief['placement']) : 'feed';
-    const publishMode = o.publishMode === 'SCHEDULED' ? 'SCHEDULED' : 'IMMEDIATE';
+    const rawPublishMode = o.publishMode === 'SCHEDULED' ? 'SCHEDULED' : 'IMMEDIATE';
     const scheduledAt =
-      publishMode === 'SCHEDULED' && typeof o.scheduledAt === 'string' && !isNaN(Date.parse(o.scheduledAt))
+      rawPublishMode === 'SCHEDULED' && typeof o.scheduledAt === 'string' && !isNaN(Date.parse(o.scheduledAt))
         ? o.scheduledAt
         : null;
+    // AI said SCHEDULED but couldn't provide a valid ISO datetime — downgrade to IMMEDIATE.
+    const publishMode: 'IMMEDIATE' | 'SCHEDULED' = rawPublishMode === 'SCHEDULED' && scheduledAt === null ? 'IMMEDIATE' : rawPublishMode;
 
     if (!campaignObjective || !targetAudience) return null;
 

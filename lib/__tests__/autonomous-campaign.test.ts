@@ -135,6 +135,34 @@ describe('runAutonomousCampaignPreflight — happy path', () => {
     expect(result.scheduledAt).toBe('2026-10-01T10:00:00.000Z');
   });
 
+  it('downgrades SCHEDULED to IMMEDIATE when scheduledAt is missing', async () => {
+    const briefNoDate = { ...PARSED_BRIEF, publishMode: 'SCHEDULED', scheduledAt: null };
+    mockCallAi.mockResolvedValueOnce(aiOk(briefNoDate));
+    mockStrategyExecute.mockResolvedValueOnce({ ok: true, output: STRATEGY_OUTPUT });
+    mockCaptionExecute.mockResolvedValueOnce({ ok: true, output: CAPTION_OUTPUT });
+
+    const result = await runAutonomousCampaignPreflight(BASE_PARAMS);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.publishMode).toBe('IMMEDIATE');
+    expect(result.scheduledAt).toBeUndefined();
+  });
+
+  it('downgrades SCHEDULED to IMMEDIATE when scheduledAt is not a valid ISO string', async () => {
+    const briefBadDate = { ...PARSED_BRIEF, publishMode: 'SCHEDULED', scheduledAt: 'next Friday' };
+    mockCallAi.mockResolvedValueOnce(aiOk(briefBadDate));
+    mockStrategyExecute.mockResolvedValueOnce({ ok: true, output: STRATEGY_OUTPUT });
+    mockCaptionExecute.mockResolvedValueOnce({ ok: true, output: CAPTION_OUTPUT });
+
+    const result = await runAutonomousCampaignPreflight(BASE_PARAMS);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.publishMode).toBe('IMMEDIATE');
+    expect(result.scheduledAt).toBeUndefined();
+  });
+
   it('falls back to objective as keyMessage when keyMessages is empty', async () => {
     const strategyNoKeys = { ...STRATEGY_OUTPUT, keyMessages: [] };
     mockCallAi.mockResolvedValueOnce(aiOk(PARSED_BRIEF));
