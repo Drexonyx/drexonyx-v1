@@ -1,35 +1,17 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-// ─── Hoisted mocks ────────────────────────────────────────────────────────────
+// ─── Mock global fetch before importing the module under test ─────────────────
 
-const { mockCreate, MockAPIError } = vi.hoisted(() => {
-  class MockAPIError extends Error {
-    status: number;
-    constructor(status: number, message: string) {
-      super(message);
-      this.status = status;
-      this.name = 'APIError';
-    }
-  }
-  return { mockCreate: vi.fn(), MockAPIError };
-});
-
-vi.mock('@anthropic-ai/sdk', () => {
-  class MockAnthropic {
-    messages = { create: mockCreate };
-    // Static APIError must be on the class itself since adapter does Anthropic.APIError
-    static APIError = MockAPIError;
-  }
-  return { default: MockAnthropic };
-});
+const mockFetch = vi.fn();
+vi.stubGlobal('fetch', mockFetch);
 
 import { callAi } from '../skills/ai/adapter';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const BASE_ENV = {
-  SKILLS_AI_MODEL: 'claude-sonnet-4-6',
-  ANTHROPIC_API_KEY: 'sk-test-key',
+  OPENROUTER_API_KEY: 'sk-or-test-key-abcdefgh',
+  SKILLS_AI_MODEL: 'openrouter/free',
 };
 
 function setEnv(overrides: Record<string, string | undefined> = {}) {
@@ -44,13 +26,29 @@ function setEnv(overrides: Record<string, string | undefined> = {}) {
 }
 
 function clearEnv() {
+  delete process.env.OPENROUTER_API_KEY;
   delete process.env.SKILLS_AI_MODEL;
-  delete process.env.ANTHROPIC_API_KEY;
+}
+
+function mockSuccess(content: string) {
+  mockFetch.mockResolvedValue({
+    ok: true,
+    status: 200,
+    json: async () => ({ choices: [{ message: { content } }] }),
+  });
+}
+
+function mockHttpError(status: number, message = 'error') {
+  mockFetch.mockResolvedValue({
+    ok: false,
+    status,
+    json: async () => ({ error: { message } }),
+  });
 }
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
-describe('callAi', () => {
+describe('callAi (OpenRouter)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     setEnv();
@@ -60,96 +58,136 @@ describe('callAi', () => {
     clearEnv();
   });
 
-  it('returns ok:false when SKILLS_AI_MODEL is missing', async () => {
-    setEnv({ SKILLS_AI_MODEL: undefined });
-    const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.isTransient).toBe(false);
-  });
-
-  it('returns ok:false when ANTHROPIC_API_KEY is missing', async () => {
-    setEnv({ ANTHROPIC_API_KEY: undefined });
-    const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
-    expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.isTransient).toBe(false);
-  });
-
-  it('never exposes the API key in the error message', async () => {
-    mockCreate.mockRejectedValue(new Error('some error'));
+  it('returns ok:false when OPENROUTER_API_KEY is missing', async () => {
+    setEnv({ OPENROUTER_API_KEY: undefined });
     const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
     expect(result.ok).toBe(false);
     if (!result.ok) {
-      expect(result.error).not.toContain('sk-test-key');
+      expect(result.isTransient).toBe(false);
+      expect(result.error).toMatch(/OPENROUTER_API_KEY/);
     }
   });
 
-  it('makes exactly one AI call per invocation (DR 0073 §2.6)', async () => {
-    mockCreate.mockResolvedValue({ content: [{ type: 'text', text: '{"ok":true}' }] });
+  it('defaults to openrouter/free when SKILLS_AI_MODEL is not set', async () => {
+    setEnv({ SKILLS_AI_MODEL: undefined });
+    mockSuccess('{"ok":true}');
     await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
-    expect(mockCreate).toHaveBeenCalledOnce();
+    const body = JSON.parse((mockFetch.mock.calls[0] as [string, RequestInit])[1].body as string);
+    expect(body.model).toBe('openrouter/free');
+  });
+
+  it('uses SKILLS_AI_MODEL env var as model (DR 0073 §2.4)', async () => {
+    setEnv({ SKILLS_AI_MODEL: 'meta-llama/llama-3.1-8b-instruct:free' });
+    mockSuccess('text');
+    await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    const body = JSON.parse((mockFetch.mock.calls[0] as [string, RequestInit])[1].body as string);
+    expect(body.model).toBe('meta-llama/llama-3.1-8b-instruct:free');
   });
 
   it('returns ok:true with text on successful AI call', async () => {
     const responseText = '{"result":"value"}';
-    mockCreate.mockResolvedValue({ content: [{ type: 'text', text: responseText }] });
+    mockSuccess(responseText);
     const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
     expect(result.ok).toBe(true);
     if (result.ok) expect(result.text).toBe(responseText);
   });
 
-  it('uses SKILLS_AI_MODEL env var as model (DR 0073 §2.4)', async () => {
-    mockCreate.mockResolvedValue({ content: [{ type: 'text', text: 'text' }] });
+  it('makes exactly one fetch call per invocation (DR 0073 §2.6)', async () => {
+    mockSuccess('text');
     await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
-    expect(mockCreate).toHaveBeenCalledWith(
-      expect.objectContaining({ model: 'claude-sonnet-4-6' }),
+    expect(mockFetch).toHaveBeenCalledOnce();
+  });
+
+  it('posts to the OpenRouter chat completions endpoint', async () => {
+    mockSuccess('text');
+    await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    expect(mockFetch).toHaveBeenCalledWith(
+      'https://openrouter.ai/api/v1/chat/completions',
+      expect.objectContaining({ method: 'POST' }),
     );
   });
 
-  it('marks 529 status as transient (DR 0073)', async () => {
-    mockCreate.mockRejectedValue(new MockAPIError(529, 'overloaded'));
+  it('never exposes the API key in the error message', async () => {
+    mockHttpError(401, 'invalid api key');
+    const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).not.toContain('sk-or-test-key-abcdefgh');
+    }
+  });
+
+  it('marks 429 rate limit as transient', async () => {
+    mockHttpError(429, 'rate limited');
     const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.isTransient).toBe(true);
   });
 
-  it('marks 500 status as transient (DR 0073)', async () => {
-    mockCreate.mockRejectedValue(new MockAPIError(500, 'server error'));
+  it('marks 500 server error as transient', async () => {
+    mockHttpError(500, 'server error');
     const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.isTransient).toBe(true);
   });
 
-  it('marks 400 status as non-transient (DR 0073)', async () => {
-    mockCreate.mockRejectedValue(new MockAPIError(400, 'bad request'));
+  it('marks 400 as non-transient', async () => {
+    mockHttpError(400, 'bad request');
     const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.isTransient).toBe(false);
   });
 
-  it('includes Anthropic error detail in error message for APIError', async () => {
-    mockCreate.mockRejectedValue(new MockAPIError(400, 'invalid_request_error: max_tokens: 2049 > 2048'));
+  it('marks 401 unauthorized as non-transient', async () => {
+    mockHttpError(401, 'unauthorized');
+    const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.isTransient).toBe(false);
+  });
+
+  it('includes status code in error message for HTTP errors', async () => {
+    mockHttpError(400, 'invalid_request_error: max_tokens too large');
     const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
     expect(result.ok).toBe(false);
     if (!result.ok) {
-      expect(result.error).toContain('status 400');
+      expect(result.error).toContain('400');
       expect(result.error).toContain('invalid_request_error');
     }
   });
 
-  it('redacts API key patterns from Anthropic error detail', async () => {
-    mockCreate.mockRejectedValue(new MockAPIError(401, 'Invalid API key sk-ant-api03-ABCDEFGHIJKLMNOPQRSTUVWXYZ'));
+  it('redacts credential patterns from error messages', async () => {
+    mockHttpError(401, 'Invalid key sk-or-abcdefghijklmnopqrstuvwxyz provided');
     const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
     expect(result.ok).toBe(false);
     if (!result.ok) {
-      expect(result.error).not.toContain('sk-ant-api03-ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+      expect(result.error).not.toContain('sk-or-abcdefghijklmnopqrstuvwxyz');
       expect(result.error).toContain('[REDACTED]');
     }
   });
 
-  it('non-APIError exceptions are non-transient', async () => {
-    mockCreate.mockRejectedValue(new Error('network failure'));
+  it('network failure is transient', async () => {
+    mockFetch.mockRejectedValue(new Error('ECONNREFUSED'));
     const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
     expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.isTransient).toBe(false);
+    if (!result.ok) expect(result.isTransient).toBe(true);
+  });
+
+  it('returns ok:false for empty response content', async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ choices: [{ message: { content: '' } }] }),
+    });
+    const result = await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    expect(result.ok).toBe(false);
+  });
+
+  it('sends system and user messages in the request body', async () => {
+    mockSuccess('response');
+    await callAi({ systemPrompt: 'system instruction', userPrompt: 'user query' });
+    const body = JSON.parse((mockFetch.mock.calls[0] as [string, RequestInit])[1].body as string);
+    expect(body.messages).toEqual([
+      { role: 'system', content: 'system instruction' },
+      { role: 'user', content: 'user query' },
+    ]);
   });
 });
