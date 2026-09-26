@@ -30,7 +30,13 @@ export async function callAi(request: AiAdapterRequest): Promise<AiAdapterResult
     return { ok: false, error: 'OPENROUTER_API_KEY is not configured', isTransient: false };
   }
 
-  const model = process.env.SKILLS_AI_MODEL ?? DEFAULT_MODEL;
+  // Normalize bare Anthropic model IDs (e.g. "claude-sonnet-4-6") to the
+  // OpenRouter provider-scoped format ("anthropic/claude-sonnet-4-6").
+  // IDs that already contain a "/" (e.g. "openrouter/free") are passed through unchanged.
+  const rawModel = process.env.SKILLS_AI_MODEL ?? DEFAULT_MODEL;
+  const model = rawModel.startsWith('claude-') && !rawModel.includes('/')
+    ? `anthropic/${rawModel}`
+    : rawModel;
 
   try {
     const response = await fetch(OPENROUTER_ENDPOINT, {

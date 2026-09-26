@@ -84,6 +84,22 @@ describe('callAi (OpenRouter)', () => {
     expect(body.model).toBe('meta-llama/llama-3.1-8b-instruct:free');
   });
 
+  it('normalizes bare Anthropic model ID to OpenRouter provider-scoped format', async () => {
+    setEnv({ SKILLS_AI_MODEL: 'claude-sonnet-4-6' });
+    mockSuccess('text');
+    await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    const body = JSON.parse((mockFetch.mock.calls[0] as [string, RequestInit])[1].body as string);
+    expect(body.model).toBe('anthropic/claude-sonnet-4-6');
+  });
+
+  it('does not double-prefix an already scoped anthropic model ID', async () => {
+    setEnv({ SKILLS_AI_MODEL: 'anthropic/claude-sonnet-4-6' });
+    mockSuccess('text');
+    await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    const body = JSON.parse((mockFetch.mock.calls[0] as [string, RequestInit])[1].body as string);
+    expect(body.model).toBe('anthropic/claude-sonnet-4-6');
+  });
+
   it('returns ok:true with text on successful AI call', async () => {
     const responseText = '{"result":"value"}';
     mockSuccess(responseText);
