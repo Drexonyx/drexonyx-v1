@@ -119,6 +119,23 @@ No markdown, no explanation. Return only the JSON object.`;
     return { ok: false, error: result.error, isTransient: result.isTransient };
   }
 
+  // TEMPORARY DIAGNOSTIC — remove once root cause is confirmed (DR 0073: no secrets logged)
+  {
+    const diagPreview = result.text.slice(0, 2000);
+    const diagExtracted = extractJson(result.text);
+    const diagObj = diagExtracted && typeof diagExtracted === 'object' && !Array.isArray(diagExtracted)
+      ? diagExtracted as Record<string, unknown>
+      : null;
+    console.error(
+      '[DIAG:brief-parser] text_len=%d extracted_type=%s has_objective=%s has_audience=%s preview=%s',
+      result.text.length,
+      diagExtracted === null ? 'null' : Array.isArray(diagExtracted) ? 'array' : typeof diagExtracted,
+      diagObj ? String(!!diagObj.campaignObjective) : 'N/A',
+      diagObj ? String(!!diagObj.targetAudience) : 'N/A',
+      JSON.stringify(diagPreview),
+    );
+  }
+
   const parsed = parseBriefOutput(result.text);
   if (!parsed) {
     return { ok: false, error: 'Brief parser returned unparseable output', isTransient: false };
