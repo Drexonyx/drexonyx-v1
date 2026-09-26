@@ -50,6 +50,14 @@ function aiOk(obj: unknown) {
   return { ok: true, text: JSON.stringify(obj) };
 }
 
+function aiOkFenced(obj: unknown) {
+  return { ok: true, text: '```json\n' + JSON.stringify(obj, null, 2) + '\n```' };
+}
+
+function aiOkProse(obj: unknown) {
+  return { ok: true, text: 'Here is the result:\n\n```json\n' + JSON.stringify(obj) + '\n```\n\nLet me know if you need anything else.' };
+}
+
 describe('runAutonomousCampaignPreflight — happy path', () => {
   beforeEach(() => vi.clearAllMocks());
 
@@ -71,6 +79,30 @@ describe('runAutonomousCampaignPreflight — happy path', () => {
     expect(result.scheduledAt).toBeUndefined();
     expect(result.strategyAngles).toEqual(STRATEGY_OUTPUT.angles);
     expect(result.strategyKeyMessages).toEqual(STRATEGY_OUTPUT.keyMessages);
+  });
+
+  it('parses brief returned inside markdown code fences', async () => {
+    mockCallAi.mockResolvedValueOnce(aiOkFenced(PARSED_BRIEF));
+    mockStrategyExecute.mockResolvedValueOnce({ ok: true, output: STRATEGY_OUTPUT });
+    mockCaptionExecute.mockResolvedValueOnce({ ok: true, output: CAPTION_OUTPUT });
+
+    const result = await runAutonomousCampaignPreflight(BASE_PARAMS);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.campaignNameSuggestion).toBe(PARSED_BRIEF.campaignName);
+  });
+
+  it('parses brief returned with prose preamble and fenced JSON', async () => {
+    mockCallAi.mockResolvedValueOnce(aiOkProse(PARSED_BRIEF));
+    mockStrategyExecute.mockResolvedValueOnce({ ok: true, output: STRATEGY_OUTPUT });
+    mockCaptionExecute.mockResolvedValueOnce({ ok: true, output: CAPTION_OUTPUT });
+
+    const result = await runAutonomousCampaignPreflight(BASE_PARAMS);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.campaignNameSuggestion).toBe(PARSED_BRIEF.campaignName);
   });
 
   it('passes first keyMessage to caption skill', async () => {

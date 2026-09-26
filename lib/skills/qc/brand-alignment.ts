@@ -1,5 +1,6 @@
 import type { Skill, SkillContext, SkillResult } from '../interface';
 import { callAi } from '../ai/adapter';
+import { extractJson } from '../ai/extract-json';
 
 export interface QcBrandAlignmentInput {
   content: string;
@@ -34,7 +35,7 @@ function buildUserPrompt(input: QcBrandAlignmentInput): string {
 
 function parseOutput(text: string): QcBrandAlignmentOutput | null {
   try {
-    const parsed = JSON.parse(text) as unknown;
+    const parsed = extractJson(text);
     if (typeof parsed !== 'object' || parsed === null) return null;
     const o = parsed as Record<string, unknown>;
     if (

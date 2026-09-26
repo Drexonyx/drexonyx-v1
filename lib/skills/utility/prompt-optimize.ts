@@ -1,5 +1,6 @@
 import type { Skill, SkillContext, SkillResult } from '../interface';
 import { callAi } from '../ai/adapter';
+import { extractJson } from '../ai/extract-json';
 
 export interface UtilityPromptOptimizeInput {
   originalPrompt: string;
@@ -31,7 +32,7 @@ function buildUserPrompt(input: UtilityPromptOptimizeInput): string {
 
 function parseOutput(text: string): UtilityPromptOptimizeOutput | null {
   try {
-    const parsed = JSON.parse(text) as unknown;
+    const parsed = extractJson(text);
     if (typeof parsed !== 'object' || parsed === null) return null;
     const o = parsed as Record<string, unknown>;
     if (

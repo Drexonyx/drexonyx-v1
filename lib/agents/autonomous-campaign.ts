@@ -16,6 +16,7 @@
 //   - Total AI calls per autonomous run: 3 (parse + strategy + caption)
 
 import { callAi } from '@/lib/skills/ai/adapter';
+import { extractJson } from '@/lib/skills/ai/extract-json';
 import { strategyCampaignDevelopSkill } from '@/lib/skills/strategy/campaign-develop';
 import { scriptSocialCaptionSkill } from '@/lib/skills/script/social-caption';
 import type { SkillContext } from '@/lib/skills/interface';
@@ -64,7 +65,7 @@ const VALID_PAGE_TARGETS = new Set(['PAGE_1', 'PAGE_2']);
 
 function parseBriefOutput(text: string): ParsedBrief | null {
   try {
-    const raw = JSON.parse(text.trim()) as unknown;
+    const raw = extractJson(text);
     if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
     const o = raw as Record<string, unknown>;
 

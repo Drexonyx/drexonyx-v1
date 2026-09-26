@@ -1,5 +1,6 @@
 import type { Skill, SkillContext, SkillResult } from '../interface';
 import { callAi } from '../ai/adapter';
+import { extractJson } from '../ai/extract-json';
 
 export interface StrategyBrandPositioningInput {
   brandName: string;
@@ -40,7 +41,7 @@ function buildUserPrompt(input: StrategyBrandPositioningInput): string {
 
 function parseOutput(text: string): StrategyBrandPositioningOutput | null {
   try {
-    const parsed = JSON.parse(text) as unknown;
+    const parsed = extractJson(text);
     if (typeof parsed !== 'object' || parsed === null) return null;
     const o = parsed as Record<string, unknown>;
     if (

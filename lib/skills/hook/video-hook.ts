@@ -1,5 +1,6 @@
 import type { Skill, SkillContext, SkillResult } from '../interface';
 import { callAi } from '../ai/adapter';
+import { extractJson } from '../ai/extract-json';
 
 export interface HookVideoInput {
   objective: string;
@@ -40,7 +41,7 @@ function buildUserPrompt(input: HookVideoInput): string {
 
 function parseOutput(text: string): HookVideoOutput | null {
   try {
-    const parsed = JSON.parse(text) as unknown;
+    const parsed = extractJson(text);
     if (typeof parsed !== 'object' || parsed === null) return null;
     const o = parsed as Record<string, unknown>;
     if (Array.isArray(o.hooks)) {
