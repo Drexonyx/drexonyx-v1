@@ -47,7 +47,7 @@ export async function callAi(request: AiAdapterRequest): Promise<AiAdapterResult
       },
       body: JSON.stringify({
         model,
-        max_tokens: request.maxTokens ?? 2048,
+        max_tokens: request.maxTokens ?? 1600,
         messages: [
           { role: 'system', content: request.systemPrompt },
           { role: 'user', content: request.userPrompt },

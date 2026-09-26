@@ -206,4 +206,18 @@ describe('callAi (OpenRouter)', () => {
       { role: 'user', content: 'user query' },
     ]);
   });
+
+  it('defaults max_tokens to 1600 when no override is given', async () => {
+    mockSuccess('response');
+    await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    const body = JSON.parse((mockFetch.mock.calls[0] as [string, RequestInit])[1].body as string);
+    expect(body.max_tokens).toBe(1600);
+  });
+
+  it('respects per-call maxTokens override', async () => {
+    mockSuccess('response');
+    await callAi({ systemPrompt: 'sys', userPrompt: 'user', maxTokens: 512 });
+    const body = JSON.parse((mockFetch.mock.calls[0] as [string, RequestInit])[1].body as string);
+    expect(body.max_tokens).toBe(512);
+  });
 });
