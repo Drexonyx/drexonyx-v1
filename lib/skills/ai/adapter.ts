@@ -4,14 +4,33 @@
 // DR 0073 §2.5: API key stored exclusively as server-side env var; never logged or returned to callers.
 // DR 0073 §2.6: Each skill.execute() makes at most ONE call to callAi().
 
+// Gemini structured-output schema type (OpenAPI Schema Object subset).
+// Pass responseSchema in any AiAdapterRequest to constrain Gemini's output.
+export type GeminiSchemaType = 'object' | 'array' | 'string' | 'number' | 'integer' | 'boolean';
+
+export interface GeminiSchema {
+  type: GeminiSchemaType;
+  nullable?: boolean;
+  description?: string;
+  enum?: string[];
+  properties?: Record<string, GeminiSchema>;
+  required?: string[];
+  items?: GeminiSchema;
+}
+
 export interface AiAdapterRequest {
   systemPrompt: string;
   userPrompt: string;
   maxTokens?: number;
+  responseSchema?: GeminiSchema;
 }
 
 export type AiAdapterResult =
   | { ok: true; text: string }
+  | { ok: false; error: string; isTransient: boolean };
+
+export type AiTypedResult<T> =
+  | { ok: true; output: T }
   | { ok: false; error: string; isTransient: boolean };
 
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
@@ -60,6 +79,7 @@ async function attemptAiCall(
           responseMimeType: 'application/json',
           maxOutputTokens: request.maxTokens ?? 1600,
           candidateCount: 1,
+          ...(request.responseSchema !== undefined ? { responseSchema: request.responseSchema } : {}),
         },
       }),
     });
@@ -127,4 +147,31 @@ export async function callAi(request: AiAdapterRequest): Promise<AiAdapterResult
 
   // All retries exhausted — return the last transient error as-is.
   return lastResult!;
+}
+
+// Wraps callAi: parses the JSON response and validates it with the supplied validator.
+// Returns distinct errors for: HTTP/provider failure, JSON parse failure, schema validation failure.
+// `validate` must throw an Error with a descriptive message when the parsed value is invalid.
+export async function callAiTyped<T>(
+  request: AiAdapterRequest & { responseSchema: GeminiSchema },
+  validate: (parsed: unknown) => T,
+): Promise<AiTypedResult<T>> {
+  const result = await callAi(request);
+  if (!result.ok) return result;
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(result.text);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return { ok: false, error: `AI response is not valid JSON: ${msg.slice(0, 200)}`, isTransient: false };
+  }
+
+  try {
+    const output = validate(parsed);
+    return { ok: true, output };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return { ok: false, error: `AI response failed schema validation: ${msg.slice(0, 300)}`, isTransient: false };
+  }
 }

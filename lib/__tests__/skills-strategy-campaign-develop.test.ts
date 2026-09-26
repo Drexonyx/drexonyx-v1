@@ -74,7 +74,7 @@ describe('strategyCampaignDevelopSkill', () => {
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.isTransient).toBe(false);
-      expect(result.error).toContain('Strategy: unparseable AI response');
+      expect(result.error).toContain('Strategy:');
     }
   });
 
@@ -141,16 +141,26 @@ describe('strategyCampaignDevelopSkill', () => {
     expect(call.maxTokens).toBe(1024);
   });
 
-  it('error message includes a preview of the AI response', async () => {
-    const badResponse = 'I recommend targeting social media channels with a focus on engagement...';
-    mockSuccess(badResponse);
+  it('error message identifies JSON parse failure for prose responses', async () => {
+    mockSuccess('I recommend targeting social media channels with a focus on engagement...');
     const result = await strategyCampaignDevelopSkill.execute(
       { objective: 'obj', targetAudience: 'aud' },
       MOCK_CONTEXT,
     );
     expect(result.ok).toBe(false);
     if (!result.ok) {
-      expect(result.error).toContain('I recommend');
+      expect(result.error).toContain('not valid JSON');
     }
+  });
+
+  it('passes responseSchema to callAi for structured output', async () => {
+    mockSuccess(VALID_OUTPUT);
+    await strategyCampaignDevelopSkill.execute(
+      { objective: 'obj', targetAudience: 'aud' },
+      MOCK_CONTEXT,
+    );
+    const call = mockCallAi.mock.calls[0][0] as { responseSchema?: unknown };
+    expect(call.responseSchema).toBeDefined();
+    expect(call.responseSchema).toMatchObject({ type: 'object' });
   });
 });

@@ -1,6 +1,6 @@
 import type { Skill, SkillContext, SkillResult } from '../interface';
 import { callAi } from '../ai/adapter';
-import { extractJson } from '../ai/extract-json';
+import type { GeminiSchema } from '../ai/adapter';
 
 export interface QcScriptReviewInput {
   script: string;
@@ -14,6 +14,17 @@ export interface QcScriptReviewOutput {
   score: number;
   recommendations: string[];
 }
+
+const QC_SCRIPT_SCHEMA: GeminiSchema = {
+  type: 'object',
+  properties: {
+    verdict: { type: 'string', enum: ['PASS', 'FAIL'] },
+    findings: { type: 'array', items: { type: 'string' } },
+    score: { type: 'number' },
+    recommendations: { type: 'array', items: { type: 'string' } },
+  },
+  required: ['verdict', 'findings', 'score', 'recommendations'],
+};
 
 const SYSTEM_PROMPT = `You are a senior QC reviewer assessing ad scripts for quality and compliance.
 Review the provided script and return a JSON object with:
@@ -33,28 +44,21 @@ function buildUserPrompt(input: QcScriptReviewInput): string {
   return parts.join('\n\n');
 }
 
-function parseOutput(text: string): QcScriptReviewOutput | null {
-  try {
-    const parsed = extractJson(text);
-    if (typeof parsed !== 'object' || parsed === null) return null;
-    const o = parsed as Record<string, unknown>;
-    if (
-      (o.verdict === 'PASS' || o.verdict === 'FAIL') &&
-      Array.isArray(o.findings) &&
-      typeof o.score === 'number' &&
-      Array.isArray(o.recommendations)
-    ) {
-      return {
-        verdict: o.verdict,
-        findings: o.findings as string[],
-        score: o.score,
-        recommendations: o.recommendations as string[],
-      };
-    }
-    return null;
-  } catch {
-    return null;
+function validateOutput(parsed: unknown): QcScriptReviewOutput {
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    throw new Error('expected object');
   }
+  const o = parsed as Record<string, unknown>;
+  if (o.verdict !== 'PASS' && o.verdict !== 'FAIL') throw new Error('verdict must be PASS or FAIL');
+  if (!Array.isArray(o.findings)) throw new Error('findings must be an array');
+  if (typeof o.score !== 'number') throw new Error('score must be a number');
+  if (!Array.isArray(o.recommendations)) throw new Error('recommendations must be an array');
+  return {
+    verdict: o.verdict,
+    findings: o.findings as string[],
+    score: o.score,
+    recommendations: o.recommendations as string[],
+  };
 }
 
 export const qcScriptReviewSkill: Skill<QcScriptReviewInput, QcScriptReviewOutput> = {
@@ -67,17 +71,27 @@ export const qcScriptReviewSkill: Skill<QcScriptReviewInput, QcScriptReviewOutpu
       systemPrompt: SYSTEM_PROMPT,
       userPrompt: buildUserPrompt(input),
       maxTokens: 512,
+      responseSchema: QC_SCRIPT_SCHEMA,
     });
 
     if (!result.ok) {
       return { ok: false, error: result.error, isTransient: result.isTransient };
     }
 
-    const output = parseOutput(result.text);
-    if (!output) {
-      return { ok: false, error: 'AI returned unparseable output', isTransient: false };
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(result.text);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return { ok: false, error: `QC script review: AI response is not valid JSON: ${msg.slice(0, 200)}`, isTransient: false };
     }
 
-    return { ok: true, output };
+    try {
+      const output = validateOutput(parsed);
+      return { ok: true, output };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return { ok: false, error: `QC script review: AI response missing required fields: ${msg.slice(0, 200)}`, isTransient: false };
+    }
   },
 };

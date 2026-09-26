@@ -1,6 +1,6 @@
 import type { Skill, SkillContext, SkillResult } from '../interface';
 import { callAi } from '../ai/adapter';
-import { extractJson } from '../ai/extract-json';
+import type { GeminiSchema } from '../ai/adapter';
 
 export interface StrategyCampaignDevelopInput {
   objective: string;
@@ -15,6 +15,17 @@ export interface StrategyCampaignDevelopOutput {
   channels: string[];
   keyMessages: string[];
 }
+
+const STRATEGY_SCHEMA: GeminiSchema = {
+  type: 'object',
+  properties: {
+    angles: { type: 'array', items: { type: 'string' } },
+    themes: { type: 'array', items: { type: 'string' } },
+    channels: { type: 'array', items: { type: 'string' } },
+    keyMessages: { type: 'array', items: { type: 'string' } },
+  },
+  required: ['angles', 'themes', 'channels', 'keyMessages'],
+};
 
 const SYSTEM_PROMPT = `You are a senior campaign strategist. Return ONLY a valid JSON object with these string-array fields:
 - angles: array of 4 distinct creative angles (short phrases)
@@ -34,28 +45,21 @@ function buildUserPrompt(input: StrategyCampaignDevelopInput): string {
   return parts.join('\n');
 }
 
-function parseOutput(text: string): StrategyCampaignDevelopOutput | null {
-  try {
-    const parsed = extractJson(text);
-    if (typeof parsed !== 'object' || parsed === null) return null;
-    const o = parsed as Record<string, unknown>;
-    if (
-      Array.isArray(o.angles) &&
-      Array.isArray(o.themes) &&
-      Array.isArray(o.channels) &&
-      Array.isArray(o.keyMessages)
-    ) {
-      return {
-        angles: o.angles as string[],
-        themes: o.themes as string[],
-        channels: o.channels as string[],
-        keyMessages: o.keyMessages as string[],
-      };
-    }
-    return null;
-  } catch {
-    return null;
+function validateOutput(parsed: unknown): StrategyCampaignDevelopOutput {
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    throw new Error('expected object');
   }
+  const o = parsed as Record<string, unknown>;
+  if (!Array.isArray(o.angles)) throw new Error('angles must be an array');
+  if (!Array.isArray(o.themes)) throw new Error('themes must be an array');
+  if (!Array.isArray(o.channels)) throw new Error('channels must be an array');
+  if (!Array.isArray(o.keyMessages)) throw new Error('keyMessages must be an array');
+  return {
+    angles: o.angles as string[],
+    themes: o.themes as string[],
+    channels: o.channels as string[],
+    keyMessages: o.keyMessages as string[],
+  };
 }
 
 export const strategyCampaignDevelopSkill: Skill<StrategyCampaignDevelopInput, StrategyCampaignDevelopOutput> = {
@@ -68,18 +72,27 @@ export const strategyCampaignDevelopSkill: Skill<StrategyCampaignDevelopInput, S
       systemPrompt: SYSTEM_PROMPT,
       userPrompt: buildUserPrompt(input),
       maxTokens: 1024,
+      responseSchema: STRATEGY_SCHEMA,
     });
 
     if (!result.ok) {
       return { ok: false, error: result.error, isTransient: result.isTransient };
     }
 
-    const output = parseOutput(result.text);
-    if (!output) {
-      const preview = result.text.slice(0, 120).replace(/\n/g, ' ');
-      return { ok: false, error: `Strategy: unparseable AI response — ${preview}`, isTransient: false };
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(result.text);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return { ok: false, error: `Strategy: AI response is not valid JSON: ${msg.slice(0, 200)}`, isTransient: false };
     }
 
-    return { ok: true, output };
+    try {
+      const output = validateOutput(parsed);
+      return { ok: true, output };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return { ok: false, error: `Strategy: AI response missing required fields: ${msg.slice(0, 200)}`, isTransient: false };
+    }
   },
 };

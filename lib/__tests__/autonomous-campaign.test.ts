@@ -81,8 +81,8 @@ describe('runAutonomousCampaignPreflight — happy path', () => {
     expect(result.strategyKeyMessages).toEqual(STRATEGY_OUTPUT.keyMessages);
   });
 
-  it('parses brief returned inside markdown code fences', async () => {
-    mockCallAi.mockResolvedValueOnce(aiOkFenced(PARSED_BRIEF));
+  it('parses brief when callAi returns clean JSON (structured output contract)', async () => {
+    mockCallAi.mockResolvedValueOnce(aiOk(PARSED_BRIEF));
     mockStrategyExecute.mockResolvedValueOnce({ ok: true, output: STRATEGY_OUTPUT });
     mockCaptionExecute.mockResolvedValueOnce({ ok: true, output: CAPTION_OUTPUT });
 
@@ -93,16 +93,20 @@ describe('runAutonomousCampaignPreflight — happy path', () => {
     expect(result.campaignNameSuggestion).toBe(PARSED_BRIEF.campaignName);
   });
 
-  it('parses brief returned with prose preamble and fenced JSON', async () => {
-    mockCallAi.mockResolvedValueOnce(aiOkProse(PARSED_BRIEF));
+  it('callAi is invoked with responseSchema containing all required brief fields', async () => {
+    mockCallAi.mockResolvedValueOnce(aiOk(PARSED_BRIEF));
     mockStrategyExecute.mockResolvedValueOnce({ ok: true, output: STRATEGY_OUTPUT });
     mockCaptionExecute.mockResolvedValueOnce({ ok: true, output: CAPTION_OUTPUT });
 
-    const result = await runAutonomousCampaignPreflight(BASE_PARAMS);
+    await runAutonomousCampaignPreflight(BASE_PARAMS);
 
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    expect(result.campaignNameSuggestion).toBe(PARSED_BRIEF.campaignName);
+    const briefCall = mockCallAi.mock.calls[0][0] as { responseSchema?: { type?: string; properties?: Record<string, unknown>; required?: string[] } };
+    expect(briefCall.responseSchema).toBeDefined();
+    expect(briefCall.responseSchema?.type).toBe('object');
+    expect(briefCall.responseSchema?.properties).toHaveProperty('campaignObjective');
+    expect(briefCall.responseSchema?.properties).toHaveProperty('targetAudience');
+    expect(briefCall.responseSchema?.required).toContain('campaignObjective');
+    expect(briefCall.responseSchema?.required).toContain('targetAudience');
   });
 
   it('passes first keyMessage to caption skill', async () => {
@@ -257,5 +261,47 @@ describe('runAutonomousCampaignPreflight — failure cases', () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.placement).toBe('feed');
+  });
+
+  it('returns ok:false with distinct error when brief JSON is malformed (not valid JSON)', async () => {
+    mockCallAi.mockResolvedValueOnce({ ok: true, text: 'not valid json' });
+
+    const result = await runAutonomousCampaignPreflight(BASE_PARAMS);
+
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.isTransient).toBe(false);
+    expect(result.error).toMatch(/Brief parsing failed/);
+    expect(result.error).toMatch(/malformed JSON/);
+  });
+
+  it('returns ok:false with distinct error when brief JSON is valid but fields are invalid', async () => {
+    const noObjective = { ...PARSED_BRIEF, campaignObjective: '' };
+    mockCallAi.mockResolvedValueOnce(aiOk(noObjective));
+
+    const result = await runAutonomousCampaignPreflight(BASE_PARAMS);
+
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.isTransient).toBe(false);
+    expect(result.error).toMatch(/Brief parsing failed/);
+    expect(result.error).toMatch(/invalid fields/);
+  });
+
+  it('full preflight chain produces correct output from structured brief, strategy, and caption', async () => {
+    const scheduledBrief = { ...PARSED_BRIEF, publishMode: 'SCHEDULED' as const, scheduledAt: '2027-01-15T09:00:00.000Z' };
+    mockCallAi.mockResolvedValueOnce(aiOk(scheduledBrief));
+    mockStrategyExecute.mockResolvedValueOnce({ ok: true, output: STRATEGY_OUTPUT });
+    mockCaptionExecute.mockResolvedValueOnce({ ok: true, output: CAPTION_OUTPUT });
+
+    const result = await runAutonomousCampaignPreflight(BASE_PARAMS);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.publishMode).toBe('SCHEDULED');
+    expect(result.scheduledAt).toBe('2027-01-15T09:00:00.000Z');
+    expect(result.captionText).toBe(CAPTION_OUTPUT.caption);
+    expect(result.strategyAngles).toEqual(STRATEGY_OUTPUT.angles);
+    expect(result.strategyKeyMessages).toEqual(STRATEGY_OUTPUT.keyMessages);
   });
 });

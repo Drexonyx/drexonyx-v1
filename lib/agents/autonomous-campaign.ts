@@ -2,7 +2,7 @@
 //
 // Runs BEFORE the orchestrated task is created.
 // Takes a natural-language brief and produces a ready-to-delegate campaign:
-//   1. Parse brief   → structured campaign parameters (via callAi)
+//   1. Parse brief   → structured campaign parameters (via callAi + responseSchema)
 //   2. Strategy      → campaign angles, themes, keyMessages (strategy.campaign.develop)
 //   3. Caption       → Facebook-optimised caption + headline (script.social_caption.generate)
 //
@@ -16,7 +16,7 @@
 //   - Total AI calls per autonomous run: 3 (parse + strategy + caption)
 
 import { callAi } from '@/lib/skills/ai/adapter';
-import { extractJson } from '@/lib/skills/ai/extract-json';
+import type { GeminiSchema } from '@/lib/skills/ai/adapter';
 import { strategyCampaignDevelopSkill } from '@/lib/skills/strategy/campaign-develop';
 import { scriptSocialCaptionSkill } from '@/lib/skills/script/social-caption';
 import type { SkillContext } from '@/lib/skills/interface';
@@ -60,35 +60,55 @@ interface ParsedBrief {
   scheduledAt: string | null;
 }
 
+const BRIEF_SCHEMA: GeminiSchema = {
+  type: 'object',
+  properties: {
+    campaignName: { type: 'string' },
+    campaignObjective: { type: 'string' },
+    targetAudience: { type: 'string' },
+    tone: { type: 'string', enum: ['professional', 'casual', 'energetic', 'inspiring', 'authoritative'] },
+    pageTarget: { type: 'string', enum: ['PAGE_1', 'PAGE_2'] },
+    placement: { type: 'string', enum: ['feed', 'story', 'reel', 'marketplace', 'search'] },
+    publishMode: { type: 'string', enum: ['IMMEDIATE', 'SCHEDULED'] },
+    scheduledAt: { type: 'string', nullable: true },
+  },
+  required: ['campaignName', 'campaignObjective', 'targetAudience', 'tone', 'pageTarget', 'placement', 'publishMode', 'scheduledAt'],
+};
+
 const VALID_PLACEMENTS = new Set(['feed', 'story', 'reel', 'marketplace', 'search']);
 const VALID_PAGE_TARGETS = new Set(['PAGE_1', 'PAGE_2']);
 
-function parseBriefOutput(text: string): ParsedBrief | null {
-  try {
-    const raw = extractJson(text);
-    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
-    const o = raw as Record<string, unknown>;
-
-    const campaignName = typeof o.campaignName === 'string' ? o.campaignName.trim() : '';
-    const campaignObjective = typeof o.campaignObjective === 'string' ? o.campaignObjective.trim() : '';
-    const targetAudience = typeof o.targetAudience === 'string' ? o.targetAudience.trim() : '';
-    const tone = typeof o.tone === 'string' ? o.tone.trim() : 'professional';
-    const pageTarget = VALID_PAGE_TARGETS.has(String(o.pageTarget)) ? (o.pageTarget as 'PAGE_1' | 'PAGE_2') : 'PAGE_1';
-    const placement = VALID_PLACEMENTS.has(String(o.placement)) ? (o.placement as ParsedBrief['placement']) : 'feed';
-    const rawPublishMode = o.publishMode === 'SCHEDULED' ? 'SCHEDULED' : 'IMMEDIATE';
-    const scheduledAt =
-      rawPublishMode === 'SCHEDULED' && typeof o.scheduledAt === 'string' && !isNaN(Date.parse(o.scheduledAt))
-        ? o.scheduledAt
-        : null;
-    // AI said SCHEDULED but couldn't provide a valid ISO datetime — downgrade to IMMEDIATE.
-    const publishMode: 'IMMEDIATE' | 'SCHEDULED' = rawPublishMode === 'SCHEDULED' && scheduledAt === null ? 'IMMEDIATE' : rawPublishMode;
-
-    if (!campaignObjective || !targetAudience) return null;
-
-    return { campaignName: campaignName || 'DREXONYX Campaign', campaignObjective, targetAudience, tone, pageTarget, placement, publishMode, scheduledAt };
-  } catch {
-    return null;
+function validateBriefOutput(parsed: unknown): ParsedBrief {
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    throw new Error('expected object');
   }
+  const o = parsed as Record<string, unknown>;
+
+  const campaignObjective = typeof o.campaignObjective === 'string' ? o.campaignObjective.trim() : '';
+  if (!campaignObjective) throw new Error('campaignObjective must be a non-empty string');
+
+  const targetAudience = typeof o.targetAudience === 'string' ? o.targetAudience.trim() : '';
+  if (!targetAudience) throw new Error('targetAudience must be a non-empty string');
+
+  const campaignName = typeof o.campaignName === 'string' && o.campaignName.trim()
+    ? o.campaignName.trim()
+    : 'DREXONYX Campaign';
+  const tone = typeof o.tone === 'string' ? o.tone.trim() : 'professional';
+  const pageTarget = VALID_PAGE_TARGETS.has(String(o.pageTarget)) ? (o.pageTarget as 'PAGE_1' | 'PAGE_2') : 'PAGE_1';
+  const placement = VALID_PLACEMENTS.has(String(o.placement)) ? (o.placement as ParsedBrief['placement']) : 'feed';
+  const rawPublishMode = o.publishMode === 'SCHEDULED' ? 'SCHEDULED' : 'IMMEDIATE';
+  const rawScheduledAt = o.scheduledAt;
+  const scheduledAt =
+    rawPublishMode === 'SCHEDULED' &&
+    typeof rawScheduledAt === 'string' &&
+    !isNaN(Date.parse(rawScheduledAt))
+      ? rawScheduledAt
+      : null;
+  // AI said SCHEDULED but couldn't provide a valid ISO datetime — downgrade to IMMEDIATE.
+  const publishMode: 'IMMEDIATE' | 'SCHEDULED' =
+    rawPublishMode === 'SCHEDULED' && scheduledAt === null ? 'IMMEDIATE' : rawPublishMode;
+
+  return { campaignName, campaignObjective, targetAudience, tone, pageTarget, placement, publishMode, scheduledAt };
 }
 
 async function parseBrief(
@@ -113,35 +133,27 @@ Return ONLY valid JSON matching this exact schema:
 }
 No markdown, no explanation. Return only the JSON object.`;
 
-  const result = await callAi({ systemPrompt, userPrompt: brief, maxTokens: 512 });
+  const result = await callAi({ systemPrompt, userPrompt: brief, maxTokens: 512, responseSchema: BRIEF_SCHEMA });
 
   if (!result.ok) {
     return { ok: false, error: result.error, isTransient: result.isTransient };
   }
 
-  // TEMPORARY DIAGNOSTIC — remove once root cause is confirmed (DR 0073: no secrets logged)
-  {
-    const diagPreview = result.text.slice(0, 2000);
-    const diagExtracted = extractJson(result.text);
-    const diagObj = diagExtracted && typeof diagExtracted === 'object' && !Array.isArray(diagExtracted)
-      ? diagExtracted as Record<string, unknown>
-      : null;
-    console.error(
-      '[DIAG:brief-parser] text_len=%d extracted_type=%s has_objective=%s has_audience=%s preview=%s',
-      result.text.length,
-      diagExtracted === null ? 'null' : Array.isArray(diagExtracted) ? 'array' : typeof diagExtracted,
-      diagObj ? String(!!diagObj.campaignObjective) : 'N/A',
-      diagObj ? String(!!diagObj.targetAudience) : 'N/A',
-      JSON.stringify(diagPreview),
-    );
+  let rawParsed: unknown;
+  try {
+    rawParsed = JSON.parse(result.text);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return { ok: false, error: `Brief parser returned malformed JSON: ${msg.slice(0, 200)}`, isTransient: false };
   }
 
-  const parsed = parseBriefOutput(result.text);
-  if (!parsed) {
-    return { ok: false, error: 'Brief parser returned unparseable output', isTransient: false };
+  try {
+    const parsed = validateBriefOutput(rawParsed);
+    return { ok: true, parsed };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return { ok: false, error: `Brief parser returned invalid fields: ${msg.slice(0, 300)}`, isTransient: false };
   }
-
-  return { ok: true, parsed };
 }
 
 // ── runAutonomousCampaignPreflight ─────────────────────────────────────────────

@@ -275,6 +275,21 @@ describe('callAi (Google Gemini)', () => {
     expect(body.generationConfig.responseMimeType).toBe('application/json');
   });
 
+  it('includes responseSchema in generationConfig when provided', async () => {
+    mockSuccess('{"foo":"bar"}');
+    const schema = { type: 'object' as const, properties: { foo: { type: 'string' as const } }, required: ['foo'] };
+    await callAi({ systemPrompt: 'sys', userPrompt: 'user', responseSchema: schema });
+    const body = JSON.parse((mockFetch.mock.calls[0] as [string, RequestInit])[1].body as string);
+    expect(body.generationConfig.responseSchema).toEqual(schema);
+  });
+
+  it('omits responseSchema from generationConfig when not provided', async () => {
+    mockSuccess('{"ok":true}');
+    await callAi({ systemPrompt: 'sys', userPrompt: 'user' });
+    const body = JSON.parse((mockFetch.mock.calls[0] as [string, RequestInit])[1].body as string);
+    expect(body.generationConfig).not.toHaveProperty('responseSchema');
+  });
+
   it('skips thought:true parts and returns the actual response text', async () => {
     const actualResponse = '{"angles":["a"],"themes":["t"],"channels":["Facebook"],"keyMessages":["m"]}';
     mockFetch.mockResolvedValue({

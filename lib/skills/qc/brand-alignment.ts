@@ -1,6 +1,6 @@
 import type { Skill, SkillContext, SkillResult } from '../interface';
 import { callAi } from '../ai/adapter';
-import { extractJson } from '../ai/extract-json';
+import type { GeminiSchema } from '../ai/adapter';
 
 export interface QcBrandAlignmentInput {
   content: string;
@@ -14,6 +14,17 @@ export interface QcBrandAlignmentOutput {
   findings: string[];
   recommendations: string[];
 }
+
+const BRAND_ALIGNMENT_SCHEMA: GeminiSchema = {
+  type: 'object',
+  properties: {
+    verdict: { type: 'string', enum: ['PASS', 'FAIL'] },
+    alignmentScore: { type: 'number' },
+    findings: { type: 'array', items: { type: 'string' } },
+    recommendations: { type: 'array', items: { type: 'string' } },
+  },
+  required: ['verdict', 'alignmentScore', 'findings', 'recommendations'],
+};
 
 const SYSTEM_PROMPT = `You are a brand compliance reviewer.
 Assess whether the provided content aligns with the brand guidelines and return a JSON object with:
@@ -33,28 +44,21 @@ function buildUserPrompt(input: QcBrandAlignmentInput): string {
   return parts.join('\n\n');
 }
 
-function parseOutput(text: string): QcBrandAlignmentOutput | null {
-  try {
-    const parsed = extractJson(text);
-    if (typeof parsed !== 'object' || parsed === null) return null;
-    const o = parsed as Record<string, unknown>;
-    if (
-      (o.verdict === 'PASS' || o.verdict === 'FAIL') &&
-      typeof o.alignmentScore === 'number' &&
-      Array.isArray(o.findings) &&
-      Array.isArray(o.recommendations)
-    ) {
-      return {
-        verdict: o.verdict,
-        alignmentScore: o.alignmentScore,
-        findings: o.findings as string[],
-        recommendations: o.recommendations as string[],
-      };
-    }
-    return null;
-  } catch {
-    return null;
+function validateOutput(parsed: unknown): QcBrandAlignmentOutput {
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    throw new Error('expected object');
   }
+  const o = parsed as Record<string, unknown>;
+  if (o.verdict !== 'PASS' && o.verdict !== 'FAIL') throw new Error('verdict must be PASS or FAIL');
+  if (typeof o.alignmentScore !== 'number') throw new Error('alignmentScore must be a number');
+  if (!Array.isArray(o.findings)) throw new Error('findings must be an array');
+  if (!Array.isArray(o.recommendations)) throw new Error('recommendations must be an array');
+  return {
+    verdict: o.verdict,
+    alignmentScore: o.alignmentScore,
+    findings: o.findings as string[],
+    recommendations: o.recommendations as string[],
+  };
 }
 
 export const qcBrandAlignmentSkill: Skill<QcBrandAlignmentInput, QcBrandAlignmentOutput> = {
@@ -67,17 +71,27 @@ export const qcBrandAlignmentSkill: Skill<QcBrandAlignmentInput, QcBrandAlignmen
       systemPrompt: SYSTEM_PROMPT,
       userPrompt: buildUserPrompt(input),
       maxTokens: 512,
+      responseSchema: BRAND_ALIGNMENT_SCHEMA,
     });
 
     if (!result.ok) {
       return { ok: false, error: result.error, isTransient: result.isTransient };
     }
 
-    const output = parseOutput(result.text);
-    if (!output) {
-      return { ok: false, error: 'AI returned unparseable output', isTransient: false };
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(result.text);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return { ok: false, error: `QC brand alignment: AI response is not valid JSON: ${msg.slice(0, 200)}`, isTransient: false };
     }
 
-    return { ok: true, output };
+    try {
+      const output = validateOutput(parsed);
+      return { ok: true, output };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return { ok: false, error: `QC brand alignment: AI response missing required fields: ${msg.slice(0, 200)}`, isTransient: false };
+    }
   },
 };

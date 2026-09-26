@@ -1,6 +1,6 @@
 import type { Skill, SkillContext, SkillResult } from '../interface';
 import { callAi } from '../ai/adapter';
-import { extractJson } from '../ai/extract-json';
+import type { GeminiSchema } from '../ai/adapter';
 
 export interface ScriptSocialCaptionInput {
   platform: string;
@@ -14,6 +14,15 @@ export interface ScriptSocialCaptionOutput {
   caption: string;
   alternatives: string[];
 }
+
+const CAPTION_SCHEMA: GeminiSchema = {
+  type: 'object',
+  properties: {
+    caption: { type: 'string' },
+    alternatives: { type: 'array', items: { type: 'string' } },
+  },
+  required: ['caption', 'alternatives'],
+};
 
 const SYSTEM_PROMPT = `You are a social media copywriter. Respond with ONLY a raw JSON object — no markdown fences, no prose, no explanation.
 The JSON must have exactly these fields:
@@ -36,25 +45,14 @@ function buildUserPrompt(input: ScriptSocialCaptionInput): string {
   return parts.join('\n');
 }
 
-function parseOutput(text: string): ScriptSocialCaptionOutput | null {
-  try {
-    const parsed = extractJson(text);
-    if (typeof parsed === 'object' && parsed !== null) {
-      const o = parsed as Record<string, unknown>;
-      if (typeof o.caption === 'string' && Array.isArray(o.alternatives)) {
-        return { caption: o.caption, alternatives: o.alternatives as string[] };
-      }
-    }
-    // Model returned plain text instead of JSON — treat the full text as the caption.
-    // alternatives is safely empty; the caller uses `alternatives[0] ?? undefined`.
-    const trimmed = text.trim();
-    if (trimmed.length > 0) {
-      return { caption: trimmed, alternatives: [] };
-    }
-    return null;
-  } catch {
-    return null;
+function validateOutput(parsed: unknown): ScriptSocialCaptionOutput {
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    throw new Error('expected object');
   }
+  const o = parsed as Record<string, unknown>;
+  if (typeof o.caption !== 'string') throw new Error('caption must be a string');
+  if (!Array.isArray(o.alternatives)) throw new Error('alternatives must be an array');
+  return { caption: o.caption, alternatives: o.alternatives as string[] };
 }
 
 export const scriptSocialCaptionSkill: Skill<ScriptSocialCaptionInput, ScriptSocialCaptionOutput> = {
@@ -67,17 +65,27 @@ export const scriptSocialCaptionSkill: Skill<ScriptSocialCaptionInput, ScriptSoc
       systemPrompt: SYSTEM_PROMPT,
       userPrompt: buildUserPrompt(input),
       maxTokens: 512,
+      responseSchema: CAPTION_SCHEMA,
     });
 
     if (!result.ok) {
       return { ok: false, error: result.error, isTransient: result.isTransient };
     }
 
-    const output = parseOutput(result.text);
-    if (!output) {
-      return { ok: false, error: 'AI returned unparseable output', isTransient: false };
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(result.text);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return { ok: false, error: `Caption: AI response is not valid JSON: ${msg.slice(0, 200)}`, isTransient: false };
     }
 
-    return { ok: true, output };
+    try {
+      const output = validateOutput(parsed);
+      return { ok: true, output };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return { ok: false, error: `Caption: AI response missing required fields: ${msg.slice(0, 200)}`, isTransient: false };
+    }
   },
 };

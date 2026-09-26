@@ -42,31 +42,20 @@ describe('scriptSocialCaptionSkill', () => {
     expect(result.output.alternatives).toEqual(JSON_OUTPUT.alternatives);
   });
 
-  it('parses JSON wrapped in markdown fences', async () => {
+  it('returns ok:false for markdown-fenced JSON (structured output bypasses fence wrapping)', async () => {
     const text = '```json\n' + JSON.stringify(JSON_OUTPUT) + '\n```';
     mockCallAi.mockResolvedValueOnce({ ok: true, text });
 
     const result = await scriptSocialCaptionSkill.execute(INPUT, CONTEXT);
 
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    expect(result.output.caption).toBe(JSON_OUTPUT.caption);
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.isTransient).toBe(false);
   });
 
-  it('parses JSON embedded in surrounding prose', async () => {
-    const text = 'Here is your caption:\n' + JSON.stringify(JSON_OUTPUT) + '\nLet me know if you need changes.';
-    mockCallAi.mockResolvedValueOnce({ ok: true, text });
+  // ── Plain-text fallback removed — structured output enforced ───────────────
 
-    const result = await scriptSocialCaptionSkill.execute(INPUT, CONTEXT);
-
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    expect(result.output.caption).toBe(JSON_OUTPUT.caption);
-  });
-
-  // ── Plain-text fallback (DR regression: "AI returned unparseable output") ──
-
-  it('normalizes a plain-text caption when the model returns prose instead of JSON', async () => {
+  it('returns ok:false when the model returns prose instead of JSON', async () => {
     const plainText =
       'Transform your vision into cinematic excellence with DREXONYX. ' +
       'Our expert team crafts compelling video narratives. #VideoProduction #DREXONYX';
@@ -74,23 +63,22 @@ describe('scriptSocialCaptionSkill', () => {
 
     const result = await scriptSocialCaptionSkill.execute(INPUT, CONTEXT);
 
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    expect(result.output.caption).toBe(plainText);
-    expect(result.output.alternatives).toEqual([]);
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.isTransient).toBe(false);
+    expect(result.error).toContain('not valid JSON');
   });
 
-  it('normalizes a multi-line plain-text caption', async () => {
+  it('returns ok:false for multi-line plain-text response', async () => {
     const plainText =
-      'Ready to elevate your brand?\n\nDREXONYX delivers cinematic storytelling that captivates audiences.\n#VideoProduction';
+      'Ready to elevate your brand?\n\nDREXONYX delivers cinematic storytelling.\n#VideoProduction';
     mockCallAi.mockResolvedValueOnce({ ok: true, text: plainText });
 
     const result = await scriptSocialCaptionSkill.execute(INPUT, CONTEXT);
 
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    expect(result.output.caption).toBe(plainText.trim());
-    expect(result.output.alternatives).toEqual([]);
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error).toContain('not valid JSON');
   });
 
   // ── Failure cases ───────────────────────────────────────────────────────────
@@ -135,5 +123,15 @@ describe('scriptSocialCaptionSkill', () => {
 
     const call = mockCallAi.mock.calls[0][0] as { userPrompt: string };
     expect(call.userPrompt).toContain('#VideoProduction');
+  });
+
+  it('passes responseSchema to callAi for structured output', async () => {
+    mockCallAi.mockResolvedValueOnce({ ok: true, text: JSON.stringify(JSON_OUTPUT) });
+
+    await scriptSocialCaptionSkill.execute(INPUT, CONTEXT);
+
+    const call = mockCallAi.mock.calls[0][0] as { responseSchema?: unknown };
+    expect(call.responseSchema).toBeDefined();
+    expect(call.responseSchema).toMatchObject({ type: 'object' });
   });
 });
