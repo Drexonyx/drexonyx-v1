@@ -1,6 +1,6 @@
 // DR 0073 §2.2: Sole location within lib/skills/ where any AI provider SDK or API key is accessed.
 // Provider: Google Gemini (REST API via generativelanguage.googleapis.com).
-// DR 0073 §2.4: Model identifier read from SKILLS_AI_MODEL env var; default = gemini-2.0-flash.
+// DR 0073 §2.4: Model identifier read from SKILLS_AI_MODEL env var; default = gemini-2.5-flash.
 // DR 0073 §2.5: API key stored exclusively as server-side env var; never logged or returned to callers.
 // DR 0073 §2.6: Each skill.execute() makes at most ONE call to callAi().
 
@@ -15,12 +15,12 @@ export type AiAdapterResult =
   | { ok: false; error: string; isTransient: boolean };
 
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
-// gemini-2.0-flash is a GA (generally available) model: stable capacity, JSON mode support,
-// no thinking-part overhead. gemini-2.5-flash is experimental and prone to sustained 503 overload.
-const DEFAULT_MODEL = 'gemini-2.0-flash';
+const DEFAULT_MODEL = 'gemini-2.5-flash';
 
 // Retry policy: up to 2 retries after the initial attempt (3 total), backoff in ms.
 // Only transient errors (429 / 5xx / network failure) are retried.
+// Jitter (±30%) spreads concurrent retries over time so a burst of simultaneous
+// calls does not produce a thundering-herd storm against an already-busy endpoint.
 const MAX_RETRIES = 2;
 const RETRY_BACKOFF_MS = [1000, 3000] as const;
 
@@ -33,6 +33,12 @@ function redactCredentials(text: string): string {
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Returns baseMs ± 30% random jitter, clamped to a minimum of 200ms.
+function jitteredDelay(baseMs: number): number {
+  const spread = baseMs * 0.3;
+  return Math.max(200, Math.round(baseMs + (Math.random() * 2 - 1) * spread));
 }
 
 async function attemptAiCall(
@@ -108,7 +114,8 @@ export async function callAi(request: AiAdapterRequest): Promise<AiAdapterResult
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     if (attempt > 0) {
-      await sleep(RETRY_BACKOFF_MS[attempt - 1] ?? RETRY_BACKOFF_MS[RETRY_BACKOFF_MS.length - 1]);
+      const baseMs = RETRY_BACKOFF_MS[attempt - 1] ?? RETRY_BACKOFF_MS[RETRY_BACKOFF_MS.length - 1];
+      await sleep(jitteredDelay(baseMs));
     }
 
     lastResult = await attemptAiCall(endpoint, apiKey, request);
