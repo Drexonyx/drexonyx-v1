@@ -39,11 +39,9 @@ public class MainActivity extends Activity {
         s.setBuiltInZoomControls(false);
         s.setSupportZoom(false);
         s.setCacheMode(WebSettings.LOAD_DEFAULT);
-        s.setAllowFileAccess(false);
-
-        if (Build.VERSION.SDK_INT >= 21) {
-            s.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-        }
+        s.setAllowFileAccess(true);
+        s.setAllowFileAccessFromFileURLs(true);
+        s.setAllowUniversalAccessFromFileURLs(true);
 
         View decorView = getWindow().getDecorView();
         decorView.setSystemUiVisibility(
@@ -52,7 +50,7 @@ public class MainActivity extends Activity {
 
         webView.setWebViewClient(new WebViewClient());
         setContentView(webView);
-        webView.loadUrl("https://www.drexonyx.com");
+        webView.loadUrl("file:///android_asset/index.html");
     }
 
     @Override

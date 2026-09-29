@@ -40,9 +40,13 @@ aapt package -f \
   -I "$ANDROID_JAR" \
   -F build/resources.apk
 
-echo "=== Step 5: Add DEX ==="
+echo "=== Step 5: Add DEX and assets ==="
 cp build/resources.apk build/app-unsigned.apk
 cd build && zip -j app-unsigned.apk classes.dex && cd ..
+# Bundle local assets into the APK under assets/
+if [ -d assets ]; then
+  zip -r build/app-unsigned.apk assets/
+fi
 
 echo "=== Step 6: Align ==="
 zipalign -p -f -v 4 build/app-unsigned.apk build/app-aligned.apk
