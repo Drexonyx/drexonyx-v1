@@ -65,37 +65,38 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 /* ── Intro screen ──────────────────────────────────────────── */
 #splash{
   position:fixed;inset:0;background:#060606;display:flex;align-items:center;justify-content:center;
-  flex-direction:column;z-index:1000;transition:opacity 0.5s ease;
+  flex-direction:column;z-index:1000;transition:opacity 0.6s ease;
 }
 #splash.gone{opacity:0;pointer-events:none}
 #intro-content{display:flex;flex-direction:column;align-items:center;position:relative}
 .intro-glow{
-  position:absolute;width:320px;height:320px;
-  top:50%;left:50%;transform:translate(-50%,-60%);
-  background:radial-gradient(circle,rgba(217,166,74,0.17) 0%,rgba(217,166,74,0.05) 44%,transparent 68%);
+  position:absolute;
+  width:min(480px,130vw);height:min(480px,130vw);
+  top:50%;left:50%;transform:translate(-50%,-55%);
+  background:radial-gradient(circle,rgba(217,166,74,0.20) 0%,rgba(217,166,74,0.08) 35%,rgba(217,166,74,0.02) 60%,transparent 75%);
   border-radius:50%;pointer-events:none;
-  animation:introGlowIn 1.0s ease-out 0.4s both;
+  animation:introGlowIn 1.2s ease-out 0.3s both;
 }
 .intro-logo{
   position:relative;z-index:1;
-  width:160px;height:160px;border-radius:28px;overflow:hidden;margin-bottom:32px;
-  box-shadow:0 0 48px rgba(217,166,74,0.18),0 8px 32px rgba(0,0,0,0.6);
-  animation:introLogoIn 0.6s cubic-bezier(0.22,1,0.36,1) 0.4s both;
+  width:min(220px,58vw);height:min(220px,58vw);border-radius:32px;overflow:hidden;margin-bottom:36px;
+  box-shadow:0 0 60px rgba(217,166,74,0.22),0 0 120px rgba(217,166,74,0.08),0 12px 40px rgba(0,0,0,0.7);
+  animation:introLogoIn 0.7s cubic-bezier(0.22,1,0.36,1) 0.35s both;
 }
 .intro-logo img{width:100%;height:100%;display:block}
 .intro-name{
-  font-size:28px;font-weight:700;letter-spacing:6px;color:#fff;
+  font-size:clamp(24px,6.5vw,32px);font-weight:700;letter-spacing:8px;color:#fff;
   text-transform:uppercase;
-  animation:introTextIn 0.5s cubic-bezier(0.22,1,0.36,1) 1.0s both;
+  animation:introTextIn 0.55s cubic-bezier(0.22,1,0.36,1) 1.0s both;
 }
 .intro-tagline{
-  font-size:11px;font-weight:400;letter-spacing:3px;color:#d9a64a;
-  text-transform:uppercase;margin-top:10px;
-  animation:introTextIn 0.5s cubic-bezier(0.22,1,0.36,1) 1.3s both;
+  font-size:clamp(10px,2.5vw,12px);font-weight:400;letter-spacing:4px;color:#d9a64a;
+  text-transform:uppercase;margin-top:12px;
+  animation:introTextIn 0.55s cubic-bezier(0.22,1,0.36,1) 1.3s both;
 }
-@keyframes introGlowIn{from{opacity:0}to{opacity:1}}
-@keyframes introLogoIn{from{opacity:0;transform:scale(1.08)}to{opacity:1;transform:scale(1)}}
-@keyframes introTextIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@keyframes introGlowIn{from{opacity:0;transform:translate(-50%,-55%) scale(0.85)}to{opacity:1;transform:translate(-50%,-55%) scale(1)}}
+@keyframes introLogoIn{from{opacity:0;transform:scale(1.06)}to{opacity:1;transform:scale(1)}}
+@keyframes introTextIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 /* ── Offline banner ─────────────────────────────────────────────────── */
 #offline-banner{
   display:none;background:#1a1000;border-bottom:1px solid var(--gold-dim);
