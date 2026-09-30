@@ -68,7 +68,7 @@ public class MainActivity extends Activity {
         s.setUseWideViewPort(true);
         s.setBuiltInZoomControls(false);
         s.setSupportZoom(false);
-        s.setCacheMode(WebSettings.LOAD_DEFAULT);
+        s.setCacheMode(WebSettings.LOAD_NO_CACHE);
         s.setAllowFileAccess(true);
         s.setAllowFileAccessFromFileURLs(true);
         s.setAllowUniversalAccessFromFileURLs(true);

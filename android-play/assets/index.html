@@ -452,6 +452,16 @@ select.form-input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://
 .hidden{display:none!important}
 .spinner{width:22px;height:22px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
 </style>
+<script>
+// Compute ix-wrap size in px before first paint — guards against vw-unit bugs in old Android WebView
+;(function(){
+  var sw = window.innerWidth || screen.width || 360;
+  var px = Math.min(Math.round(sw * 0.56), 240);
+  var st = document.createElement('style');
+  st.textContent = '.ix-wrap{width:'+px+'px!important;height:'+px+'px!important}';
+  document.head.appendChild(st);
+})();
+</script>
 </head>
 <body>
 
