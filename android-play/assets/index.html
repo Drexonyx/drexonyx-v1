@@ -79,12 +79,12 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
   top:50%;left:50%;
   -webkit-transform:translate(-50%,-53%);transform:translate(-50%,-53%);
   background:radial-gradient(circle,
-    transparent 0%,transparent 30%,
-    rgba(217,166,74,0.14) 38%,
-    rgba(217,166,74,0.50) 50%,
-    rgba(217,166,74,0.28) 60%,
-    rgba(217,166,74,0.09) 72%,
-    transparent 84%);
+    transparent 0%,transparent 28%,
+    rgba(217,166,74,0.22) 36%,
+    rgba(217,166,74,0.65) 48%,
+    rgba(217,166,74,0.38) 58%,
+    rgba(217,166,74,0.12) 70%,
+    transparent 82%);
   border-radius:50%;pointer-events:none;z-index:0;
   -webkit-animation:introGlowIn 1.8s ease-out 0.25s both;animation:introGlowIn 1.8s ease-out 0.25s both;
 }
@@ -114,6 +114,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .intro-logo{
   position:absolute;top:0;right:0;bottom:0;left:0;z-index:2;
   border-radius:50%;overflow:hidden;
+  -webkit-clip-path:circle(50% at 50% 50%);
+  clip-path:circle(50% at 50% 50%);
 }
 .intro-logo img{
   position:absolute;width:150%;height:150%;
@@ -428,9 +430,9 @@ select.form-input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://
             <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
           </filter>
         </defs>
-        <circle cx="50" cy="50" r="46" stroke="#d9a64a" stroke-opacity="0.75"
-          stroke-width="1.1" stroke-dasharray="90 200" fill="none"
-          stroke-linecap="round" filter="url(#gb)"/>
+        <circle cx="50" cy="50" r="46" stroke="#d9a64a" stroke-opacity="0.88"
+          stroke-width="2.2" stroke-dasharray="90 200" fill="none"
+          stroke-linecap="round"/>
       </svg>
     </div>
     <div class="intro-orbit-shell-a">
@@ -442,8 +444,8 @@ select.form-input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://
           </filter>
         </defs>
         <circle cx="50" cy="50" r="47" stroke="#ffe07a" stroke-opacity="0.98"
-          stroke-width="1.8" stroke-dasharray="55 258" fill="none"
-          stroke-linecap="round" filter="url(#ga)"/>
+          stroke-width="2.6" stroke-dasharray="55 258" fill="none"
+          stroke-linecap="round"/>
       </svg>
     </div>
     <div class="intro-logo">
