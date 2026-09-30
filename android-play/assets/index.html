@@ -78,7 +78,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
   -webkit-animation:sxIn 0.6s ease-out both;animation:sxIn 0.6s ease-out both;
 }
 #splash-name{
-  margin-top:20px;font-size:22px;font-weight:900;
+  margin-top:10px;font-size:22px;font-weight:900;
   letter-spacing:6px;color:#ffffff;text-transform:uppercase;text-align:center;
   -webkit-animation:sxIn 0.6s 0.2s ease-out both;animation:sxIn 0.6s 0.2s ease-out both;
 }
@@ -1483,6 +1483,13 @@ function render() {
   setTimeout(_dismissSplash, 1800);
 })();
 
+// ── Initial render — synchronous, independent of async init() ────────────────
+// Runs unconditionally so #content always has content when splash fades out.
+(function() {
+  try { updateOnline(); } catch(e) {}
+  try { render(); } catch(e) {}
+})();
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 (async function init() {
   // Restore auth state
@@ -1498,12 +1505,10 @@ function render() {
         if (S.route === 'dashboard' || S.route === 'campaigns') go('login');
       } else {
         S.user = res.user; store('user', res.user);
+        render();
       }
     });
   }
-
-  updateOnline();
-  render();
 
   // Load dashboard data if authenticated
   if (S.user) {
