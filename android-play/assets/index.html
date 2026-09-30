@@ -89,6 +89,19 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 }
 @-webkit-keyframes sxIn{from{opacity:0}to{opacity:1}}
 @keyframes sxIn{from{opacity:0}to{opacity:1}}
+/* ── Home entrance animation ─────────────────────────────────────────────── */
+@-webkit-keyframes contentIn{
+  from{opacity:0;-webkit-transform:translateY(22px);transform:translateY(22px)}
+  to{opacity:1;-webkit-transform:translateY(0);transform:translateY(0)}
+}
+@keyframes contentIn{
+  from{opacity:0;transform:translateY(22px)}
+  to{opacity:1;transform:translateY(0)}
+}
+#content.entering{
+  -webkit-animation:contentIn 0.7s cubic-bezier(0.25,0.46,0.45,0.94) both;
+  animation:contentIn 0.7s cubic-bezier(0.25,0.46,0.45,0.94) both;
+}
 
 /* ── Offline banner ─────────────────────────────────────────────────── */
 #offline-banner{
@@ -1472,13 +1485,17 @@ function render() {
   content.scrollTop = 0;
 }
 
-// ── Splash dismissal — runs unconditionally, independent of init() ────────────
+// ── Splash dismissal + Home entrance — runs unconditionally ───────────────────
 (function() {
   function _dismissSplash() {
     var s = document.getElementById('splash');
     if (!s) return;
+    // Splash fades out
     s.classList.add('gone');
-    setTimeout(function() { if (s.parentNode) s.parentNode.removeChild(s); }, 600);
+    // Home content fades up simultaneously
+    var c = document.getElementById('content');
+    if (c) c.classList.add('entering');
+    setTimeout(function() { if (s.parentNode) s.parentNode.removeChild(s); }, 650);
   }
   setTimeout(_dismissSplash, 1800);
 })();
