@@ -28,6 +28,7 @@ public class MainActivity extends Activity {
 
     private static final int FILE_CHOOSER_REQUEST = 1001;
     private static final String TAG = "DXWebView";
+    private static final String PRODUCTION_URL = "https://www.drexonyx.com";
 
     private WebView webView;
     private View splashOverlay;
@@ -74,10 +75,20 @@ public class MainActivity extends Activity {
 
         setContentView(root);
 
-        handleDeepLink(getIntent());
+        // Handle deep link on launch
+        String launchUrl = getLaunchUrl(getIntent());
+        android.util.Log.d(TAG, "onCreate: loading " + launchUrl);
+        webView.loadUrl(launchUrl);
+    }
 
-        android.util.Log.d(TAG, "onCreate: loading index.html");
-        webView.loadUrl("file:///android_asset/index.html");
+    private String getLaunchUrl(Intent intent) {
+        if (intent != null && intent.getData() != null) {
+            String url = intent.getData().toString();
+            if (url.startsWith(PRODUCTION_URL) || url.startsWith("drexonyx://")) {
+                return url;
+            }
+        }
+        return PRODUCTION_URL;
     }
 
     private View buildSplashOverlay() {
@@ -162,10 +173,12 @@ public class MainActivity extends Activity {
         s.setUseWideViewPort(true);
         s.setBuiltInZoomControls(false);
         s.setSupportZoom(false);
-        s.setCacheMode(WebSettings.LOAD_NO_CACHE);
-        s.setAllowFileAccess(true);
-        s.setAllowFileAccessFromFileURLs(true);
-        s.setAllowUniversalAccessFromFileURLs(true);
+        // Default cache mode — allows normal browser caching for the production URL
+        s.setCacheMode(WebSettings.LOAD_DEFAULT);
+        // File access not needed when loading a remote URL
+        s.setAllowFileAccess(false);
+        s.setAllowFileAccessFromFileURLs(false);
+        s.setAllowUniversalAccessFromFileURLs(false);
         s.setMediaPlaybackRequiresUserGesture(false);
         if (Build.VERSION.SDK_INT >= 21) {
             s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
@@ -177,10 +190,16 @@ public class MainActivity extends Activity {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                // Open external schemes (email, phone, whatsapp) in native apps
                 if (url.startsWith("mailto:") || url.startsWith("tel:") || url.startsWith("whatsapp:")) {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                    try {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                    } catch (Exception e) {
+                        android.util.Log.e(TAG, "Could not open external URL: " + url, e);
+                    }
                     return true;
                 }
+                // All drexonyx.com navigation stays in the WebView
                 return false;
             }
 
@@ -194,7 +213,7 @@ public class MainActivity extends Activity {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 android.util.Log.d(TAG, "onPageFinished: " + url);
-                // Short delay lets JS render Home before overlay fades
+                // Delay dismissal slightly so the page has started rendering
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -208,7 +227,7 @@ public class MainActivity extends Activity {
                 super.onReceivedError(view, errorCode, description, failingUrl);
                 android.util.Log.e(TAG, "onReceivedError: code=" + errorCode
                     + " desc=" + description + " url=" + failingUrl);
-                // Always dismiss so user is never stuck
+                // Always dismiss so user is never stuck on splash
                 dismissSplashOverlay();
             }
         });
@@ -276,29 +295,20 @@ public class MainActivity extends Activity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
-        handleDeepLink(intent);
-    }
-
-    private void handleDeepLink(Intent intent) {
-        if (intent == null || intent.getData() == null) return;
-        Uri uri = intent.getData();
-        String url = uri.toString();
-        if (webView != null) {
-            String escaped = url.replace("'", "").replace("\"", "");
-            webView.evaluateJavascript(
-                "if(window._onDeepLink) window._onDeepLink('" + escaped + "');",
-                null);
+        // Deep link: navigate the WebView to the target URL
+        if (intent != null && intent.getData() != null) {
+            String url = intent.getData().toString();
+            if (webView != null && (url.startsWith(PRODUCTION_URL) || url.startsWith("drexonyx://"))) {
+                android.util.Log.d(TAG, "onNewIntent deep link: " + url);
+                webView.loadUrl(url);
+            }
         }
     }
 
     @Override
     public void onBackPressed() {
         if (webView != null && webView.canGoBack()) {
-            webView.evaluateJavascript("window._onBackPressed && window._onBackPressed()", value -> {
-                if ("false".equals(value) || "null".equals(value) || value == null) {
-                    if (webView.canGoBack()) webView.goBack();
-                }
-            });
+            webView.goBack();
         } else {
             super.onBackPressed();
         }
@@ -314,9 +324,6 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         if (webView != null) webView.onResume();
-        if (webView != null) {
-            webView.evaluateJavascript("if(window._onAppResume) window._onAppResume()", null);
-        }
     }
 
     @Override
