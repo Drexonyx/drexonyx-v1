@@ -313,6 +313,15 @@ async function validateCredential(credential) {
 async function main() {
   const arg = process.argv[2];
 
+  // --qc: QC check only, no publish (credential not required)
+  if (arg === '--qc') {
+    const caption = process.argv[3];
+    const imagePath = process.env.IMAGE_PATH?.trim();
+    const qc = validateQC(imagePath, caption);
+    console.log(JSON.stringify(qc));
+    process.exit(qc.ok ? 0 : 1);
+  }
+
   const credential = process.env.META_PAGE_ACCESS_TOKEN?.trim();
   if (!credential) {
     console.log(JSON.stringify({ ok: false, error: '[MISSING_CREDENTIAL] META_PAGE_ACCESS_TOKEN is not set' }));
@@ -324,15 +333,6 @@ async function main() {
     const result = await validateCredential(credential);
     console.log(JSON.stringify(result));
     process.exit(result.ok ? 0 : 1);
-  }
-
-  // --qc: QC check only, no publish (credential not required)
-  if (arg === '--qc') {
-    const caption = process.argv[3];
-    const imagePath = process.env.IMAGE_PATH?.trim();
-    const qc = validateQC(imagePath, caption);
-    console.log(JSON.stringify(qc));
-    process.exit(qc.ok ? 0 : 1);
   }
 
   // --image-post: QC → duplicate check → publish → log
