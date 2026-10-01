@@ -1,7 +1,10 @@
 // TEMPORARY: Single-use Facebook publish test activation route.
 // DELETE this file after the controlled test is complete.
 //
-// Auth: Authorization: Bearer {TEST_ACTIVATION_TOKEN}
+// Auth: Vercel Cron secret — Authorization: Bearer {CRON_SECRET}.
+// Vercel injects this header automatically when invoking cron endpoints.
+// No TEST_ACTIVATION_TOKEN required; no secret exposed in client/tool args.
+//
 // Executes: QC → CAS SCHEDULED→PUBLISHING → facebook.page.publish → CAS PUBLISHING→PUBLISHED
 // Social schema is not tracked by Drizzle — all social.posts queries use raw SQL.
 
@@ -48,15 +51,15 @@ async function writeAudit(
   });
 }
 
-export async function POST(request: NextRequest): Promise<NextResponse> {
-  // 1. Auth
-  const token = process.env.TEST_ACTIVATION_TOKEN?.trim();
+export async function GET(request: NextRequest): Promise<NextResponse> {
+  // Auth: Vercel injects Authorization: Bearer {CRON_SECRET} on cron invocations.
+  const cronSecret = process.env.CRON_SECRET;
   const authHeader = request.headers.get('authorization');
-  if (!token || authHeader !== `Bearer ${token}`) {
+  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // 2. Fetch the test post — must be SCHEDULED
+  // 1. Fetch the test post — must be SCHEDULED
   const rows = await db.execute(
     sql`SELECT id, organization_id, page_target, content_type, caption, headline, media_url, publish_mode, campaign_id, status
         FROM social.posts WHERE id = ${TEST_POST_ID} LIMIT 1`,
@@ -77,7 +80,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     actorRole: 'ADMIN_OPERATIONS',
   };
 
-  // 3. CAS SCHEDULED → PUBLISHING
+  // 2. CAS SCHEDULED → PUBLISHING
   const casPublishing = await db.execute(
     sql`UPDATE social.posts SET status='PUBLISHING', updated_at=NOW()
         WHERE id = ${TEST_POST_ID} AND status = 'SCHEDULED'
@@ -96,7 +99,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     await writeAudit(orgId, TEST_POST_ID, 'SOCIAL_POST_FAILED', { reason });
   };
 
-  // 4. QC check
+  // 3. QC check
   const qcResult = await qcFacebookPolicyCheckSkill.execute(
     {
       text: post.caption,
@@ -115,7 +118,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ ok: false, error: reason }, { status: 422 });
   }
 
-  // 5. Publish
+  // 4. Publish
   const publishResult = await facebookPagePublishSkill.execute(
     {
       pageTarget: post.page_target as FacebookPageTarget,
@@ -134,7 +137,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   const { postId, pageId, publishMode } = publishResult.output;
 
-  // 6. CAS PUBLISHING → PUBLISHED
+  // 5. CAS PUBLISHING → PUBLISHED
   await db.execute(
     sql`UPDATE social.posts
         SET status='PUBLISHED', fb_post_id=${postId}, fb_page_id=${pageId},

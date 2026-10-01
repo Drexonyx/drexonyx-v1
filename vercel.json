@@ -3,6 +3,10 @@
     {
       "path": "/api/internal/poll-generations",
       "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/internal/test-publish-activation",
+      "schedule": "* * * * *"
     }
   ]
 }
