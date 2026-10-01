@@ -2,28 +2,113 @@
  * Direct Facebook Page publisher — Claude Code → Meta Graph API.
  *
  * Usage:
+ *   # Credential validation (no publish):
+ *   META_PAGE_ACCESS_TOKEN="<token>" META_PAGE_ID_1="<pageId>" \
+ *     node scripts/fb-publish.mjs --validate
+ *
+ *   # QC check only (no publish):
+ *   IMAGE_PATH="assets/facebook/posts/day01.png" \
+ *     node scripts/fb-publish.mjs --qc "Caption text"
+ *
+ *   # Text post:
  *   META_PAGE_ACCESS_TOKEN="<token>" META_PAGE_ID_1="<pageId>" \
  *     node scripts/fb-publish.mjs "Your post text here"
  *
- *   # Image post (IMAGE_PATH must be an absolute or repo-relative path):
+ *   # Image post (QC runs automatically before publish):
  *   META_PAGE_ACCESS_TOKEN="<token>" META_PAGE_ID_1="<pageId>" \
- *     IMAGE_PATH="assets/facebook/posts/2026-10-01-day01.png" \
- *     node scripts/fb-publish.mjs --image-post "Your caption here"
+ *     IMAGE_PATH="assets/facebook/posts/day01.png" \
+ *     LOG_PATH="assets/facebook/publish-log.json" \
+ *     node scripts/fb-publish.mjs --image-post "Caption here"
  *
  * Returns JSON to stdout:
- *   { "ok": true,  "postId": "<pageId>_<postId>" }
- *   { "ok": false, "error": "[GRAPH_API_ERROR:190] Session has expired..." }
+ *   { "ok": true,  "postId": "<postId>" }
+ *   { "ok": false, "error": "[REASON] description" }
  *
- * The access token is never printed, logged, or included in output.
+ * The access token is never printed, logged, or included in any output.
  * Requires Node.js 18+ (native fetch, FormData, Blob).
  */
 
-import { readFileSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, statSync } from 'fs';
 
 const GRAPH_API_BASE = 'https://graph.facebook.com/v21.0';
+// Facebook photo size limit: 10 MB
+const IMAGE_MAX_BYTES = 10 * 1024 * 1024;
+// Facebook caption character limit
+const CAPTION_MAX_CHARS = 63206;
 
+// ---------------------------------------------------------------------------
+// QC — validates image file + caption before any publish attempt
+// ---------------------------------------------------------------------------
+function validateQC(imagePath, caption) {
+  const issues = [];
+
+  // Caption checks
+  if (!caption || !caption.trim()) {
+    issues.push('Caption is empty');
+  } else if (caption.length > CAPTION_MAX_CHARS) {
+    issues.push(`Caption exceeds Facebook limit (${caption.length}/${CAPTION_MAX_CHARS} chars)`);
+  }
+
+  // Image file checks
+  if (!imagePath) {
+    issues.push('IMAGE_PATH is not set');
+  } else {
+    if (!existsSync(imagePath)) {
+      issues.push(`Image file not found: ${imagePath}`);
+    } else {
+      const stat = statSync(imagePath);
+      if (stat.size === 0) {
+        issues.push('Image file is empty (0 bytes)');
+      } else if (stat.size > IMAGE_MAX_BYTES) {
+        issues.push(`Image file too large (${(stat.size / 1024 / 1024).toFixed(1)} MB; Facebook limit 10 MB)`);
+      }
+      // Validate file signature (magic bytes)
+      const buf = readFileSync(imagePath);
+      const isPng = buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47;
+      const isJpg = buf[0] === 0xff && buf[1] === 0xd8;
+      const isGif = buf[0] === 0x47 && buf[1] === 0x49 && buf[2] === 0x46;
+      if (!isPng && !isJpg && !isGif) {
+        issues.push('Image format is not PNG, JPEG, or GIF (invalid file signature)');
+      }
+    }
+  }
+
+  return issues.length === 0
+    ? { ok: true }
+    : { ok: false, issues };
+}
+
+// ---------------------------------------------------------------------------
+// Duplicate detection — checks publish log to prevent re-publishing the same
+// image asset. Keyed on normalised imagePath.
+// ---------------------------------------------------------------------------
+function isDuplicate(logPath, imagePath) {
+  if (!logPath || !existsSync(logPath)) return false;
+  try {
+    const log = JSON.parse(readFileSync(logPath, 'utf-8'));
+    return Array.isArray(log) && log.some(entry => entry.imagePath === imagePath);
+  } catch {
+    return false;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Publish log — appends one entry after a successful publish
+// ---------------------------------------------------------------------------
+function appendToLog(logPath, entry) {
+  if (!logPath) return;
+  let log = [];
+  if (existsSync(logPath)) {
+    try { log = JSON.parse(readFileSync(logPath, 'utf-8')); } catch { log = []; }
+  }
+  log.push(entry);
+  writeFileSync(logPath, JSON.stringify(log, null, 2) + '\n');
+}
+
+// ---------------------------------------------------------------------------
+// Token resolution
+// ---------------------------------------------------------------------------
 async function resolvePageToken(credential, pageId) {
-  // Determine whether credential is already a Page token for this page.
   let meRes;
   try {
     meRes = await fetch(`${GRAPH_API_BASE}/me?fields=id`, {
@@ -48,12 +133,10 @@ async function resolvePageToken(credential, pageId) {
     };
   }
 
-  // Already a Page token for the target page — use directly.
   if (typeof meJson.id === 'string' && meJson.id === pageId) {
     return { ok: true, token: credential };
   }
 
-  // User token — exchange for Page token via /me/accounts.
   let accountsRes;
   try {
     accountsRes = await fetch(`${GRAPH_API_BASE}/me/accounts?fields=id,access_token`, {
@@ -90,6 +173,9 @@ async function resolvePageToken(credential, pageId) {
   return { ok: true, token: match.access_token };
 }
 
+// ---------------------------------------------------------------------------
+// Text post
+// ---------------------------------------------------------------------------
 async function publishToPage(pageId, token, message) {
   let res;
   try {
@@ -123,9 +209,10 @@ async function publishToPage(pageId, token, message) {
   };
 }
 
-// Publishes an image + caption to the Page using multipart form upload.
-// IMAGE_PATH must be a path to a valid image file accessible by the runner.
-// The access token is never logged or returned.
+// ---------------------------------------------------------------------------
+// Image post — multipart/form-data binary upload to /{pageId}/photos
+// The access token is never logged, returned, or included in any output.
+// ---------------------------------------------------------------------------
 async function publishImageToPage(pageId, token, caption, imagePath) {
   let imageBytes;
   try {
@@ -171,9 +258,9 @@ async function publishImageToPage(pageId, token, caption, imagePath) {
   };
 }
 
-// Validates the credential without publishing. Calls /me and /me/accounts to
-// confirm the token is active and report which pages are accessible.
-// Never prints the token or any access_token value.
+// ---------------------------------------------------------------------------
+// Credential validation (no publish)
+// ---------------------------------------------------------------------------
 async function validateCredential(credential) {
   let meRes;
   try {
@@ -199,14 +286,12 @@ async function validateCredential(credential) {
   const selfId = meJson.id;
   const selfName = meJson.name ?? '(unknown)';
 
-  // List pages this token can manage — return names and IDs only, never tokens.
   let accountsRes;
   try {
     accountsRes = await fetch(`${GRAPH_API_BASE}/me/accounts?fields=id,name`, {
       headers: { Authorization: `Bearer ${credential}` },
     });
   } catch (e) {
-    // Token is valid but accounts call failed — still report the identity.
     return { ok: true, identity: { id: selfId, name: selfName }, pages: null, accountsError: e.message };
   }
 
@@ -222,6 +307,9 @@ async function validateCredential(credential) {
   return { ok: true, identity: { id: selfId, name: selfName }, pages };
 }
 
+// ---------------------------------------------------------------------------
+// Main
+// ---------------------------------------------------------------------------
 async function main() {
   const arg = process.argv[2];
 
@@ -231,14 +319,23 @@ async function main() {
     process.exit(1);
   }
 
-  // Validation mode: confirm token is active and list accessible pages.
+  // --validate: credential check only, no publish
   if (arg === '--validate') {
     const result = await validateCredential(credential);
     console.log(JSON.stringify(result));
     process.exit(result.ok ? 0 : 1);
   }
 
-  // Image post mode: reads IMAGE_PATH from env, uploads binary to /{pageId}/photos.
+  // --qc: QC check only, no publish (credential not required)
+  if (arg === '--qc') {
+    const caption = process.argv[3];
+    const imagePath = process.env.IMAGE_PATH?.trim();
+    const qc = validateQC(imagePath, caption);
+    console.log(JSON.stringify(qc));
+    process.exit(qc.ok ? 0 : 1);
+  }
+
+  // --image-post: QC → duplicate check → publish → log
   if (arg === '--image-post') {
     const caption = process.argv[3];
     if (!caption || !caption.trim()) {
@@ -246,21 +343,36 @@ async function main() {
       process.exit(1);
     }
     const imagePath = process.env.IMAGE_PATH?.trim();
-    if (!imagePath) {
-      console.log(JSON.stringify({ ok: false, error: '[MISSING_CREDENTIAL] IMAGE_PATH env var is not set' }));
+    const logPath = process.env.LOG_PATH?.trim() || null;
+
+    // Step 1: QC
+    const qc = validateQC(imagePath, caption);
+    if (!qc.ok) {
+      console.log(JSON.stringify({ ok: false, error: `[QC_FAILED] ${qc.issues.join('; ')}` }));
       process.exit(1);
     }
+
+    // Step 2: Duplicate detection
+    if (isDuplicate(logPath, imagePath)) {
+      console.log(JSON.stringify({ ok: false, error: `[DUPLICATE] ${imagePath} has already been published` }));
+      process.exit(1);
+    }
+
     const pageId = process.env.META_PAGE_ID_1?.trim();
     if (!pageId) {
       console.log(JSON.stringify({ ok: false, error: '[MISSING_CREDENTIAL] META_PAGE_ID_1 is not set' }));
       process.exit(1);
     }
+
+    // Step 3: Resolve token
     const resolution = await resolvePageToken(credential, pageId);
     if (!resolution.ok) {
       const codeTag = resolution.code ? `:${resolution.code}` : '';
       console.log(JSON.stringify({ ok: false, error: `[${resolution.reason}${codeTag}] ${resolution.msg}` }));
       process.exit(1);
     }
+
+    // Step 4: Publish
     const result = await publishImageToPage(pageId, resolution.token, caption.trim(), imagePath);
     if (!result.ok) {
       const codeTag = result.code ? `:${result.code}` : '';
@@ -268,14 +380,25 @@ async function main() {
       console.log(JSON.stringify({ ok: false, error: `[GRAPH_API_ERROR${codeTag}${sub}] ${result.msg}` }));
       process.exit(1);
     }
+
+    // Step 5: Write to publish log
+    appendToLog(logPath, {
+      imagePath,
+      postId: result.postId,
+      publishedAt: new Date().toISOString(),
+      captionPreview: caption.trim().slice(0, 80),
+    });
+
     console.log(JSON.stringify({ ok: true, postId: result.postId }));
     process.exit(0);
   }
 
+  // Text post
   const message = arg;
   if (!message || !message.trim()) {
     console.error('Usage: node scripts/fb-publish.mjs "Your post text here"');
     console.error('       node scripts/fb-publish.mjs --image-post "Caption" (requires IMAGE_PATH env var)');
+    console.error('       node scripts/fb-publish.mjs --qc "Caption" (requires IMAGE_PATH env var)');
     console.error('       node scripts/fb-publish.mjs --validate');
     process.exit(1);
   }
@@ -286,7 +409,6 @@ async function main() {
     process.exit(1);
   }
 
-  // Step 1: resolve to an effective Page Access Token.
   const resolution = await resolvePageToken(credential, pageId);
   if (!resolution.ok) {
     const codeTag = resolution.code ? `:${resolution.code}` : '';
@@ -294,7 +416,6 @@ async function main() {
     process.exit(1);
   }
 
-  // Step 2: publish.
   const result = await publishToPage(pageId, resolution.token, message.trim());
   if (!result.ok) {
     const codeTag = result.code ? `:${result.code}` : '';
