@@ -6,8 +6,13 @@ on:
   workflow_dispatch:
     inputs:
       message:
-        description: 'Post text to publish to the DREXONYX Facebook Page'
+        description: 'Post caption / text'
         required: true
+        type: string
+      image_path:
+        description: 'Repo-relative path to image file (leave empty for text-only post)'
+        required: false
+        default: ''
         type: string
       dry_run:
         description: 'Validate credential only — do not publish'
@@ -43,13 +48,24 @@ jobs:
           META_PAGE_ID_1: ${{ secrets.META_PAGE_ID_1 }}
         run: node scripts/fb-publish.mjs --validate
 
-      # Publish step is skipped when dry_run is true.
-      # POST_MESSAGE is set as an env var — the message is never interpolated
-      # directly into the shell command string, preventing shell injection.
-      - name: Publish to Facebook Page
-        if: ${{ !inputs.dry_run }}
+      # Text-only publish — skipped when dry_run is true or image_path is set.
+      # POST_MESSAGE is set as an env var — never interpolated into the shell string.
+      - name: Publish text post to Facebook Page
+        if: ${{ !inputs.dry_run && inputs.image_path == '' }}
         env:
           META_PAGE_ACCESS_TOKEN: ${{ secrets.META_PAGE_ACCESS_TOKEN }}
           META_PAGE_ID_1: ${{ secrets.META_PAGE_ID_1 }}
           POST_MESSAGE: ${{ inputs.message }}
         run: node scripts/fb-publish.mjs "$POST_MESSAGE"
+
+      # Image post — skipped when dry_run is true or image_path is empty.
+      # IMAGE_PATH points to a file checked out from the repo (no external URL).
+      # POST_MESSAGE is set as an env var — never interpolated into the shell string.
+      - name: Publish image post to Facebook Page
+        if: ${{ !inputs.dry_run && inputs.image_path != '' }}
+        env:
+          META_PAGE_ACCESS_TOKEN: ${{ secrets.META_PAGE_ACCESS_TOKEN }}
+          META_PAGE_ID_1: ${{ secrets.META_PAGE_ID_1 }}
+          IMAGE_PATH: ${{ inputs.image_path }}
+          POST_MESSAGE: ${{ inputs.message }}
+        run: node scripts/fb-publish.mjs --image-post "$POST_MESSAGE"

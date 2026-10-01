@@ -5,13 +5,20 @@
  *   META_PAGE_ACCESS_TOKEN="<token>" META_PAGE_ID_1="<pageId>" \
  *     node scripts/fb-publish.mjs "Your post text here"
  *
+ *   # Image post (IMAGE_PATH must be an absolute or repo-relative path):
+ *   META_PAGE_ACCESS_TOKEN="<token>" META_PAGE_ID_1="<pageId>" \
+ *     IMAGE_PATH="assets/facebook/posts/2026-10-01-day01.png" \
+ *     node scripts/fb-publish.mjs --image-post "Your caption here"
+ *
  * Returns JSON to stdout:
  *   { "ok": true,  "postId": "<pageId>_<postId>" }
  *   { "ok": false, "error": "[GRAPH_API_ERROR:190] Session has expired..." }
  *
  * The access token is never printed, logged, or included in output.
- * Requires Node.js 18+ (native fetch).
+ * Requires Node.js 18+ (native fetch, FormData, Blob).
  */
+
+import { readFileSync } from 'fs';
 
 const GRAPH_API_BASE = 'https://graph.facebook.com/v21.0';
 
@@ -116,6 +123,54 @@ async function publishToPage(pageId, token, message) {
   };
 }
 
+// Publishes an image + caption to the Page using multipart form upload.
+// IMAGE_PATH must be a path to a valid image file accessible by the runner.
+// The access token is never logged or returned.
+async function publishImageToPage(pageId, token, caption, imagePath) {
+  let imageBytes;
+  try {
+    imageBytes = readFileSync(imagePath);
+  } catch (e) {
+    return { ok: false, code: 0, msg: `Could not read image file: ${e.message}` };
+  }
+
+  const ext = imagePath.split('.').pop()?.toLowerCase() ?? 'jpg';
+  const mimeType = ext === 'png' ? 'image/png' : ext === 'gif' ? 'image/gif' : 'image/jpeg';
+
+  const form = new FormData();
+  form.append('source', new Blob([imageBytes], { type: mimeType }), `image.${ext}`);
+  form.append('caption', caption);
+  form.append('published', 'true');
+
+  let res;
+  try {
+    res = await fetch(`${GRAPH_API_BASE}/${pageId}/photos`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: form,
+    });
+  } catch (e) {
+    return { ok: false, code: 0, msg: e.message };
+  }
+
+  let json;
+  try { json = await res.json(); } catch {
+    return { ok: false, code: res.status, msg: `HTTP ${res.status} (non-JSON body)` };
+  }
+
+  if (res.ok && typeof json.id === 'string') {
+    return { ok: true, postId: json.id };
+  }
+
+  const err = json?.error;
+  return {
+    ok: false,
+    code: typeof err?.code === 'number' ? err.code : res.status,
+    subcode: typeof err?.error_subcode === 'number' ? err.error_subcode : undefined,
+    msg: typeof err?.message === 'string' ? err.message : `HTTP ${res.status}`,
+  };
+}
+
 // Validates the credential without publishing. Calls /me and /me/accounts to
 // confirm the token is active and report which pages are accessible.
 // Never prints the token or any access_token value.
@@ -183,9 +238,44 @@ async function main() {
     process.exit(result.ok ? 0 : 1);
   }
 
+  // Image post mode: reads IMAGE_PATH from env, uploads binary to /{pageId}/photos.
+  if (arg === '--image-post') {
+    const caption = process.argv[3];
+    if (!caption || !caption.trim()) {
+      console.error('Usage: IMAGE_PATH=<path> node scripts/fb-publish.mjs --image-post "Caption here"');
+      process.exit(1);
+    }
+    const imagePath = process.env.IMAGE_PATH?.trim();
+    if (!imagePath) {
+      console.log(JSON.stringify({ ok: false, error: '[MISSING_CREDENTIAL] IMAGE_PATH env var is not set' }));
+      process.exit(1);
+    }
+    const pageId = process.env.META_PAGE_ID_1?.trim();
+    if (!pageId) {
+      console.log(JSON.stringify({ ok: false, error: '[MISSING_CREDENTIAL] META_PAGE_ID_1 is not set' }));
+      process.exit(1);
+    }
+    const resolution = await resolvePageToken(credential, pageId);
+    if (!resolution.ok) {
+      const codeTag = resolution.code ? `:${resolution.code}` : '';
+      console.log(JSON.stringify({ ok: false, error: `[${resolution.reason}${codeTag}] ${resolution.msg}` }));
+      process.exit(1);
+    }
+    const result = await publishImageToPage(pageId, resolution.token, caption.trim(), imagePath);
+    if (!result.ok) {
+      const codeTag = result.code ? `:${result.code}` : '';
+      const sub = result.subcode ? `/${result.subcode}` : '';
+      console.log(JSON.stringify({ ok: false, error: `[GRAPH_API_ERROR${codeTag}${sub}] ${result.msg}` }));
+      process.exit(1);
+    }
+    console.log(JSON.stringify({ ok: true, postId: result.postId }));
+    process.exit(0);
+  }
+
   const message = arg;
   if (!message || !message.trim()) {
     console.error('Usage: node scripts/fb-publish.mjs "Your post text here"');
+    console.error('       node scripts/fb-publish.mjs --image-post "Caption" (requires IMAGE_PATH env var)');
     console.error('       node scripts/fb-publish.mjs --validate');
     process.exit(1);
   }
