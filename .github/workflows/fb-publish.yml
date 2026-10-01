@@ -1,0 +1,55 @@
+name: Facebook Direct Publish
+
+# Manual trigger only — Claude Code dispatches this when a post is ready.
+# Inputs are the ONLY way to initiate a publish; no push or schedule trigger.
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        description: 'Post text to publish to the DREXONYX Facebook Page'
+        required: true
+        type: string
+      dry_run:
+        description: 'Validate credential only — do not publish'
+        required: false
+        default: false
+        type: boolean
+
+# Minimal permissions — this workflow reads repo contents and does nothing else
+# with the GitHub token. All Facebook access uses META_PAGE_ACCESS_TOKEN secret.
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Publish to Facebook Page
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Validate the credential before attempting any publish.
+      # Calls /me and /me/accounts — no post is created.
+      # The token value is never printed; GitHub Actions masks registered secrets.
+      - name: Validate Meta credential
+        env:
+          META_PAGE_ACCESS_TOKEN: ${{ secrets.META_PAGE_ACCESS_TOKEN }}
+          META_PAGE_ID_1: ${{ secrets.META_PAGE_ID_1 }}
+        run: node scripts/fb-publish.mjs --validate
+
+      # Publish step is skipped when dry_run is true.
+      # POST_MESSAGE is set as an env var — the message is never interpolated
+      # directly into the shell command string, preventing shell injection.
+      - name: Publish to Facebook Page
+        if: ${{ !inputs.dry_run }}
+        env:
+          META_PAGE_ACCESS_TOKEN: ${{ secrets.META_PAGE_ACCESS_TOKEN }}
+          META_PAGE_ID_1: ${{ secrets.META_PAGE_ID_1 }}
+          POST_MESSAGE: ${{ inputs.message }}
+        run: node scripts/fb-publish.mjs "$POST_MESSAGE"
