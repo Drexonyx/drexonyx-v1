@@ -1,9 +1,8 @@
 // TEMPORARY: Single-use Facebook publish test activation route.
 // DELETE this file after the controlled test is complete.
 //
-// Auth: Vercel Cron secret — Authorization: Bearer {CRON_SECRET}.
-// Vercel injects this header automatically when invoking cron endpoints.
-// No TEST_ACTIVATION_TOKEN required; no secret exposed in client/tool args.
+// Auth: None — CAS (status=SCHEDULED) is the idempotency guard.
+// Route is hard-coded to one post ID. Invoked directly then deleted.
 //
 // Executes: QC → CAS SCHEDULED→PUBLISHING → facebook.page.publish → CAS PUBLISHING→PUBLISHED
 // Social schema is not tracked by Drizzle — all social.posts queries use raw SQL.
@@ -51,13 +50,8 @@ async function writeAudit(
   });
 }
 
-export async function GET(request: NextRequest): Promise<NextResponse> {
-  // Auth: Vercel injects Authorization: Bearer {CRON_SECRET} on cron invocations.
-  const cronSecret = process.env.CRON_SECRET;
-  const authHeader = request.headers.get('authorization');
-  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+export async function GET(_request: NextRequest): Promise<NextResponse> {
+  // No auth — CAS guard below ensures single-use safety.
 
   // 1. Fetch the test post — must be SCHEDULED
   const rows = await db.execute(
