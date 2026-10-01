@@ -1,5 +1,6 @@
 // TEMPORARY SINGLE-USE: activation test for post 8c8cb876-97ac-4160-b9f1-892b5c2d8786
 // DELETE BEFORE PRODUCTION RE-DEPLOY
+// build: 2
 
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db/index';
