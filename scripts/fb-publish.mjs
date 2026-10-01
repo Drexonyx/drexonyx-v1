@@ -116,16 +116,77 @@ async function publishToPage(pageId, token, message) {
   };
 }
 
-async function main() {
-  const message = process.argv[2];
-  if (!message || !message.trim()) {
-    console.error('Usage: node scripts/fb-publish.mjs "Your post text here"');
-    process.exit(1);
+// Validates the credential without publishing. Calls /me and /me/accounts to
+// confirm the token is active and report which pages are accessible.
+// Never prints the token or any access_token value.
+async function validateCredential(credential) {
+  let meRes;
+  try {
+    meRes = await fetch(`${GRAPH_API_BASE}/me?fields=id,name`, {
+      headers: { Authorization: `Bearer ${credential}` },
+    });
+  } catch (e) {
+    return { ok: false, error: `[NETWORK_ERROR] ${e.message}` };
   }
+
+  let meJson;
+  try { meJson = await meRes.json(); } catch {
+    return { ok: false, error: `[GRAPH_API_ERROR] token-check: HTTP ${meRes.status} (non-JSON)` };
+  }
+
+  if (!meRes.ok) {
+    const err = meJson?.error;
+    const code = typeof err?.code === 'number' ? `:${err.code}` : '';
+    const msg = typeof err?.message === 'string' ? err.message : `HTTP ${meRes.status}`;
+    return { ok: false, error: `[GRAPH_API_ERROR${code}] ${msg}` };
+  }
+
+  const selfId = meJson.id;
+  const selfName = meJson.name ?? '(unknown)';
+
+  // List pages this token can manage — return names and IDs only, never tokens.
+  let accountsRes;
+  try {
+    accountsRes = await fetch(`${GRAPH_API_BASE}/me/accounts?fields=id,name`, {
+      headers: { Authorization: `Bearer ${credential}` },
+    });
+  } catch (e) {
+    // Token is valid but accounts call failed — still report the identity.
+    return { ok: true, identity: { id: selfId, name: selfName }, pages: null, accountsError: e.message };
+  }
+
+  let accountsJson;
+  try { accountsJson = await accountsRes.json(); } catch {
+    return { ok: true, identity: { id: selfId, name: selfName }, pages: null };
+  }
+
+  const pages = accountsRes.ok && Array.isArray(accountsJson.data)
+    ? accountsJson.data.map(p => ({ id: p.id, name: p.name }))
+    : null;
+
+  return { ok: true, identity: { id: selfId, name: selfName }, pages };
+}
+
+async function main() {
+  const arg = process.argv[2];
 
   const credential = process.env.META_PAGE_ACCESS_TOKEN?.trim();
   if (!credential) {
     console.log(JSON.stringify({ ok: false, error: '[MISSING_CREDENTIAL] META_PAGE_ACCESS_TOKEN is not set' }));
+    process.exit(1);
+  }
+
+  // Validation mode: confirm token is active and list accessible pages.
+  if (arg === '--validate') {
+    const result = await validateCredential(credential);
+    console.log(JSON.stringify(result));
+    process.exit(result.ok ? 0 : 1);
+  }
+
+  const message = arg;
+  if (!message || !message.trim()) {
+    console.error('Usage: node scripts/fb-publish.mjs "Your post text here"');
+    console.error('       node scripts/fb-publish.mjs --validate');
     process.exit(1);
   }
 
