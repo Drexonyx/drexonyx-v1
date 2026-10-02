@@ -248,6 +248,90 @@ async function publishToPage(pageId, token, message) {
 }
 
 // ---------------------------------------------------------------------------
+// Carousel helpers — upload each photo as unpublished, then post as album
+// The access token is never logged, returned, or included in any output.
+// ---------------------------------------------------------------------------
+async function uploadUnpublishedPhoto(pageId, token, imagePath) {
+  let imageBytes;
+  try {
+    imageBytes = readFileSync(imagePath);
+  } catch (e) {
+    return { ok: false, code: 0, msg: `Could not read image: ${e.message}` };
+  }
+
+  const ext = imagePath.split('.').pop()?.toLowerCase() ?? 'jpg';
+  const mimeType = ext === 'png' ? 'image/png' : ext === 'gif' ? 'image/gif' : 'image/jpeg';
+
+  const form = new FormData();
+  form.append('source', new Blob([imageBytes], { type: mimeType }), `image.${ext}`);
+  form.append('published', 'false');
+
+  let res;
+  try {
+    res = await fetch(`${GRAPH_API_BASE}/${pageId}/photos`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: form,
+    });
+  } catch (e) {
+    return { ok: false, code: 0, msg: e.message };
+  }
+
+  let json;
+  try { json = await res.json(); } catch {
+    return { ok: false, code: res.status, msg: `HTTP ${res.status} (non-JSON body)` };
+  }
+
+  if (res.ok && typeof json.id === 'string') {
+    return { ok: true, photoId: json.id };
+  }
+
+  const err = json?.error;
+  return {
+    ok: false,
+    code: typeof err?.code === 'number' ? err.code : res.status,
+    msg: typeof err?.message === 'string' ? err.message : `HTTP ${res.status}`,
+  };
+}
+
+async function publishCarouselFeed(pageId, token, message, photoIds) {
+  let res;
+  try {
+    res = await fetch(`${GRAPH_API_BASE}/${pageId}/feed`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message,
+        attached_media: photoIds.map(id => ({ media_fbid: id })),
+        published: true,
+      }),
+    });
+  } catch (e) {
+    return { ok: false, code: 0, msg: e.message };
+  }
+
+  let json;
+  try { json = await res.json(); } catch {
+    return { ok: false, code: res.status, msg: `HTTP ${res.status} (non-JSON body)` };
+  }
+
+  if (res.ok && typeof json.id === 'string') {
+    return { ok: true, postId: json.id };
+  }
+
+  const err = json?.error;
+  return {
+    ok: false,
+    code: typeof err?.code === 'number' ? err.code : res.status,
+    subcode: typeof err?.error_subcode === 'number' ? err.error_subcode : undefined,
+    msg: typeof err?.message === 'string' ? err.message : `HTTP ${res.status}`,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Image post — multipart/form-data binary upload to /{pageId}/photos
 // The access token is never logged, returned, or included in any output.
 // ---------------------------------------------------------------------------
@@ -477,6 +561,78 @@ async function main() {
     });
 
     console.log(JSON.stringify({ ok: true, postId: result.postId }));
+    process.exit(0);
+  }
+
+  // --carousel-post: upload each image as unpublished, then publish as multi-image album
+  if (arg === '--carousel-post') {
+    const caption = process.argv[3];
+    if (!caption || !caption.trim()) {
+      console.error('Usage: CAROUSEL_IMAGES=\'["path1","path2",...]\' node scripts/fb-publish.mjs --carousel-post "Caption"');
+      process.exit(1);
+    }
+
+    const carouselRaw = process.env.CAROUSEL_IMAGES?.trim();
+    if (!carouselRaw) {
+      console.log(JSON.stringify({ ok: false, error: '[MISSING_INPUT] CAROUSEL_IMAGES env var is not set' }));
+      process.exit(1);
+    }
+
+    let imagePaths;
+    try {
+      imagePaths = JSON.parse(carouselRaw);
+      if (!Array.isArray(imagePaths) || imagePaths.length === 0) throw new Error('must be non-empty array');
+    } catch (e) {
+      console.log(JSON.stringify({ ok: false, error: `[INVALID_INPUT] CAROUSEL_IMAGES must be a JSON array: ${e.message}` }));
+      process.exit(1);
+    }
+
+    // QC each image
+    for (const imgPath of imagePaths) {
+      const qc = validateQC(imgPath, caption);
+      if (!qc.ok) {
+        console.log(JSON.stringify({ ok: false, error: `[QC_FAILED] ${imgPath}: ${qc.issues.join('; ')}` }));
+        process.exit(1);
+      }
+    }
+
+    const pageId = process.env.META_PAGE_ID_1?.trim();
+    if (!pageId) {
+      console.log(JSON.stringify({ ok: false, error: '[MISSING_CREDENTIAL] META_PAGE_ID_1 is not set' }));
+      process.exit(1);
+    }
+
+    // Resolve token
+    const resolution = await resolvePageToken(credential, pageId);
+    if (!resolution.ok) {
+      const codeTag = resolution.code ? `:${resolution.code}` : '';
+      console.log(JSON.stringify({ ok: false, error: `[${resolution.reason}${codeTag}] ${resolution.msg}` }));
+      process.exit(1);
+    }
+
+    // Upload each image as unpublished, collect photo IDs
+    const photoIds = [];
+    for (const imgPath of imagePaths) {
+      const upload = await uploadUnpublishedPhoto(pageId, resolution.token, imgPath);
+      if (!upload.ok) {
+        const codeTag = upload.code ? `:${upload.code}` : '';
+        console.log(JSON.stringify({ ok: false, error: `[GRAPH_API_ERROR${codeTag}] Upload failed for ${imgPath}: ${upload.msg}` }));
+        process.exit(1);
+      }
+      photoIds.push(upload.photoId);
+      console.error(`Uploaded ${imgPath} → photo ${upload.photoId}`);
+    }
+
+    // Create the album feed post with all photos
+    const result = await publishCarouselFeed(pageId, resolution.token, caption.trim(), photoIds);
+    if (!result.ok) {
+      const codeTag = result.code ? `:${result.code}` : '';
+      const sub = result.subcode ? `/${result.subcode}` : '';
+      console.log(JSON.stringify({ ok: false, error: `[GRAPH_API_ERROR${codeTag}${sub}] ${result.msg}` }));
+      process.exit(1);
+    }
+
+    console.log(JSON.stringify({ ok: true, postId: result.postId, photoCount: photoIds.length }));
     process.exit(0);
   }
 
