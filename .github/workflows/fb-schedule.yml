@@ -1,0 +1,115 @@
+name: Facebook Daily Campaign
+
+# Fires daily at 07:00 UTC (11:00 AM Dubai/UAE time).
+# Also dispatchable manually for catch-up or one-off date override.
+on:
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+    inputs:
+      override_date:
+        description: 'Override date (YYYY-MM-DD) — blank = today'
+        required: false
+        default: ''
+        type: string
+      dry_run:
+        description: 'QC + credential check only — do not publish'
+        required: false
+        default: false
+        type: boolean
+
+# contents: write required to commit publish log after a successful post.
+permissions:
+  contents: write
+
+jobs:
+  daily-post:
+    name: Publish Daily Campaign Post
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Resolve today's post from campaign.json.
+      # Sets SKIP, DAY, MEDIA_TYPE, IMAGE_PATH, VIDEO_PATH in GITHUB_OUTPUT.
+      # Writes post message to /tmp/post-message.txt.
+      # Exits cleanly (SKIP=true) when no entry matches or already published.
+      - name: Resolve today's post
+        id: resolve
+        run: |
+          DATE_ARG="${{ inputs.override_date }}"
+          if [ -z "$DATE_ARG" ]; then
+            DATE_ARG=$(date -u +%Y-%m-%d)
+          fi
+          node scripts/fb-resolve-day.mjs "$DATE_ARG"
+
+      # QC gate — validates media file and caption. No post is created.
+      # Credential is not required for QC.
+      - name: QC check (image)
+        if: ${{ steps.resolve.outputs.SKIP == 'false' && steps.resolve.outputs.MEDIA_TYPE == 'image' }}
+        env:
+          IMAGE_PATH: ${{ steps.resolve.outputs.IMAGE_PATH }}
+        run: node scripts/fb-publish.mjs --qc "$(cat /tmp/post-message.txt)"
+
+      - name: QC check (video)
+        if: ${{ steps.resolve.outputs.SKIP == 'false' && steps.resolve.outputs.MEDIA_TYPE == 'video' }}
+        env:
+          VIDEO_PATH: ${{ steps.resolve.outputs.VIDEO_PATH }}
+        run: node scripts/fb-publish.mjs --qc "$(cat /tmp/post-message.txt)"
+
+      # Validate Meta credential before any publish attempt.
+      - name: Validate Meta credential
+        if: ${{ steps.resolve.outputs.SKIP == 'false' && !inputs.dry_run }}
+        env:
+          META_PAGE_ACCESS_TOKEN: ${{ secrets.META_PAGE_ACCESS_TOKEN }}
+          META_PAGE_ID_1: ${{ secrets.META_PAGE_ID_1 }}
+        run: node scripts/fb-publish.mjs --validate
+
+      # Publish image post.
+      - name: Publish image post
+        if: ${{ steps.resolve.outputs.SKIP == 'false' && steps.resolve.outputs.MEDIA_TYPE == 'image' && !inputs.dry_run }}
+        env:
+          META_PAGE_ACCESS_TOKEN: ${{ secrets.META_PAGE_ACCESS_TOKEN }}
+          META_PAGE_ID_1: ${{ secrets.META_PAGE_ID_1 }}
+          IMAGE_PATH: ${{ steps.resolve.outputs.IMAGE_PATH }}
+          LOG_PATH: assets/facebook/publish-log.json
+        run: node scripts/fb-publish.mjs --image-post "$(cat /tmp/post-message.txt)"
+
+      # Publish video post.
+      - name: Publish video post
+        if: ${{ steps.resolve.outputs.SKIP == 'false' && steps.resolve.outputs.MEDIA_TYPE == 'video' && !inputs.dry_run }}
+        env:
+          META_PAGE_ACCESS_TOKEN: ${{ secrets.META_PAGE_ACCESS_TOKEN }}
+          META_PAGE_ID_1: ${{ secrets.META_PAGE_ID_1 }}
+          VIDEO_PATH: ${{ steps.resolve.outputs.VIDEO_PATH }}
+          LOG_PATH: assets/facebook/publish-log.json
+        run: node scripts/fb-publish.mjs --video-post "$(cat /tmp/post-message.txt)"
+
+      # Dry-run report — shown when dry_run=true.
+      - name: Dry run summary
+        if: ${{ steps.resolve.outputs.SKIP == 'false' && inputs.dry_run }}
+        run: |
+          echo "=== DRY RUN SUMMARY ==="
+          echo "Day          : ${{ steps.resolve.outputs.DAY }}"
+          echo "Media type   : ${{ steps.resolve.outputs.MEDIA_TYPE }}"
+          echo "Image path   : ${{ steps.resolve.outputs.IMAGE_PATH }}"
+          echo "Video path   : ${{ steps.resolve.outputs.VIDEO_PATH }}"
+          echo "Message preview:"
+          head -3 /tmp/post-message.txt
+          echo "========================"
+
+      # Commit updated publish log back to the campaign branch after a successful post.
+      - name: Commit publish log
+        if: ${{ steps.resolve.outputs.SKIP == 'false' && !inputs.dry_run }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/facebook/publish-log.json
+          git diff --staged --quiet || git commit -m "log: Day ${{ steps.resolve.outputs.DAY }} published $(date -u +%Y-%m-%dT%H:%M:%SZ) [skip ci]"
+          git push
