@@ -1,13 +1,24 @@
 name: Facebook Direct Publish
 
-# Manual trigger only — Claude Code dispatches this when a post is ready.
+# Triggered by Claude Code after automated QC passes — no separate manual
+# approval step required per the owner's authorization on 2026-10-01.
 # Inputs are the ONLY way to initiate a publish; no push or schedule trigger.
 on:
   workflow_dispatch:
     inputs:
       message:
-        description: 'Post text to publish to the DREXONYX Facebook Page'
+        description: 'Post caption / text'
         required: true
+        type: string
+      image_path:
+        description: 'Repo-relative path to image file (leave empty for video or text-only post)'
+        required: false
+        default: ''
+        type: string
+      video_path:
+        description: 'Repo-relative path to video file (leave empty for image or text-only post)'
+        required: false
+        default: ''
         type: string
       dry_run:
         description: 'Validate credential only — do not publish'
@@ -15,10 +26,11 @@ on:
         default: false
         type: boolean
 
-# Minimal permissions — this workflow reads repo contents and does nothing else
-# with the GitHub token. All Facebook access uses META_PAGE_ACCESS_TOKEN secret.
+# contents: write is required to commit the publish log after a successful post.
+# All Facebook access uses META_PAGE_ACCESS_TOKEN secret; the GitHub token
+# is used only for checkout and publish-log commits.
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   publish:
@@ -34,7 +46,7 @@ jobs:
         with:
           node-version: '20'
 
-      # Validate the credential before attempting any publish.
+      # Validate Meta credential before any publish attempt.
       # Calls /me and /me/accounts — no post is created.
       # The token value is never printed; GitHub Actions masks registered secrets.
       - name: Validate Meta credential
@@ -43,13 +55,69 @@ jobs:
           META_PAGE_ID_1: ${{ secrets.META_PAGE_ID_1 }}
         run: node scripts/fb-publish.mjs --validate
 
-      # Publish step is skipped when dry_run is true.
-      # POST_MESSAGE is set as an env var — the message is never interpolated
-      # directly into the shell command string, preventing shell injection.
-      - name: Publish to Facebook Page
-        if: ${{ !inputs.dry_run }}
+      # Automated QC: validates image file (format, size, existence) and caption
+      # before any publish attempt. Fails fast — no post is created if QC fails.
+      # Skipped for text-only posts and dry_run mode.
+      - name: QC check (image + caption)
+        if: ${{ !inputs.dry_run && inputs.image_path != '' }}
+        env:
+          IMAGE_PATH: ${{ inputs.image_path }}
+        run: node scripts/fb-publish.mjs --qc "${{ inputs.message }}"
+
+      # Text-only publish — skipped when dry_run is true, or image_path or video_path is set.
+      # POST_MESSAGE is set as an env var — never interpolated into the shell string.
+      - name: Publish text post to Facebook Page
+        if: ${{ !inputs.dry_run && inputs.image_path == '' && inputs.video_path == '' }}
         env:
           META_PAGE_ACCESS_TOKEN: ${{ secrets.META_PAGE_ACCESS_TOKEN }}
           META_PAGE_ID_1: ${{ secrets.META_PAGE_ID_1 }}
           POST_MESSAGE: ${{ inputs.message }}
         run: node scripts/fb-publish.mjs "$POST_MESSAGE"
+
+      # Image post — QC already passed above. Skipped when dry_run or no image.
+      # IMAGE_PATH points to a file checked out from the repo (no external URL).
+      # LOG_PATH enables duplicate detection and publish logging.
+      # POST_MESSAGE is set as an env var — never interpolated into the shell string.
+      - name: Publish image post to Facebook Page
+        if: ${{ !inputs.dry_run && inputs.image_path != '' }}
+        env:
+          META_PAGE_ACCESS_TOKEN: ${{ secrets.META_PAGE_ACCESS_TOKEN }}
+          META_PAGE_ID_1: ${{ secrets.META_PAGE_ID_1 }}
+          IMAGE_PATH: ${{ inputs.image_path }}
+          LOG_PATH: assets/facebook/publish-log.json
+          POST_MESSAGE: ${{ inputs.message }}
+        run: node scripts/fb-publish.mjs --image-post "$POST_MESSAGE"
+
+      # Video QC: validates video file (format, size, existence) and caption.
+      # Skipped when dry_run or no video_path.
+      - name: QC check (video + caption)
+        if: ${{ !inputs.dry_run && inputs.video_path != '' }}
+        env:
+          VIDEO_PATH: ${{ inputs.video_path }}
+        run: node scripts/fb-publish.mjs --qc "${{ inputs.message }}"
+
+      # Video post — QC already passed above. Skipped when dry_run or no video.
+      # VIDEO_PATH points to a file checked out from the repo (no external URL).
+      # LOG_PATH enables duplicate detection and publish logging.
+      # POST_MESSAGE is set as an env var — never interpolated into the shell string.
+      - name: Publish video post to Facebook Page
+        if: ${{ !inputs.dry_run && inputs.video_path != '' }}
+        env:
+          META_PAGE_ACCESS_TOKEN: ${{ secrets.META_PAGE_ACCESS_TOKEN }}
+          META_PAGE_ID_1: ${{ secrets.META_PAGE_ID_1 }}
+          VIDEO_PATH: ${{ inputs.video_path }}
+          LOG_PATH: assets/facebook/publish-log.json
+          POST_MESSAGE: ${{ inputs.message }}
+        run: node scripts/fb-publish.mjs --video-post "$POST_MESSAGE"
+
+      # Commit updated publish log back to main after a successful image or video post.
+      # Uses [skip ci] to avoid re-triggering workflows.
+      # Fails gracefully if the log has no staged changes (e.g. dry_run).
+      - name: Commit publish log
+        if: ${{ !inputs.dry_run && (inputs.image_path != '' || inputs.video_path != '') }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/facebook/publish-log.json
+          git diff --staged --quiet || git commit -m "log: record Facebook publish $(date -u +%Y-%m-%dT%H:%M:%SZ) [skip ci]"
+          git push

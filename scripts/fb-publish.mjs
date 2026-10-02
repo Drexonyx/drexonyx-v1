@@ -5,6 +5,18 @@
  *   META_PAGE_ACCESS_TOKEN="<token>" META_PAGE_ID_1="<pageId>" \
  *     node scripts/fb-publish.mjs "Your post text here"
  *
+ *   # Image post (QC runs automatically before publish):
+ *   META_PAGE_ACCESS_TOKEN="<token>" META_PAGE_ID_1="<pageId>" \
+ *     IMAGE_PATH="assets/facebook/posts/day01.png" \
+ *     LOG_PATH="assets/facebook/publish-log.json" \
+ *     node scripts/fb-publish.mjs --image-post "Caption here"
+ *
+ *   # Video post (QC runs automatically before publish):
+ *   META_PAGE_ACCESS_TOKEN="<token>" META_PAGE_ID_1="<pageId>" \
+ *     VIDEO_PATH="public/portfolio/video.mp4" \
+ *     LOG_PATH="assets/facebook/publish-log.json" \
+ *     node scripts/fb-publish.mjs --video-post "Caption here"
+ *
  * Returns JSON to stdout:
  *   { "ok": true,  "postId": "<pageId>_<postId>" }
  *   { "ok": false, "error": "[GRAPH_API_ERROR:190] Session has expired..." }
@@ -13,8 +25,127 @@
  * Requires Node.js 18+ (native fetch).
  */
 
-const GRAPH_API_BASE = 'https://graph.facebook.com/v21.0';
+import { existsSync, readFileSync, statSync, writeFileSync } from 'fs';
 
+const GRAPH_API_BASE = 'https://graph.facebook.com/v21.0';
+// Facebook photo size limit: 10 MB
+const IMAGE_MAX_BYTES = 10 * 1024 * 1024;
+// Facebook video size limit: 1 GB
+const VIDEO_MAX_BYTES = 1024 * 1024 * 1024;
+// Facebook caption character limit
+const CAPTION_MAX_CHARS = 63206;
+
+// ---------------------------------------------------------------------------
+// QC — validates image file + caption before any publish attempt
+// ---------------------------------------------------------------------------
+function validateQC(imagePath, caption) {
+  const issues = [];
+
+  // Caption checks
+  if (!caption || !caption.trim()) {
+    issues.push('Caption is empty');
+  } else if (caption.length > CAPTION_MAX_CHARS) {
+    issues.push(`Caption exceeds Facebook limit (${caption.length}/${CAPTION_MAX_CHARS} chars)`);
+  }
+
+  // Image file checks
+  if (!imagePath) {
+    issues.push('IMAGE_PATH is not set');
+  } else {
+    if (!existsSync(imagePath)) {
+      issues.push(`Image file not found: ${imagePath}`);
+    } else {
+      const stat = statSync(imagePath);
+      if (stat.size === 0) {
+        issues.push('Image file is empty (0 bytes)');
+      } else if (stat.size > IMAGE_MAX_BYTES) {
+        issues.push(`Image file too large (${(stat.size / 1024 / 1024).toFixed(1)} MB; Facebook limit 10 MB)`);
+      }
+      // Validate file signature (magic bytes)
+      const buf = readFileSync(imagePath);
+      const isPng = buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47;
+      const isJpg = buf[0] === 0xff && buf[1] === 0xd8;
+      const isGif = buf[0] === 0x47 && buf[1] === 0x49 && buf[2] === 0x46;
+      if (!isPng && !isJpg && !isGif) {
+        issues.push('Image format is not PNG, JPEG, or GIF (invalid file signature)');
+      }
+    }
+  }
+
+  return issues.length === 0
+    ? { ok: true }
+    : { ok: false, issues };
+}
+
+// ---------------------------------------------------------------------------
+// Video QC — validates video file + caption before any publish attempt
+// ---------------------------------------------------------------------------
+function validateVideoQC(videoPath, caption) {
+  const issues = [];
+
+  if (!caption || !caption.trim()) {
+    issues.push('Caption is empty');
+  } else if (caption.length > CAPTION_MAX_CHARS) {
+    issues.push(`Caption exceeds Facebook limit (${caption.length}/${CAPTION_MAX_CHARS} chars)`);
+  }
+
+  if (!videoPath) {
+    issues.push('VIDEO_PATH is not set');
+  } else {
+    if (!existsSync(videoPath)) {
+      issues.push(`Video file not found: ${videoPath}`);
+    } else {
+      const stat = statSync(videoPath);
+      if (stat.size === 0) {
+        issues.push('Video file is empty (0 bytes)');
+      } else if (stat.size > VIDEO_MAX_BYTES) {
+        issues.push(`Video file too large (${(stat.size / 1024 / 1024).toFixed(0)} MB; Facebook limit 1 GB)`);
+      }
+      // MP4/MOV magic: 'ftyp' box at offset 4
+      const buf = readFileSync(videoPath);
+      const isMp4 = buf.length >= 8 &&
+        buf[4] === 0x66 && buf[5] === 0x74 && buf[6] === 0x79 && buf[7] === 0x70;
+      if (!isMp4) {
+        issues.push('Video format is not a valid MP4/MOV (ftyp signature not found at offset 4)');
+      }
+    }
+  }
+
+  return issues.length === 0 ? { ok: true } : { ok: false, issues };
+}
+
+// ---------------------------------------------------------------------------
+// Duplicate detection — checks publish log to prevent re-publishing the same
+// media asset. Keyed on imagePath (image posts) or videoPath (video posts).
+// ---------------------------------------------------------------------------
+function isDuplicate(logPath, mediaPath) {
+  if (!logPath || !existsSync(logPath)) return false;
+  try {
+    const log = JSON.parse(readFileSync(logPath, 'utf-8'));
+    return Array.isArray(log) && log.some(
+      entry => entry.imagePath === mediaPath || entry.videoPath === mediaPath,
+    );
+  } catch {
+    return false;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Publish log — appends one entry after a successful publish
+// ---------------------------------------------------------------------------
+function appendToLog(logPath, entry) {
+  if (!logPath) return;
+  let log = [];
+  if (existsSync(logPath)) {
+    try { log = JSON.parse(readFileSync(logPath, 'utf-8')); } catch { log = []; }
+  }
+  log.push(entry);
+  writeFileSync(logPath, JSON.stringify(log, null, 2) + '\n');
+}
+
+// ---------------------------------------------------------------------------
+// Token resolution
+// ---------------------------------------------------------------------------
 async function resolvePageToken(credential, pageId) {
   // Determine whether credential is already a Page token for this page.
   let meRes;
@@ -116,9 +247,104 @@ async function publishToPage(pageId, token, message) {
   };
 }
 
-// Validates the credential without publishing. Calls /me and /me/accounts to
-// confirm the token is active and report which pages are accessible.
-// Never prints the token or any access_token value.
+// ---------------------------------------------------------------------------
+// Image post — multipart/form-data binary upload to /{pageId}/photos
+// The access token is never logged, returned, or included in any output.
+// ---------------------------------------------------------------------------
+async function publishImageToPage(pageId, token, caption, imagePath) {
+  let imageBytes;
+  try {
+    imageBytes = readFileSync(imagePath);
+  } catch (e) {
+    return { ok: false, code: 0, msg: `Could not read image file: ${e.message}` };
+  }
+
+  const ext = imagePath.split('.').pop()?.toLowerCase() ?? 'jpg';
+  const mimeType = ext === 'png' ? 'image/png' : ext === 'gif' ? 'image/gif' : 'image/jpeg';
+
+  const form = new FormData();
+  form.append('source', new Blob([imageBytes], { type: mimeType }), `image.${ext}`);
+  form.append('caption', caption);
+  form.append('published', 'true');
+
+  let res;
+  try {
+    res = await fetch(`${GRAPH_API_BASE}/${pageId}/photos`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: form,
+    });
+  } catch (e) {
+    return { ok: false, code: 0, msg: e.message };
+  }
+
+  let json;
+  try { json = await res.json(); } catch {
+    return { ok: false, code: res.status, msg: `HTTP ${res.status} (non-JSON body)` };
+  }
+
+  if (res.ok && typeof json.id === 'string') {
+    return { ok: true, postId: json.id };
+  }
+
+  const err = json?.error;
+  return {
+    ok: false,
+    code: typeof err?.code === 'number' ? err.code : res.status,
+    subcode: typeof err?.error_subcode === 'number' ? err.error_subcode : undefined,
+    msg: typeof err?.message === 'string' ? err.message : `HTTP ${res.status}`,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Video post — multipart/form-data binary upload to /{pageId}/videos
+// The access token is never logged, returned, or included in any output.
+// ---------------------------------------------------------------------------
+async function publishVideoToPage(pageId, token, caption, videoPath) {
+  let videoBytes;
+  try {
+    videoBytes = readFileSync(videoPath);
+  } catch (e) {
+    return { ok: false, code: 0, msg: `Could not read video file: ${e.message}` };
+  }
+
+  const form = new FormData();
+  form.append('source', new Blob([videoBytes], { type: 'video/mp4' }), 'video.mp4');
+  form.append('description', caption);
+  form.append('published', 'true');
+
+  let res;
+  try {
+    res = await fetch(`${GRAPH_API_BASE}/${pageId}/videos`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: form,
+    });
+  } catch (e) {
+    return { ok: false, code: 0, msg: e.message };
+  }
+
+  let json;
+  try { json = await res.json(); } catch {
+    return { ok: false, code: res.status, msg: `HTTP ${res.status} (non-JSON body)` };
+  }
+
+  if (res.ok && typeof json.id === 'string') {
+    return { ok: true, postId: json.id };
+  }
+
+  const err = json?.error;
+  return {
+    ok: false,
+    code: typeof err?.code === 'number' ? err.code : res.status,
+    subcode: typeof err?.error_subcode === 'number' ? err.error_subcode : undefined,
+    msg: typeof err?.message === 'string' ? err.message : `HTTP ${res.status}`,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Credential validation (no publish)
+// ---------------------------------------------------------------------------
 async function validateCredential(credential) {
   let meRes;
   try {
@@ -170,6 +396,19 @@ async function validateCredential(credential) {
 async function main() {
   const arg = process.argv[2];
 
+  // --qc: QC check only, no publish (credential not required).
+  // Uses VIDEO_PATH when IMAGE_PATH is absent (video QC mode).
+  if (arg === '--qc') {
+    const caption = process.argv[3];
+    const imagePath = process.env.IMAGE_PATH?.trim();
+    const videoPath = process.env.VIDEO_PATH?.trim();
+    const qc = (videoPath && !imagePath)
+      ? validateVideoQC(videoPath, caption)
+      : validateQC(imagePath, caption);
+    console.log(JSON.stringify(qc));
+    process.exit(qc.ok ? 0 : 1);
+  }
+
   const credential = process.env.META_PAGE_ACCESS_TOKEN?.trim();
   if (!credential) {
     console.log(JSON.stringify({ ok: false, error: '[MISSING_CREDENTIAL] META_PAGE_ACCESS_TOKEN is not set' }));
@@ -183,9 +422,130 @@ async function main() {
     process.exit(result.ok ? 0 : 1);
   }
 
+  // --image-post: QC → duplicate check → publish → log
+  if (arg === '--image-post') {
+    const caption = process.argv[3];
+    if (!caption || !caption.trim()) {
+      console.error('Usage: IMAGE_PATH=<path> node scripts/fb-publish.mjs --image-post "Caption here"');
+      process.exit(1);
+    }
+    const imagePath = process.env.IMAGE_PATH?.trim();
+    const logPath = process.env.LOG_PATH?.trim() || null;
+
+    // Step 1: QC
+    const qc = validateQC(imagePath, caption);
+    if (!qc.ok) {
+      console.log(JSON.stringify({ ok: false, error: `[QC_FAILED] ${qc.issues.join('; ')}` }));
+      process.exit(1);
+    }
+
+    // Step 2: Duplicate detection
+    if (isDuplicate(logPath, imagePath)) {
+      console.log(JSON.stringify({ ok: false, error: `[DUPLICATE] ${imagePath} has already been published` }));
+      process.exit(1);
+    }
+
+    const pageId = process.env.META_PAGE_ID_1?.trim();
+    if (!pageId) {
+      console.log(JSON.stringify({ ok: false, error: '[MISSING_CREDENTIAL] META_PAGE_ID_1 is not set' }));
+      process.exit(1);
+    }
+
+    // Step 3: Resolve token
+    const resolution = await resolvePageToken(credential, pageId);
+    if (!resolution.ok) {
+      const codeTag = resolution.code ? `:${resolution.code}` : '';
+      console.log(JSON.stringify({ ok: false, error: `[${resolution.reason}${codeTag}] ${resolution.msg}` }));
+      process.exit(1);
+    }
+
+    // Step 4: Publish
+    const result = await publishImageToPage(pageId, resolution.token, caption.trim(), imagePath);
+    if (!result.ok) {
+      const codeTag = result.code ? `:${result.code}` : '';
+      const sub = result.subcode ? `/${result.subcode}` : '';
+      console.log(JSON.stringify({ ok: false, error: `[GRAPH_API_ERROR${codeTag}${sub}] ${result.msg}` }));
+      process.exit(1);
+    }
+
+    // Step 5: Write to publish log
+    appendToLog(logPath, {
+      imagePath,
+      postId: result.postId,
+      publishedAt: new Date().toISOString(),
+      captionPreview: caption.trim().slice(0, 80),
+    });
+
+    console.log(JSON.stringify({ ok: true, postId: result.postId }));
+    process.exit(0);
+  }
+
+  // --video-post: QC → duplicate check → publish → log
+  if (arg === '--video-post') {
+    const caption = process.argv[3];
+    if (!caption || !caption.trim()) {
+      console.error('Usage: VIDEO_PATH=<path> node scripts/fb-publish.mjs --video-post "Caption here"');
+      process.exit(1);
+    }
+    const videoPath = process.env.VIDEO_PATH?.trim();
+    const logPath = process.env.LOG_PATH?.trim() || null;
+
+    // Step 1: QC
+    const qc = validateVideoQC(videoPath, caption);
+    if (!qc.ok) {
+      console.log(JSON.stringify({ ok: false, error: `[QC_FAILED] ${qc.issues.join('; ')}` }));
+      process.exit(1);
+    }
+
+    // Step 2: Duplicate detection
+    if (isDuplicate(logPath, videoPath)) {
+      console.log(JSON.stringify({ ok: false, error: `[DUPLICATE] ${videoPath} has already been published` }));
+      process.exit(1);
+    }
+
+    const pageId = process.env.META_PAGE_ID_1?.trim();
+    if (!pageId) {
+      console.log(JSON.stringify({ ok: false, error: '[MISSING_CREDENTIAL] META_PAGE_ID_1 is not set' }));
+      process.exit(1);
+    }
+
+    // Step 3: Resolve token
+    const resolution = await resolvePageToken(credential, pageId);
+    if (!resolution.ok) {
+      const codeTag = resolution.code ? `:${resolution.code}` : '';
+      console.log(JSON.stringify({ ok: false, error: `[${resolution.reason}${codeTag}] ${resolution.msg}` }));
+      process.exit(1);
+    }
+
+    // Step 4: Publish
+    const result = await publishVideoToPage(pageId, resolution.token, caption.trim(), videoPath);
+    if (!result.ok) {
+      const codeTag = result.code ? `:${result.code}` : '';
+      const sub = result.subcode ? `/${result.subcode}` : '';
+      console.log(JSON.stringify({ ok: false, error: `[GRAPH_API_ERROR${codeTag}${sub}] ${result.msg}` }));
+      process.exit(1);
+    }
+
+    // Step 5: Write to publish log
+    appendToLog(logPath, {
+      videoPath,
+      postId: result.postId,
+      publishedAt: new Date().toISOString(),
+      captionPreview: caption.trim().slice(0, 80),
+      mediaType: 'video',
+    });
+
+    console.log(JSON.stringify({ ok: true, postId: result.postId }));
+    process.exit(0);
+  }
+
+  // Text post
   const message = arg;
   if (!message || !message.trim()) {
     console.error('Usage: node scripts/fb-publish.mjs "Your post text here"');
+    console.error('       node scripts/fb-publish.mjs --image-post "Caption" (requires IMAGE_PATH env var)');
+    console.error('       node scripts/fb-publish.mjs --video-post "Caption" (requires VIDEO_PATH env var)');
+    console.error('       node scripts/fb-publish.mjs --qc "Caption" (requires IMAGE_PATH or VIDEO_PATH env var)');
     console.error('       node scripts/fb-publish.mjs --validate');
     process.exit(1);
   }
