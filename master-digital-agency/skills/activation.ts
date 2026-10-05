@@ -36,9 +36,18 @@ const WORKFLOW_SKILL_PROFILES: Record<string, WorkflowSkillProfile> = {
       'Client Communication', 'QC', 'Delivery',
     ],
     conditional: [
+      // App type — mobile or web application
+      {
+        pattern: /mobile\s*(app|application)|ios\b|android\b|logbook|flight\s+log/i,
+        skills: ['Basic Mobile App Development'],
+      },
+      {
+        pattern: /web\s*(app|application)|webapp\b|dashboard\b|user\s+input/i,
+        skills: ['Web App Development'],
+      },
       // Technical requirements activated by explicit need
       {
-        pattern: /back.?end|booking\s+system|reservation|contact\s+form|form\s+submit|server.side|api\b|database\b|\bdb\b/i,
+        pattern: /back.?end|booking\s+system|reservation|contact\s+form|form\s+submit|server.side|api\b|database\b|\bdb\b|data\s+storage/i,
         skills: ['Backend', 'Database', 'API fundamentals without paid dependency assumptions'],
       },
       // Menu / food design

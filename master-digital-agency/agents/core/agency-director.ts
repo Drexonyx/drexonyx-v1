@@ -26,14 +26,15 @@ const ROUTING_TABLE: Array<{ keywords: string[]; workflowId: WorkflowId; primary
   // More specific matches first to avoid early keyword collisions
   { keywords: ['fiverr', 'gig'], workflowId: 'W8', primaryAgent: 'offer-pricing' },
   { keywords: ['portfolio', 'case study'], workflowId: 'W9', primaryAgent: 'delivery-client-success' },
-  { keywords: ['agency report', 'report', 'status', 'summary'], workflowId: 'W10', primaryAgent: 'agency-reporting' },
+  { keywords: ['agency report', 'agency status', 'status summary', 'full report', 'summary report'], workflowId: 'W10', primaryAgent: 'agency-reporting' },
   { keywords: ['repurpose', 'repurposing', 'adapt'], workflowId: 'W6', primaryAgent: 'social-media-campaign-director' },
   { keywords: ['website', 'site', 'landing', 'landing page', 'web page'], workflowId: 'W2', primaryAgent: 'web-production' },
   { keywords: ['web app', 'webapp', 'application'], workflowId: 'W2', primaryAgent: 'app-digital-production' },
   { keywords: ['mobile app', 'ios', 'android'], workflowId: 'W2', primaryAgent: 'app-digital-production' },
   { keywords: ['logo', 'brand', 'identity', 'poster', 'flyer', 'menu', 'presentation', 'design', 'creative'], workflowId: 'W3', primaryAgent: 'brand-design-production' },
+  { keywords: ['social media campaign', 'social campaign', 'content calendar', 'content pillars', 'posting schedule'], workflowId: 'W5', primaryAgent: 'social-media-campaign-director' },
   { keywords: ['video', 'reel', 'tiktok', 'edit', 'script', 'storyboard'], workflowId: 'W4', primaryAgent: 'video-creative-production' },
-  { keywords: ['social', 'campaign', 'instagram', 'facebook', 'content calendar'], workflowId: 'W5', primaryAgent: 'social-media-campaign-director' },
+  { keywords: ['social', 'campaign', 'instagram', 'facebook'], workflowId: 'W5', primaryAgent: 'social-media-campaign-director' },
   { keywords: ['research', 'market', 'competitor', 'trend', 'analysis', 'intelligence'], workflowId: 'W7', primaryAgent: 'research-intelligence' },
 ]
 
