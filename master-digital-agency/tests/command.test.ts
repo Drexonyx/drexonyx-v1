@@ -195,6 +195,242 @@ describe('handleCommand — edge cases', () => {
   })
 })
 
+// ── Skill activation precision (req: progressive / relevant only) ────────────
+
+describe('skill activation precision — website (W2)', () => {
+  const websiteRes = () => handleCommand('A restaurant in Dubai wants a premium website.')
+
+  it('does not activate Fiverr Market Intelligence', () => {
+    const res = websiteRes()
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).not.toContain('Fiverr Market Intelligence')
+  })
+
+  it('does not activate YouTube/Social Analysis', () => {
+    const res = websiteRes()
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).not.toContain('YouTube/Social Analysis')
+  })
+
+  it('does not activate Opportunity Scoring', () => {
+    const res = websiteRes()
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).not.toContain('Opportunity Scoring')
+  })
+
+  it('does not activate Short-form Video', () => {
+    const res = websiteRes()
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).not.toContain('Short-form Video')
+  })
+
+  it('does not activate Reels', () => {
+    const res = websiteRes()
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).not.toContain('Reels')
+  })
+
+  it('does not activate TikTok Content', () => {
+    const res = websiteRes()
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).not.toContain('TikTok Content')
+  })
+
+  it('does not activate Content Calendar', () => {
+    const res = websiteRes()
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).not.toContain('Content Calendar')
+  })
+
+  it('does not activate Publishing Workflow', () => {
+    const res = websiteRes()
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).not.toContain('Publishing Workflow')
+  })
+
+  it('does not activate Campaign Reporting', () => {
+    const res = websiteRes()
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).not.toContain('Campaign Reporting')
+  })
+
+  it('does not activate Poster Design', () => {
+    const res = websiteRes()
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).not.toContain('Poster Design')
+  })
+
+  it('does not activate Presentation Design', () => {
+    const res = websiteRes()
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).not.toContain('Presentation Design')
+  })
+
+  it('does not activate Social Media Design', () => {
+    const res = websiteRes()
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).not.toContain('Social Media Design')
+  })
+
+  it('does not activate Advertising Creative', () => {
+    const res = websiteRes()
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).not.toContain('Advertising Creative')
+  })
+
+  it('always activates Website Development', () => {
+    const res = websiteRes()
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).toContain('Website Development')
+  })
+
+  it('always activates UI/UX', () => {
+    const res = websiteRes()
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).toContain('UI/UX')
+  })
+
+  it('always activates QC', () => {
+    const res = websiteRes()
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).toContain('QC')
+  })
+
+  it('always activates Delivery', () => {
+    const res = websiteRes()
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).toContain('Delivery')
+  })
+})
+
+describe('skill activation precision — conditional skills', () => {
+  it('Backend activates when booking system is mentioned', () => {
+    const res = handleCommand('Build a website with a backend booking system for a hotel.')
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).toContain('Backend')
+  })
+
+  it('Backend does NOT activate for a basic website with no server-side mention', () => {
+    const res = handleCommand('A restaurant in Dubai wants a premium website.')
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).not.toContain('Backend')
+  })
+
+  it('Database activates when reservation system is mentioned', () => {
+    const res = handleCommand('Build a website with a reservation database for a restaurant.')
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).toContain('Database')
+  })
+
+  it('Database does NOT activate for basic website', () => {
+    const res = handleCommand('A restaurant in Dubai wants a premium website.')
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).not.toContain('Database')
+  })
+
+  it('API fundamentals activate when API is mentioned', () => {
+    const res = handleCommand('Build a website with an API for the contact form.')
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).toContain('API fundamentals without paid dependency assumptions')
+  })
+
+  it('Menu Design activates when menu is explicitly mentioned', () => {
+    const res = handleCommand('Build a restaurant website with a menu section.')
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).toContain('Menu Design')
+  })
+
+  it('Menu Design does NOT activate for a generic website', () => {
+    const res = handleCommand('Build a website for a Dubai business.')
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).not.toContain('Menu Design')
+  })
+
+  it('Brand Identity activates when logo/identity is requested', () => {
+    const res = handleCommand('Build a website with logo and brand identity for a new restaurant.')
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).toContain('Brand Identity')
+    expect(res.skills).toContain('Logo Design')
+  })
+
+  it('Brand Identity does NOT activate for a basic website with no branding mention', () => {
+    const res = handleCommand('A restaurant in Dubai wants a premium website.')
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).not.toContain('Brand Identity')
+  })
+})
+
+describe('skill activation — video workflow (W4)', () => {
+  it('does not activate Fiverr Market Intelligence', () => {
+    const res = handleCommand('A business needs 5 short promotional videos for Instagram.')
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).not.toContain('Fiverr Market Intelligence')
+  })
+
+  it('does not activate social campaign skills', () => {
+    const res = handleCommand('A business needs 5 short promotional videos for Instagram.')
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).not.toContain('Content Calendar')
+    expect(res.skills).not.toContain('Publishing Workflow')
+  })
+
+  it('activates Short-form Video and Scriptwriting', () => {
+    const res = handleCommand('A business needs 5 short promotional videos for Instagram.')
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).toContain('Short-form Video')
+    expect(res.skills).toContain('Scriptwriting')
+  })
+})
+
+describe('skill activation — social campaign (W5)', () => {
+  it('does not activate video production skills', () => {
+    const res = handleCommand('A restaurant needs a 30-day social media content campaign.')
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).not.toContain('Short-form Video')
+    expect(res.skills).not.toContain('Video Editing')
+    expect(res.skills).not.toContain('Storyboarding')
+  })
+
+  it('does not activate Fiverr Market Intelligence', () => {
+    const res = handleCommand('A restaurant needs a 30-day social media content campaign.')
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).not.toContain('Fiverr Market Intelligence')
+  })
+
+  it('activates Content Calendar', () => {
+    const res = handleCommand('A restaurant needs a 30-day social media content campaign.')
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.skills).toContain('Content Calendar')
+  })
+})
+
+describe('skill activation — multi-domain requests still work', () => {
+  it('website sub-request routes correctly with correct skills', () => {
+    const res = handleCommand('build a website for a Dubai business')
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.classification.workflowId).toBe('W2')
+    expect(res.skills).toContain('Website Development')
+    expect(res.skills).not.toContain('Fiverr Market Intelligence')
+  })
+
+  it('branding sub-request routes correctly with correct skills', () => {
+    const res = handleCommand('design a brand identity and logo')
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.classification.workflowId).toBe('W3')
+    expect(res.skills).toContain('Logo Design')
+    expect(res.skills).toContain('Brand Identity')
+    expect(res.skills).not.toContain('Short-form Video')
+  })
+
+  it('video sub-request routes correctly with correct skills', () => {
+    const res = handleCommand('produce a short promotional video')
+    if (res.excluded) throw new Error('not excluded')
+    expect(res.classification.workflowId).toBe('W4')
+    expect(res.skills).toContain('Short-form Video')
+    expect(res.skills).not.toContain('Content Calendar')
+  })
+})
+
 describe('formatCommandResponse', () => {
   it('formats normal response as readable text', () => {
     const res = handleCommand('Build a website for a Dubai hotel.')

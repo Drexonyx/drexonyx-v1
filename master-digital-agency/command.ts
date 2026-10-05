@@ -9,6 +9,7 @@ import { getAgent, AGENT_REGISTRY } from './agents'
 import { getWorkflow } from './workflows'
 import { createQCGate } from './qc'
 import { ProjectState, createProject } from './state/project'
+import { selectSkills } from './skills/activation'
 
 // ── Exclusion detection ────────────────────────────────────────────────────
 
@@ -133,14 +134,9 @@ export function handleCommand(
     })
     .filter((a): a is NonNullable<typeof a> => a !== null)
 
-  // Step 6: collect skills from all assigned agents
+  // Step 6: select skills relevant to this workflow and request
   const allAgentIds = [routing.primaryAgent, ...routing.supportingAgents]
-  const skills = [...new Set(
-    allAgentIds.flatMap(id => {
-      const agent = AGENT_REGISTRY.find(a => a.id === id)
-      return agent?.skills ?? []
-    })
-  )]
+  const skills = selectSkills(trimmed, routing.workflowId, allAgentIds, AGENT_REGISTRY)
   log.push(`[SKILLS] ${skills.length} skills activated`)
 
   // Step 7: collect QC requirements from workflow
