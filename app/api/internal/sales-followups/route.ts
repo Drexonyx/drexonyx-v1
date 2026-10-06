@@ -1,18 +1,20 @@
-// Vercel Cron Job: processes overdue PENDING follow-up records.
-// Low-risk email follow-ups (NOT_REQUIRED approval policy) are marked SENT.
+// Vercel Cron Job: processes overdue PENDING follow-up records and sends email follow-ups.
+// Low-risk email follow-ups (NOT_REQUIRED approval policy) are sent via Resend, then marked SENT.
 // Social channels (instagram, whatsapp) are blocked from automated processing.
 // High-risk or manual channel follow-ups (PENDING policy) are marked SKIPPED.
 // Idempotency: follow-ups with sent_at already set are not reprocessed.
+// Test mode: SALES_OUTREACH_TEST_MODE=true redirects all sends to OUTREACH_TEST_RECIPIENT.
 // Authentication: Vercel sets Authorization: Bearer {CRON_SECRET} on every cron invocation.
 //
-// HARD BOUNDARY: this cron never sends messages to leads — it transitions DB state only.
+// HARD BOUNDARY: never sends to real prospects when SALES_OUTREACH_TEST_MODE=true.
 
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db/index';
 import { followUps } from '@/db/schema/sales';
 import { eq } from 'drizzle-orm';
-import { getOverdueFollowUps, getApprovalPolicy } from '@/lib/sales/queries';
+import { getOverdueFollowUpsWithLeadInfo, getApprovalPolicy } from '@/lib/sales/queries';
 import type { OutreachChannel } from '@/lib/sales/queries';
+import { sendFollowUpEmail } from '@/lib/sales/outreach-sender';
 
 // Instagram and WhatsApp require manual review before any message is sent.
 const BLOCKED_CHANNELS = new Set<string>(['instagram', 'whatsapp']);
@@ -28,7 +30,14 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const overdueRows = await getOverdueFollowUps();
+  const organizationId = process.env.DREXONYX_ORG_ID?.trim();
+  if (!organizationId) {
+    return NextResponse.json({ error: 'DREXONYX_ORG_ID not configured' }, { status: 500 });
+  }
+
+  const testMode = process.env.SALES_OUTREACH_TEST_MODE === 'true';
+
+  const overdueRows = await getOverdueFollowUpsWithLeadInfo();
   const batch = overdueRows.slice(0, FOLLOWUP_BATCH_LIMIT);
 
   let processed = 0;
@@ -67,12 +76,29 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       });
 
       if (approvalStatus === 'NOT_REQUIRED') {
-        // Low-risk email follow-up: mark as SENT (dispatched through the system)
-        await db
-          .update(followUps)
-          .set({ status: 'SENT', sent_at: now, updated_at: now })
-          .where(eq(followUps.id, fu.id));
-        processed++;
+        // Low-risk email follow-up: send via Resend (sendFollowUpEmail handles DB updates)
+        const sendResult = await sendFollowUpEmail({
+          followUpId: fu.id,
+          leadId: fu.lead_id,
+          outreachId: fu.outreach_id,
+          toEmail: fu.publicEmail,
+          businessName: fu.businessName,
+          messageText: fu.messageText,
+          organizationId,
+          testMode,
+        });
+
+        if (sendResult.ok) {
+          processed++;
+        } else if (sendResult.code === 'POLICY_BLOCKED') {
+          await db
+            .update(followUps)
+            .set({ status: 'SKIPPED', updated_at: now })
+            .where(eq(followUps.id, fu.id));
+          skipped++;
+        } else {
+          errors++;
+        }
       } else {
         // Requires human approval: mark as SKIPPED for manual review
         await db

@@ -15,6 +15,14 @@
     {
       "path": "/api/internal/sales-daily-report",
       "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/internal/sales-outreach-send",
+      "schedule": "0 */2 * * *"
+    },
+    {
+      "path": "/api/internal/sales-reply-poll",
+      "schedule": "0 */4 * * *"
     }
   ]
 }

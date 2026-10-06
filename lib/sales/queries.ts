@@ -7,7 +7,7 @@
 //   - approval_status logic: NOT_REQUIRED is valid for low-risk standard outreach;
 //     PENDING/APPROVED/REJECTED gates medium/high-risk actions — see getApprovalPolicy
 
-import { and, eq, gt, lt, lte, gte, inArray, desc, asc, sql, ne } from 'drizzle-orm';
+import { and, eq, gt, lt, lte, gte, inArray, isNull, isNotNull, desc, asc, sql, ne } from 'drizzle-orm';
 import { db } from '@/db/index';
 import {
   salesLeads,
@@ -298,6 +298,81 @@ export async function getPendingApprovals(limit = 50): Promise<OutreachApprovalR
   return rows as OutreachApprovalRow[];
 }
 
+// ── Outreach send queue ───────────────────────────────────────────────────────
+
+export interface OutreachSendableRow {
+  id: string;
+  lead_id: string;
+  message_text: string;
+  message_type: string;
+  channel: string;
+  approval_status: string;
+  businessName: string;
+  publicEmail: string | null;
+}
+
+/** Returns outreach messages that are ready to be sent — approved or auto-approved,
+ *  not yet dispatched, joined with lead info for the sender. */
+export async function getOutreachSendable(limit = 20): Promise<OutreachSendableRow[]> {
+  const rows = await db
+    .select({
+      id: outreachMessages.id,
+      lead_id: outreachMessages.lead_id,
+      message_text: outreachMessages.message_text,
+      message_type: outreachMessages.message_type,
+      channel: outreachMessages.channel,
+      approval_status: outreachMessages.approval_status,
+      businessName: salesLeads.business_name,
+      publicEmail: salesLeads.public_email,
+    })
+    .from(outreachMessages)
+    .innerJoin(salesLeads, eq(salesLeads.id, outreachMessages.lead_id))
+    .where(
+      and(
+        inArray(outreachMessages.approval_status, ['APPROVED', 'NOT_REQUIRED']),
+        isNull(outreachMessages.external_message_id),
+        inArray(outreachMessages.status, ['DRAFT', 'APPROVED']),
+      ),
+    )
+    .orderBy(asc(outreachMessages.created_at))
+    .limit(limit);
+
+  return rows as OutreachSendableRow[];
+}
+
+// ── Reply poll query ──────────────────────────────────────────────────────────
+
+export interface ReplyPollRow {
+  id: string;
+  lead_id: string;
+  external_thread_id: string | null;
+  sent_at: Date | null;
+}
+
+/** Returns sent email outreach messages that have not received a reply yet. */
+export async function getSentOutreachForReplyPoll(limit = 50): Promise<ReplyPollRow[]> {
+  const rows = await db
+    .select({
+      id: outreachMessages.id,
+      lead_id: outreachMessages.lead_id,
+      external_thread_id: outreachMessages.external_thread_id,
+      sent_at: outreachMessages.sent_at,
+    })
+    .from(outreachMessages)
+    .where(
+      and(
+        eq(outreachMessages.status, 'SENT'),
+        eq(outreachMessages.channel, 'email'),
+        isNull(outreachMessages.reply_received_at),
+        isNotNull(outreachMessages.external_thread_id),
+      ),
+    )
+    .orderBy(asc(outreachMessages.sent_at))
+    .limit(limit);
+
+  return rows as ReplyPollRow[];
+}
+
 // ── Follow-up queries ─────────────────────────────────────────────────────────
 
 export async function getOverdueFollowUps(now?: Date): Promise<FollowUpRow[]> {
@@ -326,6 +401,45 @@ export async function getOverdueFollowUps(now?: Date): Promise<FollowUpRow[]> {
     .orderBy(asc(followUps.scheduled_at));
 
   return rows as FollowUpRow[];
+}
+
+export interface FollowUpWithLeadRow extends FollowUpRow {
+  businessName: string;
+  publicEmail: string | null;
+  messageText: string | null;
+}
+
+/** Like getOverdueFollowUps but includes lead email and business name for actual sending. */
+export async function getOverdueFollowUpsWithLeadInfo(now?: Date): Promise<FollowUpWithLeadRow[]> {
+  const cutoff = new Date(
+    (now ?? new Date()).getTime() - OVERDUE_FOLLOWUP_GRACE_HOURS * 3_600_000,
+  );
+
+  const rows = await db
+    .select({
+      id: followUps.id,
+      lead_id: followUps.lead_id,
+      outreach_id: followUps.outreach_id,
+      scheduled_at: followUps.scheduled_at,
+      channel: followUps.channel,
+      status: followUps.status,
+      sent_at: followUps.sent_at,
+      result: followUps.result,
+      businessName: salesLeads.business_name,
+      publicEmail: salesLeads.public_email,
+      messageText: followUps.message_text,
+    })
+    .from(followUps)
+    .innerJoin(salesLeads, eq(salesLeads.id, followUps.lead_id))
+    .where(
+      and(
+        eq(followUps.status, 'PENDING'),
+        lte(followUps.scheduled_at, cutoff),
+      ),
+    )
+    .orderBy(asc(followUps.scheduled_at));
+
+  return rows as FollowUpWithLeadRow[];
 }
 
 // ── Activity queries ──────────────────────────────────────────────────────────

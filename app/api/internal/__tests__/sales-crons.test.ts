@@ -21,8 +21,9 @@ vi.mock('@/lib/orchestration/runner', () => ({
   autoAdvanceTask: mockAutoAdvanceTask,
 }));
 
-const { mockGetOverdueFollowUps, mockBuildSalesDailyReport } = vi.hoisted(() => ({
+const { mockGetOverdueFollowUps, mockGetOverdueFollowUpsWithLeadInfo, mockBuildSalesDailyReport } = vi.hoisted(() => ({
   mockGetOverdueFollowUps: vi.fn(),
+  mockGetOverdueFollowUpsWithLeadInfo: vi.fn(),
   mockBuildSalesDailyReport: vi.fn(),
 }));
 
@@ -31,8 +32,18 @@ vi.mock('@/lib/sales/queries', async (importOriginal) => {
   return {
     ...actual,
     getOverdueFollowUps: mockGetOverdueFollowUps,
+    getOverdueFollowUpsWithLeadInfo: mockGetOverdueFollowUpsWithLeadInfo,
     buildSalesDailyReport: mockBuildSalesDailyReport,
   };
+});
+
+const { mockSendFollowUpEmail } = vi.hoisted(() => ({
+  mockSendFollowUpEmail: vi.fn(),
+}));
+
+vi.mock('@/lib/sales/outreach-sender', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../../../lib/sales/outreach-sender')>();
+  return { ...actual, sendFollowUpEmail: mockSendFollowUpEmail };
 });
 
 const { mockEmailsSend } = vi.hoisted(() => ({
@@ -122,6 +133,7 @@ beforeEach(() => {
   process.env.DREXONYX_ORG_ID = ORG_ID;
   process.env.RESEND_API_KEY = 'test-resend-key';
   process.env.RESEND_FROM_ADDRESS = 'noreply@drexonyx.com';
+  process.env.SALES_OUTREACH_TEST_MODE = 'true';
 });
 
 // ── 1. Cron authentication ────────────────────────────────────────────────────
@@ -251,12 +263,10 @@ describe('GET /api/internal/sales-discovery — idempotency', () => {
 // ── 5. Follow-up execution ────────────────────────────────────────────────────
 
 describe('GET /api/internal/sales-followups — execution', () => {
-  it('marks a low-risk email follow-up as SENT', async () => {
-    const fu = { id: 'fu-1', lead_id: 'lead-1', outreach_id: null, scheduled_at: new Date(), channel: 'email', status: 'PENDING', sent_at: null, result: null };
-    mockGetOverdueFollowUps.mockResolvedValue([fu]);
-
-    const setFn = makeUpdateChain();
-    mockUpdate.mockReturnValue({ set: setFn });
+  it('sends a low-risk email follow-up via sendFollowUpEmail', async () => {
+    const fu = { id: 'fu-1', lead_id: 'lead-1', outreach_id: null, scheduled_at: new Date(), channel: 'email', status: 'PENDING', sent_at: null, result: null, businessName: 'Acme', publicEmail: 'owner@acme.com', messageText: null };
+    mockGetOverdueFollowUpsWithLeadInfo.mockResolvedValue([fu]);
+    mockSendFollowUpEmail.mockResolvedValue({ ok: true, messageId: 'resend-1', threadId: 'resend-1', redirected: true });
 
     const req = makeRequest('http://localhost/api/internal/sales-followups');
     const res = await followupsGET(req);
@@ -266,8 +276,11 @@ describe('GET /api/internal/sales-followups — execution', () => {
     expect(body.processed).toBe(1);
     expect(body.skipped).toBe(0);
     expect(body.blocked).toBe(0);
-    expect(mockUpdate).toHaveBeenCalledOnce();
-    expect(setFn).toHaveBeenCalledWith(expect.objectContaining({ status: 'SENT' }));
+    expect(mockSendFollowUpEmail).toHaveBeenCalledOnce();
+    expect(mockSendFollowUpEmail).toHaveBeenCalledWith(expect.objectContaining({
+      followUpId: 'fu-1', leadId: 'lead-1', organizationId: ORG_ID,
+    }));
+    expect(mockUpdate).not.toHaveBeenCalled();
   });
 });
 
@@ -275,8 +288,8 @@ describe('GET /api/internal/sales-followups — execution', () => {
 
 describe('GET /api/internal/sales-followups — idempotency', () => {
   it('skips a follow-up that already has sent_at set', async () => {
-    const fu = { id: 'fu-2', lead_id: 'lead-1', outreach_id: null, scheduled_at: new Date(), channel: 'email', status: 'PENDING', sent_at: new Date(), result: null };
-    mockGetOverdueFollowUps.mockResolvedValue([fu]);
+    const fu = { id: 'fu-2', lead_id: 'lead-1', outreach_id: null, scheduled_at: new Date(), channel: 'email', status: 'PENDING', sent_at: new Date(), result: null, businessName: 'Acme', publicEmail: 'owner@acme.com', messageText: null };
+    mockGetOverdueFollowUpsWithLeadInfo.mockResolvedValue([fu]);
 
     const req = makeRequest('http://localhost/api/internal/sales-followups');
     const res = await followupsGET(req);
@@ -285,10 +298,11 @@ describe('GET /api/internal/sales-followups — idempotency', () => {
     expect(body.processed).toBe(0);
     expect(body.skipped).toBe(1);
     expect(mockUpdate).not.toHaveBeenCalled();
+    expect(mockSendFollowUpEmail).not.toHaveBeenCalled();
   });
 
   it('returns total:0 when no overdue follow-ups exist', async () => {
-    mockGetOverdueFollowUps.mockResolvedValue([]);
+    mockGetOverdueFollowUpsWithLeadInfo.mockResolvedValue([]);
 
     const req = makeRequest('http://localhost/api/internal/sales-followups');
     const res = await followupsGET(req);
@@ -390,12 +404,10 @@ describe('GET /api/internal/sales-daily-report — idempotency', () => {
 // ── 9. Low-risk approval policy ───────────────────────────────────────────────
 
 describe('GET /api/internal/sales-followups — low-risk policy (NOT_REQUIRED)', () => {
-  it('processes email + follow_up channel with NOT_REQUIRED policy', async () => {
-    const fu = { id: 'fu-low', lead_id: 'l1', outreach_id: null, scheduled_at: new Date(), channel: 'email', status: 'PENDING', sent_at: null, result: null };
-    mockGetOverdueFollowUps.mockResolvedValue([fu]);
-
-    const setFn = makeUpdateChain();
-    mockUpdate.mockReturnValue({ set: setFn });
+  it('calls sendFollowUpEmail for email + follow_up with NOT_REQUIRED policy', async () => {
+    const fu = { id: 'fu-low', lead_id: 'l1', outreach_id: null, scheduled_at: new Date(), channel: 'email', status: 'PENDING', sent_at: null, result: null, businessName: 'LowRisk Co', publicEmail: 'owner@lowrisk.com', messageText: null };
+    mockGetOverdueFollowUpsWithLeadInfo.mockResolvedValue([fu]);
+    mockSendFollowUpEmail.mockResolvedValue({ ok: true, messageId: 'r1', threadId: 'r1', redirected: true });
 
     const req = makeRequest('http://localhost/api/internal/sales-followups');
     const res = await followupsGET(req);
@@ -403,7 +415,9 @@ describe('GET /api/internal/sales-followups — low-risk policy (NOT_REQUIRED)',
 
     expect(body.processed).toBe(1);
     expect(body.skipped).toBe(0);
-    expect(setFn).toHaveBeenCalledWith(expect.objectContaining({ status: 'SENT', sent_at: expect.any(Date) }));
+    expect(mockSendFollowUpEmail).toHaveBeenCalledWith(expect.objectContaining({
+      followUpId: 'fu-low', toEmail: 'owner@lowrisk.com', businessName: 'LowRisk Co',
+    }));
   });
 });
 
@@ -411,8 +425,8 @@ describe('GET /api/internal/sales-followups — low-risk policy (NOT_REQUIRED)',
 
 describe('GET /api/internal/sales-followups — high-risk policy (PENDING)', () => {
   it('skips a manual channel follow-up (PENDING policy)', async () => {
-    const fu = { id: 'fu-hi', lead_id: 'l1', outreach_id: null, scheduled_at: new Date(), channel: 'manual', status: 'PENDING', sent_at: null, result: null };
-    mockGetOverdueFollowUps.mockResolvedValue([fu]);
+    const fu = { id: 'fu-hi', lead_id: 'l1', outreach_id: null, scheduled_at: new Date(), channel: 'manual', status: 'PENDING', sent_at: null, result: null, businessName: 'Hi Risk Co', publicEmail: 'owner@hirisk.com', messageText: null };
+    mockGetOverdueFollowUpsWithLeadInfo.mockResolvedValue([fu]);
 
     const setFn = makeUpdateChain();
     mockUpdate.mockReturnValue({ set: setFn });
@@ -423,6 +437,7 @@ describe('GET /api/internal/sales-followups — high-risk policy (PENDING)', () 
 
     expect(body.skipped).toBe(1);
     expect(body.processed).toBe(0);
+    expect(mockSendFollowUpEmail).not.toHaveBeenCalled();
     expect(setFn).toHaveBeenCalledWith(expect.objectContaining({ status: 'SKIPPED' }));
   });
 });
@@ -431,8 +446,8 @@ describe('GET /api/internal/sales-followups — high-risk policy (PENDING)', () 
 
 describe('GET /api/internal/sales-followups — social channel blocking', () => {
   it('blocks an instagram follow-up', async () => {
-    const fu = { id: 'fu-ig', lead_id: 'l1', outreach_id: null, scheduled_at: new Date(), channel: 'instagram', status: 'PENDING', sent_at: null, result: null };
-    mockGetOverdueFollowUps.mockResolvedValue([fu]);
+    const fu = { id: 'fu-ig', lead_id: 'l1', outreach_id: null, scheduled_at: new Date(), channel: 'instagram', status: 'PENDING', sent_at: null, result: null, businessName: 'Biz', publicEmail: 'x@biz.com', messageText: null };
+    mockGetOverdueFollowUpsWithLeadInfo.mockResolvedValue([fu]);
 
     const setFn = makeUpdateChain();
     mockUpdate.mockReturnValue({ set: setFn });
@@ -443,12 +458,13 @@ describe('GET /api/internal/sales-followups — social channel blocking', () => 
 
     expect(body.blocked).toBe(1);
     expect(body.processed).toBe(0);
+    expect(mockSendFollowUpEmail).not.toHaveBeenCalled();
     expect(setFn).toHaveBeenCalledWith(expect.objectContaining({ status: 'SKIPPED' }));
   });
 
   it('blocks a whatsapp follow-up', async () => {
-    const fu = { id: 'fu-wa', lead_id: 'l1', outreach_id: null, scheduled_at: new Date(), channel: 'whatsapp', status: 'PENDING', sent_at: null, result: null };
-    mockGetOverdueFollowUps.mockResolvedValue([fu]);
+    const fu = { id: 'fu-wa', lead_id: 'l1', outreach_id: null, scheduled_at: new Date(), channel: 'whatsapp', status: 'PENDING', sent_at: null, result: null, businessName: 'Biz', publicEmail: 'x@biz.com', messageText: null };
+    mockGetOverdueFollowUpsWithLeadInfo.mockResolvedValue([fu]);
 
     const setFn = makeUpdateChain();
     mockUpdate.mockReturnValue({ set: setFn });
@@ -461,12 +477,13 @@ describe('GET /api/internal/sales-followups — social channel blocking', () => 
     expect(body.processed).toBe(0);
   });
 
-  it('mixes social (blocked) + email (processed) correctly', async () => {
+  it('mixes social (blocked) + email (processed via sendFollowUpEmail) correctly', async () => {
     const rows = [
-      { id: 'fu-ig', lead_id: 'l1', outreach_id: null, scheduled_at: new Date(), channel: 'instagram', status: 'PENDING', sent_at: null, result: null },
-      { id: 'fu-em', lead_id: 'l2', outreach_id: null, scheduled_at: new Date(), channel: 'email', status: 'PENDING', sent_at: null, result: null },
+      { id: 'fu-ig', lead_id: 'l1', outreach_id: null, scheduled_at: new Date(), channel: 'instagram', status: 'PENDING', sent_at: null, result: null, businessName: 'Biz A', publicEmail: 'a@biz.com', messageText: null },
+      { id: 'fu-em', lead_id: 'l2', outreach_id: null, scheduled_at: new Date(), channel: 'email', status: 'PENDING', sent_at: null, result: null, businessName: 'Biz B', publicEmail: 'b@biz.com', messageText: null },
     ];
-    mockGetOverdueFollowUps.mockResolvedValue(rows);
+    mockGetOverdueFollowUpsWithLeadInfo.mockResolvedValue(rows);
+    mockSendFollowUpEmail.mockResolvedValue({ ok: true, messageId: 'r1', threadId: 'r1', redirected: true });
 
     const setFn = makeUpdateChain();
     mockUpdate.mockReturnValue({ set: setFn });
@@ -528,17 +545,16 @@ describe('failure handling', () => {
 
   it('continues processing other follow-ups when one throws', async () => {
     const rows = [
-      { id: 'fu-bad', lead_id: 'l1', outreach_id: null, scheduled_at: new Date(), channel: 'email', status: 'PENDING', sent_at: null, result: null },
-      { id: 'fu-ok', lead_id: 'l2', outreach_id: null, scheduled_at: new Date(), channel: 'email', status: 'PENDING', sent_at: null, result: null },
+      { id: 'fu-bad', lead_id: 'l1', outreach_id: null, scheduled_at: new Date(), channel: 'email', status: 'PENDING', sent_at: null, result: null, businessName: 'Bad Biz', publicEmail: 'bad@biz.com', messageText: null },
+      { id: 'fu-ok', lead_id: 'l2', outreach_id: null, scheduled_at: new Date(), channel: 'email', status: 'PENDING', sent_at: null, result: null, businessName: 'OK Biz', publicEmail: 'ok@biz.com', messageText: null },
     ];
-    mockGetOverdueFollowUps.mockResolvedValue(rows);
+    mockGetOverdueFollowUpsWithLeadInfo.mockResolvedValue(rows);
 
     let callCount = 0;
-    mockUpdate.mockImplementation(() => {
+    mockSendFollowUpEmail.mockImplementation(() => {
       callCount++;
-      if (callCount === 1) throw new Error('DB timeout');
-      const setFn = makeUpdateChain();
-      return { set: setFn };
+      if (callCount === 1) throw new Error('network error');
+      return Promise.resolve({ ok: true, messageId: 'r2', threadId: 'r2', redirected: true });
     });
 
     const req = makeRequest('http://localhost/api/internal/sales-followups');
