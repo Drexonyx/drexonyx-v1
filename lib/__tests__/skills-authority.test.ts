@@ -31,8 +31,9 @@ describe('AGENT_ALLOWLIST', () => {
   // DR 0125: expanded from 6 to 7 — communication.whatsapp.classify added (deterministic, zero AI).
   // DR 0126: expanded from 7 to 8 — facebook.page.publish added (post-HUMAN_GATE organic publish).
   // DR 0127: expanded from 8 to 10 — script.social_caption.generate and strategy.campaign.develop added.
-  it('contains exactly the ten DR-approved skills', () => {
-    expect(AGENT_ALLOWLIST.size).toBe(10);
+  // DR 0128: expanded from 10 to 15 — 5 sales skills added (discover, verify, score, qualify, outreach.draft).
+  it('contains exactly the fifteen DR-approved skills', () => {
+    expect(AGENT_ALLOWLIST.size).toBe(15);
     expect(AGENT_ALLOWLIST.has('utility.prompt.optimize')).toBe(true);
     expect(AGENT_ALLOWLIST.has('qc.asset.metadata')).toBe(true);
     expect(AGENT_ALLOWLIST.has('qc.script.review')).toBe(true);

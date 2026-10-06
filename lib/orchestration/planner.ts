@@ -93,6 +93,37 @@ const PLAN_TEMPLATES: Record<TaskIntent['intent_type'], readonly Omit<PlanStep, 
     { step_type: 'HUMAN_GATE', skill_id: undefined },
     { step_type: 'NOTIFICATION', skill_id: undefined },
   ],
+  // DR 0128: Sales Lead Discovery — dedup check → AI extract → create lead record → notify owner
+  // Specialist builds inline plan with step inputs; this template documents the canonical structure.
+  DISCOVER_SALES_LEAD: [
+    { step_type: 'VERIFY', skill_id: undefined },
+    { step_type: 'SKILL', skill_id: 'sales.lead.discover' },
+    { step_type: 'STATUS_TRANSITION', skill_id: undefined },
+    { step_type: 'NOTIFICATION', skill_id: undefined },
+  ],
+  // DR 0128: Sales Lead Qualification — verify → score → qualify → update lead → notify owner
+  QUALIFY_SALES_LEAD: [
+    { step_type: 'SKILL', skill_id: 'sales.lead.verify' },
+    { step_type: 'SKILL', skill_id: 'sales.lead.score' },
+    { step_type: 'SKILL', skill_id: 'sales.lead.qualify' },
+    { step_type: 'STATUS_TRANSITION', skill_id: undefined },
+    { step_type: 'NOTIFICATION', skill_id: undefined },
+  ],
+  // DR 0128: Sales Outreach Draft — draft message → create outreach record → human approval gate → notify
+  // HARD BOUNDARY: DOES NOT send any message — human must approve via HUMAN_GATE before sending
+  DRAFT_SALES_OUTREACH: [
+    { step_type: 'SKILL', skill_id: 'sales.outreach.draft' },
+    { step_type: 'STATUS_TRANSITION', skill_id: undefined },
+    { step_type: 'HUMAN_GATE', skill_id: undefined },
+    { step_type: 'NOTIFICATION', skill_id: undefined },
+  ],
+  // DR 0128: Sales Follow-up Scheduling — re-qualify → create follow-up record → notify
+  // DOES NOT send any message — scheduling only
+  SCHEDULE_SALES_FOLLOWUP: [
+    { step_type: 'SKILL', skill_id: 'sales.lead.qualify' },
+    { step_type: 'STATUS_TRANSITION', skill_id: undefined },
+    { step_type: 'NOTIFICATION', skill_id: undefined },
+  ],
 };
 
 export type PlanResult =

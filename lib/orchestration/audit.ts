@@ -274,3 +274,135 @@ export async function auditBoundaryViolation(params: {
     block_reason: params.blockReason,
   });
 }
+
+// ── DR 0128: Sales Operating System audit writers ─────────────────────────────
+// Sales events use entity_type='sales_lead', entity_id=leadId.
+// DOES NOT send any email or outreach — audit trail only.
+
+async function writeSalesEvent(
+  organizationId: string,
+  leadId: string,
+  taskId: string,
+  action: string,
+  payload: Record<string, unknown>,
+): Promise<void> {
+  await db.insert(auditEvents).values({
+    id: uuidv7(),
+    organization_id: organizationId,
+    entity_type: 'sales_lead',
+    entity_id: leadId,
+    actor_id: null,
+    actor_role: 'AGENT',
+    action,
+    payload: { task_id: taskId, lead_id: leadId, ...payload },
+  });
+}
+
+export async function auditLeadDiscovered(params: {
+  organizationId: string; taskId: string; leadId: string;
+  businessName: string; platform: string;
+}): Promise<void> {
+  await writeSalesEvent(params.organizationId, params.leadId, params.taskId, 'LEAD_DISCOVERED', {
+    business_name: params.businessName, platform: params.platform,
+  });
+}
+
+export async function auditLeadVerified(params: {
+  organizationId: string; taskId: string; leadId: string;
+  confidence: string; isActive: boolean;
+}): Promise<void> {
+  await writeSalesEvent(params.organizationId, params.leadId, params.taskId, 'LEAD_VERIFIED', {
+    confidence: params.confidence, is_active: params.isActive,
+  });
+}
+
+export async function auditLeadScored(params: {
+  organizationId: string; taskId: string; leadId: string;
+  score: number; priority: string;
+}): Promise<void> {
+  await writeSalesEvent(params.organizationId, params.leadId, params.taskId, 'LEAD_SCORED', {
+    score: params.score, priority: params.priority,
+  });
+}
+
+export async function auditOutreachDrafted(params: {
+  organizationId: string; taskId: string; leadId: string;
+  outreachId: string; channel: string; approvalStatus: string;
+}): Promise<void> {
+  await writeSalesEvent(params.organizationId, params.leadId, params.taskId, 'OUTREACH_DRAFTED', {
+    outreach_id: params.outreachId, channel: params.channel,
+    approval_status: params.approvalStatus,
+  });
+}
+
+export async function auditHumanApproved(params: {
+  organizationId: string; taskId: string; leadId: string;
+  outreachId: string; approverId: string;
+}): Promise<void> {
+  await writeSalesEvent(params.organizationId, params.leadId, params.taskId, 'HUMAN_APPROVED', {
+    outreach_id: params.outreachId, approver_id: params.approverId,
+  });
+}
+
+export async function auditOutreachSent(params: {
+  organizationId: string; taskId: string; leadId: string;
+  outreachId: string; channel: string;
+}): Promise<void> {
+  await writeSalesEvent(params.organizationId, params.leadId, params.taskId, 'OUTREACH_SENT', {
+    outreach_id: params.outreachId, channel: params.channel,
+  });
+}
+
+export async function auditReplyReceived(params: {
+  organizationId: string; taskId: string; leadId: string;
+  outreachId: string;
+}): Promise<void> {
+  await writeSalesEvent(params.organizationId, params.leadId, params.taskId, 'REPLY_RECEIVED', {
+    outreach_id: params.outreachId,
+  });
+}
+
+export async function auditFollowUpScheduled(params: {
+  organizationId: string; taskId: string; leadId: string;
+  followUpId: string; scheduledAt: string; channel: string;
+}): Promise<void> {
+  await writeSalesEvent(params.organizationId, params.leadId, params.taskId, 'FOLLOW_UP_SCHEDULED', {
+    follow_up_id: params.followUpId, scheduled_at: params.scheduledAt, channel: params.channel,
+  });
+}
+
+export async function auditFollowUpSent(params: {
+  organizationId: string; taskId: string; leadId: string;
+  followUpId: string;
+}): Promise<void> {
+  await writeSalesEvent(params.organizationId, params.leadId, params.taskId, 'FOLLOW_UP_SENT', {
+    follow_up_id: params.followUpId,
+  });
+}
+
+export async function auditLeadQualified(params: {
+  organizationId: string; taskId: string; leadId: string;
+  recommendedChannel: string;
+}): Promise<void> {
+  await writeSalesEvent(params.organizationId, params.leadId, params.taskId, 'LEAD_QUALIFIED', {
+    recommended_channel: params.recommendedChannel,
+  });
+}
+
+export async function auditLeadRejected(params: {
+  organizationId: string; taskId: string; leadId: string;
+  reason: string;
+}): Promise<void> {
+  await writeSalesEvent(params.organizationId, params.leadId, params.taskId, 'LEAD_REJECTED', {
+    reason: params.reason,
+  });
+}
+
+export async function auditClientWon(params: {
+  organizationId: string; taskId: string; leadId: string;
+  businessName: string;
+}): Promise<void> {
+  await writeSalesEvent(params.organizationId, params.leadId, params.taskId, 'CLIENT_WON', {
+    business_name: params.businessName,
+  });
+}

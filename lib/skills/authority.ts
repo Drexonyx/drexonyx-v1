@@ -30,6 +30,12 @@ export const HUMAN_SKILL_AUTHORITY: Record<SkillId, ReadonlySet<string>> = {
   'utility.output.format':            new Set(['OWNER', 'ADMIN_OPERATIONS', 'CREATIVE_PRODUCTION']),
   // DR 0075 §2.3: utility.batch.coordinate restricted to OWNER + ADMIN_OPERATIONS only
   'utility.batch.coordinate':         new Set(['OWNER', 'ADMIN_OPERATIONS']),
+  // DR 0128: Sales skills restricted to OWNER + ADMIN_OPERATIONS
+  'sales.lead.discover':  new Set(['OWNER', 'ADMIN_OPERATIONS']),
+  'sales.lead.verify':    new Set(['OWNER', 'ADMIN_OPERATIONS']),
+  'sales.lead.score':     new Set(['OWNER', 'ADMIN_OPERATIONS']),
+  'sales.lead.qualify':   new Set(['OWNER', 'ADMIN_OPERATIONS']),
+  'sales.outreach.draft': new Set(['OWNER', 'ADMIN_OPERATIONS']),
 };
 
 // DR 0075 §2.2 Option B: AGENT may invoke ONLY these skills.
@@ -46,6 +52,12 @@ export const AGENT_ALLOWLIST: ReadonlySet<SkillId> = new Set([
   'facebook.page.publish',             // DR 0126 — post-HUMAN_GATE-approval organic publish only
   'script.social_caption.generate',   // DR 0127 — agent-driven caption generation for campaign workflow
   'strategy.campaign.develop',         // DR 0127 — agent-driven campaign strategy for campaign workflow
+  // DR 0128: Sales skills — agent-driven lead lifecycle (discovery, qualification, outreach drafting)
+  'sales.lead.discover',
+  'sales.lead.verify',
+  'sales.lead.score',
+  'sales.lead.qualify',
+  'sales.outreach.draft',
 ]);
 
 // Returns true if the given human role is authorized to invoke the skill.
