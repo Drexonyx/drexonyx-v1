@@ -18,6 +18,8 @@ import {
   getLeadActivityTimeline,
   getSalesStats,
   buildSalesDailyReport,
+  getSalesEngineStatus,
+  nextUtcHour,
   getApprovalPolicy,
   CENTRAL_REPORTING_EMAIL,
   OVERDUE_FOLLOWUP_GRACE_HOURS,
@@ -642,6 +644,157 @@ describe('buildSalesDailyReport', () => {
     expect(report.summary).toHaveProperty('followUpsSent');
     expect(report.summary).toHaveProperty('pendingApprovals');
     expect(report.summary).toHaveProperty('wonClients');
+  });
+});
+
+// ── nextUtcHour (pure) ────────────────────────────────────────────────────────
+
+describe('nextUtcHour', () => {
+  it('returns the same day when the target hour is in the future', () => {
+    const from = new Date('2026-10-08T05:00:00Z'); // 05:00 UTC
+    const next = nextUtcHour(6, from);
+    expect(next.toISOString()).toBe('2026-10-08T06:00:00.000Z');
+  });
+
+  it('rolls over to next day when the target hour has passed today', () => {
+    const from = new Date('2026-10-08T10:00:00Z'); // 10:00 UTC, past 09:00
+    const next = nextUtcHour(9, from);
+    expect(next.toISOString()).toBe('2026-10-09T09:00:00.000Z');
+  });
+
+  it('rolls over to next day when target hour equals current hour exactly', () => {
+    const from = new Date('2026-10-08T06:00:00.000Z'); // exactly 06:00
+    const next = nextUtcHour(6, from);
+    expect(next.toISOString()).toBe('2026-10-09T06:00:00.000Z');
+  });
+
+  it('always returns a time strictly in the future', () => {
+    const from = new Date();
+    const next = nextUtcHour(from.getUTCHours(), from);
+    expect(next.getTime()).toBeGreaterThan(from.getTime());
+  });
+});
+
+// ── getSalesEngineStatus ──────────────────────────────────────────────────────
+
+// getSalesEngineStatus calls mockSelect in this order:
+// 1. leadRows (getSalesStats)
+// 2. outreachRows (getSalesStats)
+// 3. approvalRows (getSalesStats)
+// 4. followUpRows (getOverdueFollowUps inside getSalesStats)
+// 5. lastActivityRows (auditEvents)
+// 6. failedRows (FAILED/BOUNCED outreach)
+// 7. lastSentRows (last SENT outreach)
+// 8. repliesRows (outreach with reply_received_at)
+// 9. pendingFollowUpRows (followUps PENDING)
+
+function setupEngineStatusMocks(overrides: {
+  leads?: unknown[];
+  outreach?: unknown[];
+  approvals?: unknown[];
+  followUps?: unknown[];
+  lastActivity?: unknown[];
+  failed?: unknown[];
+  lastSent?: unknown[];
+  replies?: unknown[];
+  pendingFollowUps?: unknown[];
+}) {
+  mockSelect
+    .mockReturnValueOnce(resolve(overrides.leads ?? []))
+    .mockReturnValueOnce(resolve(overrides.outreach ?? []))
+    .mockReturnValueOnce(resolve(overrides.approvals ?? []))
+    .mockReturnValueOnce(resolve(overrides.followUps ?? []))
+    .mockReturnValueOnce(resolve(overrides.lastActivity ?? []))
+    .mockReturnValueOnce(resolve(overrides.failed ?? []))
+    .mockReturnValueOnce(resolve(overrides.lastSent ?? []))
+    .mockReturnValueOnce(resolve(overrides.replies ?? []))
+    .mockReturnValueOnce(resolve(overrides.pendingFollowUps ?? []));
+}
+
+describe('getSalesEngineStatus', () => {
+  const now = new Date('2026-10-08T10:00:00Z');
+  const recentActivity = { created_at: new Date('2026-10-08T09:00:00Z') }; // within 24h
+
+  it('returns ACTIVE when there is recent audit activity within 24h', async () => {
+    setupEngineStatusMocks({ lastActivity: [recentActivity] });
+    const result = await getSalesEngineStatus(now);
+    expect(result.status).toBe('ACTIVE');
+  });
+
+  it('returns ERROR when there are FAILED outreach messages in last 24h', async () => {
+    setupEngineStatusMocks({
+      lastActivity: [recentActivity],
+      failed: [{ id: 'msg-failed' }],
+    });
+    const result = await getSalesEngineStatus(now);
+    expect(result.status).toBe('ERROR');
+  });
+
+  it('returns WAITING when no recent activity and no errors', async () => {
+    const oldActivity = { created_at: new Date('2026-10-06T09:00:00Z') }; // > 24h ago
+    setupEngineStatusMocks({ lastActivity: [oldActivity] });
+    const result = await getSalesEngineStatus(now);
+    expect(result.status).toBe('WAITING');
+  });
+
+  it('returns WAITING when there is no activity at all', async () => {
+    setupEngineStatusMocks({ lastActivity: [] });
+    const result = await getSalesEngineStatus(now);
+    expect(result.status).toBe('WAITING');
+  });
+
+  it('returns correct reply count from reply_received_at rows', async () => {
+    setupEngineStatusMocks({
+      replies: [{ id: 'r1' }, { id: 'r2' }],
+    });
+    const result = await getSalesEngineStatus(now);
+    expect(result.repliesReceived).toBe(2);
+  });
+
+  it('returns correct pending follow-up count', async () => {
+    setupEngineStatusMocks({
+      pendingFollowUps: [{ id: 'fu-1' }, { id: 'fu-2' }, { id: 'fu-3' }],
+    });
+    const result = await getSalesEngineStatus(now);
+    expect(result.pendingFollowUps).toBe(3);
+  });
+
+  it('populates lastOutreachAt from last SENT message', async () => {
+    const sentAt = new Date('2026-10-08T09:00:00Z');
+    setupEngineStatusMocks({ lastSent: [{ sent_at: sentAt }] });
+    const result = await getSalesEngineStatus(now);
+    expect(result.lastOutreachAt).toEqual(sentAt);
+  });
+
+  it('sets lastOutreachAt to null when no sent messages exist', async () => {
+    setupEngineStatusMocks({ lastSent: [] });
+    const result = await getSalesEngineStatus(now);
+    expect(result.lastOutreachAt).toBeNull();
+  });
+
+  it('returns stats object with totalLeads from leadRows', async () => {
+    setupEngineStatusMocks({
+      leads: [
+        { status: 'NEW', priority: 'HOT' },
+        { status: 'QUALIFIED', priority: 'WARM' },
+      ],
+    });
+    const result = await getSalesEngineStatus(now);
+    expect(result.stats.totalLeads).toBe(2);
+    expect(result.stats.byStatus['NEW']).toBe(1);
+    expect(result.stats.byStatus['QUALIFIED']).toBe(1);
+  });
+
+  it('result has all required fields', async () => {
+    setupEngineStatusMocks({});
+    const result = await getSalesEngineStatus(now);
+    expect(result).toHaveProperty('status');
+    expect(result).toHaveProperty('lastActivityAt');
+    expect(result).toHaveProperty('lastOutreachAt');
+    expect(result).toHaveProperty('failedLast24h');
+    expect(result).toHaveProperty('repliesReceived');
+    expect(result).toHaveProperty('pendingFollowUps');
+    expect(result).toHaveProperty('stats');
   });
 });
 

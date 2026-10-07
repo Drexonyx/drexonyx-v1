@@ -794,6 +794,95 @@ export async function buildSalesDailyReport(now?: Date): Promise<SalesDailyRepor
   };
 }
 
+// ── Sales engine status ───────────────────────────────────────────────────────
+
+/** Returns the next UTC occurrence of a given clock hour (0–23), always strictly in the future. */
+export function nextUtcHour(targetHour: number, from?: Date): Date {
+  const now = from ?? new Date();
+  const next = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), targetHour, 0, 0, 0),
+  );
+  if (next <= now) {
+    next.setUTCDate(next.getUTCDate() + 1);
+  }
+  return next;
+}
+
+export interface SalesEngineStatusResult {
+  status: 'ACTIVE' | 'WAITING' | 'ERROR';
+  lastActivityAt: Date | null;
+  lastOutreachAt: Date | null;
+  failedLast24h: number;
+  repliesReceived: number;
+  pendingFollowUps: number;
+  stats: SalesStats;
+}
+
+export async function getSalesEngineStatus(now?: Date): Promise<SalesEngineStatusResult> {
+  const ts = now ?? new Date();
+  const cutoff24h = new Date(ts.getTime() - 86_400_000);
+
+  const [stats, lastActivityRows, failedRows, lastSentRows, repliesRows, pendingFollowUpRows] =
+    await Promise.all([
+      getSalesStats(ts),
+      db
+        .select({ created_at: auditEvents.created_at })
+        .from(auditEvents)
+        .where(eq(auditEvents.entity_type, 'sales_lead'))
+        .orderBy(desc(auditEvents.created_at))
+        .limit(1),
+      db
+        .select({ id: outreachMessages.id })
+        .from(outreachMessages)
+        .where(
+          and(
+            inArray(outreachMessages.status, ['FAILED', 'BOUNCED']),
+            gte(outreachMessages.created_at, cutoff24h),
+          ),
+        )
+        .limit(100),
+      db
+        .select({ sent_at: outreachMessages.sent_at })
+        .from(outreachMessages)
+        .where(and(eq(outreachMessages.status, 'SENT'), isNotNull(outreachMessages.sent_at)))
+        .orderBy(desc(outreachMessages.sent_at))
+        .limit(1),
+      db
+        .select({ id: outreachMessages.id })
+        .from(outreachMessages)
+        .where(isNotNull(outreachMessages.reply_received_at)),
+      db
+        .select({ id: followUps.id })
+        .from(followUps)
+        .where(eq(followUps.status, 'PENDING')),
+    ]);
+
+  const lastActivityAt = lastActivityRows[0]?.created_at ?? null;
+  const lastOutreachAt = lastSentRows[0]?.sent_at ?? null;
+  const failedLast24h = failedRows.length;
+  const repliesReceived = repliesRows.length;
+  const pendingFollowUps = pendingFollowUpRows.length;
+
+  let status: 'ACTIVE' | 'WAITING' | 'ERROR';
+  if (failedLast24h > 0) {
+    status = 'ERROR';
+  } else if (lastActivityAt !== null && lastActivityAt >= cutoff24h) {
+    status = 'ACTIVE';
+  } else {
+    status = 'WAITING';
+  }
+
+  return {
+    status,
+    lastActivityAt,
+    lastOutreachAt,
+    failedLast24h,
+    repliesReceived,
+    pendingFollowUps,
+    stats,
+  };
+}
+
 // ── Email opt-out helpers ─────────────────────────────────────────────────────
 
 /** Returns the opt-out record for a given email address, or null if none exists. */
