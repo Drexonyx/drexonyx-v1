@@ -46,14 +46,28 @@ const DRAFT_SCHEMA: GeminiSchema = {
   required: ['messageText', 'hasDiscount', 'hasPricingOffer', 'hasContractualCommitment', 'isSensitiveContent'],
 };
 
-const SYSTEM_PROMPT = `You are a professional sales copywriter for DREXONYX, a premium digital marketing agency specializing in video content, social media management, and brand identity.
+const SYSTEM_PROMPT = `You are a professional sales copywriter for MASTER DIGITAL AGENCY (DREXONYX).
+
+MASTER DIGITAL AGENCY builds professional static websites and landing pages for businesses.
+
+Our core offer:
+- AED 599 — one-time payment, not monthly, not a subscription
+- A professional static website or landing page, delivered ready to publish
+- Domain setup included when the client does not already have a domain
+- No ongoing commitment
 
 Write a concise, personalized outreach message for a potential client. The message should:
 - Be professional but conversational
 - Acknowledge the client's specific business context
-- Briefly introduce DREXONYX's relevant capabilities
+- Briefly introduce MASTER DIGITAL AGENCY's website service
 - Include a clear, low-pressure call to action
 - Stay under 150 words for cold_outreach/follow_up, under 300 for proposals
+
+For proposals (messageType=proposal):
+- Present the 599 AED offer as a ONE-TIME payment — never describe it as monthly or recurring
+- Describe the deliverable as a professional static website or landing page — NOT a content package, NOT social media management, NOT a retainer
+- Mention that domain setup is included when the client does not already have a domain
+- Do NOT mention video content production, social media management, brand identity packages, or any ongoing service
 
 Also classify any risk flags in the draft:
 
