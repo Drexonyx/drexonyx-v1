@@ -12,7 +12,12 @@ import { db } from '@/db/index';
 import { outreachMessages, followUps, salesLeads } from '@/db/schema/sales';
 import { auditEvents } from '@/db/schema/system';
 import { eq, and, isNull, inArray } from 'drizzle-orm';
-import { getApprovalPolicy, type OutreachChannel } from '@/lib/sales/queries';
+import {
+  getApprovalPolicy,
+  getEmailOptOut,
+  ensureOptOutToken,
+  type OutreachChannel,
+} from '@/lib/sales/queries';
 
 export const OUTREACH_TEST_RECIPIENT = 'Irenfold@gmail.com';
 
@@ -31,7 +36,8 @@ export type OutreachSendResult =
         | 'SEND_FAILURE'
         | 'MISSING_CONFIG'
         | 'NOT_FOUND'
-        | 'DB_ERROR';
+        | 'DB_ERROR'
+        | 'OPT_OUT';
     };
 
 // ── Email validation ──────────────────────────────────────────────────────────
@@ -81,6 +87,19 @@ export async function sendOutreachEmail(params: {
   }
   if (!isValidPublicEmail(toEmail)) {
     return { ok: false, reason: `Invalid email address: ${toEmail}`, code: 'INVALID_EMAIL' };
+  }
+
+  // 1b. Opt-out check and unsubscribe token (production only — test sends bypass this)
+  let unsubscribeUrl: string | undefined;
+  if (!isTestMode) {
+    const normalizedEmail = toEmail.toLowerCase();
+    const optOut = await getEmailOptOut(normalizedEmail);
+    if (optOut?.opted_out_at) {
+      return { ok: false, reason: 'Email has opted out of outreach', code: 'OPT_OUT' };
+    }
+    const token = await ensureOptOutToken(normalizedEmail, outreachMessageId);
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.drexonyx.com';
+    unsubscribeUrl = `${baseUrl}/api/unsubscribe?token=${token}`;
   }
 
   // 2. Fetch the outreach message
@@ -162,7 +181,7 @@ export async function sendOutreachEmail(params: {
   const redirected = isTestMode && toEmail !== OUTREACH_TEST_RECIPIENT;
 
   const subject = buildOutreachSubject(msg.message_type, businessName);
-  const html = buildEmailHtml(msg.message_text);
+  const html = buildEmailHtml(msg.message_text, unsubscribeUrl);
 
   // 7. Send
   const now = new Date();
@@ -271,6 +290,19 @@ export async function sendFollowUpEmail(params: {
     return { ok: false, reason: `Invalid email address: ${toEmail}`, code: 'INVALID_EMAIL' };
   }
 
+  // 1b. Opt-out check (production only)
+  let followUpUnsubscribeUrl: string | undefined;
+  if (!isTestMode) {
+    const normalizedEmail = toEmail.toLowerCase();
+    const optOut = await getEmailOptOut(normalizedEmail);
+    if (optOut?.opted_out_at) {
+      return { ok: false, reason: 'Email has opted out of outreach', code: 'OPT_OUT' };
+    }
+    const token = await ensureOptOutToken(normalizedEmail);
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://www.drexonyx.com';
+    followUpUnsubscribeUrl = `${baseUrl}/api/unsubscribe?token=${token}`;
+  }
+
   // 2. Policy check — follow-up email is always NOT_REQUIRED for low-risk
   const policy = getApprovalPolicy({
     channel: 'email',
@@ -303,7 +335,7 @@ export async function sendFollowUpEmail(params: {
     messageText ??
     `Following up on our previous email regarding content collaboration for ${businessName}.`;
   const subject = buildOutreachSubject('follow_up', businessName);
-  const html = buildEmailHtml(text);
+  const html = buildEmailHtml(text, followUpUnsubscribeUrl);
 
   // 5. Send
   const now = new Date();
@@ -388,7 +420,7 @@ function buildOutreachSubject(messageType: string, businessName: string): string
   return `Master Digital Agency — Content Partnership Opportunity`;
 }
 
-function buildEmailHtml(messageText: string): string {
+function buildEmailHtml(messageText: string, unsubscribeUrl?: string): string {
   const esc = (s: string) =>
     s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const paragraphs = messageText
@@ -398,5 +430,8 @@ function buildEmailHtml(messageText: string): string {
         `<p style="margin:0 0 14px;">${esc(p.replace(/\n/g, '<br>'))}</p>`,
     )
     .join('');
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"></head><body style="font-family:system-ui,sans-serif;color:#111827;max-width:600px;margin:0 auto;padding:24px;">${paragraphs}</body></html>`;
+  const footer = unsubscribeUrl
+    ? `<p style="margin:32px 0 0;font-size:11px;color:#6b7280;">Master Digital Agency · Dubai, UAE — <a href="${esc(unsubscribeUrl)}" style="color:#6b7280;">Unsubscribe</a></p>`
+    : '';
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"></head><body style="font-family:system-ui,sans-serif;color:#111827;max-width:600px;margin:0 auto;padding:24px;">${paragraphs}${footer}</body></html>`;
 }

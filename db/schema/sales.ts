@@ -249,3 +249,26 @@ export const outreachApprovals = salesSchema.table(
     index('outreach_approvals_requested_at_idx').on(t.requested_at),
   ],
 );
+
+// ─── Email Opt-Outs ───────────────────────────────────────────────────────────
+// CAN-SPAM / CASL compliance: tracks unsubscribe requests.
+// One record per email address; opted_out_at is NULL until the recipient
+// clicks the unsubscribe link. Token is generated on first outreach and
+// stored here so the same link works across all future sends.
+
+export const emailOptOuts = salesSchema.table(
+  'email_optouts',
+  {
+    id: uuid('id').primaryKey().$defaultFn(() => uuidv7()),
+    email: text('email').notNull(),
+    token: text('token').notNull(),
+    opted_out_at: timestamp('opted_out_at', { withTimezone: true }),
+    source_message_id: text('source_message_id'),
+    created_at: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    unique('email_optouts_email_unique').on(t.email),
+    unique('email_optouts_token_unique').on(t.token),
+    index('email_optouts_opted_out_at_idx').on(t.opted_out_at),
+  ],
+);

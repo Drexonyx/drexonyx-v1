@@ -12,13 +12,20 @@ vi.mock('@/db/index', () => ({
   db: { select: mockSelect, insert: mockInsert, update: mockUpdate },
 }));
 
-const { mockGetApprovalPolicy } = vi.hoisted(() => ({
+const { mockGetApprovalPolicy, mockGetEmailOptOut, mockEnsureOptOutToken } = vi.hoisted(() => ({
   mockGetApprovalPolicy: vi.fn(),
+  mockGetEmailOptOut: vi.fn(),
+  mockEnsureOptOutToken: vi.fn(),
 }));
 
 vi.mock('@/lib/sales/queries', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../../../lib/sales/queries')>();
-  return { ...actual, getApprovalPolicy: mockGetApprovalPolicy };
+  return {
+    ...actual,
+    getApprovalPolicy: mockGetApprovalPolicy,
+    getEmailOptOut: mockGetEmailOptOut,
+    ensureOptOutToken: mockEnsureOptOutToken,
+  };
 });
 
 const { mockEmailsSend } = vi.hoisted(() => ({
@@ -103,6 +110,8 @@ beforeEach(() => {
   process.env.RESEND_FROM_ADDRESS = 'Master Digital Agency <info@drexonyx.com>';
   process.env.SALES_OUTREACH_TEST_MODE = 'true'; // safe default for all tests
   mockGetApprovalPolicy.mockReturnValue('NOT_REQUIRED');
+  mockGetEmailOptOut.mockResolvedValue(null); // not opted out by default
+  mockEnsureOptOutToken.mockResolvedValue('default-opt-out-token');
 });
 
 // ── isValidPublicEmail ────────────────────────────────────────────────────────

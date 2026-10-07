@@ -15,6 +15,7 @@ import {
   outreachMessages,
   followUps,
   outreachApprovals,
+  emailOptOuts,
 } from '@/db/schema/sales';
 import { auditEvents } from '@/db/schema/system';
 
@@ -791,4 +792,63 @@ export async function buildSalesDailyReport(now?: Date): Promise<SalesDailyRepor
     activity,
     issues,
   };
+}
+
+// ── Email opt-out helpers ─────────────────────────────────────────────────────
+
+/** Returns the opt-out record for a given email address, or null if none exists. */
+export async function getEmailOptOut(email: string): Promise<{
+  token: string;
+  opted_out_at: Date | null;
+} | null> {
+  const rows = await db
+    .select({ token: emailOptOuts.token, opted_out_at: emailOptOuts.opted_out_at })
+    .from(emailOptOuts)
+    .where(eq(emailOptOuts.email, email.toLowerCase()))
+    .limit(1);
+  return rows[0] ?? null;
+}
+
+/** Ensures an opt-out token exists for the given email address.
+ *  Uses INSERT ON CONFLICT DO NOTHING + SELECT to handle concurrent inserts.
+ *  Returns the token (pre-existing or newly created). */
+export async function ensureOptOutToken(
+  email: string,
+  sourceMessageId?: string,
+): Promise<string> {
+  const normalized = email.toLowerCase();
+  const newToken = crypto.randomUUID();
+  await db.execute(
+    sql`INSERT INTO "sales"."email_optouts" (email, token, source_message_id, created_at)
+        VALUES (${normalized}, ${newToken}, ${sourceMessageId ?? null}, now())
+        ON CONFLICT (email) DO NOTHING`,
+  );
+  const rows = await db
+    .select({ token: emailOptOuts.token })
+    .from(emailOptOuts)
+    .where(eq(emailOptOuts.email, normalized))
+    .limit(1);
+  return rows[0]!.token;
+}
+
+/** Marks an email as opted out by token. Idempotent if already opted out. */
+export async function recordOptOut(token: string): Promise<
+  | { ok: true; alreadyOptedOut: boolean }
+  | { ok: false; reason: 'TOKEN_NOT_FOUND' }
+> {
+  const rows = await db
+    .select({ opted_out_at: emailOptOuts.opted_out_at })
+    .from(emailOptOuts)
+    .where(eq(emailOptOuts.token, token))
+    .limit(1);
+
+  if (rows.length === 0) return { ok: false, reason: 'TOKEN_NOT_FOUND' };
+  if (rows[0].opted_out_at !== null) return { ok: true, alreadyOptedOut: true };
+
+  await db
+    .update(emailOptOuts)
+    .set({ opted_out_at: new Date() })
+    .where(eq(emailOptOuts.token, token));
+
+  return { ok: true, alreadyOptedOut: false };
 }
