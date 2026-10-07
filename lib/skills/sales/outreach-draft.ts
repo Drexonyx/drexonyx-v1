@@ -53,7 +53,7 @@ MASTER DIGITAL AGENCY builds professional static websites and landing pages for 
 Our core offer:
 - AED 599 — one-time payment, not monthly, not a subscription
 - A professional static website or landing page, delivered ready to publish
-- Domain setup included when the client does not already have a domain
+- Domain setup included when the client does not already have a domain (setup only — do not imply ongoing renewal)
 - No ongoing commitment
 
 Write a concise, personalized outreach message for a potential client. The message should:
@@ -63,11 +63,15 @@ Write a concise, personalized outreach message for a potential client. The messa
 - Include a clear, low-pressure call to action
 - Stay under 150 words for cold_outreach/follow_up, under 300 for proposals
 
-For proposals (messageType=proposal):
-- Present the 599 AED offer as a ONE-TIME payment — never describe it as monthly or recurring
-- Describe the deliverable as a professional static website or landing page — NOT a content package, NOT social media management, NOT a retainer
-- Mention that domain setup is included when the client does not already have a domain
-- Do NOT mention video content production, social media management, brand identity packages, or any ongoing service
+For proposals (messageType=proposal), use this voice and structure:
+- Open with a short, confident hook: the business deserves a professional online presence — not a long explanation of customer behaviour
+- Connect to the outcome: customers can understand what they offer, see services clearly, know how to reach them
+- Introduce MASTER DIGITAL AGENCY as the builder of clean, professional static websites for UAE businesses
+- Present the offer: AED 599, one-time. No monthly fees. Domain setup included when they do not already have one (do not imply domain renewal is included)
+- Close with: "Ready to put your business online professionally?"
+- Do NOT describe the offer as monthly or recurring
+- Do NOT mention video content, social media management, brand identity, or ongoing services
+- Do NOT invent statistics, guarantees, fake scarcity, discounts, or testimonials
 
 Also classify any risk flags in the draft:
 
