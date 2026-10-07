@@ -132,7 +132,7 @@ beforeEach(() => {
   process.env.CRON_SECRET = CRON_SECRET;
   process.env.DREXONYX_ORG_ID = ORG_ID;
   process.env.RESEND_API_KEY = 'test-resend-key';
-  process.env.RESEND_FROM_ADDRESS = 'noreply@drexonyx.com';
+  process.env.RESEND_FROM_ADDRESS = 'Master Digital Agency <info@drexonyx.com>';
   process.env.SALES_OUTREACH_TEST_MODE = 'true';
 });
 

@@ -100,7 +100,7 @@ function makeOutreachMsgRow(overrides: Record<string, unknown> = {}) {
 beforeEach(() => {
   vi.clearAllMocks();
   process.env.RESEND_API_KEY = 'test-resend-key';
-  process.env.RESEND_FROM_ADDRESS = 'noreply@drexonyx.com';
+  process.env.RESEND_FROM_ADDRESS = 'Master Digital Agency <info@drexonyx.com>';
   process.env.SALES_OUTREACH_TEST_MODE = 'true'; // safe default for all tests
   mockGetApprovalPolicy.mockReturnValue('NOT_REQUIRED');
 });

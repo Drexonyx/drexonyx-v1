@@ -383,9 +383,9 @@ export async function sendFollowUpEmail(params: {
 
 function buildOutreachSubject(messageType: string, businessName: string): string {
   if (messageType === 'follow_up') {
-    return `Following up — DREXONYX Studio × ${businessName}`;
+    return `Following up — Master Digital Agency × ${businessName}`;
   }
-  return `DREXONYX Studio — Content Partnership Opportunity`;
+  return `Master Digital Agency — Content Partnership Opportunity`;
 }
 
 function buildEmailHtml(messageText: string): string {
