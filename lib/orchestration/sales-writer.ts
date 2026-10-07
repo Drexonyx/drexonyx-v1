@@ -6,13 +6,15 @@
 // HARD BOUNDARIES:
 //   - DOES NOT send any message, email, or DM
 //   - DOES NOT call any external service
-//   - Status changes are recorded; actual outreach requires separate human-approval gate
+//   - Standard cold email outreach receives approval_status NOT_REQUIRED (auto-sendable by cron)
+//   - High-risk messages (proposals, pricing offers, sensitive content) receive PENDING
 
 import { db } from '@/db/index';
 import { salesLeads, leadSources, outreachMessages, followUps, outreachApprovals } from '@/db/schema/sales';
 import { taskSteps } from '@/db/schema/orchestration';
 import { eq, and, lt } from 'drizzle-orm';
 import { uuidv7 } from 'uuidv7';
+import { getApprovalPolicy, type OutreachChannel } from '@/lib/sales/queries';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -201,7 +203,19 @@ async function handleSalesOutreach(params: {
 
   const draftOut = bySkill['sales.outreach.draft'] ?? {};
   const messageText = (draftOut.messageText as string | undefined) ?? '';
-  const approvalStatus = (draftOut.approvalStatus as string | undefined) ?? 'PENDING';
+  const channel = (draftOut.channel as string | undefined) ?? 'email';
+  const messageType = (draftOut.messageType as string | undefined) ?? 'cold_outreach';
+
+  // Use approval status from draft skill if set; otherwise derive from policy
+  const computedPolicy = getApprovalPolicy({
+    channel: channel as OutreachChannel,
+    messageType,
+    hasDiscount: false,
+    hasContractualCommitment: false,
+    hasPricingOffer: false,
+    isSensitiveContent: false,
+  });
+  const approvalStatus = (draftOut.approvalStatus as string | undefined) ?? computedPolicy;
 
   if (!messageText) {
     return { ok: false, error: 'sales_outreach create: messageText missing from draft skill output' };
@@ -215,10 +229,6 @@ async function handleSalesOutreach(params: {
 
   const now = new Date();
   const outreachId = uuidv7();
-
-  // Determine channel and type from the draft output or fallback
-  const channel = (draftOut.channel as string | undefined) ?? 'email';
-  const messageType = (draftOut.messageType as string | undefined) ?? 'cold_outreach';
 
   await db.insert(outreachMessages).values({
     id: outreachId,

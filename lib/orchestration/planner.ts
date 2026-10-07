@@ -109,12 +109,11 @@ const PLAN_TEMPLATES: Record<TaskIntent['intent_type'], readonly Omit<PlanStep, 
     { step_type: 'STATUS_TRANSITION', skill_id: undefined },
     { step_type: 'NOTIFICATION', skill_id: undefined },
   ],
-  // DR 0128: Sales Outreach Draft — draft message → create outreach record → human approval gate → notify
-  // HARD BOUNDARY: DOES NOT send any message — human must approve via HUMAN_GATE before sending
+  // DR 0128: Sales Outreach Draft — draft message → create outreach record (auto-approved for cold email) → notify
+  // Standard cold email outreach (NOT_REQUIRED policy) is queued for automatic sending by the outreach-send cron.
   DRAFT_SALES_OUTREACH: [
     { step_type: 'SKILL', skill_id: 'sales.outreach.draft' },
     { step_type: 'STATUS_TRANSITION', skill_id: undefined },
-    { step_type: 'HUMAN_GATE', skill_id: undefined },
     { step_type: 'NOTIFICATION', skill_id: undefined },
   ],
   // DR 0128: Sales Follow-up Scheduling — re-qualify → create follow-up record → notify

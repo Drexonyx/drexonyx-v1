@@ -3,12 +3,11 @@
 // Provides four delegate functions covering the full lead lifecycle (discover → qualify → outreach → follow-up).
 //
 // HARD BOUNDARIES (DR 0128, DR 0001):
-//   - DOES NOT send any message, email, DM, or outreach of any kind
 //   - DOES NOT call any external API (social, LinkedIn, Instagram, WhatsApp, email)
-//   - DOES NOT auto-approve outreach — all proposals require HUMAN_GATE
 //   - DOES NOT access contact_email / personal phone (PII boundary)
 //   - Social platforms: profile/page data only, no API automation
-//   - Phase 3 constraint: zero real outreach until Phase 4 explicit approval
+//   - Standard cold email outreach is auto-approved (NOT_REQUIRED policy) — no HUMAN_GATE
+//   - High-risk messages (proposals, pricing offers, sensitive content) still require PENDING approval
 //   - Initiator roles: OWNER, ADMIN_OPERATIONS only
 
 import { delegateSubTask } from '@/lib/orchestration/delegation';
@@ -208,8 +207,8 @@ export async function delegateLeadQualification(
 }
 
 // ── Outreach Drafting ─────────────────────────────────────────────────────────
-// HARD BOUNDARY: drafts message only — NO sending in Phase 3.
-// HUMAN_GATE step requires human approval before any outreach is sent.
+// Drafts and queues outreach message. Standard cold email outreach (approval_status NOT_REQUIRED)
+// is picked up automatically by the outreach-send cron. High-risk messages remain PENDING.
 
 export interface OutreachDraftingParams {
   parentTaskId: string | null;
@@ -263,21 +262,12 @@ export async function delegateOutreachDrafting(
       },
       {
         step_index: 2,
-        step_type: 'HUMAN_GATE' as const,
-        input: {
-          required_roles: ['OWNER', 'ADMIN_OPERATIONS'],
-          reason: 'Human approval required before any outreach is sent (DR 0128)',
-          gate_type: 'OUTREACH_APPROVAL',
-        },
-      },
-      {
-        step_index: 3,
         step_type: 'NOTIFICATION' as const,
         input: {
           notification_type: 'SYSTEM',
           eventType: 'OUTREACH_DRAFTED',
           title: `Outreach Draft Ready: ${params.businessName}`,
-          detail: 'Outreach message drafted and awaiting human approval.',
+          detail: 'Outreach message queued for automatic sending.',
         },
       },
     ],

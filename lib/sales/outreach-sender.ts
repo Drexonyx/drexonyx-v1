@@ -2,7 +2,8 @@
 //
 // HARD BOUNDARY: never sends to real prospects when SALES_OUTREACH_TEST_MODE=true.
 // Test mode redirects every send to OUTREACH_TEST_RECIPIENT (Irenfold@gmail.com).
-// High-risk / PENDING-policy messages are blocked and never sent autonomously.
+// Standard cold email outreach (approval_status NOT_REQUIRED) is sent automatically.
+// High-risk messages (proposals, pricing, sensitive content) remain PENDING until manually approved.
 //
 // Idempotency: a message whose external_message_id is already set is treated as
 // already sent and returns ok:true without re-sending (safe to retry).

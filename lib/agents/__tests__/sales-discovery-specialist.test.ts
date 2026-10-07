@@ -206,26 +206,24 @@ describe('delegateOutreachDrafting', () => {
     expect(mockDelegateSubTask).toHaveBeenCalledWith(expect.objectContaining({ intentType: 'DRAFT_SALES_OUTREACH' }));
   });
 
-  it('builds a 4-step plan: SKILL → STATUS_TRANSITION → HUMAN_GATE → NOTIFICATION', async () => {
+  it('builds a 3-step plan: SKILL → STATUS_TRANSITION → NOTIFICATION', async () => {
     mockDelegateSubTask.mockResolvedValue({ ok: true, subTaskId: 'sub-uuid' });
     await delegateOutreachDrafting({ ...BASE, leadId: 'lead-1', businessName: 'Acme', channel: 'email', messageType: 'cold_outreach' });
 
     const call = mockDelegateSubTask.mock.calls[0][0];
-    expect(call.plan.steps).toHaveLength(4);
+    expect(call.plan.steps).toHaveLength(3);
     expect(call.plan.steps[0].step_type).toBe('SKILL');
     expect(call.plan.steps[1].step_type).toBe('STATUS_TRANSITION');
-    expect(call.plan.steps[2].step_type).toBe('HUMAN_GATE');
-    expect(call.plan.steps[3].step_type).toBe('NOTIFICATION');
+    expect(call.plan.steps[2].step_type).toBe('NOTIFICATION');
   });
 
-  it('HUMAN_GATE step is always present (DR 0128 boundary)', async () => {
+  it('no HUMAN_GATE in plan — cold email outreach is auto-approved', async () => {
     mockDelegateSubTask.mockResolvedValue({ ok: true, subTaskId: 'sub-uuid' });
-    await delegateOutreachDrafting({ ...BASE, leadId: 'lead-1', businessName: 'Acme', channel: 'instagram', messageType: 'proposal' });
+    await delegateOutreachDrafting({ ...BASE, leadId: 'lead-1', businessName: 'Acme', channel: 'email', messageType: 'cold_outreach' });
 
     const call = mockDelegateSubTask.mock.calls[0][0];
     const humanGate = call.plan.steps.find((s: { step_type: string }) => s.step_type === 'HUMAN_GATE');
-    expect(humanGate).toBeDefined();
-    expect(humanGate.input.gate_type).toBe('OUTREACH_APPROVAL');
+    expect(humanGate).toBeUndefined();
   });
 
   it('SKILL step uses sales.outreach.draft and passes channel/messageType', async () => {
