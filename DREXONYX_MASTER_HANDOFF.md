@@ -4,8 +4,9 @@
 project. Written to survive context loss. All secret _values_ are omitted; only variable
 _names_ appear.
 
-**Last updated:** 2026-09-24  
-**Branch at time of writing:** `claude/drexonyx-v1-baseline-inspection-fb76lg`  
+**Last updated:** 2026-10-07  
+**Branch at time of writing:** `ccr-3a71ba38-pwua60`  
+**Latest commit on branch:** `e9676bf` (feat: dynamic platform personalization for outreach drafts)  
 **Latest merged commit to main:** `3963e51` (PR #23 — GitHub Actions polling workflow)
 
 ---
@@ -453,6 +454,18 @@ and must not be removed.
 | Vercel Cron removed | ✅ Done | `vercel.json` = `{}`, no sub-daily limit |
 | Vitest test suite | ✅ Done | 955+ tests |
 | `ARCHITECTURE.md` + `CLAUDE.md` | ✅ Done | Governing documents in repo |
+| Sales Engine — DB schema | ✅ Done | `db/schema/sales.ts` — `sales` PostgreSQL schema |
+| Sales Engine — Lead skills | ✅ Done | `lib/skills/sales/` — discover, qualify, score, outreach-draft |
+| Sales Engine — Discovery agent | ✅ Done | `lib/agents/sales-discovery-specialist.ts` |
+| Sales Engine — Orchestration writer | ✅ Done | `lib/orchestration/sales-writer.ts` |
+| Sales Engine — Outreach sender | ✅ Done | `lib/sales/outreach-sender.ts` (Resend, email only) |
+| Sales Engine — Approval policy | ✅ Done | `lib/sales/queries.ts` → `getApprovalPolicy` |
+| Sales Engine — Opt-out system | ✅ Done | `email_opt_outs` + `opt_out_tokens` tables; checked before every send |
+| Ziina CTA in proposal emails | ✅ Done | `buildEmailHtml` renders "Pay 599 AED Securely" button for proposals only |
+| Proposal copy — correct offer | ✅ Done | SYSTEM_PROMPT corrected: AED 599 one-time, static website, domain setup |
+| Proposal copy — voice and structure | ✅ Done | Confident hook, outcome framing, approved CTA line |
+| Dynamic platform personalization | ✅ Done | `sourcePlatform`/`sourceUrl` flow through skill → AI prompt |
+| MDA Demo Production Standard | ✅ Done | Section T in this Master File — full QC + handoff + payment→production spec |
 
 ---
 
@@ -497,6 +510,18 @@ and must not be removed.
 7. **Review Facebook HUMAN_GATE flow** — confirm approval UX is satisfactory before enabling
    social publishing.
 
+### Before live sales outreach
+8. **Set `SALES_OUTREACH_TEST_MODE=false`** only after owner explicitly authorises live email sends.
+9. **Verify `RESEND_FROM_ADDRESS`** is set to the correct MDA sender address in Vercel Production.
+10. **Smoke test opt-out flow** end-to-end: send a test email, click unsubscribe link, confirm token is consumed and `opted_out_at` is set.
+11. **Verify approval gate** for proposals: confirm PENDING messages do not auto-send; confirm APPROVED messages do auto-send on next cron run.
+
+### Demo Production workflow (Section T)
+12. **Implement demo generator** — a skill or agent that takes prospect data (from `sales_leads` + `lead_sources`) and produces a complete static HTML demo page following the MDA Demo Production Standard (Section T).
+13. **Implement demo QC runner** — automated checks covering T5–T9 that produce a DEMO_READY / DEMO_BLOCKED decision with specific failure reasons.
+14. **Implement demo delivery flow** — sends the prospect the demo link + explanation + payment CTA when DEMO_READY.
+15. **Implement payment→production conversion** — on Ziina `completed` webhook, snapshot the approved demo, lock scope in the order record, trigger production build.
+
 ### Future work (not yet scoped)
 - Analytics / reporting dashboard
 - Multi-tenant expansion (additional organisations)
@@ -522,6 +547,7 @@ the generation pipeline, known issues, and exact next steps.
 
 Key constraints that are ALWAYS in effect — never override these without explicit approval:
 - ZIINA_TEST_MODE must remain true (no live payments)
+- SALES_OUTREACH_TEST_MODE must remain true (no live outreach email sends)
 - organizationId always comes from server-side session or DB row (never from client)
 - Unauthenticated webhooks must never mutate production state
 - HIGGSFIELD_WEBHOOK_SECRET absence must cause 401 — never allow fallthrough
@@ -529,6 +555,9 @@ Key constraints that are ALWAYS in effect — never override these without expli
 - Do not create duplicate production jobs, orders, or payment records
 - Do not modify database records directly
 - Do not expose secret values in any output
+- Never fabricate business data (services, prices, testimonials, contact details) in demos
+- Demo must reach DEMO_READY (all QC gates in Section T pass) before sending to any prospect
+- Ziina payment URL https://pay.ziina.com/drexonyx/Md6AyFJ0z?source=app must never be changed
 
 The active blocker is: CRON_SECRET must be added as a GitHub Actions repository secret manually at:
 github.com/Drexonyx/drexonyx-v1/settings/secrets/actions
@@ -573,6 +602,378 @@ with cron as a durable fallback. The driver now returns immediately after dispat
 - **DR 0103:** No secret in `NEXT_PUBLIC_*` vars
 - **DR 0125:** WhatsApp webhook HMAC-verified; inbound only
 - **DR 0126:** Facebook publish requires HUMAN_GATE; R2 media only
+
+---
+
+## S. MDA Sales Engine
+
+The Sales Engine is a separate overlay on top of the core Drexonyx V1 system. It runs
+independently of the video-production pipeline and has its own DB schema, skills, agents,
+orchestration layer, and outreach transport.
+
+### S1. Database schema — `sales` (PostgreSQL schema)
+**File:** `db/schema/sales.ts`
+
+| Table | Purpose |
+|---|---|
+| `sales_leads` | One record per business identity. Statuses: NEW → REVIEWING → QUALIFIED → OUTREACH_SENT → REPLIED → FOLLOW_UP → WON / REJECTED / ARCHIVED |
+| `lead_sources` | Multiple platform sources per lead. Unique constraint on `(platform, identifier)` prevents duplicates. |
+| `outreach_messages` | One row per drafted/sent message. Channels: email, instagram, whatsapp, linkedin, manual. Types: cold_outreach, follow_up, reply, proposal. |
+| `follow_ups` | Scheduled follow-up actions (default +3 days after initial outreach). |
+| `outreach_approvals` | Human-approval records for PENDING messages. |
+| `email_opt_outs` | Email addresses that opted out. Checked before every send. |
+| `opt_out_tokens` | One-time unsubscribe tokens embedded in email footers. |
+
+### S2. AI Skills (`lib/skills/sales/`)
+
+| Skill ID | File | Purpose |
+|---|---|---|
+| `sales.lead.discover` | `lead-discover.ts` | Extract structured lead data from raw text (social profile, web copy, directory listing). One AI call. No DB access. |
+| `sales.lead.qualify` | `lead-qualify.ts` | Assess lead quality and channel recommendation. |
+| `sales.lead.score` | `lead-score.ts` | Assign numeric score and HOT/WARM/COLD priority. |
+| `sales.outreach.draft` | `outreach-draft.ts` | Draft outreach message and classify risk flags. One AI call. No DB access. |
+| `sales.strategy.campaign.develop` | `strategy-campaign-develop.ts` | Campaign strategy planning. |
+
+**Approval policy (`lib/sales/queries.ts` → `getApprovalPolicy`):**
+- Standard email `cold_outreach` and `follow_up` → `NOT_REQUIRED` (auto-sendable by cron)
+- Proposals, pricing offers, discounts, sensitive content, non-email channels → `PENDING` (human must approve)
+
+### S3. Agents (`lib/agents/sales-discovery-specialist.ts`)
+
+Exported functions:
+- `delegateLeadDiscovery(params)` — runs discover → qualify → score → outreach draft sub-task chain
+- `delegateOutreachDrafting(params)` — drafts and queues a single outreach message
+- `delegateFollowUpScheduling(params)` — schedules a follow-up record
+
+Inputs include `sourcePlatform?` and `sourceUrl?` which are passed through to the AI draft skill for platform-aware personalization.
+
+### S4. Outreach sender (`lib/sales/outreach-sender.ts`)
+
+Two exported async functions:
+- `sendOutreachEmail(params)` — initial cold outreach / proposal email via Resend
+- `sendFollowUpEmail(params)` — follow-up email via Resend
+
+**Hard boundary (DR 0128):** Neither function sends when `SALES_OUTREACH_TEST_MODE=true`. In test mode every send is redirected to `OUTREACH_TEST_RECIPIENT` (`Irenfold@gmail.com`).
+
+**Proposal emails** include a Ziina payment CTA: `https://pay.ziina.com/drexonyx/Md6AyFJ0z?source=app` rendered as "Pay 599 AED Securely". This URL must never be changed without explicit owner approval.
+
+**Opt-out / unsubscribe:**
+- Production sends check `email_opt_outs` before dispatch; opted-out addresses → `OPT_OUT` error, no send.
+- Each production email includes a unique unsubscribe link (`/api/unsubscribe?token=...`).
+- Test-mode sends skip opt-out checks.
+
+### S5. Orchestration writer (`lib/orchestration/sales-writer.ts`)
+Writes sales DB records from orchestration step outputs. Called exclusively by STATUS_TRANSITION and VERIFY step handlers in the runner. Never sends email.
+
+### S6. Environment variables (Sales Engine)
+
+| Variable | Purpose | Classification |
+|---|---|---|
+| `SALES_OUTREACH_TEST_MODE` | `true` = redirect all sends to test recipient, skip opt-out | server-only |
+| `RESEND_API_KEY` | Resend transactional email API key | server-only |
+| `RESEND_FROM_ADDRESS` | Sender address for outreach emails | server-only |
+| `NEXT_PUBLIC_APP_URL` | Base URL used in unsubscribe links | public |
+| `GOOGLE_GEMINI_API_KEY` (or equivalent AI key) | AI provider for sales skills | server-only |
+
+### S7. Security boundaries (DR 0128)
+
+- Skills ONLY draft text. They do NOT send any message.
+- Sending requires `approval_status = NOT_REQUIRED` or `APPROVED`.
+- All proposals, discounts, pricing, and non-email channels require `PENDING` approval.
+- PII boundary: `contact_email` / personal phone are NEVER emitted in skill output.
+- `SALES_OUTREACH_TEST_MODE` must remain `true` until explicitly authorised for live outreach.
+- No social DM, WhatsApp, or non-email outreach is implemented — email only.
+
+---
+
+## T. MDA DEMO PRODUCTION STANDARD
+
+**This section governs the complete demo → payment → production workflow for the MDA AED 599 website offer.**
+
+The demo is the primary sales artifact. Its purpose is to demonstrate, using the prospect's real
+business data, that MDA can deliver a professional website worth the AED 599 purchase. Quality must
+be high enough that the prospect can confidently approve after reviewing.
+
+This is a commercial workflow involving real customers and real money. Accuracy, transparency, data
+integrity, legal/safety compliance, and prevention of misleading claims are non-negotiable.
+**Never fabricate information to make a demo look better.**
+
+---
+
+### T1. Prospect Data Collection
+
+Before generating a demo, collect all available public business information:
+
+| Data point | Required | Source |
+|---|---|---|
+| Business name | Yes | Lead record |
+| Business category / industry | Yes | Lead discovery |
+| Services / products offered | Yes | Business profile, website, social |
+| Location (city, country) | Yes | Lead record |
+| Public contact (phone, email) | If available | Publicly listed only |
+| Website URL | If available | Lead record |
+| Social profiles (Instagram, Facebook, etc.) | If available | Lead sources |
+| Public business description / bio | If available | Profile copy |
+| Public images / logo | If available | Profile or website (only where use is permitted) |
+| Opening hours | If available | Verified source only |
+| Calls to action (WhatsApp, call, book) | If available | Verified from profile/site |
+| Other relevant public business information | As found | Any verified public source |
+
+**Rule:** Only public, voluntarily published information is used. Never use private, scraped, or
+leaked data.
+
+---
+
+### T2. Data Verification
+
+Every factual element appearing in the demo must have a verifiable source. Store the source alongside the data point.
+
+**Never invent or assume:**
+- Services or products not confirmed by the business's own published content
+- Prices, rates, or packages not publicly stated by the business
+- Offers, promotions, or deals
+- Testimonials, reviews, or ratings
+- Certifications, awards, or credentials
+- Exact locations or addresses beyond what is publicly listed
+- Contact details (phone, email, WhatsApp) not publicly stated
+- Social media account URLs not confirmed in lead sources
+- Any business claim not directly attributable to a verified source
+
+**If information cannot be verified:**
+- Omit it from the demo entirely, OR
+- Clearly treat it as unavailable (e.g., leave a "Contact us for services" placeholder)
+
+Do not use a placeholder that implies real content exists.
+
+---
+
+### T3. Demo Architecture
+
+The AI generating the demo must select the appropriate page structure based on the business
+category. There is no universal template. Structure is always business-specific.
+
+**Architecture decision logic:**
+
+| Business type | Likely page sections |
+|---|---|
+| Restaurant / café | Hero, About, Menu, Gallery, Hours, Location/Map, Reserve/Order CTA, Social, Footer |
+| Retail / product shop | Hero, Products, About, Gallery, Contact, Social, Footer |
+| Service business (plumber, clinic, salon) | Hero, Services, About, Why Us, Gallery, Contact/Book CTA, Location, Footer |
+| Professional / freelancer | Hero, Services, Portfolio/Work, About, Contact, Footer |
+| B2B / corporate | Hero, Services, About, Clients/Partners (verified only), Contact, Footer |
+| Event / entertainment | Hero, About, Events, Gallery, Tickets/Book CTA, Contact, Footer |
+
+**Allowed sections (include only those relevant to the actual business):**
+- Hero with real business name and actual tagline / business description
+- Business introduction (from verified public copy)
+- Services / products (verified from the business's own listings)
+- Why choose this business (honest, based on verified differentiators)
+- Gallery (public images where permitted — never stock that misrepresents the business)
+- Location / map embed (only if address is publicly verified)
+- Contact section (phone/email/WhatsApp only from verified public data)
+- Social links (only confirmed accounts from lead sources)
+- Footer (business name, city, year)
+
+**Sections to omit when data is unavailable:**
+- No pricing section unless prices are publicly confirmed
+- No testimonials section unless real public reviews exist
+- No certifications / awards unless publicly documented
+- No map if address is not publicly available
+- No WhatsApp CTA unless the number is publicly listed
+
+---
+
+### T4. Visual Quality Standard
+
+The demo must meet this bar before being shown to any prospect:
+
+- **Professional:** appropriate for a real business website, not a rough prototype
+- **Coherent:** consistent colour palette, typography, and spacing throughout
+- **Responsive:** works correctly on mobile, tablet, and desktop
+- **Visually balanced:** no single section dominates disproportionately; layout proportions match content importance
+- **Business-specific:** design choices (palette, imagery style, tone) reflect the actual business category
+- **Conversion-oriented:** clear calls to action; the next step for the visitor is always obvious
+- **Modern:** current design conventions; no outdated UI patterns
+- **Free from template residue:** no generic placeholder text, no "Lorem Ipsum", no "Your Business Name", no "Company Logo Here"
+
+**Imagery:**
+- Prefer verified public business imagery (photos from their social profile, website) over stock
+- Stock images may be used only when no suitable business imagery is available and when the stock image is accurate (e.g., a food photo for a restaurant that sells that type of food)
+- Never use stock imagery that misrepresents the business (wrong product type, wrong location, wrong people)
+- AI-generated imagery may be used only with explicit owner approval per individual demo
+
+---
+
+### T5. Responsive QC
+
+Test at three breakpoints before demo release:
+
+| Breakpoint | Target width |
+|---|---|
+| Mobile | 375px–430px |
+| Tablet | 768px–1024px |
+| Desktop | 1280px+ |
+
+At each breakpoint check:
+- [ ] No horizontal overflow / scrollbar
+- [ ] Correct section spacing (no collapsed or doubled gaps)
+- [ ] Typography readable and correctly sized
+- [ ] Images cropped correctly; no stretching or distortion
+- [ ] Navigation usable (hamburger on mobile if applicable)
+- [ ] All buttons and CTAs visible and tappable at mobile size
+- [ ] Forms usable (input fields not cut off)
+- [ ] External links open correctly
+- [ ] Layout shifts do not occur on load
+
+**All three breakpoints must pass before the demo proceeds to Functional QC.**
+
+---
+
+### T6. Functional QC
+
+Check every interactive element:
+
+- [ ] All buttons have correct actions (no dead/no-op buttons)
+- [ ] All internal anchor links reach the correct section
+- [ ] All external links (social, website) open to the correct verified URL
+- [ ] Phone `tel:` links dial the correct verified number
+- [ ] WhatsApp `wa.me/` links open to the correct verified number
+- [ ] Email `mailto:` links use the correct verified address
+- [ ] Map embeds / location links point to the correct verified address
+- [ ] No broken images (all images load; no 404 alt-text placeholders)
+- [ ] No placeholder URLs (`example.com`, `yourwebsite.com`, `#`)
+- [ ] No placeholder text (`[PHONE]`, `[EMAIL]`, `YOUR NAME`, `Lorem ipsum`)
+- [ ] Contact form (if present) submits correctly or clearly indicates it is a demo
+
+**Any failure = DEMO_BLOCKED. Identify the exact failing element.**
+
+---
+
+### T7. Content QC
+
+Before showing the demo to the prospect, verify each content element:
+
+- [ ] Business name: matches lead record exactly (correct spelling, correct capitalisation)
+- [ ] All contact information: matches verified public source
+- [ ] All services listed: confirmed from the business's own published content
+- [ ] Location: matches verified public address/city
+- [ ] Source URLs recorded for every factual claim
+- [ ] CTAs: accurate (correct phone, correct WhatsApp number, correct social handle)
+- [ ] Pricing (if displayed): matches publicly stated pricing only
+- [ ] Spelling: correct in English and/or Arabic as appropriate to the business
+- [ ] Language: appropriate to the business's primary market
+- [ ] Zero placeholders remaining anywhere in the page
+- [ ] Zero unsupported claims (no invented certifications, reviews, stats, or credentials)
+
+**Any failure = DEMO_BLOCKED. Identify the exact failing element.**
+
+---
+
+### T8. Commercial QC
+
+The demo must represent the offer honestly:
+
+- [ ] Demo clearly shows what MDA will build — a static website / landing page
+- [ ] Demo does NOT promise features not included in the AED 599 offer
+- [ ] Demo does NOT claim the website has been completed — it is explicitly a preview/proposal
+- [ ] Demo does NOT imply services have been paid for or delivered when they have not
+- [ ] No fabricated results ("your website will get X visitors/month")
+- [ ] No fabricated customer reviews or star ratings
+- [ ] No fabricated business statistics
+- [ ] AED 599 is stated as the price only if a payment CTA is included; never rounded up or altered
+
+**Any failure = DEMO_BLOCKED. Identify the exact failing element.**
+
+---
+
+### T9. Security and Privacy
+
+- [ ] No private information (personal phone numbers, private emails, home addresses, staff names not publicly listed)
+- [ ] No information obtained through scraping against platform terms of service
+- [ ] No sensitive business information (revenue figures, internal operations, non-public client lists)
+- [ ] All images used are from sources where use is appropriate and legally/ethically acceptable (public social profiles, the business's own website, licensed stock, or MDA-generated with approval)
+- [ ] Demo URL does not expose any MDA internal identifiers or database IDs to the prospect
+
+**Any failure = DEMO_BLOCKED. Identify the exact issue before proceeding.**
+
+---
+
+### T10. Final Gate — DEMO_READY / DEMO_BLOCKED Decision
+
+A demo **MUST NOT** be sent to the prospect until all required QC gates pass.
+
+**Checklist summary:**
+
+| Gate | Sections | Pass condition |
+|---|---|---|
+| Data verification | T2 | All facts have verified sources; nothing invented |
+| Architecture | T3 | Section set appropriate to business category; no inapplicable sections |
+| Visual quality | T4 | Professional, responsive, business-specific, template-free |
+| Responsive QC | T5 | All three breakpoints pass all checks |
+| Functional QC | T6 | All interactive elements work; no dead links, placeholder URLs, or placeholder text |
+| Content QC | T7 | Business name, contact, services, location all verified; spelling correct; no placeholders |
+| Commercial QC | T8 | No misleading claims, no undelivered promises, no fabricated content |
+| Security / Privacy | T9 | No private or unauthorized information exposed |
+
+**Decision:**
+```
+IF all 8 gates pass  → DEMO_READY
+IF any gate fails    → DEMO_BLOCKED: [exact gate] [exact failing element]
+```
+
+When `DEMO_BLOCKED`:
+1. Identify the exact reason (gate name + failing element)
+2. Fix the issue or omit the unsupported content
+3. Re-run the full checklist from the beginning
+4. Do not send the demo until the decision reaches DEMO_READY
+
+---
+
+### T11. Client Handoff (Demo Delivery)
+
+When `DEMO_READY`, the prospect receives:
+
+**What to send:**
+1. A direct link to the demo (shareable, no login required)
+2. A concise explanation of what was prepared:
+   - What the demo shows (their business, professionally presented as a static website)
+   - What is and is not included in the AED 599 offer
+   - That this is a proposal preview — not a completed or deployed website
+3. The AED 599 offer stated clearly
+4. A clear next step: "If you're happy with this, we can confirm and publish it for AED 599."
+5. The Ziina payment CTA: `https://pay.ziina.com/drexonyx/Md6AyFJ0z?source=app` (rendered as "Pay 599 AED Securely") — only after the prospect has seen the demo and expressed intent
+
+**What NOT to send:**
+- Do not send a payment link before the prospect has reviewed the demo
+- Do not send a payment link if the demo is DEMO_BLOCKED
+- Do not promise a delivery timeline unless one has been approved
+- Do not include scope items not in the AED 599 package
+
+---
+
+### T12. Payment → Production Conversion
+
+After confirmed payment (Ziina webhook `status = completed`):
+
+1. **Preserve the approved demo:** snapshot the approved demo version before any edits. Record the approved scope (sections, content, images) in the order record.
+2. **Convert to production:** begin production build from the approved demo exactly as reviewed by the client.
+3. **Scope lock:** the approved demo defines the delivery scope. No features, sections, or content changes may be added without explicit client approval and (if priced separately) a new payment.
+4. **Production QC:** run the complete QC checklist (T5–T9) again on the production build before final delivery. The production version must pass all gates.
+5. **Final delivery:** deliver the production website (files or published URL) to the client. Record delivery in the `production.deliveries` table.
+6. **Audit trail:** every step — demo approval, payment received, production started, QC passed, delivery made — is logged in `system.audit_events`.
+
+**Accidental scope expansion prevention:**
+- Never add sections not in the approved demo without written client approval
+- Never change contact information, prices, or services without re-verifying against the client's confirmed data
+- If the client requests a change after payment, confirm in writing before implementing
+
+---
+
+### T13. Continuity Requirement
+
+This entire workflow (T1–T12) is documented in this Master File so that any AI session, engineer, or
+team member can continue the project without guessing. When a new session starts, read this file before
+doing any demo-related work. The workflow is authoritative; do not deviate from it without owner approval.
 
 ---
 
