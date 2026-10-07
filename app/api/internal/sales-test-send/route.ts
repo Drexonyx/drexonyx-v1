@@ -17,7 +17,7 @@ import { uuidv7 } from 'uuidv7';
 
 export const maxDuration = 30;
 
-export async function POST(_req: NextRequest): Promise<NextResponse> {
+async function runTest(): Promise<NextResponse> {
   if (process.env.SALES_OUTREACH_TEST_MODE !== 'true') {
     return NextResponse.json(
       { ok: false, error: 'SALES_OUTREACH_TEST_MODE is not enabled' },
@@ -105,6 +105,12 @@ export async function POST(_req: NextRequest): Promise<NextResponse> {
   });
 }
 
+export async function POST(_req: NextRequest): Promise<NextResponse> {
+  return runTest();
+}
+
+// GET support allows web_fetch_vercel_url (GET-only) to trigger the test.
+// Safety is unchanged: runTest() still returns 403 unless SALES_OUTREACH_TEST_MODE=true.
 export async function GET(): Promise<NextResponse> {
-  return NextResponse.json({ ok: false, error: 'Use POST' }, { status: 405 });
+  return runTest();
 }

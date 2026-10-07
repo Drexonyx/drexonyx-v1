@@ -89,9 +89,10 @@ describe('POST /api/internal/sales-test-send — guards', () => {
     expect(res.status).toBe(500);
   });
 
-  it('returns 405 for GET requests', async () => {
+  it('returns 403 for GET when test mode is disabled', async () => {
+    process.env.SALES_OUTREACH_TEST_MODE = 'false';
     const res = await GET();
-    expect(res.status).toBe(405);
+    expect(res.status).toBe(403);
   });
 });
 
