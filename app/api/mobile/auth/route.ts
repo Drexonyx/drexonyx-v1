@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
       .from(orgMemberships)
       .where(and(eq(orgMemberships.user_id, u.id), isNull(orgMemberships.archived_at)));
 
-    const membership = selectPreferredMembership(memberships);
+    const membership = selectPreferredMembership(memberships, process.env.DREXONYX_ORG_ID);
     if (!membership) return json({ ok: false, error: 'No active membership' }, 401);
 
     const token = signMobileJWT({
