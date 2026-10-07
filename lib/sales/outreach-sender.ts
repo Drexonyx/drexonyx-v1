@@ -182,7 +182,10 @@ export async function sendOutreachEmail(params: {
   const redirected = isTestMode && toEmail !== OUTREACH_TEST_RECIPIENT;
 
   const subject = buildOutreachSubject(msg.message_type, businessName);
-  const html = buildEmailHtml(msg.message_text, unsubscribeUrl);
+  const paymentUrl = msg.message_type === 'proposal'
+    ? 'https://pay.ziina.com/drexonyx/Md6AyFJ0z?source=app'
+    : undefined;
+  const html = buildEmailHtml(msg.message_text, unsubscribeUrl, paymentUrl);
 
   // 7. Send
   const now = new Date();
@@ -421,7 +424,7 @@ function buildOutreachSubject(messageType: string, businessName: string): string
   return `Master Digital Agency — Content Partnership Opportunity`;
 }
 
-function buildEmailHtml(messageText: string, unsubscribeUrl?: string): string {
+function buildEmailHtml(messageText: string, unsubscribeUrl?: string, paymentUrl?: string): string {
   const esc = (s: string) =>
     s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const paragraphs = messageText
@@ -431,8 +434,15 @@ function buildEmailHtml(messageText: string, unsubscribeUrl?: string): string {
         `<p style="margin:0 0 14px;">${esc(p.replace(/\n/g, '<br>'))}</p>`,
     )
     .join('');
+  const paymentCta = paymentUrl
+    ? `<div style="margin:28px 0 24px;padding:20px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;text-align:center;">` +
+      `<p style="font-size:12px;color:#6b7280;margin:0 0 14px;letter-spacing:0.04em;text-transform:uppercase;">Secure your spot — pay to confirm</p>` +
+      `<a href="${esc(paymentUrl)}" style="display:inline-block;background:#1a1a2e;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;padding:14px 32px;border-radius:6px;">Pay 599 AED Securely</a>` +
+      `<p style="font-size:11px;color:#9ca3af;margin:12px 0 0;">🔒 Powered by Ziina · DREXONYX</p>` +
+      `</div>`
+    : '';
   const footer = unsubscribeUrl
     ? `<p style="margin:32px 0 0;font-size:11px;color:#6b7280;">Master Digital Agency · Dubai, UAE — <a href="${esc(unsubscribeUrl)}" style="color:#6b7280;">Unsubscribe</a></p>`
     : '';
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"></head><body style="font-family:system-ui,sans-serif;color:#111827;max-width:600px;margin:0 auto;padding:24px;">${paragraphs}${footer}</body></html>`;
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"></head><body style="font-family:system-ui,sans-serif;color:#111827;max-width:600px;margin:0 auto;padding:24px;">${paragraphs}${paymentCta}${footer}</body></html>`;
 }
