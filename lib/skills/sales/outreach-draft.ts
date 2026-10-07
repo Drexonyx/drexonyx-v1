@@ -22,6 +22,8 @@ export interface SalesOutreachDraftInput {
   portfolioMatch?: string;
   notes?: string;
   senderName?: string;
+  sourcePlatform?: string;
+  sourceUrl?: string;
 }
 
 export interface SalesOutreachDraftOutput {
@@ -73,6 +75,13 @@ For proposals (messageType=proposal), use this voice and structure:
 - Do NOT mention video content, social media management, brand identity, or ongoing services
 - Do NOT invent statistics, guarantees, fake scarcity, discounts, or testimonials
 
+Platform-based personalization (applies to all message types):
+- If "Discovery source" is provided in the prompt, naturally reference that platform/context in the opening when it adds genuine value (e.g. "We came across your Instagram page" or "We found your business on Google").
+- If the source is unknown, not provided, or referencing it would sound unnatural, use a neutral phrase such as "We came across your business online".
+- NEVER invent or assume a platform presence unless the discovery source field explicitly names that platform.
+- The core sales message and AED 599 offer must remain platform-independent regardless of source.
+- For multi-source leads, use the primary discovery source if provided; do not list multiple platforms.
+
 Also classify any risk flags in the draft:
 
 Return ONLY a valid JSON object with:
@@ -92,6 +101,8 @@ function buildUserPrompt(input: SalesOutreachDraftInput): string {
     `Message type: ${input.messageType}`,
     `Sender: ${sender}`,
   ];
+  if (input.sourcePlatform) parts.push(`Discovery source: ${input.sourcePlatform}`);
+  if (input.sourceUrl) parts.push(`Source URL: ${input.sourceUrl}`);
   if (input.opportunity) parts.push(`Opportunity identified: ${input.opportunity}`);
   if (input.portfolioMatch) parts.push(`Relevant portfolio work: ${input.portfolioMatch}`);
   if (input.notes) parts.push(`Additional context: ${input.notes}`);

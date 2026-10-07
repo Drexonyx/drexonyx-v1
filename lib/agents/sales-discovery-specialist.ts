@@ -222,6 +222,8 @@ export interface OutreachDraftingParams {
   opportunity?: string;
   portfolioMatch?: string;
   notes?: string;
+  sourcePlatform?: string;
+  sourceUrl?: string;
   context?: TaskContext;
 }
 
@@ -249,6 +251,8 @@ export async function delegateOutreachDrafting(
           ...(params.opportunity ? { opportunity: params.opportunity } : {}),
           ...(params.portfolioMatch ? { portfolioMatch: params.portfolioMatch } : {}),
           ...(params.notes ? { notes: params.notes } : {}),
+          ...(params.sourcePlatform ? { sourcePlatform: params.sourcePlatform } : {}),
+          ...(params.sourceUrl ? { sourceUrl: params.sourceUrl } : {}),
         },
       },
       {
