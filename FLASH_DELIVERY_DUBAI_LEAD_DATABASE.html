@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Flash Delivery — Dubai Lead Database</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg: #0f1117;
+  --bg2: #161b27;
+  --bg3: #1e2535;
+  --border: #2a3040;
+  --fg: #e8eaf0;
+  --fg2: #9ba3b8;
+  --fg3: #5c657a;
+  --accent: #ff5a1f;
+  --accent2: #ff7a47;
+  --hot: #ff4444;
+  --hot-bg: rgba(255,68,68,0.12);
+  --warm: #f59e0b;
+  --warm-bg: rgba(245,158,11,0.12);
+  --cold: #60a5fa;
+  --cold-bg: rgba(96,165,250,0.12);
+  --high-q: #22c55e;
+  --mid-q: #f59e0b;
+  --low-q: #ef4444;
+  color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--fg);font-family:'Inter',system-ui,sans-serif;font-size:14px;line-height:1.5}
+body{padding:0 0 env(safe-area-inset-bottom,0) 0}
+
+/* Layout */
+.app{display:flex;flex-direction:column;min-height:100%}
+.header{background:var(--bg2);border-bottom:1px solid var(--border);padding:16px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.header-logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0}
+.header-title{font-size:15px;font-weight:700;color:var(--fg)}
+.header-sub{font-size:11px;color:var(--fg2)}
+.header-actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--fg);cursor:pointer;font-size:12px;font-weight:500;font-family:inherit;transition:border-color .15s,background .15s;white-space:nowrap}
+.btn:hover{border-color:var(--accent);background:rgba(255,90,31,0.1)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2);border-color:var(--accent2)}
+.btn-sm{padding:5px 10px;font-size:11px}
+
+.main{flex:1;padding:20px;display:flex;flex-direction:column;gap:16px}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.stat-label{font-size:11px;color:var(--fg2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.stat-value{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}
+.stat-value.hot{color:var(--hot)}
+.stat-value.warm{color:var(--warm)}
+.stat-value.cold{color:var(--cold)}
+.stat-value.total{color:var(--accent)}
+
+/* Controls */
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.search-wrap{position:relative;flex:1;min-width:200px}
+.search-wrap input{width:100%;padding:9px 12px 9px 36px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--fg);font-family:inherit;font-size:13px;outline:none;transition:border-color .15s}
+.search-wrap input:focus{border-color:var(--accent)}
+.search-wrap input::placeholder{color:var(--fg3)}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--fg3);font-size:14px;pointer-events:none}
+.filter-group{display:flex;gap:6px;flex-wrap:wrap}
+.filter-select{padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--fg);font-family:inherit;font-size:12px;cursor:pointer;outline:none}
+.filter-select:focus{border-color:var(--accent)}
+
+/* Table */
+.table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.table-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border)}
+.table-count{font-size:12px;color:var(--fg2)}
+table{width:100%;border-collapse:collapse;min-width:700px}
+.table-scroll{overflow-x:auto}
+thead th{padding:10px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--fg2);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none}
+thead th:hover{color:var(--fg)}
+thead th .sort-arrow{opacity:.4;margin-left:4px}
+thead th.sorted .sort-arrow{opacity:1;color:var(--accent)}
+tbody tr{border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:rgba(255,90,31,0.04)}
+td{padding:10px 12px;font-size:13px;white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+.td-name{font-weight:500;color:var(--fg)}
+.td-cat{color:var(--fg2);font-size:12px}
+.td-area{color:var(--fg2)}
+.td-score{font-weight:600;font-variant-numeric:tabular-nums}
+.td-contact{font-size:11px}
+
+/* Priority badges */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.03em}
+.badge-hot{background:var(--hot-bg);color:var(--hot)}
+.badge-warm{background:var(--warm-bg);color:var(--warm)}
+.badge-cold{background:var(--cold-bg);color:var(--cold)}
+
+/* Data quality dot */
+.dq{display:inline-flex;align-items:center;gap:4px;font-size:11px}
+.dq-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dq-high .dq-dot{background:var(--high-q)}
+.dq-mid .dq-dot{background:var(--mid-q)}
+.dq-low .dq-dot{background:var(--low-q)}
+.dq-high{color:var(--high-q)}
+.dq-mid{color:var(--mid-q)}
+.dq-low{color:var(--low-q)}
+
+/* Contact icons */
+.contact-icons{display:flex;gap:4px}
+.ci{width:22px;height:22px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;background:var(--bg3);color:var(--fg3)}
+.ci.has{color:var(--accent);background:rgba(255,90,31,0.12)}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:14px;width:100%;max-width:640px;max-height:80vh;overflow-y:auto;transform:scale(.96);transition:transform .2s}
+.modal-overlay.open .modal{transform:scale(1)}
+.modal-head{padding:18px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px;position:sticky;top:0;background:var(--bg2);z-index:1}
+.modal-title{flex:1;min-width:0}
+.modal-title h2{font-size:16px;font-weight:700;margin-bottom:4px}
+.modal-title p{font-size:12px;color:var(--fg2)}
+.modal-close{background:var(--bg3);border:1px solid var(--border);color:var(--fg);border-radius:6px;padding:5px 10px;cursor:pointer;font-size:13px;flex-shrink:0}
+.modal-close:hover{border-color:var(--accent)}
+.modal-body{padding:16px 20px;display:flex;flex-direction:column;gap:16px}
+.detail-section h3{font-size:11px;font-weight:600;color:var(--fg2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.detail-item{background:var(--bg3);border-radius:7px;padding:10px 12px}
+.detail-item.full{grid-column:1/-1}
+.detail-label{font-size:10px;color:var(--fg3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.detail-value{font-size:13px;color:var(--fg);word-break:break-word}
+.detail-value a{color:var(--accent2);text-decoration:none}
+.detail-value a:hover{text-decoration:underline}
+.detail-value.nf{color:var(--fg3);font-style:italic}
+.score-bar{height:6px;border-radius:3px;background:var(--bg3);margin-top:6px;overflow:hidden}
+.score-fill{height:100%;border-radius:3px;transition:width .4s}
+
+/* Footer */
+.footer{padding:14px 20px;border-top:1px solid var(--border);font-size:11px;color:var(--fg3);display:flex;gap:16px;flex-wrap:wrap}
+.footer-note{display:flex;align-items:center;gap:5px}
+
+/* No results */
+.no-results{padding:40px;text-align:center;color:var(--fg3)}
+.no-results p{margin-top:8px;font-size:12px}
+
+/* Empty contact chip */
+.nf-chip{font-size:11px;color:var(--fg3);font-style:italic}
+
+@media(max-width:600px){
+  .header{flex-wrap:wrap}
+  .header-actions{width:100%}
+  .detail-grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .main{padding:12px}
+}
+
+@media print{
+  .header-actions,.controls,.modal-overlay{display:none!important}
+  .table-wrap{border:1px solid #ccc}
+  body{background:#fff;color:#000}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header class="header">
+  <div class="header-logo">
+    <div class="logo-icon">FD</div>
+    <div>
+      <div class="header-title">FLASH DELIVERY — Dubai Lead Database</div>
+      <div class="header-sub">Product businesses needing recurring courier services · Dubai · Oct 2026</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-sm" onclick="exportCSV()">⬇ CSV</button>
+    <button class="btn btn-sm" onclick="exportJSON()">⬇ JSON</button>
+    <button class="btn btn-sm" onclick="window.print()">🖨 Print</button>
+  </div>
+</header>
+
+<div class="main">
+  <div class="stats" id="stats"></div>
+
+  <div class="controls">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search" placeholder="Search by name, category, area, source…" oninput="render()">
+    </div>
+    <div class="filter-group">
+      <select class="filter-select" id="fPriority" onchange="render()">
+        <option value="">All Priorities</option>
+        <option value="HOT">🔴 HOT</option>
+        <option value="WARM">🟡 WARM</option>
+        <option value="COLD">🔵 COLD</option>
+      </select>
+      <select class="filter-select" id="fCategory" onchange="render()">
+        <option value="">All Categories</option>
+      </select>
+      <select class="filter-select" id="fContact" onchange="render()">
+        <option value="">Any Contact</option>
+        <option value="phone">Has Phone</option>
+        <option value="whatsapp">Has WhatsApp</option>
+        <option value="email">Has Email</option>
+        <option value="instagram">Has Instagram</option>
+        <option value="website">Has Website</option>
+      </select>
+      <select class="filter-select" id="fDQ" onchange="render()">
+        <option value="">All Quality</option>
+        <option value="HIGH">High Quality</option>
+        <option value="MEDIUM">Medium Quality</option>
+        <option value="LOW">Low Quality</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-header">
+      <span class="table-count" id="tableCount">Loading…</span>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortBy('businessName')">#&nbsp;Business <span class="sort-arrow">↕</span></th>
+            <th onclick="sortBy('category')">Category <span class="sort-arrow">↕</span></th>
+            <th onclick="sortBy('dubaiArea')">Dubai Area <span class="sort-arrow">↕</span></th>
+            <th onclick="sortBy('score')">Score <span class="sort-arrow">↕</span></th>
+            <th onclick="sortBy('priority')">Priority <span class="sort-arrow">↕</span></th>
+            <th>Contact</th>
+            <th onclick="sortBy('dataQuality')">Data&nbsp;Quality <span class="sort-arrow">↕</span></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span class="footer-note">⚠ All data sourced from public websites only. "Not Found" fields were not publicly available — never guessed or invented.</span>
+    <span class="footer-note">📋 Phone numbers marked * sourced from third-party directories — verify before use.</span>
+    <span class="footer-note">📅 Discovered: October 2026</span>
+  </div>
+</div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-head">
+      <div class="modal-title">
+        <h2 id="mTitle"></h2>
+        <p id="mSub"></p>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕ Close</button>
+    </div>
+    <div class="modal-body" id="mBody"></div>
+  </div>
+</div>
+
+<script>
+const LEADS = [
+  // ── FLOWERS ──────────────────────────────────────────────────────────────
+  {id:1,businessName:"DJFlowers",category:"Flowers",subCategory:"Florist / Subscription Bouquets",dubaiArea:"Dubai Media City",website:"https://djflowers.ae",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://www.newsfilecorp.com/release/271449/DJflowers-Shop-Launches-Premium-Flower-Subscription-with-Personal-Florist-Concierge-Service",evidenceOfSales:"Custom bouquet subscriptions, venue decor, balloon services; same-day personal delivery concierge; open daily 9am–10pm",deliveryRelevance:"Subscription model means recurring shipments; same-day delivery to customers; delivery to venues",score:65,priority:"WARM",qualificationReason:"Active florist with confirmed subscription delivery; could use courier support for peak demand",notes:"Also known as Double Jenya Flower Shop. Founder: Ievgeniia Kostenko.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"MEDIUM"},
+
+  {id:2,businessName:"Flower Station Dubai",category:"Flowers",subCategory:"Online Flower Delivery",dubaiArea:"Dubai Investment Park",website:"https://www.flowerstationdubai.com",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"+971 58-890-7788 *",sourceUrl:"https://insurancemarket.ae/lifestyle/top-5-flower-shops-in-dubai",evidenceOfSales:"Bouquets from AED 210; same-day delivery cut-off 7pm GST; 1,250+ five-star Google reviews; 10+ years operating",deliveryRelevance:"Same-day delivery across Dubai; high order volume evidenced by 1,250+ reviews",score:62,priority:"WARM",qualificationReason:"High-volume florist with strong reviews; potential courier partner for peak periods",notes:"Phone sourced from directory — verify. Also offers cards, sweets, balloons, candles.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"MEDIUM"},
+
+  {id:3,businessName:"OnlineFlowerShop.ae",category:"Flowers",subCategory:"Online Flower Delivery",dubaiArea:"International City",website:"https://www.onlineflowershop.ae",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://www.bayut.com/mybayut/online-flower-delivery-dubai",evidenceOfSales:"Operating since 2016; arrangements made fresh each morning; delivered in climate-controlled vans; free delivery on orders above AED 300",deliveryRelevance:"Same-day and next-day delivery across Dubai; physical shop plus online store",score:55,priority:"WARM",qualificationReason:"Established florist with own delivery; possible overflow courier partnership",notes:"Physical shop in International City (Spain Cluster, near Dragon Mart).",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"LOW"},
+
+  {id:4,businessName:"La Flora",category:"Flowers",subCategory:"Premium Flower Delivery",dubaiArea:"Al Qusais Industrial Area 5",website:"https://laflora.ae",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"+971 55 929 1245 *",sourceUrl:"https://au.trustpilot.com/review/laflora.ae",evidenceOfSales:"Sources flowers from Ecuador and Netherlands; sends photo/video of bouquet before dispatch; same-day to Dubai and Sharjah",deliveryRelevance:"Same-day delivery in Dubai and Sharjah; next-day to Abu Dhabi, Ajman and rest of UAE",score:62,priority:"WARM",qualificationReason:"Premium florist with multi-emirate delivery operation; high quality product requires careful courier",notes:"Phone sourced from indirect listing — verify. Sends WhatsApp proof-of-bouquet before dispatch.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"MEDIUM"},
+
+  {id:5,businessName:"Black Tulip Flowers",category:"Flowers",subCategory:"Established Florist Chain",dubaiArea:"Al Qusais / Oud Metha / Wafi Mall",website:"https://www.blacktulipflowers.com",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"trade@btfgroup.com",whatsapp:"Not Found",phone:"+971 4 356 6400",sourceUrl:"https://btfgroup.com/uae/",evidenceOfSales:"Established 1990; sells fresh flowers, forever roses, plants; multiple Dubai outlets; free same-day delivery on orders above AED 299",deliveryRelevance:"Multi-outlet operation with confirmed same-day delivery; corporate florals and events create recurring delivery needs",score:58,priority:"WARM",qualificationReason:"Multi-location established chain; corporate events create recurring bulk delivery opportunities",notes:"Also btfgroup.com. Phone +971 4 344 0350 (Trustpilot listing). Email: info@btfgroup.com (general) trade@btfgroup.com (wholesale).",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C/B2B",dataQuality:"HIGH"},
+
+  // ── ORGANIC / SPECIALTY FOOD ──────────────────────────────────────────────
+  {id:6,businessName:"Scoop Wholefoods",category:"Organic Food",subCategory:"Bulk Wholefood Grocery",dubaiArea:"Springs Souk",website:"https://www.scoopwholefoods.ae",instagramUrl:"@scoopwholefoods_ae *",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"+971 58 551 6802",phone:"+971 58 551 6802",sourceUrl:"https://esgmena.com/scoop-wholefoods-launches-e-commerce-delivery-service-in-dubai/",evidenceOfSales:"900+ bulk wholefood product lines; online store with next-day UAE-wide delivery; physical retail 9am–10pm daily; ~50% Australian-certified organic",deliveryRelevance:"Next-day UAE-wide delivery from Springs Souk location; high SKU count needs reliable courier",score:78,priority:"HOT",qualificationReason:"Confirmed WhatsApp + phone; active e-commerce with next-day delivery; 900+ product lines means recurring courier need",notes:"Instagram handle @scoopwholefoods_ae sourced from article — verify. Confirmed WA + phone.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"HIGH"},
+
+  {id:7,businessName:"Ripe Organic",category:"Organic Food",subCategory:"Farm Shop / Organic Grocery",dubaiArea:"Al Manara",website:"https://ripeme.com",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"+971 4 379 0441",sourceUrl:"https://insurancemarket.ae/lifestyle/5-best-organic-stores-in-dubai-you-must-visit",evidenceOfSales:"Farm shop with local eggs, raw honey, artisan bread; online ordering with next-day home delivery; also on InstaShop, Deliveroo, Careem",deliveryRelevance:"Next-day home delivery in Dubai; perishable products require reliable courier",score:65,priority:"WARM",qualificationReason:"Active next-day delivery; perishable goods create urgent recurring courier need",notes:"Acquired by NRTC Group Dec 2025; phone +971 58 940 6782 (mobile, from Insurance Market — verify). Also on Deliveroo and Careem.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"MEDIUM"},
+
+  {id:8,businessName:"GreenHeart Organic Farms",category:"Organic Food",subCategory:"Urban Farm / Organic Grocery",dubaiArea:"Al Barsha South (Arjan)",website:"https://greenheartuae.com",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"+971 4 361 7010",sourceUrl:"https://insurancemarket.ae/lifestyle/5-best-organic-stores-in-dubai-you-must-visit",evidenceOfSales:"Founded 2012, added online store 2013; sells fresh organic produce, pantry items; Mon–Sat 10am–6pm",deliveryRelevance:"Online store with delivery; organic produce requires careful handling",score:62,priority:"WARM",qualificationReason:"Established organic farm shop with online delivery operation",notes:"Phone confirmed by 3 independent sources (Insurance Market, Goumbook, Bayut).",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"MEDIUM"},
+
+  {id:9,businessName:"Secrets Fine Food",category:"Specialty Food",subCategory:"French / European Artisan Grocery",dubaiArea:"Dubai (Online-First)",website:"https://www.secretsfinefood.com",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"+971 4 296 5249 *",sourceUrl:"https://bestfoodimporters.com/company/secrets-fine-food-llc/",evidenceOfSales:"Online since 2013; French and European artisan goods from small producers; also offers yacht delivery; next-day delivery free above AED 200",deliveryRelevance:"Next-day delivery; specialty perishables and gourmet goods; yacht delivery service shows logistics flexibility",score:68,priority:"WARM",qualificationReason:"Specialty food e-commerce with next-day delivery and unique yacht delivery segment",notes:"Phone from bestfoodimporters.com directory — verify. PO Box 93467.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"MEDIUM"},
+
+  {id:10,businessName:"IFM Gourmet Dubai",category:"Specialty Food",subCategory:"Italian / Mediterranean Specialty Food",dubaiArea:"Dubai",website:"https://www.ifmgourmet.com",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://www.einpresswire.com/article/817189687/ifm-gourmet-in-dubai-launches-poseidon-emporium",evidenceOfSales:"Retail division of IFM Investments LLC; premium Italian and Mediterranean specialty foods; launched Poseidon Emporium product line May 2025; serves chefs, hotels, restaurants",deliveryRelevance:"Distributes to hotels and restaurants — B2B recurring delivery",score:40,priority:"COLD",qualificationReason:"Primarily B2B food distributor; no public contact info found; lower fit for small-parcel courier",notes:"May 2025 press release: Poseidon Emporium new product line. PO Box 211090.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2B",dataQuality:"LOW"},
+
+  // ── ELECTRONICS ──────────────────────────────────────────────────────────
+  {id:11,businessName:"AS2 Electronics",category:"Electronics",subCategory:"Mobile Accessories & Gadgets",dubaiArea:"Jumeirah 1",website:"https://as2.ae",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"+971 5 827 04445 *",sourceUrl:"https://maps.yango.com/org/as2_electronics_trading/48001257213/",evidenceOfSales:"Sells mobile accessories, phone cables, security cameras, LED flashlights; free delivery on Dubai orders (threshold unconfirmed); 22 Indeed employer reviews",deliveryRelevance:"Delivers lightweight electronics accessories across Dubai",score:30,priority:"COLD",qualificationReason:"Status shows temporarily closed on Yango Maps; no confirmed contact; limited public info",notes:"Phone from Yango Maps — verify current status. Status: TEMPORARILY CLOSED per Yango Maps as of search date.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"LOW"},
+
+  {id:12,businessName:"Dubai Tronics",category:"Electronics",subCategory:"Gadgets & Phones",dubaiArea:"Dubai",website:"https://dubaitronics.online",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://dubaitravelblog.com/electronic-stores-in-dubai/",evidenceOfSales:"High-end phones, gaming laptops, everyday accessories; same-day delivery in Dubai; 2-hour express windows; claims 30,000+ customers (self-reported); 7-day returns",deliveryRelevance:"Same-day delivery in Dubai; 2-hour express — needs reliable courier partner",score:60,priority:"WARM",qualificationReason:"Active electronics e-commerce with same-day delivery; high-value items need tracked courier",notes:"30,000+ customers self-reported. UAE warranty included.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"LOW"},
+
+  // ── BABY & CHILDREN ───────────────────────────────────────────────────────
+  {id:13,businessName:"Le Bouquet Baby",category:"Baby Products",subCategory:"Luxury Baby & Nursery Retail",dubaiArea:"Festival City Mall + Al Barsha",website:"https://lebouquetbaby.com",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://business.google.com/v/le-bouquet-baby-dubai-festival-city-mall/06241391344862769635/",evidenceOfSales:"Two physical Dubai stores; free delivery above AED 100; cash-on-delivery available; 4 interest-free installments; Google rating 4.9/5 from 12 reviews",deliveryRelevance:"Free delivery above AED 100; baby products with bulky strollers and gear need reliable last-mile",score:65,priority:"WARM",qualificationReason:"Luxury baby retailer with online delivery and two physical locations",notes:"Confirmed active on Instagram as of June 2025 (Particl.com) but handle not found. Hours: 10am–10pm weekdays, 11:30pm weekends.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"MEDIUM"},
+
+  {id:14,businessName:"Elli Junior UAE",category:"Baby Products",subCategory:"Baby & Children Gift Essentials",dubaiArea:"Dubai",website:"https://ellijunior.com",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://www.findmynanny.ae/resources/top-baby-shops-in-dubai-your-go-to-stores-for-newborn-essentials",evidenceOfSales:"High-end all-in-one destination for parenting needs and gifts; free next-day delivery on orders above AED 200; price-match promise; gift wrapping offered",deliveryRelevance:"Next-day delivery across Dubai; parenting gifts and baby essentials are regular purchase category",score:63,priority:"WARM",qualificationReason:"Baby gifts e-commerce with free next-day delivery; recurring purchase category",notes:"No direct contact info found publicly. Gift wrapping service available.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"LOW"},
+
+  // ── HEALTH & WELLNESS ─────────────────────────────────────────────────────
+  {id:15,businessName:"Maison Santé",category:"Health & Wellness",subCategory:"Natural Pharmacy / Supplements",dubaiArea:"Meyan Mall, Umm Suqeim 2",website:"https://www.pharmacy.maisonsante.ae",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"+971 4 324 4432 *",sourceUrl:"https://biogena.com/en-gb/stores/biogena-store-dubai-at-maison-sante",evidenceOfSales:"Stocks natural remedies and practitioner-grade supplements including BIOGENA micronutrient line; quick delivery across Dubai",deliveryRelevance:"Supplements and health products delivered across Dubai; wellness delivery is growing segment",score:60,priority:"WARM",qualificationReason:"Natural pharmacy with delivery; health product recurring purchases",notes:"Phone from BIOGENA store listing — verify. Attached to holistic wellness clinic.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"MEDIUM"},
+
+  // ── FASHION ───────────────────────────────────────────────────────────────
+  {id:16,businessName:"The Giving Movement",category:"Fashion",subCategory:"Sustainable Athleisure",dubaiArea:"City Walk (flagship) + Dubai Mall",website:"https://thegivingmovement.com",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://whatson.ae/?p=275607",evidenceOfSales:"Started as fully online brand 2020; donates $4 per item; now in UAE malls; ships across Dubai and GCC",deliveryRelevance:"UAE-wide shipping; GCC expansion requires multi-city courier network",score:60,priority:"WARM",qualificationReason:"Growing sustainable brand with online + physical presence; likely uses logistics partner",notes:"Physical stores: City Walk Dubai, other UAE malls. Uses Stripe for payments (confirmed).",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"LOW"},
+
+  {id:17,businessName:"Sand Dollar Dubai",category:"Fashion",subCategory:"Swimwear / Beachwear / Resortwear",dubaiArea:"Jumeirah 1 (Mercato Mall)",website:"https://sanddollardubai.com",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"+971 4 5516211",sourceUrl:"https://maps.yango.com/org/sand_dollar/141657790108/",evidenceOfSales:"Multi-location boutique (Mercato Mall, Fairmont The Palm, Jumeirah resorts); own web store; guaranteed 3-hour delivery in Dubai",deliveryRelevance:"3-hour delivery guarantee in Dubai; ships to rest of UAE same-day; ships internationally",score:65,priority:"WARM",qualificationReason:"Multi-outlet fashion boutique with 3-hour Dubai delivery; high-end beach/swimwear segment",notes:"Also at Fairmont The Palm, Jumeirah Al Naseem, Jumeirah Mina A'Salam.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"MEDIUM"},
+
+  {id:18,businessName:"Bendita Boutique Dubai",category:"Fashion",subCategory:"Luxury Women's Clothing",dubaiArea:"Jumeirah 3",website:"Not Found",instagramUrl:"https://www.instagram.com/bendita.dubai/",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://www.instagram.com/bendita.dubai/",evidenceOfSales:"~98,000 Instagram followers; makes own luxury pieces with timeless feminine cuts; sells from Jumeirah 3 boutique and online; ships internationally",deliveryRelevance:"International shipping from Dubai; high follower count indicates large order volume",score:82,priority:"HOT",qualificationReason:"98K followers on Instagram-only; high order volume; ships internationally from Dubai — needs reliable courier",notes:"No website found. All orders via Instagram DM. ~98,000 followers.",discoveryDate:"2026-10-07",followers:"~98,000",businessType:"B2C",dataQuality:"MEDIUM"},
+
+  {id:19,businessName:"Abaya Boutique Official",category:"Fashion",subCategory:"Modest Wear (Abayas, Hijabs)",dubaiArea:"Mirdif",website:"Not Found",instagramUrl:"https://www.instagram.com/abayaboutique_official/",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://www.instagram.com/abayaboutique_official/",evidenceOfSales:"~5,300 followers; sells high-end modest wear; orders placed via DM; ships worldwide from Mirdif",deliveryRelevance:"Worldwide delivery from Mirdif base; DM orders need fulfillment partner",score:68,priority:"WARM",qualificationReason:"Instagram seller shipping worldwide; needs reliable courier from Mirdif location",notes:"~5,300 Instagram followers. DM orders only.",discoveryDate:"2026-10-07",followers:"~5,300",businessType:"B2C",dataQuality:"MEDIUM"},
+
+  {id:20,businessName:"Bella Rose Boutique DXB",category:"Fashion",subCategory:"Women's Clothing & Swimwear",dubaiArea:"Dubai",website:"Not Found",instagramUrl:"https://www.instagram.com/bellarosedxb/",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://www.instagram.com/bellarosedxb/",evidenceOfSales:"~5,100 followers; sells women's clothing and swimwear; advertises same-day delivery in Dubai; ships worldwide",deliveryRelevance:"Advertises same-day delivery in Dubai; Instagram-only seller needs courier partner for fulfilment",score:85,priority:"HOT",qualificationReason:"Instagram-only seller with same-day delivery promise; no in-house fleet — courier partner critical",notes:"~5,100 Instagram followers. Same-day delivery in Dubai offered.",discoveryDate:"2026-10-07",followers:"~5,100",businessType:"B2C",dataQuality:"MEDIUM"},
+
+  {id:21,businessName:"LAMA Boutique UAE",category:"Fashion",subCategory:"Italian Women's Fashion & Bags",dubaiArea:"Dubai",website:"Not Found",instagramUrl:"https://www.instagram.com/lamaboutique_uae/",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Via Instagram bio (number not listed publicly)",phone:"Not Found",sourceUrl:"https://www.instagram.com/lamaboutique_uae/",evidenceOfSales:"~4,491 followers; sells Italian clothing and bags; AED 30 delivery fee; accepts DM and WhatsApp orders; ships worldwide",deliveryRelevance:"AED 30 per delivery; charges customers for delivery = outsourcing courier costs",score:80,priority:"HOT",qualificationReason:"Charges AED 30 delivery fee = outsourcing courier; WhatsApp orders; clear need for reliable pick-and-drop",notes:"~4,491 Instagram followers. WhatsApp number not public. AED 30 delivery fee.",discoveryDate:"2026-10-07",followers:"~4,491",businessType:"B2C",dataQuality:"MEDIUM"},
+
+  {id:22,businessName:"FAATIH Boutique",category:"Fashion",subCategory:"Party Wear / Designer Pieces",dubaiArea:"Dubai / UAE",website:"Not Found",instagramUrl:"https://www.instagram.com/faatih_boutique/",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://www.instagram.com/faatih_boutique/",evidenceOfSales:"~33,000 followers; sells party wear, designer pieces, hijabs; takes DM orders; delivers UAE-wide",deliveryRelevance:"Delivers orders across UAE from Dubai base; 33K followers = high volume DM-based fulfillment",score:82,priority:"HOT",qualificationReason:"33K followers; DM-based fashion seller delivering across UAE; no logistics infrastructure",notes:"By Fatimah Rinzy. ~33,000 Instagram followers.",discoveryDate:"2026-10-07",followers:"~33,000",businessType:"B2C",dataQuality:"MEDIUM"},
+
+  {id:23,businessName:"JorayFashion UAE",category:"Fashion",subCategory:"Luxury / Formal / Bridal",dubaiArea:"Dubai (also Sharjah + GCC)",website:"Not Found",instagramUrl:"https://www.instagram.com/jorayfashion_uae/",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://www.instagram.com/jorayfashion_uae/",evidenceOfSales:"~31,000 followers; branded designer outfits across luxury, formal, casual and bridal; DM orders; delivers Dubai, Sharjah, GCC",deliveryRelevance:"Delivers across Dubai, Sharjah, and GCC; 31K followers = significant recurring delivery volume",score:80,priority:"HOT",qualificationReason:"31K followers; formal and bridal delivery time-sensitive; no confirmed logistics infra",notes:"~31,000 Instagram followers. Delivers Dubai + Sharjah + GCC.",discoveryDate:"2026-10-07",followers:"~31,000",businessType:"B2C",dataQuality:"MEDIUM"},
+
+  {id:24,businessName:"Double I Dubai",category:"Fashion",subCategory:"Upscale Feminine Dresses",dubaiArea:"Dubai",website:"Not Found",instagramUrl:"https://www.instagram.com/double_i_dubai/",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://www.instagram.com/double_i_dubai/",evidenceOfSales:"~12,000 followers; upscale feminine dresses; ships worldwide from Dubai; DM to order",deliveryRelevance:"Ships worldwide from Dubai base; 12K followers indicates active order volume",score:78,priority:"HOT",qualificationReason:"12K Instagram followers; worldwide shipping from Dubai; Instagram-only = no fleet",notes:"~12,000 Instagram followers. DM orders only.",discoveryDate:"2026-10-07",followers:"~12,000",businessType:"B2C",dataQuality:"MEDIUM"},
+
+  {id:25,businessName:"Accessory Lovers",category:"Fashion",subCategory:"Fashion Accessories",dubaiArea:"Al Satwa",website:"https://accessorylovers.com",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"+971 56 152 5416",sourceUrl:"https://accessorylovers.com/contacts-us/",evidenceOfSales:"Sells fashion accessories; free shipping UAE-wide on orders over AED 100; physical store in Al Satwa",deliveryRelevance:"Free UAE delivery on orders above AED 100; physical store + online = dual-channel delivery",score:70,priority:"HOT",qualificationReason:"Physical store + e-commerce; free UAE delivery threshold means active courier usage; confirmed phone",notes:"Physical: Shop 241, 45 Al Dhiyafa Road, near Satwa Roundabout. Phone confirmed on site.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"MEDIUM"},
+
+  // ── COSMETICS & BEAUTY ────────────────────────────────────────────────────
+  {id:26,businessName:"Hindash Cosmetics",category:"Cosmetics & Beauty",subCategory:"Homegrown UAE Cosmetics Brand",dubaiArea:"Al Barsha 1",website:"https://hindash.com/",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"support@hindash.com",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://emirateswoman.com/makeup-artist-hindash-own-cosmetic-line/",evidenceOfSales:"Own cosmetics line (palettes, anti-dote range) sold online at hindash.com; physical stock at Rasis Business Centre Al Barsha 1; UAE shipping in 3 working days",deliveryRelevance:"UAE shipping in 3 working days; international in 5–7; free shipping over AED 365; cosmetics requiring careful handling",score:82,priority:"HOT",qualificationReason:"Own-brand cosmetics with confirmed email; active UAE and international shipping from Al Barsha 1",notes:"Founder: Hindash (makeup artist with 1.1M+ personal followers). Email: support@hindash.com (confirmed).",discoveryDate:"2026-10-07",followers:"Not Found (brand); founder 1.1M+",businessType:"B2C",dataQuality:"HIGH"},
+
+  {id:27,businessName:"CTZN Cosmetics",category:"Cosmetics & Beauty",subCategory:"Homegrown UAE Cosmetics",dubaiArea:"Mall of the Emirates area",website:"https://www.ctzncosmetics.com/",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://communicateonline.me/focus/cpg-fmcg/homegrown-uae-beauty-and-food-brands-gain-momentum/",evidenceOfSales:"Founded 2019 by Khan sisters; Nudiversal lip products; stocked at FACES UAE and THAT Concept Store (Mall of Emirates)",deliveryRelevance:"Products shipped via FACES UAE (same-day in Dubai) and THAT Concept Store",score:60,priority:"WARM",qualificationReason:"UAE-born brand stocked in retailers; courier needs via retail partners",notes:"Founded by Aleena, Aleezeh, Naseeha Khan. Also sold via FACES UAE and Noon.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"LOW"},
+
+  {id:28,businessName:"Beaute Dubai",category:"Cosmetics & Beauty",subCategory:"Cosmetics Instagram Shop (Reseller)",dubaiArea:"Dubai",website:"Not Found",instagramUrl:"https://www.instagram.com/beaute.dubai/",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://www.instagram.com/beaute.dubai/",evidenceOfSales:"~42,000 followers; sells authentic US, UK, Korean brands; AED 20 shipping fee; 1–2 day delivery; no deliveries Fridays",deliveryRelevance:"AED 20 shipping per order; 1–2 day delivery; charges customers = outsourcing courier",score:88,priority:"HOT",qualificationReason:"42K followers; AED 20 delivery charge = outsourcing to courier; 1-2 day delivery SLA to maintain",notes:"~42,000 Instagram followers. Cash on delivery or payment link. No Friday deliveries.",discoveryDate:"2026-10-07",followers:"~42,000",businessType:"B2C",dataQuality:"MEDIUM"},
+
+  {id:29,businessName:"Beauty Cosmetic UAE",category:"Cosmetics & Beauty",subCategory:"Cosmetics Instagram Shop",dubaiArea:"Dubai",website:"Not Found",instagramUrl:"https://www.instagram.com/beauty_cosmetic_uae/",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"+971525346076",phone:"Not Found",sourceUrl:"https://www.instagram.com/beauty_cosmetic_uae/",evidenceOfSales:"WhatsApp number publicly listed in Instagram bio; AED 15 delivery fee; free delivery on orders over AED 150; cash on delivery; bank transfer",deliveryRelevance:"AED 15 per delivery = clearly outsourcing courier; WhatsApp order intake; cash on delivery service",score:90,priority:"HOT",qualificationReason:"WhatsApp number publicly listed; AED 15 delivery fee shows they pay courier per order; cash-on-delivery service needed",notes:"WhatsApp: +971525346076 (publicly listed in Instagram bio). AED 15 delivery, free over AED 150.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"HIGH"},
+
+  // ── GIFT HAMPERS ──────────────────────────────────────────────────────────
+  {id:30,businessName:"Haza's Dubai Gift Hampers",category:"Gift Hampers",subCategory:"Occasion-Based Gift Hampers",dubaiArea:"Dubai",website:"Not Found",instagramUrl:"https://www.instagram.com/hazas_dubai_gift_hampers/",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://www.instagram.com/hazas_dubai_gift_hampers/",evidenceOfSales:"~115,000 followers; sells gift hampers; positions as budget-friendly; UAE-wide delivery; seasonal peaks Feb–Mar",deliveryRelevance:"UAE-wide delivery stated; 115K followers = enormous order volume especially in peak seasons",score:92,priority:"HOT",qualificationReason:"115K Instagram followers; gift hampers with UAE delivery; peak season volume needs reliable courier at scale",notes:"~115,000 Instagram followers. Budget-friendly positioning. Seasonal peaks February–March.",discoveryDate:"2026-10-07",followers:"~115,000",businessType:"B2C",dataQuality:"MEDIUM"},
+
+  {id:31,businessName:"Gift a Little Dubai",category:"Gift Hampers",subCategory:"Luxury & Corporate Gift Hampers",dubaiArea:"Dubai",website:"Not Found",instagramUrl:"https://www.instagram.com/giftalittledubai/",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://www.instagram.com/giftalittledubai/",evidenceOfSales:"~2,500 followers; curates luxury and corporate gift hampers, Ramadan/Eid, wedding and baby hampers from Dubai",deliveryRelevance:"Delivers physical gift hampers across Dubai; corporate gifting creates B2B delivery runs",score:68,priority:"WARM",qualificationReason:"Corporate gifting = recurring B2B delivery; Eid/Ramadan peaks; growing Instagram presence",notes:"~2,500 Instagram followers. Corporate gifting clients.",discoveryDate:"2026-10-07",followers:"~2,500",businessType:"B2C/B2B",dataQuality:"LOW"},
+
+  {id:32,businessName:"Baskilicious",category:"Gift Hampers",subCategory:"Corporate & Occasion Gift Hampers",dubaiArea:"Dubai (UAE-wide)",website:"https://www.baskilicious.com/",instagramUrl:"@baskilicious *",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://www.baskilicious.com/",evidenceOfSales:"Operating since 2017; hampers from AED 150; birthday, Eid, Diwali, Christmas; corporate gifting service; same-day delivery across Dubai before daily cutoff",deliveryRelevance:"Same-day delivery across Dubai; UAE-wide coverage; corporate gifting = recurring business; seasonal volume spikes",score:85,priority:"HOT",qualificationReason:"Same-day delivery + corporate gifting = high volume recurring courier need; 9+ years operating",notes:"@baskilicious on Instagram (referenced on website — verify exact URL). Also covers Abu Dhabi, Sharjah, other emirates.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C/B2B",dataQuality:"MEDIUM"},
+
+  {id:33,businessName:"GiftBag.ae",category:"Gift Hampers",subCategory:"Gift Delivery Shop",dubaiArea:"Dubai (UAE-wide)",website:"https://giftbag.ae/",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://giftbag.ae/",evidenceOfSales:"Sells gift hampers, flowers, cakes, chocolates; prices AED 130–AED 1,650; 4-hour delivery labelling on select hampers; established since 2011",deliveryRelevance:"Same-day delivery across Dubai; 4-hour express windows; established 2011 = high delivery volume",score:85,priority:"HOT",qualificationReason:"4-hour express delivery offering = depends on courier reliability; 15+ years of operations means substantial volume",notes:"Established 2011. Hampers from AED 130 to AED 1,650.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"MEDIUM"},
+
+  {id:34,businessName:"Wrap It Up UAE",category:"Gift Hampers",subCategory:"Gift Hampers & Wedding Packaging",dubaiArea:"Dubai / UAE",website:"Not Found",instagramUrl:"https://www.instagram.com/wrap_it_up_uae/",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://www.instagram.com/wrap_it_up_uae/",evidenceOfSales:"~4,200 followers; sells Ramadan/Eid hampers, wedding packaging; corporate gifting; physical products assembled and delivered",deliveryRelevance:"Delivery across UAE; wedding and corporate hampers require careful handling and on-time delivery",score:68,priority:"WARM",qualificationReason:"Wedding and corporate hampers = time-sensitive delivery; Ramadan peaks create volume",notes:"~4,200 Instagram followers. Ramadan/Eid + corporate gifting focus.",discoveryDate:"2026-10-07",followers:"~4,200",businessType:"B2C/B2B",dataQuality:"LOW"},
+
+  {id:35,businessName:"House of Hampers",category:"Gift Hampers",subCategory:"Luxury Gift Hampers",dubaiArea:"Dubai",website:"https://www.houseofhampers.ae/",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://www.houseofhampers.ae/",evidenceOfSales:"Sells luxury gift hampers in Dubai; website active; premium price positioning",deliveryRelevance:"Delivers physical luxury gift hampers across Dubai",score:65,priority:"WARM",qualificationReason:"Luxury gift hampers with delivery; no direct contact found limits qualification",notes:"Website confirmed active. No contact details found publicly.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"LOW"},
+
+  // ── COSMETICS WHOLESALE ───────────────────────────────────────────────────
+  {id:36,businessName:"Dubai Wholesale Store",category:"Cosmetics & Beauty",subCategory:"Korean Skincare Wholesale / Distribution",dubaiArea:"Al Barsha",website:"https://www.dubaiwholesalestore.com/",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"dubaiwholesale88@gmail.com",whatsapp:"+971 50 698 9149",phone:"+971 56 925 6505",sourceUrl:"https://www.dubaiwholesalestore.com/pages/contact",evidenceOfSales:"Sources and distributes Korean skincare brands in UAE; B2B wholesaler and distributor; Al Barsha warehouse",deliveryRelevance:"B2B distribution from Al Barsha warehouse across UAE; recurring wholesale delivery cycles",score:82,priority:"HOT",qualificationReason:"Confirmed email + WhatsApp + phone; B2B wholesale = high-volume recurring delivery; Al Barsha warehouse",notes:"Suite 17, Business Incorporation Zone, Umm Suqeim Road, Al Barsha. Email confirmed. WA confirmed.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2B",dataQuality:"HIGH"},
+
+  // ── CANDLES & SCENTED PRODUCTS ────────────────────────────────────────────
+  {id:37,businessName:"Studio Kinza",category:"Candles & Scented",subCategory:"Handcrafted Soy Candles",dubaiArea:"Al Quoz",website:"https://www.studiokinza.com",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"hello@studiokinza.com",whatsapp:"Not Found",phone:"+971 55 590 2936",sourceUrl:"https://vymaps.com/AE/studio-kinza-vn141323/",evidenceOfSales:"Handcrafted soy candles sold online and in-studio; Dubai Design Week 2024 and 2025 participant; candle-making workshops across Dubai and Abu Dhabi",deliveryRelevance:"Online candle sales requiring delivery; workshop supply kit delivery; confirmed Al Quoz address",score:82,priority:"HOT",qualificationReason:"Confirmed email + phone; active e-commerce; fragile candle products need careful courier",notes:"Warehouse #1, 4 Street 14C, Capital Complex, Al Quoz. Registered as Studio Kinza FZE. Email: hello@studiokinza.com",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"HIGH"},
+
+  {id:38,businessName:"House of Chandelle",category:"Candles & Scented",subCategory:"Luxury Handcrafted Candles",dubaiArea:"Dubai",website:"https://houseofchandelle.com",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://houseofchandelle.com",evidenceOfSales:"Handcrafted eco-friendly vegan candles in reusable containers; corporate gifting; discovery box sampling sets; online shop",deliveryRelevance:"Online sales; corporate gifting bulk orders require reliable courier",score:65,priority:"WARM",qualificationReason:"Corporate gifting + online sales; luxury candles need careful handling",notes:"Buy-two-get-one promotions. Corporate gifting line available.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C/B2B",dataQuality:"LOW"},
+
+  {id:39,businessName:"RIKO UAE",category:"Candles & Scented",subCategory:"Soy Candles & Floral Bouquets",dubaiArea:"Dubai",website:"https://rikouae.com",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://rikouae.com",evidenceOfSales:"Hand-crafted 100% soy wax candles; free shipping across UAE; delivery within 1–3 days in Dubai; bulk orders available; candle workshops AED 250; prices AED 49–AED 110",deliveryRelevance:"Free UAE shipping; 1–3 day Dubai delivery; bulk order capability = recurring courier need",score:80,priority:"HOT",qualificationReason:"Free UAE shipping offered = courier partner needed; bulk orders available = B2B potential",notes:"Prices AED 49–AED 110. Bulk orders available. Workshops at AED 250.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C/B2B",dataQuality:"LOW"},
+
+  {id:40,businessName:"Melosa Candles",category:"Candles & Scented",subCategory:"Sculpted Soy Candle Art",dubaiArea:"Dubai",website:"https://melosacandles.com",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://melosacandles.com",evidenceOfSales:"Handmade sculpted soy wax aromatherapy candles in Dubai; prices AED 49–AED 349; personalized custom designs for gifts",deliveryRelevance:"Custom candle gifts delivered; fragile sculpted candles need careful courier",score:62,priority:"WARM",qualificationReason:"Custom sculpted candles shipped; gift market creates recurring orders",notes:"Prices AED 49–AED 349. Personalized/custom designs available.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"LOW"},
+
+  {id:41,businessName:"Belles Ames",category:"Candles & Scented",subCategory:"Small-Batch Luxury Candles",dubaiArea:"Dubai",website:"https://www.bellesames.com",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://www.bellesames.com",evidenceOfSales:"Small-batch hand-poured in Dubai; organic vegetable wax and premium oils; coconut wax with lead-free wicks; sells online",deliveryRelevance:"Online candle sales requiring delivery; small-batch model = recurring order fulfillment",score:60,priority:"WARM",qualificationReason:"Small-batch candle brand with online sales; courier needed for order fulfilment",notes:"Hand-poured in Dubai. Coconut wax, organic vegetable wax, premium oils.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"LOW"},
+
+  {id:42,businessName:"Scotchie's Candles",category:"Candles & Scented",subCategory:"Pet-Friendly Organic Candles",dubaiArea:"Mirdif",website:"Not Found",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://magicpin.com/uae/Dubai/Mirdif/Other/Scotchies-Candles/store/1c53723",evidenceOfSales:"100% soy wax with cold-pressed infused oils; claims to be Middle East's first pet-friendly organic candle brand; rated 5.0 from 115 reviews on Magicpin; custom orders",deliveryRelevance:"Custom orders delivery; Mirdif-based operations",score:35,priority:"COLD",qualificationReason:"No website, phone or email found; Mirdif physical location only; limited public info",notes:"Address: Main Parking Entrance, Uptown Mirdif, 37th Street, Mirdif. 5.0 rating from 115 Magicpin reviews.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"LOW"},
+
+  {id:43,businessName:"Innara Inc.",category:"Candles & Scented",subCategory:"Zero-Waste Candles & Soap",dubaiArea:"Al Barsha 1",website:"Not Found",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://www.hidubai.com/businesses/innara-shopping-souvenirs-gifts-al-barsha-1-dubai",evidenceOfSales:"Dubai-based social enterprise founded 2018; handmade soy candles and soap; candle holders from recycled UAE construction debris; Dubai Design Week 2021; Gulf News holiday gift guide featured",deliveryRelevance:"Sells via own website; gift market; sustainable products for corporate gifting",score:65,priority:"WARM",qualificationReason:"Social enterprise candles with online sales; corporate gifting potential; Al Barsha 1 location confirmed",notes:"Founder: Guddi Bajaj. 8th Floor, Yes Business Centre, 16 Street, Al Barsha 1. Gulf News featured.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C/B2B",dataQuality:"MEDIUM"},
+
+  {id:44,businessName:"Lava Candles",category:"Candles & Scented",subCategory:"Luxury Emirati Candle Brand",dubaiArea:"Dubai / UAE",website:"Not Found",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://gulfnews.com/lifestyle/meet-the-sheikha-behind-emirati-brand-lava-candles-1.65744213",evidenceOfSales:"Founded 2016; stocked in top shops across UAE; corporate gifting and wedding favours; prices AED 230–AED 2,400; Gulf News and Grazia Magazine ME featured",deliveryRelevance:"Stocked in multiple shops requires distribution; corporate gifting = recurring B2B delivery",score:72,priority:"HOT",qualificationReason:"Stocked in multiple UAE locations = recurring distribution need; AED 230–2,400 price range = high-value shipments",notes:"Emirati-founded (Sheikha). Also known as Lava Moments. Prices AED 230–AED 2,400.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C/B2B",dataQuality:"LOW"},
+
+  // ── HOME DECOR ────────────────────────────────────────────────────────────
+  {id:45,businessName:"Knot Home",category:"Home Decor",subCategory:"Cushions / Rugs / Accessories",dubaiArea:"Dubai (Online-First)",website:"https://knothome.com",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://www.businesswire.com/news/home/20231120931770/en/Knot-Home-Signs-Memorandum-of-Understanding-MoU-with-Home-Centre",evidenceOfSales:"Dubai-based online brand; sells cushions, rugs, accessories; signed MoU with Home Centre for online marketplace (2023); PropertyFinder home decor guide",deliveryRelevance:"Online-first brand ships home accessories across Dubai; Home Centre MoU increases delivery volume",score:68,priority:"WARM",qualificationReason:"Online-first model requires courier for all orders; Home Centre partnership expands delivery scope",notes:"CEO: Habib Yaraghi. MoU with Home Centre signed Nov 2023.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"LOW"},
+
+  {id:46,businessName:"Home and Soul",category:"Home Decor",subCategory:"Furniture & Home Decor",dubaiArea:"Al Wasl",website:"https://homeandsouldubai.com",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"+971 56 112 1444",sourceUrl:"https://www.dubizzle.com/blog/property/homeware-stores-dubai/",evidenceOfSales:"Online and in-store furniture and decor; 4-hour express delivery for orders before 5:30 PM in Dubai; Dubizzle homeware guide featured",deliveryRelevance:"4-hour express delivery offered = depends heavily on reliable courier; high-value furniture and decor items",score:80,priority:"HOT",qualificationReason:"4-hour express delivery SLA requires courier partner; confirmed phone; Al Wasl location",notes:"Villa 6, Al Wasl Road, near Falcon House bus stop. Registered: Home and Soul Furniture Trading LLC.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"MEDIUM"},
+
+  {id:47,businessName:"Curate Home",category:"Home Decor",subCategory:"Artisan Home Decor & Lifestyle",dubaiArea:"Al Quoz (Sheikh Zayed Road)",website:"https://www.curatehome.me",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"+971 50 218 4608",sourceUrl:"https://www.propertyfinder.ae/blog/?p=122233",evidenceOfSales:"Dubai-based; artisans from multiple cultures; free UAE shipping on orders over AED 499; same-day Dubai delivery before 6 PM; listed on Namshi marketplace",deliveryRelevance:"Same-day delivery before 6 PM; free UAE shipping; Namshi listing adds volume; artisan goods need careful handling",score:82,priority:"HOT",qualificationReason:"Same-day delivery + Namshi marketplace + confirmed phone = active courier usage",notes:"Sheikh Zayed Road, Al Quoz Industrial 1. Also has Depachika Store location. Phone confirmed.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"MEDIUM"},
+
+  // ── ARTISANAL / HANDMADE ──────────────────────────────────────────────────
+  {id:48,businessName:"CraftiHouse",category:"Artisanal / Handmade",subCategory:"Persian Handicrafts / Turkish Ceramics",dubaiArea:"Dubai",website:"https://craftihouse.com",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://craftihouse.com",evidenceOfSales:"Persian handicrafts, Turkish ceramics, copper trays, leather bags; worldwide dispatch within 24 hours from Dubai; free UAE delivery on orders over AED 365; founded 2003",deliveryRelevance:"24-hour worldwide dispatch from Dubai; free UAE delivery threshold; fragile ceramics need careful courier",score:65,priority:"WARM",qualificationReason:"24h worldwide dispatch from Dubai; fragile handicrafts require specialist careful courier",notes:"Founded 2003. Worldwide dispatch within 24h. Free UAE delivery over AED 365.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"LOW"},
+
+  // ── PET SUPPLIES ──────────────────────────────────────────────────────────
+  {id:49,businessName:"Pets Lounge UAE",category:"Pet Supplies",subCategory:"Pet Shop + Mobile Grooming",dubaiArea:"Nad Al Sheba 1",website:"https://petsloungeuae.com",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"+971 52 216 6773",phone:"+971 4 327 2724",sourceUrl:"https://vymaps.com/AE/Pets-Lounge-246817/",evidenceOfSales:"Pet shop stocking food, accessories, toys; grooming salon; mobile grooming to homes across Dubai; online orders with delivery",deliveryRelevance:"Online orders with delivery across Dubai and UAE; mobile grooming route = recurring daily delivery pattern",score:85,priority:"HOT",qualificationReason:"Confirmed phone + WhatsApp; online delivery across Dubai and UAE; recurring pet supply orders",notes:"Dar Mira, Shop 6, Muscat Street, Nad Al Sheba 1. Serves dogs, cats, parrots, rabbits.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"HIGH"},
+
+  {id:50,businessName:"PetzSee",category:"Pet Supplies",subCategory:"Online Pet Supplies Store",dubaiArea:"Dubai (Online)",website:"https://petzsee.com",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://www.bayut.com/mybayut/pet-shops-dubai/",evidenceOfSales:"20,000+ items including aquarium gear, bird and reptile supplies; free delivery in Dubai, Sharjah and Ajman on orders over AED 100",deliveryRelevance:"Free delivery across Dubai, Sharjah, Ajman for orders over AED 100; 20K+ SKUs = high delivery volume",score:80,priority:"HOT",qualificationReason:"20,000+ item online store with free multi-emirate delivery = very high courier volume",notes:"Rare reptile product range noted as UAE market differentiator. Free delivery over AED 100.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"LOW"},
+
+  {id:51,businessName:"Petsky Online",category:"Pet Supplies",subCategory:"Online Pet Supplies + Click & Collect",dubaiArea:"Jumeirah Lake Towers (JLT)",website:"https://petskyonline.com",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://www.bayut.com/mybayut/pet-shops-dubai/",evidenceOfSales:"20,000+ items from 500+ brands; free shipping on orders over AED 100; same-day delivery; click-and-collect from JLT; 4.0 rating from ~3,900 reviews",deliveryRelevance:"Same-day delivery available; 3,900+ reviews = high order volume; click-and-collect + delivery dual channel",score:82,priority:"HOT",qualificationReason:"3,900+ reviews = proven high volume; same-day delivery = courier dependency; JLT location confirmed",notes:"500+ brands, 20,000+ items. 4.0 rating from ~3,900 reviews. JLT click-and-collect.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"MEDIUM"},
+
+  // ── SPORTS & FITNESS ──────────────────────────────────────────────────────
+  {id:52,businessName:"Urban Fitness Cart",category:"Sports & Fitness",subCategory:"Home & Commercial Gym Equipment",dubaiArea:"Al Garhoud",website:"https://urbanfitnesscart.com",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://www.yellowpages-uae.com/urban-fitness-cart-sport-equipment-trading-llc-200141",evidenceOfSales:"Online gym equipment store with Al Garhoud showroom; 3-hour express delivery within Dubai; gym setup and installation service; 100+ brands",deliveryRelevance:"3-hour express delivery; gym equipment heavy/bulky = dedicated courier need; installation service adds logistics",score:82,priority:"HOT",qualificationReason:"3-hour express delivery from Al Garhoud; heavy gym equipment needs specialist courier with installation",notes:"S-12, Al Garhoud Business Center. Registered: Urban Fitness Cart Sport Equipment Trading LLC (founded 2021). 100+ brands incl. NordicTrack.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C/B2B",dataQuality:"MEDIUM"},
+
+  {id:53,businessName:"Miracle Fitness UAE",category:"Sports & Fitness",subCategory:"Home & Commercial Gym Equipment",dubaiArea:"Al Quoz Industrial Area 2",website:"https://miraclefitnessuae.com",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"+971 58 590 5109",sourceUrl:"https://miraclefitnessuae.com",evidenceOfSales:"Home gym specialist; ships across UAE, Oman and Saudi Arabia; sells and installs gym equipment",deliveryRelevance:"Shipping across UAE + Oman + Saudi Arabia; heavy equipment delivery and installation",score:72,priority:"HOT",qualificationReason:"Multi-country delivery; gym installation service; confirmed phone; Al Quoz warehouse",notes:"Warehouse No. F2, Al Asayel Street (near old National Taxi signal), Al Quoz Industrial Area 2. Phone confirmed.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C/B2B",dataQuality:"MEDIUM"},
+
+  {id:54,businessName:"Athletix UAE",category:"Sports & Fitness",subCategory:"Sports & Fitness Equipment Online",dubaiArea:"Dubai (Online)",website:"https://athletix.ae",instagramUrl:"Not Found",facebookUrl:"Not Found",tiktokUrl:"Not Found",email:"Not Found",whatsapp:"Not Found",phone:"Not Found",sourceUrl:"https://athletix.ae",evidenceOfSales:"Dubai-based online fitness store; free shipping on orders over AED 250; free installation on orders over AED 5,000; Tabby pay-in-four; delivers to Dubai, Sharjah, Abu Dhabi",deliveryRelevance:"Free shipping over AED 250; free installation over AED 5,000; multi-emirate delivery",score:68,priority:"WARM",qualificationReason:"Online fitness store with multi-emirate free shipping threshold; installation service creates delivery dependency",notes:"Free installation on orders over AED 5,000. Tabby pay-in-four. Dubai, Sharjah, Abu Dhabi delivery.",discoveryDate:"2026-10-07",followers:"Not Found",businessType:"B2C",dataQuality:"LOW"}
+];
+
+// ── App State ──────────────────────────────────────────────────────────────
+let sortKey = 'score', sortDir = -1;
+
+function getScoreColor(s){
+  if(s>=70)return'var(--hot)';
+  if(s>=50)return'var(--warm)';
+  return'var(--cold)';
+}
+
+function filtered(){
+  const q=(document.getElementById('search').value||'').toLowerCase().trim();
+  const fp=document.getElementById('fPriority').value;
+  const fc=document.getElementById('fCategory').value;
+  const fct=document.getElementById('fContact').value;
+  const fdq=document.getElementById('fDQ').value;
+  return LEADS.filter(l=>{
+    if(fp&&l.priority!==fp)return false;
+    if(fc&&l.category!==fc)return false;
+    if(fdq&&l.dataQuality!==fdq)return false;
+    if(fct==='phone'&&l.phone==='Not Found')return false;
+    if(fct==='whatsapp'&&l.whatsapp==='Not Found')return false;
+    if(fct==='email'&&l.email==='Not Found')return false;
+    if(fct==='instagram'&&l.instagramUrl==='Not Found')return false;
+    if(fct==='website'&&l.website==='Not Found')return false;
+    if(q){
+      const hay=[l.businessName,l.category,l.subCategory,l.dubaiArea,l.qualificationReason,l.notes,l.deliveryRelevance].join(' ').toLowerCase();
+      if(!hay.includes(q))return false;
+    }
+    return true;
+  }).sort((a,b)=>{
+    const av=a[sortKey],bv=b[sortKey];
+    if(typeof av==='number')return(bv-av)*sortDir*-1;
+    return String(av).localeCompare(String(bv))*sortDir;
+  });
+}
+
+function sortBy(k){
+  if(sortKey===k)sortDir*=-1;
+  else{sortKey=k;sortDir=-1;}
+  document.querySelectorAll('thead th').forEach(th=>{
+    th.classList.remove('sorted');
+    const arrow=th.querySelector('.sort-arrow');
+    if(arrow)arrow.textContent='↕';
+  });
+  const idx={businessName:0,category:1,dubaiArea:2,score:3,priority:4,dataQuality:6}[k];
+  if(idx!==undefined){
+    const ths=document.querySelectorAll('thead th');
+    ths[idx].classList.add('sorted');
+    const arrow=ths[idx].querySelector('.sort-arrow');
+    if(arrow)arrow.textContent=sortDir===-1?'↓':'↑';
+  }
+  render();
+}
+
+function contactIcons(l){
+  const checks=[
+    {k:'phone',label:'☎'},
+    {k:'whatsapp',label:'W'},
+    {k:'email',label:'@'},
+    {k:'instagramUrl',label:'IG'},
+    {k:'website',label:'🌐'},
+  ];
+  return checks.map(c=>{
+    const has=l[c.k]&&l[c.k]!=='Not Found';
+    return`<span class="ci${has?' has':''}" title="${c.k}">${c.label}</span>`;
+  }).join('');
+}
+
+function dqBadge(dq){
+  const cls={HIGH:'dq-high',MEDIUM:'dq-mid',LOW:'dq-low'}[dq]||'dq-low';
+  return`<span class="dq ${cls}"><span class="dq-dot"></span>${dq}</span>`;
+}
+
+function priorityBadge(p){
+  const cls={HOT:'badge-hot',WARM:'badge-warm',COLD:'badge-cold'}[p]||'badge-cold';
+  return`<span class="badge ${cls}">${p==='HOT'?'🔴':'HOT'===p?'🔴':p==='WARM'?'🟡':'🔵'} ${p}</span>`;
+}
+
+function render(){
+  const rows=filtered();
+  const tbody=document.getElementById('tbody');
+  const count=document.getElementById('tableCount');
+  count.textContent=`Showing ${rows.length} of ${LEADS.length} leads`;
+  if(!rows.length){
+    tbody.innerHTML=`<tr><td colspan="7"><div class="no-results"><div style="font-size:28px">🔍</div><p>No leads match the current filters.</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML=rows.map((l,i)=>`
+    <tr onclick="openModal(${l.id})">
+      <td class="td-name">${i+1}. ${l.businessName}</td>
+      <td class="td-cat">${l.category}<br><span style="font-size:11px;color:var(--fg3)">${l.subCategory}</span></td>
+      <td class="td-area">${l.dubaiArea}</td>
+      <td class="td-score" style="color:${getScoreColor(l.score)}">${l.score}</td>
+      <td>${priorityBadge(l.priority)}</td>
+      <td><div class="contact-icons">${contactIcons(l)}</div></td>
+      <td>${dqBadge(l.dataQuality)}</td>
+    </tr>`).join('');
+}
+
+function updateStats(){
+  const hot=LEADS.filter(l=>l.priority==='HOT').length;
+  const warm=LEADS.filter(l=>l.priority==='WARM').length;
+  const cold=LEADS.filter(l=>l.priority==='COLD').length;
+  const withContact=LEADS.filter(l=>l.phone!=='Not Found'||l.whatsapp!=='Not Found'||l.email!=='Not Found').length;
+  document.getElementById('stats').innerHTML=`
+    <div class="stat-card"><div class="stat-label">Total Leads</div><div class="stat-value total">${LEADS.length}</div></div>
+    <div class="stat-card"><div class="stat-label">🔴 HOT</div><div class="stat-value hot">${hot}</div></div>
+    <div class="stat-card"><div class="stat-label">🟡 WARM</div><div class="stat-value warm">${warm}</div></div>
+    <div class="stat-card"><div class="stat-label">🔵 COLD</div><div class="stat-value cold">${cold}</div></div>
+    <div class="stat-card"><div class="stat-label">Have Direct Contact</div><div class="stat-value" style="color:var(--high-q)">${withContact}</div></div>
+    <div class="stat-card"><div class="stat-label">Categories</div><div class="stat-value" style="color:var(--fg2)">${[...new Set(LEADS.map(l=>l.category))].length}</div></div>`;
+}
+
+function populateFilters(){
+  const cats=[...new Set(LEADS.map(l=>l.category))].sort();
+  const sel=document.getElementById('fCategory');
+  cats.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); });
+}
+
+function val(v){
+  if(!v||v==='Not Found')return`<span class="nf-chip">Not Found</span>`;
+  if(v.startsWith('http'))return`<a href="${v}" target="_blank" rel="noopener">${v}</a>`;
+  return v;
+}
+
+function openModal(id){
+  const l=LEADS.find(x=>x.id===id);
+  if(!l)return;
+  document.getElementById('mTitle').textContent=l.businessName;
+  document.getElementById('mSub').textContent=`${l.category} · ${l.subCategory} · ${l.dubaiArea}`;
+  const scoreColor=getScoreColor(l.score);
+  const scoreWidth=l.score+'%';
+  document.getElementById('mBody').innerHTML=`
+    <div class="detail-section">
+      <h3>Qualification</h3>
+      <div class="detail-grid">
+        <div class="detail-item"><div class="detail-label">Priority</div><div class="detail-value">${priorityBadge(l.priority)}</div></div>
+        <div class="detail-item"><div class="detail-label">Score</div><div class="detail-value" style="color:${scoreColor};font-size:22px;font-weight:700">${l.score}<span style="font-size:12px;color:var(--fg3)">/100</span><div class="score-bar"><div class="score-fill" style="width:${scoreWidth};background:${scoreColor}"></div></div></div></div>
+        <div class="detail-item full"><div class="detail-label">Qualification Reason</div><div class="detail-value">${l.qualificationReason}</div></div>
+        <div class="detail-item full"><div class="detail-label">Delivery Relevance</div><div class="detail-value">${l.deliveryRelevance}</div></div>
+        <div class="detail-item full"><div class="detail-label">Evidence of Product Sales</div><div class="detail-value">${l.evidenceOfSales}</div></div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h3>Contact Information</h3>
+      <div class="detail-grid">
+        <div class="detail-item"><div class="detail-label">Phone</div><div class="detail-value">${val(l.phone)}</div></div>
+        <div class="detail-item"><div class="detail-label">WhatsApp</div><div class="detail-value">${val(l.whatsapp)}</div></div>
+        <div class="detail-item full"><div class="detail-label">Email</div><div class="detail-value">${val(l.email)}</div></div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h3>Online Presence</h3>
+      <div class="detail-grid">
+        <div class="detail-item full"><div class="detail-label">Website</div><div class="detail-value">${val(l.website)}</div></div>
+        <div class="detail-item"><div class="detail-label">Instagram</div><div class="detail-value">${val(l.instagramUrl)}</div></div>
+        <div class="detail-item"><div class="detail-label">Facebook</div><div class="detail-value">${val(l.facebookUrl)}</div></div>
+        <div class="detail-item"><div class="detail-label">TikTok</div><div class="detail-value">${val(l.tiktokUrl)}</div></div>
+        <div class="detail-item"><div class="detail-label">Social Followers</div><div class="detail-value">${val(l.followers)}</div></div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h3>Business Details</h3>
+      <div class="detail-grid">
+        <div class="detail-item"><div class="detail-label">Business Type</div><div class="detail-value">${l.businessType}</div></div>
+        <div class="detail-item"><div class="detail-label">Data Quality</div><div class="detail-value">${dqBadge(l.dataQuality)}</div></div>
+        <div class="detail-item"><div class="detail-label">Discovery Date</div><div class="detail-value">${l.discoveryDate}</div></div>
+        <div class="detail-item"><div class="detail-label">Status</div><div class="detail-value"><span class="badge" style="background:rgba(96,165,250,0.12);color:#60a5fa">NEW</span></div></div>
+        <div class="detail-item full"><div class="detail-label">Source URL</div><div class="detail-value">${val(l.sourceUrl)}</div></div>
+        ${l.notes?`<div class="detail-item full"><div class="detail-label">Notes</div><div class="detail-value">${l.notes}</div></div>`:''}
+      </div>
+    </div>`;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal(e){
+  if(e&&e.target!==document.getElementById('modalOverlay')&&e.type!=='click')return;
+  if(e&&e.currentTarget===document.getElementById('modalOverlay')&&e.target!==e.currentTarget)return;
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+document.getElementById('modal').addEventListener('click',e=>e.stopPropagation());
+
+function exportCSV(){
+  const headers=['ID','Business Name','Category','Sub-Category','Dubai Area','Score','Priority','Website','Instagram','Facebook','TikTok','Email','WhatsApp','Phone','Followers','Business Type','Evidence of Sales','Delivery Relevance','Qualification Reason','Data Quality','Notes','Source URL','Discovery Date'];
+  const rows=LEADS.map(l=>[l.id,l.businessName,l.category,l.subCategory,l.dubaiArea,l.score,l.priority,l.website,l.instagramUrl,l.facebookUrl,l.tiktokUrl,l.email,l.whatsapp,l.phone,l.followers,l.businessType,l.evidenceOfSales,l.deliveryRelevance,l.qualificationReason,l.dataQuality,l.notes,l.sourceUrl,l.discoveryDate].map(v=>`"${String(v).replace(/"/g,'""')}"`));
+  const csv=[headers.map(h=>`"${h}"`).join(','),...rows.map(r=>r.join(','))].join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='flash_delivery_dubai_leads.csv';
+  a.click();
+}
+
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(LEADS,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='flash_delivery_dubai_leads.json';
+  a.click();
+}
+
+// Init
+updateStats();
+populateFilters();
+sortBy('score');
+</script>
+</body>
+</html>
