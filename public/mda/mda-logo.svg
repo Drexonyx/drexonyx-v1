@@ -1,39 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" fill="none">
-  <!--
-    Blue shapes drawn first (behind white text).
-    White text fill is opaque on strokes; counters/open areas are transparent,
-    letting blue show through only where no solid stroke falls.
+  <!-- D: compact blue square in upper D counter -->
+  <rect x="40" y="21" width="9" height="9" fill="#0A84FF"/>
 
-    M  — pure white, no blue
-    D  — blue block spans left portion of D counter (x=36–49, y=13–37)
-    A  — three distinct blue regions:
-           • Upper counter triangle (inner apex y≈21, crossbar-top y=31)
-           • Lower-left leg opening  (y=36–42, stops at x=69.5 top / x=69 bottom)
-           • Lower-right leg opening (y=36–42, starts at x=72 top / x=71 bottom)
-         2-unit dark gap between the two lower shapes (x=69.5–72 at top, x=69–71 at bottom)
-  -->
+  <!-- A upper: apex at (70.5,14), right-pointing to (79,22), widens to crossbar x=64-84 -->
+  <polygon points="70.5,14 79,22 84,31 64,31" fill="#5AAEFF"/>
 
-  <!-- D: prominent blue block inside left portion of D counter -->
-  <rect x="36" y="13" width="13" height="24" fill="#0A84FF"/>
+  <!-- A lower right: darker blue fills right leg opening (y=31-42, right side) -->
+  <polygon points="72,31 84,31 83,42 68,42" fill="#0A84FF"/>
 
-  <!-- A: upper counter triangle (inner left ≈67, inner right ≈74.5, apex y≈21) -->
-  <polygon points="70.3,21 67,31 74.5,31" fill="#0A84FF"/>
-
-  <!-- A: lower-left leg opening -->
-  <polygon points="66,36 69.5,36 69,42 62,42" fill="#0A84FF"/>
-
-  <!-- A: lower-right leg opening — ~2.5-unit dark gap separates from lower-left -->
-  <polygon points="72,36 75,36 79,42 71.5,42" fill="#0A84FF"/>
-
-  <!-- MDA — weight-900 white, paints over blue on all solid strokes -->
+  <!-- MDA text (on top) -->
   <text x="0" y="42"
     font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif"
     font-weight="900" font-size="38" letter-spacing="-1" fill="#f4f4f5">MDA</text>
 
-  <!-- White separator — width=129 matches measured descriptor width (128.45 SVG units) -->
+  <!-- Separator -->
   <rect x="0" y="48" width="129" height="1" rx=".5" fill="#f4f4f5" opacity=".45"/>
 
-  <!-- MASTER DIGITAL AGENCY descriptor -->
+  <!-- MASTER DIGITAL AGENCY -->
   <text x="0" y="58"
     font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif"
     font-weight="600" font-size="7.5" letter-spacing="1.5" fill="#a1a1aa">MASTER DIGITAL AGENCY</text>
