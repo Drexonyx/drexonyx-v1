@@ -73,6 +73,86 @@ const SERVICES = [
   },
 ] as const;
 
+const PORTFOLIO_ITEMS = [
+  {
+    category: 'Media' as const,
+    title: 'UGC Demo Reel',
+    desc: 'Short-form video content for social media — produced, directed, and delivered for launch.',
+    src: '/portfolio/ugc-demo-reel-thumb.svg',
+    width: 1600,
+    height: 900,
+  },
+  {
+    category: 'Digital' as const,
+    title: 'E-Commerce Launch',
+    desc: 'Full digital build — storefront, product pages, checkout, and performance optimisation.',
+    src: '/portfolio/ugc-ecommerce-launch-thumb.svg',
+    width: 1600,
+    height: 900,
+  },
+  {
+    category: 'Creative' as const,
+    title: 'Product Feature Ad',
+    desc: 'Static feed creative for paid social — designed for scroll-stopping visibility and conversion.',
+    src: '/portfolio/static-feed-ad-product-feature.svg',
+    width: 1080,
+    height: 1080,
+  },
+  {
+    category: 'Business Solutions' as const,
+    title: 'Campaign Strategy',
+    desc: 'End-to-end campaign brief and market positioning — from audience mapping to launch plan.',
+    src: '/portfolio/campaign-brief-sample.svg',
+    width: 1600,
+    height: 900,
+  },
+] as const;
+
+const PACKAGES = [
+  {
+    tier: 'STARTER',
+    price: 'AED 599',
+    tagline: 'Get online. Look professional.',
+    featured: false,
+    items: [
+      'Static website, up to 5 pages',
+      'Mobile-responsive design',
+      'Contact form & location map',
+      'Menu or services section',
+      'Branded colour scheme & typography',
+    ],
+    href: '/start-project',
+  },
+  {
+    tier: 'PROFESSIONAL',
+    price: 'AED 899',
+    tagline: 'The complete business website.',
+    featured: true,
+    items: [
+      'CMS-powered, up to 10 pages',
+      'Booking or enquiry integrations',
+      'Basic SEO setup & analytics',
+      'Social media link integration',
+      'Everything in Starter',
+    ],
+    href: '/start-project',
+  },
+  {
+    tier: 'PREMIUM',
+    price: 'AED 1,899',
+    tagline: 'Custom build. Full execution.',
+    featured: false,
+    items: [
+      'Custom design & brand identity essentials',
+      'Unlimited pages',
+      'Advanced integrations & automation',
+      'Performance & SEO optimisation',
+      'Launch support & handover',
+    ],
+    href: '/start-project',
+  },
+] as const;
+
 const PROCESS_STEPS = [
   {
     step: '01',
@@ -96,25 +176,6 @@ const PROCESS_STEPS = [
   },
 ];
 
-const WHY_ITEMS = [
-  {
-    label: 'Full-Stack Agency',
-    desc: 'Digital, creative, media, and strategy under one roof. No fragmented hand-offs, no gaps.',
-  },
-  {
-    label: 'Built for the UAE',
-    desc: 'Local expertise, global execution standards. We understand Dubai and the GCC market inside out.',
-  },
-  {
-    label: 'One Team, One Vision',
-    desc: 'Your account team stays consistent from brief to delivery — the people you speak to are the people building.',
-  },
-  {
-    label: 'Results-First Thinking',
-    desc: 'Every decision — design, copy, technology — is made in service of business outcomes, not aesthetics alone.',
-  },
-];
-
 const MDA_NAV_CATS = ['Digital', 'Creative', 'Media', 'Business Solutions'] as const;
 
 export default function MDAPage() {
@@ -124,7 +185,7 @@ export default function MDAPage() {
       <section className={styles.mdaHeader} aria-label="MDA brand identity">
         <div className={styles.container}>
           <div className={styles.mdaHeaderInner}>
-            <MDALogo size="lg" showEndorsement />
+            <MDALogo size="lg" showEndorsement assetSrc="/mda/mda-logo.svg" />
             <nav className={styles.mdaCatNav} aria-label="MDA service categories">
               <ul className={styles.mdaCatList} role="list">
                 {MDA_NAV_CATS.map((cat) => (
@@ -151,7 +212,7 @@ export default function MDAPage() {
       {/* ── 2: Hero ─────────────────────────────────────────────────────────── */}
       <section className={styles.hero} aria-labelledby="mda-hero-heading">
         <div className={styles.container}>
-          <p className={styles.heroEyebrow}>Digital · Creative · Media · Business Solutions</p>
+          <p className={styles.heroEyebrow}>Full-Service Commercial Agency · Dubai &amp; UAE</p>
           <h1 id="mda-hero-heading" className={styles.heroHeading}>
             DIGITAL.{' '}
             <span className={styles.heroAccentGold}>CREATIVE.</span>
@@ -160,9 +221,9 @@ export default function MDAPage() {
             <span className={styles.heroAccentBlue}>SOLUTIONS.</span>
           </h1>
           <p className={styles.heroSub}>
-            We build, design, automate and elevate businesses.
+            One agency. Every dimension of your business.
             <br />
-            Full-service. Strategy to execution. One team.
+            From strategy to execution — we build, design, produce, and deliver.
           </p>
           <div className={styles.heroCtas}>
             <CTAButton href="/start-project" variant="primary" size="lg">
@@ -201,23 +262,97 @@ export default function MDAPage() {
         </div>
       </section>
 
-      {/* ── 4: Featured Commercial Offer ────────────────────────────────────── */}
-      <section className={styles.offer} aria-labelledby="offer-heading">
+      {/* ── 4: Selected Work ────────────────────────────────────────────────── */}
+      <section id="work" className={styles.portfolio} aria-labelledby="portfolio-heading">
         <div className={styles.container}>
-          <div className={styles.offerInner}>
-            <div className={styles.offerContent}>
-              <p className={styles.offerEyebrow}>Featured Offer</p>
-              <h2 id="offer-heading" className={styles.offerHeading}>
+          <SectionHeading
+            eyebrow="Selected Work"
+            title="Built by MDA."
+          />
+          <div className={styles.portfolioGrid}>
+            {PORTFOLIO_ITEMS.map((item) => (
+              <div key={item.title} className={styles.portfolioCard}>
+                <div className={styles.portfolioThumb}>
+                  <Image
+                    src={item.src}
+                    alt={item.title}
+                    width={item.width}
+                    height={item.height}
+                    className={styles.portfolioImg}
+                  />
+                </div>
+                <div className={styles.portfolioMeta}>
+                  <span className={styles.portfolioCat}>{item.category}</span>
+                  <h3 className={styles.portfolioTitle}>{item.title}</h3>
+                  <p className={styles.portfolioDesc}>{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 5: Packages ─────────────────────────────────────────────────────── */}
+      <section id="packages" className={styles.packages} aria-labelledby="packages-heading">
+        <div className={styles.container}>
+          <SectionHeading
+            eyebrow="Commercial Packages"
+            title="Professional websites. Fixed price."
+            description="Transparent pricing, no hidden costs, no scope creep. Every package is delivered by the same team that builds enterprise products."
+          />
+          <div className={styles.packagesGrid}>
+            {PACKAGES.map((pkg) => (
+              <div
+                key={pkg.tier}
+                className={[
+                  styles.packageCard,
+                  pkg.featured ? styles.packageCardFeatured : '',
+                ].filter(Boolean).join(' ')}
+              >
+                {pkg.featured && (
+                  <div className={styles.packageBadge}>MOST POPULAR</div>
+                )}
+                <div className={styles.packageTop}>
+                  <p className={styles.packageTier}>{pkg.tier}</p>
+                  <p className={styles.packagePrice}>{pkg.price}</p>
+                  <p className={styles.packageTagline}>{pkg.tagline}</p>
+                </div>
+                <ul className={styles.packageItems} role="list">
+                  {pkg.items.map((item) => (
+                    <li key={item} className={styles.packageItem}>
+                      <span className={styles.packageCheck} aria-hidden="true">✓</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <div className={styles.packageFooter}>
+                  <CTAButton
+                    href={pkg.href}
+                    variant={pkg.featured ? 'primary' : 'outline'}
+                    size="md"
+                  >
+                    GET STARTED →
+                  </CTAButton>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Restaurant website spotlight — approved poster */}
+          <div className={styles.posterSpotlight}>
+            <div className={styles.posterSpotlightContent}>
+              <p className={styles.posterSpotlightEyebrow}>Featured Offer</p>
+              <h2 className={styles.posterSpotlightHeading}>
                 Your Restaurant Website.
                 <br />
-                <span className={styles.offerAccent}>AED 599.</span>
+                <span className={styles.posterSpotlightAccent}>AED 599.</span>
               </h2>
-              <p className={styles.offerDesc}>
+              <p className={styles.posterSpotlightDesc}>
                 A complete, professional restaurant website — fully designed, built, and launched.
                 Menu, gallery, reservations, location. Everything your guests need to find you and
                 come back.
               </p>
-              <div className={styles.offerCtas}>
+              <div className={styles.posterSpotlightCtas}>
                 <CTAButton href="/start-project" variant="primary" size="md">
                   GET STARTED →
                 </CTAButton>
@@ -226,35 +361,16 @@ export default function MDAPage() {
                 </CTAButton>
               </div>
             </div>
-            <div className={styles.offerPoster}>
+            <div className={styles.posterSpotlightPoster}>
               <Image
                 src="/mda/MDA_MASTER_POSTER_01_RESTAURANT_WEBSITE_AED599.jpg"
                 alt="MDA Restaurant Website package — AED 599 — professional website design for restaurants"
                 width={1024}
                 height={1536}
-                className={styles.offerPosterImg}
+                className={styles.posterSpotlightImg}
                 quality={85}
               />
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 5: Why MDA ──────────────────────────────────────────────────────── */}
-      <section className={styles.why} aria-labelledby="why-heading">
-        <div className={styles.container}>
-          <SectionHeading
-            eyebrow="Why MDA"
-            title="The agency built for what you actually need."
-          />
-          <div className={styles.whyGrid}>
-            {WHY_ITEMS.map((item) => (
-              <div key={item.label} className={styles.whyCard}>
-                <div className={styles.whyDot} aria-hidden="true" />
-                <h3 className={styles.whyLabel}>{item.label}</h3>
-                <p className={styles.whyDesc}>{item.desc}</p>
-              </div>
-            ))}
           </div>
         </div>
       </section>
@@ -308,7 +424,7 @@ export default function MDAPage() {
       <footer className={styles.mdaFooter} aria-label="MDA brand footer">
         <div className={styles.container}>
           <div className={styles.mdaFooterInner}>
-            <MDALogo size="sm" showEndorsement />
+            <MDALogo size="sm" showEndorsement assetSrc="/mda/mda-logo.svg" />
             <nav className={styles.mdaFooterNav} aria-label="MDA footer navigation">
               <ul className={styles.mdaFooterLinks} role="list">
                 <li>
@@ -317,13 +433,18 @@ export default function MDAPage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/services" className={styles.mdaFooterLink}>
+                  <Link href="#services" className={styles.mdaFooterLink}>
                     Services
                   </Link>
                 </li>
                 <li>
-                  <Link href="/portfolio" className={styles.mdaFooterLink}>
-                    Portfolio
+                  <Link href="#work" className={styles.mdaFooterLink}>
+                    Work
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#packages" className={styles.mdaFooterLink}>
+                    Packages
                   </Link>
                 </li>
                 <li>
