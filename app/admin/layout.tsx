@@ -24,6 +24,10 @@ export default async function AdminLayout({
     <div className={s.shell}>
       <aside className={s.sidebar}>
         <div className={s.sidebarHeader}>
+          <div className={s.mdaBrand}>
+            <span className={s.mdaBrandMono}>MDA</span>
+            <span className={s.mdaBrandDesc}>MASTER DIGITAL AGENCY</span>
+          </div>
           <div className={s.adminLabel}>Admin</div>
           <div className={s.orgName}>{org?.name ?? '—'}</div>
           <div className={s.roleLabel}>{session.role}</div>

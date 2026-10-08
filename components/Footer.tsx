@@ -88,6 +88,12 @@ export default function Footer() {
         </p>
         <p className={styles.copyTagline}>Creativity Today. A Bolder Tomorrow.</p>
       </div>
+
+      <div className={styles.mdaStrip}>
+        <p className={styles.mdaEndorsement}>
+          MDA — MASTER DIGITAL AGENCY · A DREXONYX Brand
+        </p>
+      </div>
     </footer>
   );
 }
