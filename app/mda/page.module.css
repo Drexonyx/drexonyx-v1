@@ -1,0 +1,457 @@
+/* MDA Public Landing Page */
+
+.container {
+  max-width: var(--drex-container);
+  margin: 0 auto;
+  padding: 0 var(--drex-pad);
+}
+
+/* ── 1: MDA Brand Header ────────────────────────────────────────────────── */
+.mdaHeader {
+  padding: 1.75rem 0;
+  border-bottom: 1px solid var(--drex-border);
+  background: var(--drex-bg);
+}
+
+.mdaHeaderInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.mdaCatNav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.mdaCatList {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.mdaCatLink {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--drex-text-secondary);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--drex-duration) var(--drex-ease);
+}
+
+.mdaCatLink:hover {
+  color: var(--drex-accent);
+}
+
+/* ── 2: Hero ────────────────────────────────────────────────────────────── */
+.hero {
+  padding: 5.5rem 0 5rem;
+  position: relative;
+  overflow: hidden;
+  background: var(--drex-bg);
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -100px;
+  right: -180px;
+  width: 580px;
+  height: 580px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(200, 152, 10, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -80px;
+  left: -120px;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(29, 140, 248, 0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.heroEyebrow {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--drex-accent);
+  margin-bottom: 1.25rem;
+  position: relative;
+}
+
+.heroHeading {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.0;
+  color: var(--drex-text);
+  max-width: 860px;
+  text-wrap: balance;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.heroBreak {
+  display: block;
+}
+
+.heroAccentGold {
+  color: var(--drex-accent);
+}
+
+.heroAccentBlue {
+  color: var(--mda-digital);
+}
+
+.heroSub {
+  font-size: 1.125rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.65;
+  max-width: 54ch;
+  margin-bottom: 2.5rem;
+  position: relative;
+}
+
+.heroCtas {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.heroEndorsement {
+  position: relative;
+}
+
+/* ── 3: Services ────────────────────────────────────────────────────────── */
+.services {
+  padding: 5rem 0;
+  background: var(--drex-bg);
+  border-top: 1px solid var(--drex-border);
+}
+
+.servicesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-top: 2.5rem;
+}
+
+/* ── 4: Featured Commercial Offer ───────────────────────────────────────── */
+.offer {
+  padding: 5rem 0;
+  background: var(--drex-surface);
+  border-top: 1px solid var(--drex-border);
+}
+
+.offerInner {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 3rem;
+  align-items: center;
+}
+
+.offerContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.offerEyebrow {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--drex-accent);
+}
+
+.offerHeading {
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--drex-text);
+  text-wrap: balance;
+}
+
+.offerAccent {
+  color: var(--drex-accent);
+}
+
+.offerDesc {
+  font-size: 1rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.7;
+  max-width: 52ch;
+}
+
+.offerCtas {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.offerPoster {
+  border-radius: var(--mda-radius-lg);
+  overflow: hidden;
+  box-shadow: 0 8px 48px rgba(0, 0, 0, 0.5);
+}
+
+.offerPosterImg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ── 5: Why MDA ─────────────────────────────────────────────────────────── */
+.why {
+  padding: 5rem 0;
+  background: var(--drex-bg);
+  border-top: 1px solid var(--drex-border);
+}
+
+.whyGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin-top: 2.5rem;
+}
+
+.whyCard {
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: var(--mda-radius-lg);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition:
+    border-color var(--drex-duration) var(--drex-ease),
+    box-shadow var(--drex-duration) var(--drex-ease);
+}
+
+.whyCard:hover {
+  border-color: var(--mda-border-gold);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+.whyDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--drex-accent);
+  flex-shrink: 0;
+}
+
+.whyLabel {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--drex-text);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.whyDesc {
+  font-size: 0.9rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.65;
+}
+
+/* ── 6: Process ─────────────────────────────────────────────────────────── */
+.process {
+  padding: 5rem 0;
+  background: var(--drex-surface);
+  border-top: 1px solid var(--drex-border);
+}
+
+.processSteps {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 2rem;
+  margin-top: 2.5rem;
+  list-style: none;
+  padding: 0;
+}
+
+.processStep {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.processNum {
+  font-size: 2rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  color: var(--drex-accent);
+  line-height: 1;
+  flex-shrink: 0;
+  opacity: 0.55;
+}
+
+.processBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.processLabel {
+  font-size: 0.875rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--drex-text);
+}
+
+.processDesc {
+  font-size: 0.875rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.65;
+}
+
+/* ── 7: CTA ─────────────────────────────────────────────────────────────── */
+.cta {
+  padding: 6rem 0;
+  background: var(--drex-bg);
+  border-top: 1px solid var(--drex-border);
+  text-align: center;
+}
+
+.ctaInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.ctaHeading {
+  font-size: clamp(2rem, 5vw, 3.75rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.0;
+  color: var(--drex-text);
+  text-wrap: balance;
+}
+
+.ctaAccent {
+  color: var(--drex-accent);
+}
+
+.ctaSub {
+  font-size: 1.0625rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.6;
+  max-width: 48ch;
+}
+
+.ctaEndorsement {
+  margin-top: 0.5rem;
+}
+
+/* ── 8: MDA Brand Footer ────────────────────────────────────────────────── */
+.mdaFooter {
+  padding: 2.5rem 0;
+  border-top: 1px solid var(--drex-border);
+  background: var(--drex-bg);
+}
+
+.mdaFooterInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.mdaFooterLinks {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.mdaFooterLink {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--drex-text-secondary);
+  text-decoration: none;
+  transition: color var(--drex-duration) var(--drex-ease);
+}
+
+.mdaFooterLink:hover {
+  color: var(--drex-text);
+}
+
+.mdaFooterLegal {
+  font-size: 0.75rem;
+  color: var(--drex-text-muted);
+  border-top: 1px solid var(--drex-border);
+  padding-top: 1.25rem;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .mdaHeaderInner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .mdaCatNav {
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .mdaCatList {
+    gap: 0.75rem;
+  }
+
+  .offerInner {
+    grid-template-columns: 1fr;
+  }
+
+  .offerPoster {
+    max-width: 300px;
+    margin: 0 auto;
+  }
+
+  .mdaFooterInner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .mdaCatList {
+    gap: 0.5rem;
+  }
+
+  .heroHeading {
+    font-size: clamp(2rem, 10vw, 3rem);
+  }
+}
