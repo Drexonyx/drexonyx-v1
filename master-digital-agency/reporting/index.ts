@@ -3,6 +3,7 @@
 import { ProjectState } from '../state/project'
 import { ClientState } from '../state/client'
 import { surfaceNextBestAction } from '../agents/core/agency-director'
+import { BRAND } from '@/lib/brand'
 
 export interface AgencyReport {
   generatedAt: string
@@ -98,7 +99,7 @@ export function generateAgencyReport(
 
 export function formatAgencyReport(report: AgencyReport): string {
   const lines: string[] = [
-    `# MASTER DIGITAL AGENCY — REPORT`,
+    `# ${BRAND.MDA_DESCRIPTOR} — REPORT`,
     `Generated: ${new Date(report.generatedAt).toLocaleString()}`,
     ``,
     `## Projects (${report.projects.length})`,

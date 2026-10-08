@@ -13,6 +13,7 @@ import { callAi } from '../ai/adapter';
 import type { GeminiSchema } from '../ai/adapter';
 import { getApprovalPolicy } from '@/lib/sales/queries';
 import type { OutreachChannel } from '@/lib/sales/queries';
+import { BRAND } from '@/lib/brand';
 
 export interface SalesOutreachDraftInput {
   businessName: string;
@@ -48,9 +49,9 @@ const DRAFT_SCHEMA: GeminiSchema = {
   required: ['messageText', 'hasDiscount', 'hasPricingOffer', 'hasContractualCommitment', 'isSensitiveContent'],
 };
 
-const SYSTEM_PROMPT = `You are a professional sales copywriter for MASTER DIGITAL AGENCY (DREXONYX).
+const SYSTEM_PROMPT = `You are a professional sales copywriter for ${BRAND.MDA_DESCRIPTOR} (${BRAND.MDA_NAME}), ${BRAND.ENDORSEMENT}.
 
-MASTER DIGITAL AGENCY builds professional static websites and landing pages for businesses.
+${BRAND.MDA_DESCRIPTOR} is a full-service digital agency covering Digital, Creative, Media, and Business Solutions. For this campaign, we are promoting our professional static website service for UAE businesses.
 
 Our core offer:
 - AED 599 — one-time payment, not monthly, not a subscription
@@ -61,14 +62,14 @@ Our core offer:
 Write a concise, personalized outreach message for a potential client. The message should:
 - Be professional but conversational
 - Acknowledge the client's specific business context
-- Briefly introduce MASTER DIGITAL AGENCY's website service
+- Briefly introduce ${BRAND.MDA_DESCRIPTOR}'s website service
 - Include a clear, low-pressure call to action
 - Stay under 150 words for cold_outreach/follow_up, under 300 for proposals
 
 For proposals (messageType=proposal), use this voice and structure:
 - Open with a short, confident hook: the business deserves a professional online presence — not a long explanation of customer behaviour
 - Connect to the outcome: customers can understand what they offer, see services clearly, know how to reach them
-- Introduce MASTER DIGITAL AGENCY as the builder of clean, professional static websites for UAE businesses
+- Introduce ${BRAND.MDA_DESCRIPTOR} as the builder of clean, professional static websites for UAE businesses
 - Present the offer: AED 599, one-time. No monthly fees. Domain setup included when they do not already have one (do not imply domain renewal is included)
 - Close with: "Ready to put your business online professionally?"
 - Do NOT describe the offer as monthly or recurring
@@ -94,7 +95,7 @@ Return ONLY a valid JSON object with:
 No markdown fences, no prose explanation — pure JSON only.`;
 
 function buildUserPrompt(input: SalesOutreachDraftInput): string {
-  const sender = input.senderName ?? 'DREXONYX';
+  const sender = input.senderName ?? BRAND.MDA_NAME;
   const parts = [
     `Client business: ${input.businessName}`,
     `Channel: ${input.channel}`,

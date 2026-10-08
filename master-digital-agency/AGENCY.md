@@ -24,9 +24,14 @@ Do not build expensive infrastructure before a real commercial reason exists.
 - Paid CRM/automation/hosting/AI dependencies: excluded unless owner explicitly approves
 - Spam, fake followers, fake engagement: excluded permanently
 
-## DREXONYX Boundary
-DREXONYX is a separate system. Do not import, duplicate, or reference its agents, skills,
-workflows, or database. Future cross-use requires explicit owner authorization.
+## DREXONYX Relationship
+DREXONYX is the Master / Group Brand. MDA — MASTER DIGITAL AGENCY is the flagship
+commercial and service brand under the DREXONYX group.
+
+MDA agents, skills, and workflows are operationally separate from the DREXONYX
+production system. Do not import, duplicate, or reference DREXONYX internal production
+agents, skills, workflows, or database from MDA operations without explicit owner
+authorization.
 
 ## Human Approval Gates
 Require owner approval before: spending money, publishing high-risk material, irreversible
