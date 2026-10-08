@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import {
   MDALogo,
-  ServiceCard,
+  ServiceBadge,
   CTAButton,
   SectionHeading,
   EndorsementFooter,
@@ -38,44 +38,90 @@ export const metadata: Metadata = {
   },
 };
 
-const SERVICES = [
+type ServiceCategory = 'Digital' | 'Creative' | 'Media' | 'Business Solutions';
+
+const SERVICES: {
+  category: ServiceCategory;
+  title: string;
+  tagline: string;
+  description: string;
+  items: readonly [string, string, string, string];
+  href: string;
+  ctaLabel: string;
+}[] = [
   {
-    category: 'Digital' as const,
+    category: 'Digital',
     title: 'Digital Solutions',
+    tagline: 'Websites · Web Apps · AI · Automation',
     description:
-      'Websites, web applications, automation systems, and digital infrastructure — built to perform and scale with your business.',
+      'Websites, web applications, AI-powered systems, and automation workflows — built to perform and scale with your business.',
+    items: [
+      'Websites & Web Applications',
+      'UI/UX Design',
+      'AI Systems & Automation',
+      'Digital Workflows',
+    ],
     href: '/start-project',
     ctaLabel: 'Start Digital →',
   },
   {
-    category: 'Creative' as const,
+    category: 'Creative',
     title: 'Creative Services',
+    tagline: 'Branding · Logos · Profiles · Design',
     description:
-      'Brand identity, visual design, UI/UX, and content creation — crafted to command attention and build lasting recognition.',
+      'Brand identity, logo design, corporate profiles, marketing materials, and social media creatives — crafted to command attention and build lasting recognition.',
+    items: [
+      'Brand Identity & Logo Design',
+      'Corporate Profiles & Brochures',
+      'Presentations & Catalogues',
+      'Marketing & Social Media Design',
+    ],
     href: '/start-project',
     ctaLabel: 'Start Creative →',
   },
   {
-    category: 'Media' as const,
+    category: 'Media',
     title: 'Media Production',
+    tagline: 'Video · Cinematic · Photography · Content',
     description:
-      'Video production, photography, social content, and digital advertising — media built to move your audience and drive action.',
+      'Video production, cinematic content, photography, promotional content, and post-production — media built to move your audience and drive action.',
+    items: [
+      'Video & Cinematic Production',
+      'Product Photography',
+      'Social Media Content',
+      'Editing & Post-Production',
+    ],
     href: '/start-project',
     ctaLabel: 'Start Media →',
   },
   {
-    category: 'Business Solutions' as const,
+    category: 'Business Solutions',
     title: 'Business Solutions',
+    tagline: 'Workflows · Forms · Automation · Systems',
     description:
-      'Strategy, operations, growth systems, and business intelligence — the infrastructure that turns vision into measurable results.',
+      'Digital workflows, electronic forms, online business systems, automation, and commercial tools — the infrastructure that turns vision into measurable results.',
+    items: [
+      'Digital Workflows & Automation',
+      'Electronic Forms & Systems',
+      'Online Business Platforms',
+      'Commercial Solutions',
+    ],
     href: '/start-project',
     ctaLabel: 'Get Started →',
   },
-] as const;
+];
+
+const PILLAR_CARD_ACCENT: Record<ServiceCategory, string> = {
+  Digital: styles.pillarCardDigital,
+  Creative: styles.pillarCardCreative,
+  Media: styles.pillarCardMedia,
+  'Business Solutions': styles.pillarCardSolutions,
+};
 
 const PORTFOLIO_ITEMS = [
   {
-    category: 'Media' as const,
+    category: 'Media' as ServiceCategory,
+    label: 'MDA INTERNAL PRODUCTION SAMPLE',
     title: 'UGC Demo Reel',
     desc: 'Short-form video content for social media — produced, directed, and delivered for launch.',
     src: '/portfolio/ugc-demo-reel-thumb.svg',
@@ -83,7 +129,8 @@ const PORTFOLIO_ITEMS = [
     height: 900,
   },
   {
-    category: 'Digital' as const,
+    category: 'Digital' as ServiceCategory,
+    label: 'MDA INTERNAL PRODUCTION SAMPLE',
     title: 'E-Commerce Launch',
     desc: 'Full digital build — storefront, product pages, checkout, and performance optimisation.',
     src: '/portfolio/ugc-ecommerce-launch-thumb.svg',
@@ -91,7 +138,8 @@ const PORTFOLIO_ITEMS = [
     height: 900,
   },
   {
-    category: 'Creative' as const,
+    category: 'Creative' as ServiceCategory,
+    label: 'MDA INTERNAL PRODUCTION SAMPLE',
     title: 'Product Feature Ad',
     desc: 'Static feed creative for paid social — designed for scroll-stopping visibility and conversion.',
     src: '/portfolio/static-feed-ad-product-feature.svg',
@@ -99,7 +147,8 @@ const PORTFOLIO_ITEMS = [
     height: 1080,
   },
   {
-    category: 'Business Solutions' as const,
+    category: 'Business Solutions' as ServiceCategory,
+    label: 'MDA INTERNAL PRODUCTION SAMPLE',
     title: 'Campaign Strategy',
     desc: 'End-to-end campaign brief and market positioning — from audience mapping to launch plan.',
     src: '/portfolio/campaign-brief-sample.svg',
@@ -171,8 +220,8 @@ const PROCESS_STEPS = [
   },
   {
     step: '04',
-    label: 'LAUNCH',
-    desc: 'Go live with confidence. We deploy, test, and optimise for performance and results from day one.',
+    label: 'DELIVER',
+    desc: 'Go live with confidence. We deploy, optimise, and hand over — with full support from launch day and beyond.',
   },
 ];
 
@@ -214,23 +263,23 @@ export default function MDAPage() {
         <div className={styles.container}>
           <p className={styles.heroEyebrow}>Full-Service Commercial Agency · Dubai &amp; UAE</p>
           <h1 id="mda-hero-heading" className={styles.heroHeading}>
-            DIGITAL.{' '}
-            <span className={styles.heroAccentGold}>CREATIVE.</span>
+            <span className={styles.heroLineDigital}>DIGITAL.</span>{' '}
+            <span className={styles.heroLineCreative}>CREATIVE.</span>
             <br className={styles.heroBreak} />
-            MEDIA.{' '}
-            <span className={styles.heroAccentBlue}>SOLUTIONS.</span>
+            <span className={styles.heroLineMedia}>MEDIA.</span>{' '}
+            <span className={styles.heroLineSolutions}>SOLUTIONS.</span>
           </h1>
           <p className={styles.heroSub}>
             One agency. Every dimension of your business.
             <br />
-            From strategy to execution — we build, design, produce, and deliver.
+            From strategy to execution — we build, design, produce, automate, and deliver.
           </p>
           <div className={styles.heroCtas}>
             <CTAButton href="/start-project" variant="primary" size="lg">
               START YOUR PROJECT →
             </CTAButton>
             <CTAButton href="#services" variant="secondary" size="lg">
-              EXPLORE SERVICES
+              EXPLORE OUR SERVICES
             </CTAButton>
           </div>
           <div className={styles.heroEndorsement}>
@@ -239,30 +288,46 @@ export default function MDAPage() {
         </div>
       </section>
 
-      {/* ── 3: Services ─────────────────────────────────────────────────────── */}
-      <section id="services" className={styles.services} aria-labelledby="services-heading">
+      {/* ── 3: Four Service Pillars ──────────────────────────────────────────── */}
+      <section id="services" className={styles.pillars} aria-labelledby="pillars-heading">
         <div className={styles.container}>
           <SectionHeading
             eyebrow="What We Do"
             title="Four pillars. One agency."
             description="MDA delivers across every dimension of the modern business — digital infrastructure, creative output, media production, and strategic growth. Pick one or bring us the full brief."
           />
-          <div className={styles.servicesGrid}>
+          <div className={styles.pillarsGrid}>
             {SERVICES.map((svc) => (
-              <ServiceCard
+              <article
                 key={svc.category}
-                category={svc.category}
-                title={svc.title}
-                description={svc.description}
-                href={svc.href}
-                ctaLabel={svc.ctaLabel}
-              />
+                className={[styles.pillarCard, PILLAR_CARD_ACCENT[svc.category]].join(' ')}
+              >
+                <div className={styles.pillarCardTop}>
+                  <ServiceBadge category={svc.category} />
+                  <p className={styles.pillarTagline}>{svc.tagline}</p>
+                </div>
+                <h3 className={styles.pillarTitle}>{svc.title}</h3>
+                <p className={styles.pillarDesc}>{svc.description}</p>
+                <ul className={styles.pillarFeatures} role="list">
+                  {svc.items.map((item) => (
+                    <li key={item} className={styles.pillarFeatureItem}>
+                      <span className={styles.pillarCheck} aria-hidden="true">✓</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <div className={styles.pillarFooter}>
+                  <CTAButton href={svc.href} variant="outline" size="sm">
+                    {svc.ctaLabel}
+                  </CTAButton>
+                </div>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── 4: Selected Work ────────────────────────────────────────────────── */}
+      {/* ── 4: Selected Work ─────────────────────────────────────────────────── */}
       <section id="work" className={styles.portfolio} aria-labelledby="portfolio-heading">
         <div className={styles.container}>
           <SectionHeading
@@ -282,7 +347,10 @@ export default function MDAPage() {
                   />
                 </div>
                 <div className={styles.portfolioMeta}>
-                  <span className={styles.portfolioCat}>{item.category}</span>
+                  <div className={styles.portfolioMetaTop}>
+                    <span className={styles.portfolioCat}>{item.category}</span>
+                    <span className={styles.portfolioSample}>{item.label}</span>
+                  </div>
                   <h3 className={styles.portfolioTitle}>{item.title}</h3>
                   <p className={styles.portfolioDesc}>{item.desc}</p>
                 </div>
@@ -292,7 +360,7 @@ export default function MDAPage() {
         </div>
       </section>
 
-      {/* ── 5: Packages ─────────────────────────────────────────────────────── */}
+      {/* ── 5: Commercial Packages ───────────────────────────────────────────── */}
       <section id="packages" className={styles.packages} aria-labelledby="packages-heading">
         <div className={styles.container}>
           <SectionHeading
@@ -338,49 +406,43 @@ export default function MDAPage() {
             ))}
           </div>
 
-          {/* Restaurant website spotlight — approved poster */}
-          <div className={styles.posterSpotlight}>
-            <div className={styles.posterSpotlightContent}>
-              <p className={styles.posterSpotlightEyebrow}>Featured Offer</p>
-              <h2 className={styles.posterSpotlightHeading}>
-                Your Restaurant Website.
-                <br />
-                <span className={styles.posterSpotlightAccent}>AED 599.</span>
-              </h2>
-              <p className={styles.posterSpotlightDesc}>
-                A complete, professional restaurant website — fully designed, built, and launched.
+          {/* Featured Digital Example — compact and contextual */}
+          <div className={styles.featuredOffer}>
+            <div className={styles.featuredOfferContent}>
+              <p className={styles.featuredOfferEyebrow}>Digital · Example Output</p>
+              <h3 className={styles.featuredOfferHeading}>
+                Restaurant Website from{' '}
+                <span className={styles.featuredOfferAccent}>AED 599</span>
+              </h3>
+              <p className={styles.featuredOfferDesc}>
+                A complete professional restaurant website — fully designed, built, and launched.
                 Menu, gallery, reservations, location. Everything your guests need to find you and
                 come back.
               </p>
-              <div className={styles.posterSpotlightCtas}>
-                <CTAButton href="/start-project" variant="primary" size="md">
-                  GET STARTED →
-                </CTAButton>
-                <CTAButton href="/start-project" variant="outline" size="md">
-                  See What&apos;s Included
-                </CTAButton>
-              </div>
+              <CTAButton href="/start-project" variant="outline" size="sm">
+                Start Your Project →
+              </CTAButton>
             </div>
-            <div className={styles.posterSpotlightPoster}>
+            <div className={styles.featuredOfferPoster}>
               <Image
                 src="/mda/MDA_MASTER_POSTER_01_RESTAURANT_WEBSITE_AED599.jpg"
-                alt="MDA Restaurant Website package — AED 599 — professional website design for restaurants"
+                alt="MDA restaurant website — example of a Digital Starter package output at AED 599"
                 width={1024}
                 height={1536}
-                className={styles.posterSpotlightImg}
-                quality={85}
+                className={styles.featuredOfferImg}
+                quality={75}
               />
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── 6: Process ──────────────────────────────────────────────────────── */}
+      {/* ── 6: How We Work ──────────────────────────────────────────────────── */}
       <section className={styles.process} aria-labelledby="process-heading">
         <div className={styles.container}>
           <SectionHeading
             eyebrow="How We Work"
-            title="From brief to launch — a process you can trust."
+            title="From brief to delivery — a process you can trust."
           />
           <ol className={styles.processSteps} role="list">
             {PROCESS_STEPS.map((s) => (
@@ -413,6 +475,9 @@ export default function MDAPage() {
             <CTAButton href="/start-project" variant="primary" size="lg">
               START YOUR PROJECT →
             </CTAButton>
+            <p className={styles.ctaPillars}>
+              Digital · Creative · Media · Business Solutions
+            </p>
             <div className={styles.ctaEndorsement}>
               <EndorsementFooter showBrandName />
             </div>

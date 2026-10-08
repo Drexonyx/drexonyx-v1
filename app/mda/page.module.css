@@ -52,7 +52,7 @@
 }
 
 .mdaCatLink:hover {
-  color: var(--drex-accent);
+  color: var(--drex-text);
 }
 
 /* ── 2: Hero ────────────────────────────────────────────────────────────── */
@@ -71,7 +71,7 @@
   width: 580px;
   height: 580px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(200, 152, 10, 0.08) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(10, 132, 255, 0.07) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -83,7 +83,7 @@
   width: 480px;
   height: 480px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(29, 140, 248, 0.07) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(200, 152, 10, 0.06) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -92,20 +92,20 @@
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--drex-accent);
+  color: var(--drex-text-muted);
   margin-bottom: 1.25rem;
   position: relative;
 }
 
 .heroHeading {
-  font-size: clamp(2.5rem, 6vw, 5rem);
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-size: clamp(2.5rem, 7vw, 5.5rem);
+  font-weight: 900;
+  letter-spacing: -0.035em;
   line-height: 1.0;
   color: var(--drex-text);
-  max-width: 860px;
+  max-width: 900px;
   text-wrap: balance;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
   position: relative;
 }
 
@@ -113,19 +113,16 @@
   display: block;
 }
 
-.heroAccentGold {
-  color: var(--drex-accent);
-}
-
-.heroAccentBlue {
-  color: var(--mda-digital);
-}
+.heroLineDigital   { color: var(--mda-digital); }
+.heroLineCreative  { color: var(--drex-accent); }
+.heroLineMedia     { color: var(--mda-media); }
+.heroLineSolutions { color: var(--mda-solutions); }
 
 .heroSub {
   font-size: 1.125rem;
   color: var(--drex-text-secondary);
   line-height: 1.65;
-  max-width: 54ch;
+  max-width: 56ch;
   margin-bottom: 2.5rem;
   position: relative;
 }
@@ -143,24 +140,122 @@
   position: relative;
 }
 
-/* ── 3: Services ────────────────────────────────────────────────────────── */
-.services {
+/* ── 3: Four Service Pillars ────────────────────────────────────────────── */
+.pillars {
   padding: 5rem 0;
-  background: var(--drex-bg);
+  background: var(--drex-surface);
   border-top: 1px solid var(--drex-border);
 }
 
-.servicesGrid {
+.pillarsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1.25rem;
-  margin-top: 2.5rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+
+.pillarCard {
+  background: var(--drex-bg);
+  border: 1px solid var(--drex-border);
+  border-radius: var(--mda-radius-lg);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+  transition:
+    border-color var(--drex-duration) var(--drex-ease),
+    box-shadow var(--drex-duration) var(--drex-ease);
+}
+
+.pillarCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--_pillar-accent, var(--drex-accent));
+  border-radius: var(--mda-radius-lg) var(--mda-radius-lg) 0 0;
+}
+
+.pillarCard:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 6px 32px rgba(0, 0, 0, 0.5);
+}
+
+.pillarCardDigital   { --_pillar-accent: var(--mda-digital);   }
+.pillarCardCreative  { --_pillar-accent: var(--mda-creative);  }
+.pillarCardMedia     { --_pillar-accent: var(--mda-media);     }
+.pillarCardSolutions { --_pillar-accent: var(--mda-solutions); }
+
+.pillarCardTop {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pillarTagline {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--drex-text-muted);
+}
+
+.pillarTitle {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--drex-text);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.pillarDesc {
+  font-size: 0.9375rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.65;
+  flex: 1;
+}
+
+.pillarFeatures {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-top: 1px solid var(--drex-border);
+  padding-top: 1rem;
+}
+
+.pillarFeatureItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  font-size: 0.875rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.5;
+}
+
+.pillarCheck {
+  color: var(--_pillar-accent, var(--drex-accent));
+  font-size: 0.8125rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 0.1em;
+}
+
+.pillarFooter {
+  margin-top: auto;
+  padding-top: 0.5rem;
 }
 
 /* ── 4: Portfolio ───────────────────────────────────────────────────────── */
 .portfolio {
   padding: 5rem 0;
-  background: var(--drex-surface);
+  background: var(--drex-bg);
   border-top: 1px solid var(--drex-border);
 }
 
@@ -172,7 +267,7 @@
 }
 
 .portfolioCard {
-  background: var(--drex-bg);
+  background: var(--drex-surface);
   border: 1px solid var(--drex-border);
   border-radius: var(--mda-radius-lg);
   overflow: hidden;
@@ -209,12 +304,28 @@
   gap: 0.5rem;
 }
 
+.portfolioMetaTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .portfolioCat {
   font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--drex-accent);
+}
+
+.portfolioSample {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--drex-text-muted);
 }
 
 .portfolioTitle {
@@ -234,7 +345,7 @@
 /* ── 5: Packages ────────────────────────────────────────────────────────── */
 .packages {
   padding: 5rem 0;
-  background: var(--drex-bg);
+  background: var(--drex-surface);
   border-top: 1px solid var(--drex-border);
 }
 
@@ -247,7 +358,7 @@
 }
 
 .packageCard {
-  background: var(--drex-surface);
+  background: var(--drex-bg);
   border: 1px solid var(--drex-border);
   border-radius: var(--mda-radius-lg);
   padding: 1.75rem;
@@ -340,65 +451,60 @@
   margin-top: auto;
 }
 
-/* Poster spotlight — approved poster, restaurant offer */
-.posterSpotlight {
+/* Featured Digital Example — compact, contextual, clearly subordinate */
+.featuredOffer {
   display: grid;
-  grid-template-columns: 1fr 280px;
-  gap: 3rem;
+  grid-template-columns: 1fr 160px;
+  gap: 2.5rem;
   align-items: center;
-  margin-top: 4rem;
-  padding-top: 4rem;
-  border-top: 1px solid var(--drex-border);
+  margin-top: 2.5rem;
+  padding: 1.75rem 2rem;
+  background: var(--drex-bg);
+  border: 1px solid var(--drex-border);
+  border-radius: var(--mda-radius-lg);
 }
 
-.posterSpotlightContent {
+.featuredOfferContent {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 0.875rem;
 }
 
-.posterSpotlightEyebrow {
+.featuredOfferEyebrow {
   font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--drex-accent);
+  color: var(--mda-digital);
 }
 
-.posterSpotlightHeading {
-  font-size: clamp(2rem, 4.5vw, 3.25rem);
+.featuredOfferHeading {
+  font-size: clamp(1.25rem, 2.5vw, 1.625rem);
   font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
   color: var(--drex-text);
-  text-wrap: balance;
 }
 
-.posterSpotlightAccent {
+.featuredOfferAccent {
   color: var(--drex-accent);
 }
 
-.posterSpotlightDesc {
-  font-size: 1rem;
+.featuredOfferDesc {
+  font-size: 0.875rem;
   color: var(--drex-text-secondary);
-  line-height: 1.7;
-  max-width: 52ch;
+  line-height: 1.65;
+  max-width: none;
 }
 
-.posterSpotlightCtas {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.posterSpotlightPoster {
-  border-radius: var(--mda-radius-lg);
+.featuredOfferPoster {
+  border-radius: var(--mda-radius);
   overflow: hidden;
-  box-shadow: 0 8px 48px rgba(0, 0, 0, 0.5);
+  flex-shrink: 0;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
 }
 
-.posterSpotlightImg {
+.featuredOfferImg {
   display: block;
   width: 100%;
   height: auto;
@@ -407,7 +513,7 @@
 /* ── 6: Process ─────────────────────────────────────────────────────────── */
 .process {
   padding: 5rem 0;
-  background: var(--drex-surface);
+  background: var(--drex-bg);
   border-top: 1px solid var(--drex-border);
 }
 
@@ -431,10 +537,10 @@
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.03em;
-  color: var(--drex-accent);
+  color: var(--mda-digital);
   line-height: 1;
   flex-shrink: 0;
-  opacity: 0.55;
+  opacity: 0.5;
 }
 
 .processBody {
@@ -461,7 +567,7 @@
 /* ── 7: CTA ─────────────────────────────────────────────────────────────── */
 .cta {
   padding: 6rem 0;
-  background: var(--drex-bg);
+  background: var(--drex-surface);
   border-top: 1px solid var(--drex-border);
   text-align: center;
 }
@@ -475,8 +581,8 @@
 
 .ctaHeading {
   font-size: clamp(2rem, 5vw, 3.75rem);
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-weight: 900;
+  letter-spacing: -0.035em;
   line-height: 1.0;
   color: var(--drex-text);
   text-wrap: balance;
@@ -493,8 +599,15 @@
   max-width: 48ch;
 }
 
+.ctaPillars {
+  font-size: 0.8125rem;
+  color: var(--drex-text-muted);
+  letter-spacing: 0.08em;
+  max-width: none;
+}
+
 .ctaEndorsement {
-  margin-top: 0.5rem;
+  margin-top: 0.25rem;
 }
 
 /* ── 8: MDA Brand Footer ────────────────────────────────────────────────── */
@@ -540,6 +653,7 @@
   color: var(--drex-text-muted);
   border-top: 1px solid var(--drex-border);
   padding-top: 1.25rem;
+  max-width: none;
 }
 
 /* ── Responsive ─────────────────────────────────────────────────────────── */
@@ -550,7 +664,7 @@
 }
 
 @media (max-width: 768px) {
-  /* Header stays single row: hide category links, keep logo + CTA */
+  /* Header: hide category links, keep logo + CTA */
   .mdaCatList {
     display: none;
   }
@@ -559,17 +673,21 @@
     gap: 0;
   }
 
+  .pillarsGrid {
+    grid-template-columns: 1fr;
+  }
+
   .portfolioGrid {
     grid-template-columns: 1fr;
   }
 
-  .posterSpotlight {
+  .featuredOffer {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 
-  .posterSpotlightPoster {
-    max-width: 280px;
-    margin: 0 auto;
+  .featuredOfferPoster {
+    max-width: 140px;
   }
 
   .mdaFooterInner {
@@ -580,10 +698,14 @@
 
 @media (max-width: 480px) {
   .heroHeading {
-    font-size: clamp(2rem, 10vw, 3rem);
+    font-size: clamp(2rem, 11vw, 3rem);
   }
 
   .packagesGrid {
     grid-template-columns: 1fr;
+  }
+
+  .pillarCard {
+    padding: 1.5rem;
   }
 }
