@@ -8,9 +8,9 @@
   line-height: 1;
 }
 
-.mdaLogoSm { --_mono: 1.125rem; --_desc: 0.5rem;   --_end: 0.45rem; }
-.mdaLogoMd { --_mono: 1.5rem;   --_desc: 0.625rem;  --_end: 0.5rem;  }
-.mdaLogoLg { --_mono: 2.25rem;  --_desc: 0.75rem;   --_end: 0.5625rem; }
+.mdaLogoSm { --_mono: 1.125rem; --_desc: 0.5rem;    --_end: 0.45rem;   --_asset-h: 20px; }
+.mdaLogoMd { --_mono: 1.5rem;   --_desc: 0.625rem;  --_end: 0.5rem;    --_asset-h: 28px; }
+.mdaLogoLg { --_mono: 2.25rem;  --_desc: 0.75rem;   --_end: 0.5625rem; --_asset-h: 44px; }
 
 .mdaLogoMark {
   display: flex;
@@ -35,6 +35,15 @@
   color: var(--drex-text-secondary);
   display: block;
   line-height: 1.3;
+}
+
+/* Asset slot — sized by size-class variable; replaces text mark when assetSrc is set */
+.mdaLogoAsset {
+  display: block;
+  height: var(--_asset-h, 28px);
+  width: auto;
+  max-width: 200px;
+  object-fit: contain;
 }
 
 .mdaLogoEndorsement {
