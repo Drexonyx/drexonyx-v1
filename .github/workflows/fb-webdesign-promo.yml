@@ -23,7 +23,7 @@ jobs:
           ref: claude/drexonyx-v1-baseline-inspection-fb76lg
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '20'
 
