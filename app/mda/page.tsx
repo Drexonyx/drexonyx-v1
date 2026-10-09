@@ -234,7 +234,7 @@ export default function MDAPage() {
       <section className={styles.mdaHeader} aria-label="MDA brand identity">
         <div className={styles.container}>
           <div className={styles.mdaHeaderInner}>
-            <MDALogo size="lg" showEndorsement assetSrc="/mda/mda-logo.svg" />
+            <MDALogo size="lg" assetSrc="/mda/mda-logo.png" />
             <nav className={styles.mdaCatNav} aria-label="MDA service categories">
               <ul className={styles.mdaCatList} role="list">
                 {MDA_NAV_CATS.map((cat) => (
@@ -489,7 +489,7 @@ export default function MDAPage() {
       <footer className={styles.mdaFooter} aria-label="MDA brand footer">
         <div className={styles.container}>
           <div className={styles.mdaFooterInner}>
-            <MDALogo size="sm" showEndorsement assetSrc="/mda/mda-logo.svg" />
+            <MDALogo size="sm" assetSrc="/mda/mda-logo.png" />
             <nav className={styles.mdaFooterNav} aria-label="MDA footer navigation">
               <ul className={styles.mdaFooterLinks} role="list">
                 <li>
