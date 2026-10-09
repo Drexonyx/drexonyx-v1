@@ -141,32 +141,37 @@ describe("About page", () => {
 });
 
 describe("Start Project page", () => {
-  it("renders an h1 heading", () => {
-    render(<StartCampaignPage />);
+  it("renders an h1 heading", async () => {
+    render(await StartCampaignPage({ searchParams: Promise.resolve({}) }));
     expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
   });
 
-  it("renders the intake form", () => {
-    render(<StartCampaignPage />);
-    expect(screen.getByRole("form", { name: /campaign brief intake form/i })).toBeInTheDocument();
+  it("renders the project brief form", async () => {
+    render(await StartCampaignPage({ searchParams: Promise.resolve({}) }));
+    expect(screen.getByRole("form", { name: /project brief form/i })).toBeInTheDocument();
   });
 
-  it("continue button is enabled on step 1", () => {
-    render(<StartCampaignPage />);
-    expect(screen.getByRole("button", { name: /continue/i })).not.toBeDisabled();
+  it("renders service category selection cards on default path", async () => {
+    render(await StartCampaignPage({ searchParams: Promise.resolve({}) }));
+    expect(screen.getByText("Digital Services")).toBeInTheDocument();
+    expect(screen.getByText("Creative Services")).toBeInTheDocument();
+    expect(screen.getByText("Media & Video Production")).toBeInTheDocument();
   });
 
-  it("renders platform options as enabled checkboxes", () => {
-    render(<StartCampaignPage />);
-    const checkboxes = screen.getAllByRole("checkbox");
-    expect(checkboxes.length).toBeGreaterThan(0);
-    checkboxes.forEach((cb) => expect(cb).not.toBeDisabled());
+  it("renders campaign brief form when type=campaign", async () => {
+    render(
+      await StartCampaignPage({ searchParams: Promise.resolve({ type: "campaign" }) }),
+    );
+    expect(
+      screen.getByRole("form", { name: /campaign brief intake form/i }),
+    ).toBeInTheDocument();
   });
 
-  it("renders creative type options on step 1", () => {
-    render(<StartCampaignPage />);
+  it("renders UGC Video Ads option in campaign brief", async () => {
+    render(
+      await StartCampaignPage({ searchParams: Promise.resolve({ type: "campaign" }) }),
+    );
     expect(screen.getByText("UGC Video Ads")).toBeInTheDocument();
-    expect(screen.getByText("Static Ad Creative")).toBeInTheDocument();
   });
 });
 

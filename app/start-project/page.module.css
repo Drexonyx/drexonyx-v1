@@ -435,6 +435,95 @@
   line-height: 1.6;
 }
 
+/* ── Service selection cards ───────────────────────────────────────────── */
+.serviceGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.serviceCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1rem 1.25rem;
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color var(--drex-duration) var(--drex-ease),
+    background var(--drex-duration) var(--drex-ease);
+}
+
+.serviceCard:hover {
+  border-color: var(--drex-accent);
+  background: var(--drex-accent-subtle);
+}
+
+.serviceCardSelected {
+  border-color: var(--drex-accent);
+  background: var(--drex-accent-subtle);
+}
+
+.serviceCardFull {
+  grid-column: 1 / -1;
+}
+
+.serviceCardLabel {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--drex-text);
+  pointer-events: none;
+}
+
+.serviceCardTagline {
+  font-size: 0.8125rem;
+  color: var(--drex-text-muted);
+  pointer-events: none;
+}
+
+/* ── Sub-option chips ──────────────────────────────────────────────────── */
+.subOptionGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+}
+
+.subOptionChip {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--drex-text-secondary);
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: 100px;
+  cursor: pointer;
+  transition:
+    border-color var(--drex-duration) var(--drex-ease),
+    color var(--drex-duration) var(--drex-ease),
+    background var(--drex-duration) var(--drex-ease);
+}
+
+.subOptionChip:hover {
+  border-color: var(--drex-accent);
+  color: var(--drex-text);
+}
+
+.subOptionChipSelected {
+  border-color: var(--drex-accent);
+  color: var(--drex-text);
+  background: var(--drex-accent-subtle);
+}
+
+.stepSubtext {
+  font-size: 0.875rem;
+  color: var(--drex-text-muted);
+  margin-top: -1rem;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────── */
 @media (max-width: 900px) {
   .formLayout {
     grid-template-columns: 1fr;
@@ -443,5 +532,15 @@
 
   .sidebar {
     position: static;
+  }
+}
+
+@media (max-width: 600px) {
+  .serviceGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .serviceCardFull {
+    grid-column: 1;
   }
 }

@@ -62,7 +62,7 @@ const SERVICES: {
       'AI Systems & Automation',
       'Digital Workflows',
     ],
-    href: '/start-project',
+    href: '/start-project?service=digital',
     ctaLabel: 'Start Digital →',
   },
   {
@@ -77,7 +77,7 @@ const SERVICES: {
       'Presentations & Catalogues',
       'Marketing & Social Media Design',
     ],
-    href: '/start-project',
+    href: '/start-project?service=creative',
     ctaLabel: 'Start Creative →',
   },
   {
@@ -92,8 +92,8 @@ const SERVICES: {
       'Social Media Content',
       'Editing & Post-Production',
     ],
-    href: '/start-project',
-    ctaLabel: 'Start Media →',
+    href: '/start-project?type=campaign',
+    ctaLabel: 'Start Campaign →',
   },
   {
     category: 'Business Solutions',
@@ -107,7 +107,7 @@ const SERVICES: {
       'Online Business Platforms',
       'Commercial Solutions',
     ],
-    href: '/start-project',
+    href: '/start-project?service=solutions',
     ctaLabel: 'Get Started →',
   },
 ];
