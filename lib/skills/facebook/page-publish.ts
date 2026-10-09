@@ -120,6 +120,93 @@ async function callGraphApi(
   };
 }
 
+// Token normalization (DR 0126 §token-resolution):
+// META_PAGE_ACCESS_TOKEN may be either a User Access Token or a Page Access Token.
+// - Page token: /me resolves to the target pageId → use directly.
+// - User token: /me resolves to a different ID → derive Page token via /me/accounts.
+// The resolved token is never stored, logged, or returned in any response.
+type TokenResolution =
+  | { ok: true; token: string }
+  | { ok: false; reason: FacebookPublishFailReason; msg: string; isTransient: boolean };
+
+async function resolvePageToken(credential: string, pageId: string): Promise<TokenResolution> {
+  // Step 1: determine whether the credential is already a Page token for this page.
+  let meRes: Response;
+  try {
+    meRes = await fetch(`${GRAPH_API_BASE}/me?fields=id`, {
+      headers: { 'Authorization': `Bearer ${credential}` },
+    });
+  } catch (e) {
+    return { ok: false, reason: 'GRAPH_API_ERROR', msg: e instanceof Error ? e.message : 'Network error', isTransient: true };
+  }
+
+  let meJson: Record<string, unknown>;
+  try {
+    meJson = await meRes.json() as Record<string, unknown>;
+  } catch {
+    return { ok: false, reason: 'GRAPH_API_ERROR', msg: `token-check: HTTP ${meRes.status} (non-JSON)`, isTransient: meRes.status >= 500 };
+  }
+
+  if (!meRes.ok) {
+    const err = meJson.error as Record<string, unknown> | undefined;
+    return {
+      ok: false,
+      reason: 'GRAPH_API_ERROR',
+      msg: typeof err?.message === 'string' ? `token-check: ${err.message}` : `token-check: HTTP ${meRes.status}`,
+      isTransient: meRes.status >= 500,
+    };
+  }
+
+  // Credential is already a Page token for the target page — use it directly.
+  if (typeof meJson.id === 'string' && meJson.id === pageId) {
+    return { ok: true, token: credential };
+  }
+
+  // Credential is a User token — exchange it for the Page token via /me/accounts.
+  let accountsRes: Response;
+  try {
+    accountsRes = await fetch(`${GRAPH_API_BASE}/me/accounts?fields=id,access_token`, {
+      headers: { 'Authorization': `Bearer ${credential}` },
+    });
+  } catch (e) {
+    return { ok: false, reason: 'GRAPH_API_ERROR', msg: e instanceof Error ? e.message : 'Network error', isTransient: true };
+  }
+
+  let accountsJson: Record<string, unknown>;
+  try {
+    accountsJson = await accountsRes.json() as Record<string, unknown>;
+  } catch {
+    return { ok: false, reason: 'GRAPH_API_ERROR', msg: `accounts: HTTP ${accountsRes.status} (non-JSON)`, isTransient: accountsRes.status >= 500 };
+  }
+
+  if (!accountsRes.ok) {
+    const err = accountsJson.error as Record<string, unknown> | undefined;
+    return {
+      ok: false,
+      reason: 'GRAPH_API_ERROR',
+      msg: typeof err?.message === 'string' ? `accounts: ${err.message}` : `accounts: HTTP ${accountsRes.status}`,
+      isTransient: accountsRes.status >= 500,
+    };
+  }
+
+  const pages = accountsJson.data as Array<Record<string, unknown>> | undefined;
+  if (!Array.isArray(pages)) {
+    return { ok: false, reason: 'GRAPH_API_ERROR', msg: 'accounts: response missing data array', isTransient: false };
+  }
+
+  const match = pages.find(p => typeof p.id === 'string' && p.id === pageId);
+  if (!match) {
+    return { ok: false, reason: 'UNAUTHORIZED_PAGE', msg: 'Page not found in accounts — verify admin role for the configured page', isTransient: false };
+  }
+
+  const pageToken = match.access_token;
+  if (typeof pageToken !== 'string' || !pageToken) {
+    return { ok: false, reason: 'MISSING_CREDENTIAL', msg: 'accounts: target page entry has no access_token', isTransient: false };
+  }
+
+  return { ok: true, token: pageToken };
+}
+
 export const facebookPagePublishSkill: Skill<FacebookPagePublishInput, FacebookPagePublishOutput> = {
   id: 'facebook.page.publish',
   version: '1.0.0',
@@ -136,8 +223,8 @@ export const facebookPagePublishSkill: Skill<FacebookPagePublishInput, FacebookP
     });
 
     // 1. Credential check
-    const token = process.env.META_PAGE_ACCESS_TOKEN?.trim();
-    if (!token) {
+    const credential = process.env.META_PAGE_ACCESS_TOKEN?.trim();
+    if (!credential) {
       return fail('MISSING_CREDENTIAL', 'META_PAGE_ACCESS_TOKEN is not set');
     }
 
@@ -191,6 +278,15 @@ export const facebookPagePublishSkill: Skill<FacebookPagePublishInput, FacebookP
       scheduledPublishTime = Math.floor(ts / 1000);
     }
 
+    // 4.5. Resolve credential to an effective Page Access Token (DR 0126 §token-resolution).
+    // Handles User tokens (derives via /me/accounts) and Page tokens (uses directly).
+    // The effective token is never stored, logged, or returned in any response.
+    const tokenResolution = await resolvePageToken(credential, pageId);
+    if (!tokenResolution.ok) {
+      return fail(tokenResolution.reason, tokenResolution.msg, tokenResolution.isTransient);
+    }
+    const effectiveToken = tokenResolution.token;
+
     // 5. Build Graph API request — organic feed post only (DR 0126)
     const published = input.publishMode === 'IMMEDIATE';
     const scheduleParams = scheduledPublishTime !== undefined
@@ -216,7 +312,7 @@ export const facebookPagePublishSkill: Skill<FacebookPagePublishInput, FacebookP
     }
 
     // 6. Call Graph API
-    const apiResult = await callGraphApi(endpoint!, token, body!);
+    const apiResult = await callGraphApi(endpoint!, effectiveToken, body!);
     if (!apiResult.ok) {
       const codeTag = apiResult.errorCode > 0 ? `:${apiResult.errorCode}` : '';
       return {

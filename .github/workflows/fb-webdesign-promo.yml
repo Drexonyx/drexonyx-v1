@@ -1,0 +1,41 @@
+name: Facebook Webdesign Promo Carousel
+
+# One-shot: fires at 15:00 UTC on 2 Oct 2026 = 19:00 Dubai (UTC+4).
+# Checks out the campaign feature branch so images and scripts are available.
+# workflow_dispatch kept for manual re-runs.
+on:
+  schedule:
+    - cron: '0 15 2 10 *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  post-carousel:
+    name: Post Webdesign Promo Carousel
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout campaign branch
+        uses: actions/checkout@v4
+        with:
+          ref: claude/drexonyx-v1-baseline-inspection-fb76lg
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validate Meta credential
+        env:
+          META_PAGE_ACCESS_TOKEN: ${{ secrets.META_PAGE_ACCESS_TOKEN }}
+          META_PAGE_ID_1: ${{ secrets.META_PAGE_ID_1 }}
+        run: node scripts/fb-publish.mjs --validate
+
+      - name: Publish carousel
+        env:
+          META_PAGE_ACCESS_TOKEN: ${{ secrets.META_PAGE_ACCESS_TOKEN }}
+          META_PAGE_ID_1: ${{ secrets.META_PAGE_ID_1 }}
+          CAROUSEL_IMAGES: '["assets/facebook/posts/webdesign-carousel/slide-1.png","assets/facebook/posts/webdesign-carousel/slide-2.png","assets/facebook/posts/webdesign-carousel/slide-3.png","assets/facebook/posts/webdesign-carousel/slide-4.png","assets/facebook/posts/webdesign-carousel/slide-5.png"]'
+        run: node scripts/fb-publish.mjs --carousel-post "$(cat assets/facebook/posts/webdesign-carousel/caption.txt)"

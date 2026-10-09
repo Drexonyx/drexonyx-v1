@@ -36,10 +36,27 @@ beforeEach(() => {
   vi.stubEnv('META_PAGE_ID_2', PAGE_ID_2);
   vi.stubEnv('R2_ACCOUNT_ID', R2_ACCOUNT_ID);
   vi.stubGlobal('fetch', mockFetch);
-  mockFetch.mockResolvedValue({
-    ok: true,
-    status: 200,
-    json: async () => ({ id: 'post-789' }),
+  // Default mock: /me → { id: PAGE_ID_1 } (simulates Page token for PAGE_1),
+  //               /me/accounts → both pages (for PAGE_2 path),
+  //               anything else → Graph API success { id: 'post-789' }.
+  mockFetch.mockImplementation((url: string) => {
+    const u = typeof url === 'string' ? url : '';
+    if (u.includes('/me/accounts')) {
+      return Promise.resolve({
+        ok: true,
+        status: 200,
+        json: async () => ({
+          data: [
+            { id: PAGE_ID_1, access_token: 'test-token-abc' },
+            { id: PAGE_ID_2, access_token: 'test-token-abc' },
+          ],
+        }),
+      });
+    }
+    if (u.includes('/me')) {
+      return Promise.resolve({ ok: true, status: 200, json: async () => ({ id: PAGE_ID_1 }) });
+    }
+    return Promise.resolve({ ok: true, status: 200, json: async () => ({ id: 'post-789' }) });
   });
 });
 
@@ -124,25 +141,25 @@ describe('facebook.page.publish — TEXT immediate', () => {
 
   it('calls /{pageId}/feed endpoint', async () => {
     await facebookPagePublishSkill.execute(BASE_TEXT, CTX);
-    const url = mockFetch.mock.calls[0][0] as string;
+    const url = mockFetch.mock.calls[1][0] as string;
     expect(url).toContain(`/${PAGE_ID_1}/feed`);
   });
 
   it('sets published:true for IMMEDIATE mode', async () => {
     await facebookPagePublishSkill.execute(BASE_TEXT, CTX);
-    const body = JSON.parse(mockFetch.mock.calls[0][1].body as string);
+    const body = JSON.parse(mockFetch.mock.calls[1][1].body as string);
     expect(body.published).toBe(true);
   });
 
   it('does NOT log or include token in request body', async () => {
     await facebookPagePublishSkill.execute(BASE_TEXT, CTX);
-    const body = JSON.parse(mockFetch.mock.calls[0][1].body as string);
+    const body = JSON.parse(mockFetch.mock.calls[1][1].body as string);
     expect(JSON.stringify(body)).not.toContain('test-token-abc');
   });
 
   it('sends token in Authorization header, not in body', async () => {
     await facebookPagePublishSkill.execute(BASE_TEXT, CTX);
-    const headers = mockFetch.mock.calls[0][1].headers as Record<string, string>;
+    const headers = mockFetch.mock.calls[1][1].headers as Record<string, string>;
     expect(headers['Authorization']).toBe('Bearer test-token-abc');
   });
 });
@@ -163,13 +180,13 @@ describe('facebook.page.publish — IMAGE', () => {
 
   it('calls /{pageId}/photos endpoint', async () => {
     await facebookPagePublishSkill.execute(imageInput, CTX);
-    const url = mockFetch.mock.calls[0][0] as string;
+    const url = mockFetch.mock.calls[1][0] as string;
     expect(url).toContain(`/${PAGE_ID_1}/photos`);
   });
 
   it('passes url and caption in body', async () => {
     await facebookPagePublishSkill.execute(imageInput, CTX);
-    const body = JSON.parse(mockFetch.mock.calls[0][1].body as string);
+    const body = JSON.parse(mockFetch.mock.calls[1][1].body as string);
     expect(body.url).toBe(MEDIA_URL);
     expect(body.caption).toBe(imageInput.message);
   });
@@ -230,13 +247,13 @@ describe('facebook.page.publish — VIDEO', () => {
 
   it('calls /{pageId}/videos endpoint', async () => {
     await facebookPagePublishSkill.execute(videoInput, CTX);
-    const url = mockFetch.mock.calls[0][0] as string;
+    const url = mockFetch.mock.calls[1][0] as string;
     expect(url).toContain(`/${PAGE_ID_1}/videos`);
   });
 
   it('passes file_url and description in body', async () => {
     await facebookPagePublishSkill.execute(videoInput, CTX);
-    const body = JSON.parse(mockFetch.mock.calls[0][1].body as string);
+    const body = JSON.parse(mockFetch.mock.calls[1][1].body as string);
     expect(body.file_url).toBe(videoInput.mediaUrl);
     expect(body.description).toBe(videoInput.message);
   });
@@ -264,7 +281,7 @@ describe('facebook.page.publish — SCHEDULED mode', () => {
       { ...BASE_TEXT, publishMode: 'SCHEDULED', scheduledAt: futureTs },
       CTX,
     );
-    const body = JSON.parse(mockFetch.mock.calls[0][1].body as string);
+    const body = JSON.parse(mockFetch.mock.calls[1][1].body as string);
     expect(body.published).toBe(false);
     expect(typeof body.scheduled_publish_time).toBe('number');
   });
@@ -390,5 +407,97 @@ describe('facebook.page.publish — output shape', () => {
     const result = await facebookPagePublishSkill.execute(BASE_TEXT, CTX);
     expect(result.ok).toBe(true);
     if (result.ok) expect(result.output.scheduledAt).toBeUndefined();
+  });
+});
+
+// ─── Token normalization (DR 0126 §token-resolution) ──────────────────────────
+
+describe('facebook.page.publish — token normalization', () => {
+  it('uses credential directly when /me resolves to the target page (Page token)', async () => {
+    // Default mock: /me returns { id: PAGE_ID_1 } — credential is already a Page token.
+    await facebookPagePublishSkill.execute(BASE_TEXT, CTX);
+    // calls[0] = /me check, calls[1] = publish — exactly 2 total.
+    expect(mockFetch.mock.calls).toHaveLength(2);
+    expect((mockFetch.mock.calls[0][0] as string)).toContain('/me');
+    expect((mockFetch.mock.calls[1][0] as string)).toContain(`/${PAGE_ID_1}/feed`);
+  });
+
+  it('derives Page token from User token via /me/accounts', async () => {
+    const DERIVED_TOKEN = 'derived-page-token-xyz';
+    // Override: /me returns a User ID (not a page ID), /me/accounts returns the pages list.
+    mockFetch.mockImplementation((url: string) => {
+      const u = typeof url === 'string' ? url : '';
+      if (u.includes('/me/accounts')) {
+        return Promise.resolve({
+          ok: true, status: 200,
+          json: async () => ({ data: [{ id: PAGE_ID_1, access_token: DERIVED_TOKEN }] }),
+        });
+      }
+      if (u.includes('/me')) {
+        return Promise.resolve({ ok: true, status: 200, json: async () => ({ id: 'user-id-9999' }) });
+      }
+      return Promise.resolve({ ok: true, status: 200, json: async () => ({ id: 'post-789' }) });
+    });
+    const result = await facebookPagePublishSkill.execute(BASE_TEXT, CTX);
+    expect(result.ok).toBe(true);
+    // calls: /me → /me/accounts → publish (3 total)
+    expect(mockFetch.mock.calls).toHaveLength(3);
+    const publishHeaders = mockFetch.mock.calls[2][1].headers as Record<string, string>;
+    expect(publishHeaders['Authorization']).toBe(`Bearer ${DERIVED_TOKEN}`);
+  });
+
+  it('derived Page token is never exposed in output', async () => {
+    const DERIVED_TOKEN = 'derived-page-token-xyz';
+    mockFetch.mockImplementation((url: string) => {
+      const u = typeof url === 'string' ? url : '';
+      if (u.includes('/me/accounts')) {
+        return Promise.resolve({
+          ok: true, status: 200,
+          json: async () => ({ data: [{ id: PAGE_ID_1, access_token: DERIVED_TOKEN }] }),
+        });
+      }
+      if (u.includes('/me')) {
+        return Promise.resolve({ ok: true, status: 200, json: async () => ({ id: 'user-id-9999' }) });
+      }
+      return Promise.resolve({ ok: true, status: 200, json: async () => ({ id: 'post-789' }) });
+    });
+    const result = await facebookPagePublishSkill.execute(BASE_TEXT, CTX);
+    expect(result.ok).toBe(true);
+    expect(JSON.stringify(result)).not.toContain(DERIVED_TOKEN);
+  });
+
+  it('fails UNAUTHORIZED_PAGE when page not found in /me/accounts', async () => {
+    mockFetch.mockImplementation((url: string) => {
+      const u = typeof url === 'string' ? url : '';
+      if (u.includes('/me/accounts')) {
+        return Promise.resolve({ ok: true, status: 200, json: async () => ({ data: [] }) });
+      }
+      if (u.includes('/me')) {
+        return Promise.resolve({ ok: true, status: 200, json: async () => ({ id: 'user-id-9999' }) });
+      }
+      return Promise.resolve({ ok: true, status: 200, json: async () => ({ id: 'post-789' }) });
+    });
+    const result = await facebookPagePublishSkill.execute(BASE_TEXT, CTX);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toContain('UNAUTHORIZED_PAGE');
+  });
+
+  it('fails GRAPH_API_ERROR when token validation call fails', async () => {
+    mockFetch.mockImplementation((url: string) => {
+      const u = typeof url === 'string' ? url : '';
+      if (u.includes('/me')) {
+        return Promise.resolve({
+          ok: false, status: 401,
+          json: async () => ({ error: { code: 190, message: 'Invalid OAuth access token' } }),
+        });
+      }
+      return Promise.resolve({ ok: true, status: 200, json: async () => ({ id: 'post-789' }) });
+    });
+    const result = await facebookPagePublishSkill.execute(BASE_TEXT, CTX);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).toContain('GRAPH_API_ERROR');
+      expect(result.isTransient).toBe(false);
+    }
   });
 });
