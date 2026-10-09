@@ -119,24 +119,37 @@ const PILLAR_CARD_ACCENT: Record<ServiceCategory, string> = {
   'Business Solutions': styles.pillarCardSolutions,
 };
 
-const PORTFOLIO_ITEMS = [
+type PortfolioItem = {
+  category: ServiceCategory;
+  label: string;
+  title: string;
+  desc: string;
+  src: string;
+  width: number;
+  height: number;
+  imgPos?: string;
+};
+
+const PORTFOLIO_ITEMS: PortfolioItem[] = [
   {
     category: 'Media' as ServiceCategory,
     label: 'MDA INTERNAL PRODUCTION SAMPLE',
     title: 'UGC Demo Reel',
     desc: 'Short-form video content for social media — produced, directed, and delivered for launch.',
-    src: '/portfolio/ugc-demo-reel-thumb.svg',
-    width: 1600,
-    height: 900,
+    src: '/portfolio/ugc-demo-reel.jpg',
+    width: 1122,
+    height: 1402,
+    imgPos: 'center center',
   },
   {
     category: 'Digital' as ServiceCategory,
     label: 'MDA INTERNAL PRODUCTION SAMPLE',
     title: 'E-Commerce Launch',
     desc: 'Full digital build — storefront, product pages, checkout, and performance optimisation.',
-    src: '/portfolio/ugc-ecommerce-launch-thumb.svg',
-    width: 1600,
-    height: 900,
+    src: '/portfolio/ecommerce-launch.jpg',
+    width: 1122,
+    height: 1402,
+    imgPos: 'top center',
   },
   {
     category: 'Creative' as ServiceCategory,
@@ -345,6 +358,7 @@ export default function MDAPage() {
                     width={item.width}
                     height={item.height}
                     className={styles.portfolioImg}
+                    style={item.imgPos ? { objectPosition: item.imgPos } : undefined}
                   />
                 </div>
                 <div className={styles.portfolioMeta}>
