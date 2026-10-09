@@ -157,9 +157,8 @@ const PORTFOLIO_ITEMS: PortfolioItem[] = [
     title: 'Product Feature Ad',
     desc: 'Static feed creative for paid social — designed for scroll-stopping visibility and conversion.',
     src: '/portfolio/product-feature-ad.jpg',
-    width: 1207,
-    height: 1303,
-    imgPos: 'center 30%',
+    width: 1672,
+    height: 941,
   },
   {
     category: 'Business Solutions' as ServiceCategory,
