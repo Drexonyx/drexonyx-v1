@@ -414,11 +414,11 @@ export default function MDAPage() {
               label="Starter — 5 example sites"
               gridClass={styles.examplesGrid5}
               examples={[
-                { src: '/mda/examples/restaurant-599.png', alt: 'Restaurant website example' },
-                { src: '/mda/examples/gym-599.png', alt: 'Gym website example' },
-                { src: '/mda/examples/cleaning-599.png', alt: 'Cleaning company website example' },
-                { src: '/mda/examples/cars-599.png', alt: 'Car dealership website example' },
-                { src: '/mda/examples/pool-599.png', alt: 'Pool services website example' },
+                { src: '/mda/examples/restaurant-599.jpg', alt: 'Restaurant website example' },
+                { src: '/mda/examples/gym-599.jpg', alt: 'Gym website example' },
+                { src: '/mda/examples/cleaning-599.jpg', alt: 'Cleaning company website example' },
+                { src: '/mda/examples/cars-599.jpg', alt: 'Car dealership website example' },
+                { src: '/mda/examples/pool-599.jpg', alt: 'Pool services website example' },
               ]}
             />
 
@@ -427,9 +427,9 @@ export default function MDAPage() {
               label="Professional — 3 example sites"
               gridClass={styles.examplesGrid3}
               examples={[
-                { src: '/mda/examples/dental-899.png', alt: 'Dental clinic website example' },
-                { src: '/mda/examples/realestate-899.png', alt: 'Real estate website example' },
-                { src: '/mda/examples/hotel-899.png', alt: 'Boutique hotel website example' },
+                { src: '/mda/examples/dental-899.jpg', alt: 'Dental clinic website example' },
+                { src: '/mda/examples/realestate-899.jpg', alt: 'Real estate website example' },
+                { src: '/mda/examples/hotel-899.jpg', alt: 'Boutique hotel website example' },
               ]}
             />
 
@@ -440,7 +440,7 @@ export default function MDAPage() {
               cardClass={styles.exampleCardFeatured}
               priority
               examples={[
-                { src: '/mda/examples/tech-1899.png', alt: 'Premium SaaS / tech company website example' },
+                { src: '/mda/examples/tech-1899.jpg', alt: 'Premium SaaS / tech company website example' },
               ]}
             />
 
