@@ -62,7 +62,7 @@ const SERVICES: {
       'AI Systems & Automation',
       'Digital Workflows',
     ],
-    href: '/start-project',
+    href: '/start-project?service=digital',
     ctaLabel: 'Start Digital →',
   },
   {
@@ -77,7 +77,7 @@ const SERVICES: {
       'Presentations & Catalogues',
       'Marketing & Social Media Design',
     ],
-    href: '/start-project',
+    href: '/start-project?service=creative',
     ctaLabel: 'Start Creative →',
   },
   {
@@ -92,8 +92,8 @@ const SERVICES: {
       'Social Media Content',
       'Editing & Post-Production',
     ],
-    href: '/start-project',
-    ctaLabel: 'Start Media →',
+    href: '/start-project?type=campaign',
+    ctaLabel: 'Start Campaign →',
   },
   {
     category: 'Business Solutions',
@@ -107,7 +107,7 @@ const SERVICES: {
       'Online Business Platforms',
       'Commercial Solutions',
     ],
-    href: '/start-project',
+    href: '/start-project?service=solutions',
     ctaLabel: 'Get Started →',
   },
 ];
@@ -157,9 +157,8 @@ const PORTFOLIO_ITEMS: PortfolioItem[] = [
     title: 'Product Feature Ad',
     desc: 'Static feed creative for paid social — designed for scroll-stopping visibility and conversion.',
     src: '/portfolio/product-feature-ad.jpg',
-    width: 1207,
-    height: 1303,
-    imgPos: 'center 30%',
+    width: 1672,
+    height: 941,
   },
   {
     category: 'Business Solutions' as ServiceCategory,
