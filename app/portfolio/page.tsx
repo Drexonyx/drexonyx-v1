@@ -30,6 +30,14 @@ export default function PortfolioPage() {
         </div>
         <div className="container">
           <div className={styles.heroContent}>
+            <Image
+              src="/brand/drexonyx-logo.png"
+              alt="DREXONYX"
+              width={1866}
+              height={736}
+              className={styles.heroLogo}
+              priority
+            />
             <div className={styles.heroBadge}>Dubai · Portfolio</div>
             <h1 id="portfolio-hero-heading" className={styles.heroHeading}>
               Performance <span className={styles.heroAccent}>Creative Work</span>

@@ -33,7 +33,12 @@ export type IntentType =
   | 'COORDINATE_WEBSITE_PRODUCTION' // DR 0121
   | 'AUDIT_WEBSITE_CONTENT' // DR 0122
   | 'COORDINATE_MARKETING_CAMPAIGN' // DR 0124
-  | 'ROUTE_WHATSAPP_INQUIRY'; // DR 0125
+  | 'ROUTE_WHATSAPP_INQUIRY' // DR 0125
+  // DR 0128: Sales Operating System intents (TypeScript-only; DB migration deferred)
+  | 'DISCOVER_SALES_LEAD'
+  | 'QUALIFY_SALES_LEAD'
+  | 'DRAFT_SALES_OUTREACH'
+  | 'SCHEDULE_SALES_FOLLOWUP';
 
 export type ApprovalStatus =
   | 'PENDING'

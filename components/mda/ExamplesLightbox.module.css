@@ -1,0 +1,140 @@
+/* ExamplesLightbox */
+
+.tier {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tierHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.tierBadge {
+  display: inline-block;
+  background: var(--drex-accent);
+  color: var(--drex-bg);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+}
+
+.tierLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--drex-text-muted);
+}
+
+/* Clickable card */
+.card {
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--drex-border);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+  background: none;
+  padding: 0;
+  cursor: zoom-in;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  display: block;
+  width: 100%;
+}
+
+.card:hover {
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.45);
+  transform: translateY(-2px);
+}
+
+.card:hover .zoomHint {
+  opacity: 1;
+}
+
+.cardImg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.zoomHint {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  border-radius: 4px;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+/* Lightbox */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  cursor: zoom-out;
+  animation: fadeIn 0.18s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0 }
+  to   { opacity: 1 }
+}
+
+.closeBtn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(255,255,255,0.12);
+  border: none;
+  color: #fff;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  z-index: 1;
+}
+
+.closeBtn:hover {
+  background: rgba(255,255,255,0.22);
+}
+
+.lightboxImg {
+  max-width: min(1100px, 95vw);
+  width: 100%;
+  cursor: default;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+  animation: scaleIn 0.18s ease;
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.93); opacity: 0 }
+  to   { transform: scale(1);    opacity: 1 }
+}
+
+.fullImg {
+  display: block;
+  width: 100%;
+  height: auto;
+}

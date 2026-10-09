@@ -1,0 +1,336 @@
+<title>UAE Manpower Suppliers Database</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#0a0a0f;--bg2:#111118;--bg3:#1a1a24;--border:#2a2a3a;
+  --fg:#e8e8f0;--fg2:#a0a0b8;--fg3:#606078;
+  --accent:#ff5a1f;--accent2:#ff7a45;
+  --high:#22c55e;--good:#3b82f6;--medium:#f59e0b;--low:#6b7280;
+  --verified:#22c55e;--partial:#f59e0b;--unverified:#6b7280;
+  --yes:#22c55e;--partial-cap:#f59e0b;--no:#ef4444;
+  color-scheme:dark;
+}
+@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  --bg:#f4f4f8;--bg2:#ffffff;--bg3:#e8e8f0;--border:#d0d0e0;
+  --fg:#1a1a2e;--fg2:#444460;--fg3:#888899;
+  color-scheme:light;
+}}
+:root[data-theme="light"]{
+  --bg:#f4f4f8;--bg2:#ffffff;--bg3:#e8e8f0;--border:#d0d0e0;
+  --fg:#1a1a2e;--fg2:#444460;--fg3:#888899;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{color-scheme:dark;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:'Inter',sans-serif;font-size:14px;line-height:1.5}
+.hdr{background:var(--bg2);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.hdr-logo{font-weight:700;font-size:16px;color:var(--accent);letter-spacing:.05em;font-family:'JetBrains Mono',monospace}
+.hdr-title{font-size:15px;font-weight:600;flex:1}
+.hdr-sub{font-size:11px;color:var(--fg3);font-family:'JetBrains Mono',monospace}
+.hdr-btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--fg2);cursor:pointer;font-size:12px;font-family:'Inter',sans-serif;transition:.15s}
+.btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.stats{display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--bg2)}
+.stat{flex:1;padding:12px 16px;border-right:1px solid var(--border);text-align:center}
+.stat:last-child{border-right:none}
+.stat-val{font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.stat-lbl{font-size:10px;color:var(--fg3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+.stat-val.hi{color:var(--high)} .stat-val.go{color:var(--good)}
+.stat-val.me{color:var(--medium)} .stat-val.ac{color:var(--accent)}
+.filters{background:var(--bg2);padding:12px 24px;border-bottom:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.filters label{font-size:11px;color:var(--fg3);text-transform:uppercase;letter-spacing:.06em}
+.filters select,.search-box{padding:6px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--fg);font-size:12px;font-family:'Inter',sans-serif}
+.search-box{width:220px}
+.search-box::placeholder{color:var(--fg3)}
+.results-bar{padding:8px 24px;font-size:11px;color:var(--fg3);background:var(--bg);border-bottom:1px solid var(--border)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;padding:16px 24px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:.15s;position:relative}
+.card:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:0 4px 20px rgba(255,90,31,.1)}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:10px}
+.card-name{font-size:14px;font-weight:600;line-height:1.3}
+.card-emirate{font-size:10px;color:var(--fg3);font-family:'JetBrains Mono',monospace;margin-top:2px}
+.score-ring{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.score-num{font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;line-height:1}
+.score-lbl{font-size:9px;color:var(--fg3);text-transform:uppercase;letter-spacing:.06em}
+.badges{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
+.badge{padding:2px 7px;border-radius:4px;font-size:10px;font-weight:500;font-family:'JetBrains Mono',monospace}
+.badge.HIGH{background:rgba(34,197,94,.15);color:var(--high);border:1px solid rgba(34,197,94,.3)}
+.badge.GOOD{background:rgba(59,130,246,.15);color:var(--good);border:1px solid rgba(59,130,246,.3)}
+.badge.MEDIUM{background:rgba(245,158,11,.15);color:var(--medium);border:1px solid rgba(245,158,11,.3)}
+.badge.LOW{background:rgba(107,114,128,.15);color:var(--low);border:1px solid rgba(107,114,128,.3)}
+.badge.VERIFIED{background:rgba(34,197,94,.15);color:var(--verified);border:1px solid rgba(34,197,94,.3)}
+.badge.PARTIALLY_VERIFIED{background:rgba(245,158,11,.12);color:var(--partial);border:1px solid rgba(245,158,11,.3)}
+.badge.UNVERIFIED{background:rgba(107,114,128,.1);color:var(--unverified);border:1px solid rgba(107,114,128,.2)}
+.badge.TIER_1{background:rgba(255,90,31,.15);color:var(--accent);border:1px solid rgba(255,90,31,.3)}
+.badge.TIER_2,.badge.TIER_3{background:var(--bg3);color:var(--fg3);border:1px solid var(--border)}
+.cap-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.cap{display:flex;align-items:center;gap:3px;font-size:10px}
+.cap-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.cap-dot.YES{background:var(--yes)} .cap-dot.PARTIAL{background:var(--partial-cap)} .cap-dot.NO{background:var(--no)}
+.card-contact{font-size:11px;color:var(--fg2);font-family:'JetBrains Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.flag-row{margin-top:8px;font-size:10px;color:#ef4444;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:4px;padding:4px 8px;line-height:1.4}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:12px;max-width:700px;width:100%;max-height:90vh;overflow-y:auto;padding:24px}
+.modal-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;gap:12px}
+.modal-name{font-size:18px;font-weight:700}
+.modal-close{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer;color:var(--fg2);font-size:16px}
+.modal-close:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.modal-score{text-align:center}
+.modal-score-num{font-size:32px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--accent)}
+.modal-score-lbl{font-size:10px;color:var(--fg3);text-transform:uppercase}
+.section{margin-bottom:16px}
+.section-title{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--fg3);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+.field-grid{display:grid;grid-template-columns:140px 1fr;gap:4px 12px}
+.field-key{font-size:11px;color:var(--fg3);padding:3px 0;font-family:'JetBrains Mono',monospace}
+.field-val{font-size:12px;color:var(--fg);padding:3px 0;word-break:break-word}
+.field-val.mono{font-family:'JetBrains Mono',monospace;font-size:11px}
+.field-val.accent{color:var(--accent)}
+.flag-block{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:6px;padding:8px 12px;font-size:11px;color:#ef4444;line-height:1.5}
+.strength-block{background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.15);border-radius:6px;padding:8px 12px;font-size:11px;color:#86efac;line-height:1.5}
+.notes-block{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:12px;color:var(--fg2);line-height:1.6}
+.disclaimer{background:rgba(255,90,31,.06);border:1px solid rgba(255,90,31,.2);border-radius:8px;padding:12px 16px;margin:16px 24px;font-size:11px;color:var(--fg2);line-height:1.6}
+.disclaimer strong{color:var(--accent)}
+.empty{text-align:center;padding:48px;color:var(--fg3);font-size:14px}
+.mda-bar{height:4px;border-radius:2px;background:var(--border);margin-top:4px;overflow:hidden;width:60px}
+.mda-fill{height:100%;border-radius:2px;transition:.3s}
+@media(max-width:600px){
+  .stats{flex-wrap:wrap}.stat{min-width:50%}
+  .grid{grid-template-columns:1fr;padding:12px 16px}
+  .filters{padding:12px 16px}
+  .search-box{width:100%}
+  .field-grid{grid-template-columns:1fr}
+  .field-key{color:var(--fg3);font-size:10px}
+}
+</style>
+<div class="hdr">
+  <div>
+    <div class="hdr-logo">DREXONYX</div>
+    <div class="hdr-sub">RESEARCH ONLY — NO OUTREACH SENT</div>
+  </div>
+  <div class="hdr-title">UAE Manpower Suppliers Database — Construction Site Helpers</div>
+  <div class="hdr-btns">
+    <button class="btn" onclick="exportCSV()">Export CSV</button>
+    <button class="btn" onclick="exportJSON()">Export JSON</button>
+    <button class="btn" id="themeBtn" onclick="toggleTheme()">Light Mode</button>
+  </div>
+</div>
+<div class="stats">
+  <div class="stat"><div class="stat-val">34</div><div class="stat-lbl">Total Companies</div></div>
+  <div class="stat"><div class="stat-val hi">1</div><div class="stat-lbl">HIGH Priority</div></div>
+  <div class="stat"><div class="stat-val go">2</div><div class="stat-lbl">GOOD Priority</div></div>
+  <div class="stat"><div class="stat-val me">10</div><div class="stat-lbl">MEDIUM Priority</div></div>
+  <div class="stat"><div class="stat-val ac">4</div><div class="stat-lbl">Verified Status</div></div>
+  <div class="stat"><div class="stat-val">13</div><div class="stat-lbl">Confirmed Phone</div></div>
+  <div class="stat"><div class="stat-val ac">53</div><div class="stat-lbl">Avg MDA Score</div></div>
+</div>
+<div class="disclaimer">
+  <strong>⚠ RESEARCH ONLY — NO OUTREACH SENT.</strong>
+  This database is for internal evaluation purposes. DO NOT send any emails, WhatsApp messages, calls, or any form of contact without explicit approval from Drexonyx Studio owner.
+  The source employer identity is protected and does not appear in this document.
+</div>
+<div class="filters">
+  <label>Search:</label>
+  <input type="text" class="search-box" id="searchBox" placeholder="Company name, emirate, notes..." oninput="applyFilters()">
+  <label>Priority:</label>
+  <select id="fPriority" onchange="applyFilters()">
+    <option value="">All</option>
+    <option value="HIGH">HIGH</option>
+    <option value="GOOD">GOOD</option>
+    <option value="MEDIUM">MEDIUM</option>
+    <option value="LOW">LOW</option>
+  </select>
+  <label>Emirate:</label>
+  <select id="fEmirate" onchange="applyFilters()">
+    <option value="">All</option>
+    <option value="Dubai">Dubai</option>
+    <option value="Abu Dhabi">Abu Dhabi</option>
+    <option value="Sharjah">Sharjah</option>
+    <option value="Ajman">Ajman</option>
+    <option value="RAK">RAK</option>
+    <option value="Multi-emirate">Multi</option>
+  </select>
+  <label>Construction:</label>
+  <select id="fConst" onchange="applyFilters()">
+    <option value="">All</option>
+    <option value="YES">YES</option>
+    <option value="PARTIAL">PARTIAL</option>
+  </select>
+  <label>Oil & Gas:</label>
+  <select id="fOG" onchange="applyFilters()">
+    <option value="">All</option>
+    <option value="YES">YES</option>
+    <option value="PARTIAL">PARTIAL</option>
+  </select>
+  <label>Overseas:</label>
+  <select id="fOv" onchange="applyFilters()">
+    <option value="">All</option>
+    <option value="YES">YES</option>
+    <option value="PARTIAL">PARTIAL</option>
+  </select>
+  <label>Verified:</label>
+  <select id="fVerif" onchange="applyFilters()">
+    <option value="">All</option>
+    <option value="VERIFIED">Verified</option>
+    <option value="PARTIALLY_VERIFIED">Partial</option>
+    <option value="UNVERIFIED">Unverified</option>
+  </select>
+  <label>Sort:</label>
+  <select id="fSort" onchange="applyFilters()">
+    <option value="score">MDA Score ↓</option>
+    <option value="rank">Rank</option>
+    <option value="name">Name A–Z</option>
+    <option value="emirate">Emirate</option>
+  </select>
+</div>
+<div class="results-bar" id="resultsBar">Showing 34 companies</div>
+<div class="grid" id="grid"></div>
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modalContent"></div>
+</div>
+<script>
+const COMPANIES = [{"id": 1, "rank": 1, "companyName": "Dulsco Group", "legalName": "Dulsco LLC", "website": "dulsco.com", "email": "Not publicly listed", "phone": "Not publicly listed (check dulsco.com/contact)", "whatsapp": "Not found", "address": "P.O. Box 6238, Dubai, UAE", "emirate": "Dubai", "established": "1959", "employeeCount": "14,000+", "constructionCapability": "YES", "oilGasCapability": "YES", "overseasRecruitment": "YES", "mohreStatus": "VERIFIED", "category": "TIER_1", "mdaScore": 88, "priority": "HIGH", "verificationStatus": "VERIFIED", "sourcesCount": 5, "primarySource": "Dubai Municipality Bunyan Programme (official govt listing)", "contactConfidence": "NOT_FOUND_ONLINE", "redFlags": "None", "strengths": "Dubai Municipality Bunyan partner (official govt evidence); ACCA Magazine 2023 press; 14,000+ workers independently verified; dedicated O&G division; overseas acquisition confirmed", "notes": "Only company with official UAE government construction partner listing. Overseas workers confirmed from Nepal, Bangladesh, Myanmar, India. Acquired Advance Global Recruitment for international expansion. Ask for 'Dulsco People' division.", "lastVerified": "October 2026"}, {"id": 2, "rank": 2, "companyName": "Transguard Group", "legalName": "Transguard Group LLC", "website": "transguardgroup.com", "email": "info@transguardgroup.com", "phone": "+971 4 703 0500 / 800 1800", "whatsapp": "Not found", "address": "Dubai Airport Free Zone (DAFZA), Dubai", "emirate": "Dubai", "established": "2001", "employeeCount": "30,000+", "constructionCapability": "YES", "oilGasCapability": "PARTIAL", "overseasRecruitment": "YES", "mohreStatus": "VERIFIED", "category": "TIER_1", "mdaScore": 80, "priority": "GOOD", "verificationStatus": "VERIFIED", "sourcesCount": 4, "primarySource": "transguardgroup.com", "contactConfidence": "CONFIRMED", "redFlags": "Primary business is security/aviation; construction is secondary", "strengths": "Emirates Group subsidiary; Category A MOHRE; 30,000+ employees; 70,000+ monthly payroll; confirmed housing + transport management", "notes": "Part of Emirates Group. Category A MOHRE license is highest tier. Manages worker housing and transport. Confirm construction helpers specifically are in scope.", "lastVerified": "October 2026"}, {"id": 3, "rank": 3, "companyName": "Adecco UAE", "legalName": "Adecco Human Resources (UAE) LLC", "website": "adecco.com/en-us/locations/middle-east/uae", "email": "adeccoae.info@adecco.com", "phone": "+971 4 368 7900 / +971 2 626 4664", "whatsapp": "Not found", "address": "Dubai + Abu Dhabi offices", "emirate": "Multi-emirate", "established": "2000", "employeeCount": "Not disclosed (global: 500,000+)", "constructionCapability": "YES", "oilGasCapability": "PARTIAL", "overseasRecruitment": "YES", "mohreStatus": "VERIFIED", "category": "TIER_1", "mdaScore": 72, "priority": "GOOD", "verificationStatus": "VERIFIED", "sourcesCount": 4, "primarySource": "adecco.com", "contactConfidence": "CONFIRMED", "redFlags": "Global brand primarily focused on professional placements; helpers may not be primary blue-collar offering", "strengths": "Global brand 60+ years; UAE multi-city; email + phone confirmed; construction sector confirmed", "notes": "Confirm blue-collar/unskilled helpers within UAE scope. Global brands sometimes redirect unskilled volume to specialist local agencies.", "lastVerified": "October 2026"}, {"id": 4, "rank": 4, "companyName": "Sawaeed Employment LLC", "legalName": "Sawaeed Employment LLC (Emirates Stallions Group)", "website": "sawaeed.ae", "email": "Not confirmed (try info@sawaeed.ae)", "phone": "+971 2 559 4444", "whatsapp": "Not found", "address": "ICAD III, Mussafah South, P.O. Box 70919, Abu Dhabi", "emirate": "Abu Dhabi", "established": "2006", "employeeCount": "200–5,000 (sources conflict)", "constructionCapability": "YES", "oilGasCapability": "PARTIAL", "overseasRecruitment": "YES", "mohreStatus": "VERIFIED", "category": "TIER_2", "mdaScore": 67, "priority": "MEDIUM", "verificationStatus": "PARTIALLY_VERIFIED", "sourcesCount": 4, "primarySource": "sawaeed.ae; Abu Dhabi Chamber 223215; Decypha; Revelio Labs", "contactConfidence": "CONFIRMED", "redFlags": "Acquired by Emirates Stallions Group April 2024 — verify service model unchanged; headcount figures conflict (200 vs 5,000+) across sources", "strengths": "Employer-of-record model: manages workers' visas, housing, medical, EOSB on behalf of clients; skills testing & training centre in Mussafah for construction trades; Abu Dhabi Chamber reg. 223215 confirmed; licence CN-1005602; Mussafah base adjacent to oil & gas industrial zone", "notes": "Strong candidate for oil & gas site deployment: employer-of-record model reduces client HR burden, Mussafah location is Abu Dhabi's primary industrial/O&G zone. Verify acquisition impact on operations since April 2024. Phone +971 2 559 4444 is valid Abu Dhabi format.", "lastVerified": "October 2026"}, {"id": 5, "rank": 5, "companyName": "G4S / First Select Employment", "legalName": "G4S Secure Solutions (UAE) LLC", "website": "g4s.com/en-ae", "email": "info@uae.g4s.com", "phone": "+971 2 305 8600", "whatsapp": "Not found", "address": "Abu Dhabi, UAE", "emirate": "Abu Dhabi", "established": "2002", "employeeCount": "9,000+", "constructionCapability": "YES", "oilGasCapability": "PARTIAL", "overseasRecruitment": "YES", "mohreStatus": "VERIFIED", "category": "TIER_1", "mdaScore": 68, "priority": "MEDIUM", "verificationStatus": "VERIFIED", "sourcesCount": 3, "primarySource": "g4s.com/en-ae", "contactConfidence": "CONFIRMED", "redFlags": "Security company primarily; manpower supply is secondary. G4S acquired by Allied Universal 2021 — verify current UAE branding", "strengths": "9,000+ UAE staff; email + phone confirmed; Abu Dhabi construction blue-collar supply confirmed; strong regulatory compliance", "notes": "Verify 'First Select Employment Services' is still the active manpower division brand post-acquisition.", "lastVerified": "October 2026"}, {"id": 6, "rank": 6, "companyName": "Five Continents Technical (5CE)", "legalName": "Five Continents Technical and Industrial Services Establishment", "website": "Not confirmed", "email": "Not found", "phone": "+971 2 643 1313", "whatsapp": "Not found", "address": "Abu Dhabi, UAE", "emirate": "Abu Dhabi", "established": "1989", "employeeCount": "Not disclosed", "constructionCapability": "YES", "oilGasCapability": "YES", "overseasRecruitment": "PARTIAL", "mohreStatus": "CLAIMED", "category": "TIER_2", "mdaScore": 64, "priority": "MEDIUM", "verificationStatus": "PARTIALLY_VERIFIED", "sourcesCount": 2, "primarySource": "Recruiter.com; Naukrigulf", "contactConfidence": "UNVERIFIED", "redFlags": "Recruiter.com profile dated; focus appears engineers/technicians not unskilled helpers", "strengths": "35+ years operation (est. 1989); ADNOC Group confirmed client; Ministry of Labour licence CN1019406; EPC clients: JGC, Tecnimont, Worley", "notes": "Strong O&G credentials. Verify explicitly that they supply construction helpers alongside technical roles. Phone +971 2 643 1313 is valid Abu Dhabi format.", "lastVerified": "October 2026"}, {"id": 7, "rank": 7, "companyName": "JAMS HR Solutions", "legalName": "JAMS HR Solutions (JAMS Group)", "website": "jamshrsolutions.com", "email": "Not publicly listed", "phone": "+971 4 887 3737 (2021 — re-verify)", "whatsapp": "Not found", "address": "Gate No. 02, Jebel Ali Free Zone (JAFZA), Dubai", "emirate": "Dubai", "established": "1978", "employeeCount": "Not disclosed", "constructionCapability": "PARTIAL", "oilGasCapability": "NO", "overseasRecruitment": "YES", "mohreStatus": "CLAIMED", "category": "TIER_2", "mdaScore": 61, "priority": "MEDIUM", "verificationStatus": "PARTIALLY_VERIFIED", "sourcesCount": 3, "primarySource": "GoodFirms; Naukrigulf; LinkedIn", "contactConfidence": "UNVERIFIED", "redFlags": "Phone from 2021 — re-verify; JAFZA licence has different regulatory framework than mainland MOHRE", "strengths": "Est. 1978 (46+ years); JAFZA + Dubai DED licensed; consistently referenced; JAFZA base implies active overseas supply", "notes": "One of oldest manpower companies in UAE. Verify phone and confirm construction helpers in scope.", "lastVerified": "October 2026"}, {"id": 8, "rank": 8, "companyName": "Ontime Manpower Supply", "legalName": "Ontime Manpower Supply LLC", "website": "ontimeuae.com", "email": "Not publicly listed", "phone": "+971 4 256 6333", "whatsapp": "Not found", "address": "Garhoud, Dubai (P.O. Box 25314)", "emirate": "Dubai", "established": "2011", "employeeCount": "Not disclosed", "constructionCapability": "YES", "oilGasCapability": "NO", "overseasRecruitment": "PARTIAL", "mohreStatus": "CLAIMED", "category": "TIER_2", "mdaScore": 60, "priority": "MEDIUM", "verificationStatus": "PARTIALLY_VERIFIED", "sourcesCount": 4, "primarySource": "GoodFirms; HiDubai; Great Place to Work", "contactConfidence": "CONFIRMED", "redFlags": "Office address discrepancy between two sources (possible relocation)", "strengths": "Phone confirmed across 2 independent sources; Great Place to Work certified; 100+ worker deployment confirmed; MOHRE authorization since 2011; Mon-Fri 8:30-18:30, Sat 8:30-15:00", "notes": "Phone +971 4 256 6333 is the best-confirmed contact in this database (two independent sources). Great Place to Work is genuinely independent HR validation.", "lastVerified": "October 2026"}, {"id": 9, "rank": 9, "companyName": "Flexitalent (Farnek Group)", "legalName": "Flexitalent Manpower Supply (Farnek Group)", "website": "flexitalent.com", "email": "Not publicly listed", "phone": "+971 4 382 4400", "whatsapp": "Not found", "address": "Al Quoz, Dubai", "emirate": "Dubai", "established": "March 2025", "employeeCount": "Not disclosed", "constructionCapability": "YES", "oilGasCapability": "YES", "overseasRecruitment": "PARTIAL", "mohreStatus": "CLAIMED", "category": "TIER_2", "mdaScore": 59, "priority": "MEDIUM", "verificationStatus": "PARTIALLY_VERIFIED", "sourcesCount": 2, "primarySource": "flexitalent.com", "contactConfidence": "UNVERIFIED", "redFlags": "Launched March 2025 — very new entity despite established Farnek Group parent", "strengths": "Dedicated construction page (general labourers, masons, heavy equipment, site supervisors); dedicated O&G page; OPITO BOSIET + HUET + NEBOSH certifications; Farnek Group backing", "notes": "Best oil & gas safety certifications in this database. OPITO/HUET/NEBOSH are standard requirements for O&G site access. Very new entity — confirm operational capacity for 100-worker deployment.", "lastVerified": "October 2026"}, {"id": 10, "rank": 10, "companyName": "Connect Resources LLC", "legalName": "Connect Resources LLC", "website": "connectresources.ae", "email": "contact@connectresources.ae", "phone": "+971 4 331 6688", "whatsapp": "Not found", "address": "City Tower 2, Sheikh Zayed Road, Dubai", "emirate": "Dubai", "established": "Not confirmed", "employeeCount": "Not disclosed", "constructionCapability": "PARTIAL", "oilGasCapability": "NO", "overseasRecruitment": "PARTIAL", "mohreStatus": "CLAIMED", "category": "TIER_2", "mdaScore": 59, "priority": "MEDIUM", "verificationStatus": "PARTIALLY_VERIFIED", "sourcesCount": 2, "primarySource": "connectresources.ae", "contactConfidence": "CONFIRMED", "redFlags": "Construction helpers not explicitly confirmed", "strengths": "Best-confirmed contact details (email + phone both from official website); Sheikh Zayed Road address", "notes": "Confirm construction helpers specifically are within scope.", "lastVerified": "October 2026"}, {"id": 11, "rank": 11, "companyName": "World Star Manpower Solutions", "legalName": "World Star Manpower Solutions LLC", "website": "worldstarmanpower.ae", "email": "inquiry@worldstarmanpower.ae", "phone": "Dubai: +971 4 330 0604 | Sharjah: +971 6 767 7770 | Abu Dhabi: +971 2 666 1110 | Const.: +971 56 672 7777", "whatsapp": "+971 50 777 8779", "address": "Al Musallah, P.O. Box 98044, Sharjah (HQ); also Dubai, Abu Dhabi, Fujairah, Al Ain", "emirate": "Sharjah", "established": "Not confirmed (parent group est. 1974)", "employeeCount": "12,000+ (self-reported)", "constructionCapability": "YES", "oilGasCapability": "PARTIAL", "overseasRecruitment": "NO", "mohreStatus": "CLAIMED", "category": "TIER_2", "mdaScore": 62, "priority": "MEDIUM", "verificationStatus": "PARTIALLY_VERIFIED", "sourcesCount": 4, "primarySource": "worldstarmanpower.ae; Yellow Pages UAE; agent research", "contactConfidence": "CONFIRMED", "redFlags": "12,000+ headcount is self-reported; no independent press found; parent group est. 1974 but manpower subsidiary date unclear", "strengths": "Multi-emirate (7 emirates + Fujairah + Al Ain); dedicated helpers page; 24-72h deployment claim; email + phone confirmed; WhatsApp confirmed; construction + formwork + masonry pages", "notes": "manpowersupply.ae appears to be a sister brand under same World Star Holding group (shares +971 4 330 0604 Dubai phone). Both claim MOHRE approval. Verify which entity is legal employer of record.", "lastVerified": "October 2026"}, {"id": 12, "rank": 12, "companyName": "PACT Manpower Services", "legalName": "PACT Employment Services LLC", "website": "pactemployment.ae", "email": "umme@pactemployment.ae", "phone": "+971 58 832 7856 (third-party — verify)", "whatsapp": "Not found", "address": "Karama, Dubai", "emirate": "Dubai", "established": "Not confirmed", "employeeCount": "Not disclosed", "constructionCapability": "YES", "oilGasCapability": "PARTIAL", "overseasRecruitment": "YES", "mohreStatus": "CLAIMED", "category": "TIER_3", "mdaScore": 56, "priority": "MEDIUM", "verificationStatus": "UNVERIFIED", "sourcesCount": 2, "primarySource": "pactemployment.ae; July 2026 walk-in ad", "contactConfidence": "UNVERIFIED", "redFlags": "Small operator; phone from third-party source", "strengths": "Construction helpers EXPLICITLY listed (July 2026 walk-in); oil & gas site mentioned in posting; actively seeking overseas supply partners — directly matching demand letter", "notes": "HIGHEST RELEVANCE MATCH: July 2026 walk-in ad specifically mentioned construction site helpers at oil & gas site location. Directly matches demand letter position and site type. Email umme@pactemployment.ae confirmed on website.", "lastVerified": "October 2026"}, {"id": 13, "rank": 13, "companyName": "UDEEL", "legalName": "UDEEL LLC", "website": "Not confirmed", "email": "Not found", "phone": "Not found", "whatsapp": "Not found", "address": "Abu Dhabi", "emirate": "Abu Dhabi", "established": "1993", "employeeCount": "Not disclosed", "constructionCapability": "YES", "oilGasCapability": "YES", "overseasRecruitment": "PARTIAL", "mohreStatus": "CLAIMED", "category": "TIER_2", "mdaScore": 55, "priority": "MEDIUM", "verificationStatus": "PARTIALLY_VERIFIED", "sourcesCount": 2, "primarySource": "Agent research", "contactConfidence": "NOT_FOUND_ONLINE", "redFlags": "No contact details found online; website not confirmed", "strengths": "ADNOC relationship since 1993 (30+ years); energy + construction + oil & gas; Abu Dhabi base", "notes": "Long-standing ADNOC relationship makes UDEEL potentially well-suited for oil & gas site manpower. Contact via Abu Dhabi business directory or ADNOC supply chain contacts.", "lastVerified": "October 2026"}, {"id": 14, "rank": 14, "companyName": "Aspire Manpower Services", "legalName": "Aspire Manpower Services LLC", "website": "aspirems.ae", "email": "Not publicly listed", "phone": "+971 2 666 9097", "whatsapp": "Not found", "address": "Abu Dhabi", "emirate": "Abu Dhabi", "established": "Not confirmed", "employeeCount": "Not disclosed", "constructionCapability": "YES", "oilGasCapability": "NO", "overseasRecruitment": "PARTIAL", "mohreStatus": "CLAIMED", "category": "TIER_3", "mdaScore": 52, "priority": "LOW", "verificationStatus": "UNVERIFIED", "sourcesCount": 2, "primarySource": "aspirems.ae", "contactConfidence": "UNVERIFIED", "redFlags": "Limited independent data", "strengths": "Emirati-owned (regulatory advantage); MOHRE-licensed claimed; Abu Dhabi base; source countries: India, Nepal, Bangladesh, Philippines, Kenya, Pakistan (website)", "notes": "Emirati ownership is a regulatory advantage for UAE government project contracts. Phone +971 2 666 9097 is valid Abu Dhabi format.", "lastVerified": "October 2026"}, {"id": 15, "rank": 15, "companyName": "Workforce Group", "legalName": "Workforce Group LLC", "website": "workforce.ae", "email": "Not publicly listed", "phone": "+971 4 583 2255", "whatsapp": "Not found", "address": "Dubai", "emirate": "Dubai", "established": "Not confirmed", "employeeCount": "1,000+ (self-reported)", "constructionCapability": "YES", "oilGasCapability": "NO", "overseasRecruitment": "PARTIAL", "mohreStatus": "CLAIMED", "category": "TIER_3", "mdaScore": 52, "priority": "LOW", "verificationStatus": "UNVERIFIED", "sourcesCount": 2, "primarySource": "workforce.ae; SNG.ae website cross-reference", "contactConfidence": "UNVERIFIED", "redFlags": "1,000+ claim unverified; limited independent data", "strengths": "Dedicated construction page; 1,000+ workers claimed; Dubai base", "notes": "Phone +971 4 583 2255 needs verification against company website.", "lastVerified": "October 2026"}, {"id": 16, "rank": 16, "companyName": "Mahad Manpower UAE", "legalName": "Mahad Manpower UAE (franchise model)", "website": "mahadmanpower.ae", "email": "info@mahadmanpower.ae", "phone": "Not found (UAE phone not published)", "whatsapp": "Not found", "address": "Dubai (franchise entity; Qatar HQ)", "emirate": "Dubai", "established": "UAE expansion 2022", "employeeCount": "Not disclosed", "constructionCapability": "YES", "oilGasCapability": "NO", "overseasRecruitment": "YES", "mohreStatus": "CLAIMED", "category": "TIER_3", "mdaScore": 50, "priority": "LOW", "verificationStatus": "UNVERIFIED", "sourcesCount": 2, "primarySource": "mahadmanpower.ae", "contactConfidence": "UNVERIFIED", "redFlags": "Franchise model — UAE entity licence must be verified separately from brand; founding year discrepancy (2010 vs 'over two decades'); diverse source countries = higher risk of overseas fee-charging", "strengths": "Widest stated source-country list: India, Nepal, Sri Lanka, Kenya, Ghana, Uganda, Philippines, Indonesia; 500+ worker case study from India/Nepal confirmed; MOHRE + Dubai DED claimed", "notes": "WORKER FEE WARNING: Highly diverse sourcing pipeline increases risk of recruitment fees being charged to workers in source countries. Ask explicitly for zero-fee policy in writing covering all in-country agents. No UAE phone found — request before engagement.", "lastVerified": "October 2026"}, {"id": 17, "rank": 17, "companyName": "NG Manpower / Connect Group", "legalName": "NG Manpower (Connect Group)", "website": "connectgroup.co/ngmanpower", "email": "Not publicly listed", "phone": "Not found", "whatsapp": "Not found", "address": "UAE (exact address not confirmed)", "emirate": "UAE", "established": "Not confirmed", "employeeCount": "Not disclosed", "constructionCapability": "YES", "oilGasCapability": "YES", "overseasRecruitment": "PARTIAL", "mohreStatus": "CLAIMED", "category": "TIER_3", "mdaScore": 48, "priority": "LOW", "verificationStatus": "UNVERIFIED", "sourcesCount": 2, "primarySource": "connectgroup.co/ngmanpower", "contactConfidence": "NOT_FOUND_ONLINE", "redFlags": "No contact details found; limited data", "strengths": "Oil & gas + construction dual capability; Connect Group parent brand", "notes": "Dual O&G + construction mandate relevant. Contact via Connect Group main office.", "lastVerified": "October 2026"}, {"id": 18, "rank": 18, "companyName": "Al Marmoom Manpower Supply", "legalName": "Al Marmoom Manpower Supply LLC", "website": "marmoommanpower.com", "email": "Not publicly listed", "phone": "Partial: 04 88..., 02 88..., 056 5... (Yellow Pages — truncated)", "whatsapp": "Not found", "address": "Office 08, Khorasan Trading Bldg, Dubai Investment Park 2, Jebel Ali; Branch in Mussafah Abu Dhabi", "emirate": "Dubai", "established": "2021", "employeeCount": "6,000–9,000 (conflicting self-reported)", "constructionCapability": "YES", "oilGasCapability": "PARTIAL", "overseasRecruitment": "NO", "mohreStatus": "CLAIMED", "category": "TIER_3", "mdaScore": 49, "priority": "LOW", "verificationStatus": "PARTIALLY_VERIFIED", "sourcesCount": 3, "primarySource": "marmoommanpower.com; Yellow Pages UAE", "contactConfidence": "UNVERIFIED", "redFlags": "RED FLAG: Worker count inconsistent on same website (6,000 vs 9,000). Est. 2021 — new entity with very few independent mentions for claimed scale. Partial numbers only via Yellow Pages.", "strengths": "Dedicated construction + helper pages with named projects; DIP2 + Mussafah industrial zone offices; 7-emirate coverage claimed; rapid mobilisation (days after signing)", "notes": "DIP2 and Mussafah locations are well-positioned for Jebel Ali and Abu Dhabi projects. Verify worker count discrepancy directly. Visit yellowpages-uae.com for full phone numbers.", "lastVerified": "October 2026"}, {"id": 19, "rank": 19, "companyName": "BCC Manpower Services", "legalName": "BCC Manpower Services LLC (BCC Group)", "website": "bccmanpower.com", "email": "info@bccmanpower.com | info@bccmanpower.ae | Mail@bccmanpower.com", "phone": "Sharjah: 056 422 2063 | Dubai: 04 263 2001 | Abu Dhabi: 02 658 8663", "whatsapp": "Not found", "address": "Sharjah (Al Zahraa, Al Musalla HQ); Dubai (Al Qusais); Abu Dhabi (Musaffah)", "emirate": "Sharjah", "established": "Not confirmed", "employeeCount": "Not disclosed", "constructionCapability": "YES", "oilGasCapability": "NO", "overseasRecruitment": "PARTIAL", "mohreStatus": "CLAIMED", "category": "TIER_3", "mdaScore": 50, "priority": "LOW", "verificationStatus": "UNVERIFIED", "sourcesCount": 3, "primarySource": "Gulf News coverage; bccmanpower.com; Khaleeji Times", "contactConfidence": "CONFIRMED", "redFlags": "One aggregator flags 'Acquired' status — verify current ownership. Data ~3 years old.", "strengths": "Construction wing confirmed by Gulf News (independent); multi-emirate presence (Sharjah/Dubai/Abu Dhabi); overseas recruitment coordinator role advertised; multi-city phones confirmed", "notes": "Gulf News confirmation of construction wing is independent validation. Phone numbers confirmed. Verify acquisition status and current operations.", "lastVerified": "October 2026"}, {"id": 20, "rank": 20, "companyName": "Aries Technical Contracting", "legalName": "Aries Tech Cont LLC", "website": "Not found", "email": "Not found", "phone": "+971 6 561 6516", "whatsapp": "Not found", "address": "Al Arouba Street, Al Nabaa, P.O. Box 61352, Sharjah", "emirate": "Sharjah", "established": "2005", "employeeCount": "1,200+ (self-reported)", "constructionCapability": "YES", "oilGasCapability": "PARTIAL", "overseasRecruitment": "NO", "mohreStatus": "CLAIMED", "category": "TIER_3", "mdaScore": 49, "priority": "LOW", "verificationStatus": "UNVERIFIED", "sourcesCount": 1, "primarySource": "UAE Yellow Pages", "contactConfidence": "UNVERIFIED", "redFlags": "Single source (Yellow Pages only); no website found", "strengths": "Est. 2005 (20 years); 1,200+ workers claimed; Sharjah base for northern emirates; phone +971 6 561 6516 is valid Sharjah format", "notes": "Sharjah-based operator. Good for northern emirates projects. Single-source — verify via direct call.", "lastVerified": "October 2026"}, {"id": 21, "rank": 21, "companyName": "SNG Employment Services", "legalName": "SNG Employment and Facilities Services", "website": "sng.ae", "email": "info@sng.ae", "phone": "+971 4 231 8000", "whatsapp": "Not found", "address": "5th Floor, Ascon House, Salah Al Din Road, Deira, Dubai", "emirate": "Dubai", "established": "Not confirmed", "employeeCount": "Not disclosed", "constructionCapability": "YES", "oilGasCapability": "NO", "overseasRecruitment": "YES", "mohreStatus": "CLAIMED", "category": "TIER_3", "mdaScore": 46, "priority": "LOW", "verificationStatus": "UNVERIFIED", "sourcesCount": 2, "primarySource": "sng.ae; agent research", "contactConfidence": "CONFIRMED", "redFlags": "Directory data approximately 860 days old — verify current operational status; no MOHRE number published", "strengths": "Deira Dubai address (mainland trade licence implied); payroll outsourcing capability; visa processing advertised; email + phone confirmed; construction manpower supply page", "notes": "Deira Salah Al Din Road is a credible Dubai commercial address. Visa and payroll handling capability is relevant for overseas worker deployment. Confirm operations are still active given data age.", "lastVerified": "October 2026"}, {"id": 22, "rank": 22, "companyName": "Abu Dhabi Manpower Supply (ADMS)", "legalName": "Abu Dhabi Manpower Supply", "website": "admsuae.com", "email": "Not found (check admsuae.com)", "phone": "Not found (check admsuae.com)", "whatsapp": "Not found", "address": "Abu Dhabi", "emirate": "Abu Dhabi", "established": "1980", "employeeCount": "Not disclosed", "constructionCapability": "YES", "oilGasCapability": "PARTIAL", "overseasRecruitment": "YES", "mohreStatus": "CLAIMED", "category": "TIER_3", "mdaScore": 47, "priority": "LOW", "verificationStatus": "UNVERIFIED", "sourcesCount": 1, "primarySource": "admsuae.com", "contactConfidence": "NOT_FOUND_ONLINE", "redFlags": "No contact details found online for a 44-year-old company — unusual; ISO 9001 claim unconfirmed", "strengths": "Est. 1980 (44+ years); employer-of-record model (manages visas, housing, medical, EOSB); ISO 9001 certification claimed; Abu Dhabi base; explicitly claims overseas hiring", "notes": "Extreme longevity (1980) is unusual for this sector. If operational, the track record is very strong. Absence of any online contact details is concerning — verify via admsuae.com directly or Abu Dhabi DED business directory.", "lastVerified": "October 2026"}, {"id": 23, "rank": 23, "companyName": "manpower.ae", "legalName": "Manpower UAE (legal name not confirmed)", "website": "manpower.ae", "email": "info@manpower.ae", "phone": "+971 4 2632006 / +971 55 8777717", "whatsapp": "Not found", "address": "Al Mozna Building, Al Qusais, Dubai", "emirate": "Dubai", "established": "Not confirmed", "employeeCount": "Not disclosed", "constructionCapability": "YES", "oilGasCapability": "YES", "overseasRecruitment": "NO", "mohreStatus": "CLAIMED", "category": "TIER_3", "mdaScore": 50, "priority": "LOW", "verificationStatus": "UNVERIFIED", "sourcesCount": 3, "primarySource": "manpower.ae; acciyo.com review; agent research", "contactConfidence": "CONFIRMED", "redFlags": "Thin About Us — no leadership or registration details (third-party review). May confuse with global ManpowerGroup brand. Verify UAE trade licence.", "strengths": "Email + phone confirmed; dedicated civil construction + oil & gas pages; steel fixers, scaffolders, helpers listed; Mussafah + Jebel Ali coverage; Al Qusais address", "notes": "Good website content. Verify trade licence and MOHRE registration before engaging. Do not confuse with ManpowerGroup (global brand — entirely separate entity).", "lastVerified": "October 2026"}, {"id": 24, "rank": 24, "companyName": "Al Sahara Manpower Supply", "legalName": "Al Sahara Group", "website": "alsaharagroup.com", "email": "Not found", "phone": "+971 6 532 2336 (Facebook listing)", "whatsapp": "Not found", "address": "Flat 308, Horizon Tower, Block D, Al Rashidiya 1, P.O. Box 239028, Ajman", "emirate": "Ajman", "established": "Approx. 2014 (years-of-operation claim inconsistent)", "employeeCount": "Not disclosed", "constructionCapability": "YES", "oilGasCapability": "NO", "overseasRecruitment": "PARTIAL", "mohreStatus": "CLAIMED", "category": "TIER_3", "mdaScore": 39, "priority": "LOW", "verificationStatus": "UNVERIFIED", "sourcesCount": 3, "primarySource": "Yellow Pages UAE; alsaharagroup.com; Facebook", "contactConfidence": "UNVERIFIED", "redFlags": "Years-of-operation inconsistent (9 vs 12 on same website); phone from Facebook listing only", "strengths": "Ajman base for northern emirates projects; civil works and carpenter supply confirmed; active Facebook presence", "notes": "Best option for projects in northern UAE (Ajman, UMQ, RAK). Phone +971 6 532 2336 is valid Ajman landline format.", "lastVerified": "October 2026"}, {"id": 25, "rank": 25, "companyName": "Rhobos Group", "legalName": "Rhobos Group LLC", "website": "rhobosgroup.com", "email": "info@rhobosgroup.com", "phone": "+971 526076855 / +971 45578493", "whatsapp": "+971 45578493", "address": "Meydan Grandstand, 6th Floor, Nad Al Sheba, Dubai", "emirate": "Dubai", "established": "Not confirmed", "employeeCount": "Not disclosed", "constructionCapability": "YES", "oilGasCapability": "NO", "overseasRecruitment": "NO", "mohreStatus": "CLAIMED", "category": "TIER_3", "mdaScore": 46, "priority": "LOW", "verificationStatus": "UNVERIFIED", "sourcesCount": 2, "primarySource": "rhobosgroup.com; overseas recruitment agent research", "contactConfidence": "CONFIRMED", "redFlags": "Meydan Grandstand may be registered address not operational office; self-described as 'No. 1 supplier in RAK' — unverified marketing claim", "strengths": "Email, phone AND WhatsApp all confirmed (rare in this dataset); construction 3-tier labour classification (skilled/semi-skilled/unskilled); client testimonial for short-notice deployment; RAK + Dubai coverage", "notes": "Now has confirmed contact details. Meydan Grandstand (6th Floor) is a premium registered address — verify actual operations location. WhatsApp +971 45578493 is the most direct initial contact channel.", "lastVerified": "October 2026"}, {"id": 26, "rank": 26, "companyName": "JFMS Manpower Supply", "legalName": "JFMS Manpower Supply (full legal name unconfirmed)", "website": "jfmsmanpower.com", "email": "Not found", "phone": "Not found", "whatsapp": "Not found", "address": "Dubai (covers Dubai, Abu Dhabi, Sharjah)", "emirate": "Dubai", "established": "Not confirmed", "employeeCount": "Not disclosed", "constructionCapability": "YES", "oilGasCapability": "NO", "overseasRecruitment": "PARTIAL", "mohreStatus": "CLAIMED", "category": "TIER_3", "mdaScore": 40, "priority": "LOW", "verificationStatus": "UNVERIFIED", "sourcesCount": 1, "primarySource": "jfmsmanpower.com", "contactConfidence": "NOT_FOUND_ONLINE", "redFlags": "No contact info found after 6 targeted searches — highly unusual for active supplier", "strengths": "Dedicated construction page; helpers + trades; short/long/project contracts; visa + documentation + medical clearance handling", "notes": "Visit jfmsmanpower.com contact page directly. Visa/documentation handling is relevant for overseas workers.", "lastVerified": "October 2026"}, {"id": 27, "rank": 27, "companyName": "Spectra Force Manpower", "legalName": "Spectra Force Manpower Supply Services", "website": "spectraforceuae.com", "email": "info@spectraforceuae.com", "phone": "+971 52 340 8865 / +971 56 988 8865", "whatsapp": "Not found", "address": "2nd Floor, Madinat Zayed Tower, Muroor Road, P.O. Box 26306, Abu Dhabi", "emirate": "Abu Dhabi", "established": "Not confirmed", "employeeCount": "Not disclosed", "constructionCapability": "PARTIAL", "oilGasCapability": "NO", "overseasRecruitment": "NO", "mohreStatus": "CLAIMED", "category": "TIER_3", "mdaScore": 43, "priority": "LOW", "verificationStatus": "UNVERIFIED", "sourcesCount": 2, "primarySource": "Yellow Pages UAE; spectraforceuae.com", "contactConfidence": "CONFIRMED", "redFlags": "RED FLAG: ISO certifications claimed 2004/2007 editions — all superseded (current: 9001:2015, 14001:2015, 45001:2018). Request current certificates. Do not confuse with US company SPECTRAFORCE Technologies.", "strengths": "Email + phone confirmed; Abu Dhabi Muroor Road address (credible commercial location); civil manpower and carpenter suppliers Yellow Pages categories; visa + accommodation handling advertised", "notes": "Outdated ISO claims are a material concern. Ask explicitly for current-edition certificates. Phone confirmed.", "lastVerified": "October 2026"}, {"id": 28, "rank": 28, "companyName": "Euro Emirates LLC", "legalName": "Euro Emirates LLC", "website": "euroemirates.com", "email": "Not found", "phone": "Not found", "whatsapp": "Not found", "address": "Abu Dhabi", "emirate": "Abu Dhabi", "established": "Not confirmed", "employeeCount": "Not disclosed", "constructionCapability": "PARTIAL", "oilGasCapability": "PARTIAL", "overseasRecruitment": "YES", "mohreStatus": "CLAIMED", "category": "TIER_3", "mdaScore": 41, "priority": "LOW", "verificationStatus": "UNVERIFIED", "sourcesCount": 2, "primarySource": "OpenPR press release; euroemirates.com", "contactConfidence": "NOT_FOUND_ONLINE", "redFlags": "OpenPR self-press-release is primary evidence; licensing not confirmed", "strengths": "Claims own worker housing infrastructure and 50+ transport vehicles (Abu Dhabi); overseas hiring claimed; Abu Dhabi base; relevant for large-volume accommodation deployments", "notes": "Own accommodation and transport is noteworthy for 100-worker deployments. Verify operational status and licensing. Contact via euroemirates.com.", "lastVerified": "October 2026"}, {"id": 29, "rank": 29, "companyName": "Oman Agencies", "legalName": "Oman Agencies (UAE presence)", "website": "omanagencies.com", "email": "clients@omanagencies.com", "phone": "Not found (UAE)", "whatsapp": "Not found", "address": "UAE-wide (primary base: Oman/Gulf region)", "emirate": "UAE", "established": "50+ years claimed", "employeeCount": "50,000+ placements claimed", "constructionCapability": "YES", "oilGasCapability": "NO", "overseasRecruitment": "YES", "mohreStatus": "UNCONFIRMED", "category": "TIER_3", "mdaScore": 49, "priority": "LOW", "verificationStatus": "UNVERIFIED", "sourcesCount": 1, "primarySource": "omanagencies.com", "contactConfidence": "UNVERIFIED", "redFlags": "UAE MOHRE licence not confirmed; appears to be Oman-based agency supplying UAE clients rather than UAE-licensed entity; verify UAE legal presence", "strengths": "50+ years claimed longevity; 50,000+ placements; 35 countries scope; source countries: India, Nepal, Sri Lanka, Bangladesh; email confirmed", "notes": "Verify whether they hold a UAE MOHRE manpower supply licence vs. operating as an Oman-based agency for UAE employers. Email clients@omanagencies.com is confirmed.", "lastVerified": "October 2026"}, {"id": 30, "rank": 30, "companyName": "manpowersupply.ae", "legalName": "Manpower Supply UAE (World Star Holding group)", "website": "manpowersupply.ae", "email": "sales@manpowersupply.ae / info@manpowersupply.ae", "phone": "+971 4 330 0604 (Dubai) / +971 2554 5230 (Abu Dhabi)", "whatsapp": "Not found", "address": "Dubai (linked to World Star Holding)", "emirate": "Dubai", "established": "Not confirmed", "employeeCount": "Not disclosed", "constructionCapability": "YES", "oilGasCapability": "NO", "overseasRecruitment": "NO", "mohreStatus": "CLAIMED", "category": "TIER_3", "mdaScore": 44, "priority": "LOW", "verificationStatus": "UNVERIFIED", "sourcesCount": 2, "primarySource": "Agent research; World Star Holding cross-reference", "contactConfidence": "CONFIRMED", "redFlags": "Appears to be a sister brand of World Star Manpower under same World Star Holding group — verify which entity is legal employer of record before engaging both", "strengths": "Helpers explicitly listed; email + phone confirmed; Dubai + Abu Dhabi lines; part of World Star Holding group", "notes": "Dubai phone (+971 4 330 0604) is identical to World Star Manpower — confirms same holding group. Engaging either brand may reach the same parent. Confirm which entity holds the MOHRE supply licence.", "lastVerified": "October 2026"}, {"id": 31, "rank": 31, "companyName": "Sherman Global", "legalName": "Sherman Global Management Consultants (SGMC)", "website": "shermanglobal.ae", "email": "Not publicly listed", "phone": "Not found", "whatsapp": "Not found", "address": "Dubai", "emirate": "Dubai", "established": "Not confirmed", "employeeCount": "Not disclosed", "constructionCapability": "PARTIAL", "oilGasCapability": "PARTIAL", "overseasRecruitment": "YES", "mohreStatus": "CLAIMED", "category": "TIER_3", "mdaScore": 36, "priority": "LOW", "verificationStatus": "UNVERIFIED", "sourcesCount": 1, "primarySource": "shermanglobal.ae", "contactConfidence": "NOT_FOUND_ONLINE", "redFlags": "Primarily focuses on engineers/supervisors — blue-collar helpers may not be primary offering; no contact details found", "strengths": "Overseas recruitment confirmed from: India, Pakistan, Nepal, Bangladesh, Sri Lanka, Philippines; engineering + supervisory O&G roles", "notes": "Better suited for supervisory/technical roles within a deployment. Overseas sourcing capability is confirmed. Contact via website.", "lastVerified": "October 2026"}, {"id": 32, "rank": 32, "companyName": "Al Qaaim Manpower (RAK)", "legalName": "Al Qaim Management and Operation", "website": "alqaaim.ae", "email": "Not found", "phone": "Not found", "whatsapp": "Not found", "address": "Sidrow, Dahan Road (near Great Wall Hotel), Ras Al Khaimah", "emirate": "RAK", "established": "Not confirmed", "employeeCount": "Not disclosed", "constructionCapability": "YES", "oilGasCapability": "NO", "overseasRecruitment": "NO", "mohreStatus": "CLAIMED", "category": "TIER_3", "mdaScore": 35, "priority": "LOW", "verificationStatus": "UNVERIFIED", "sourcesCount": 2, "primarySource": "alqaaim.ae; magicpin.com", "contactConfidence": "NOT_FOUND_ONLINE", "redFlags": "No contact details found; limited data; RAK base may limit reach to Dubai/Abu Dhabi projects", "strengths": "100+ construction projects claimed; RAK base; helpers, masons, scaffolders, plumbers listed; RAK-specific niche market", "notes": "Best option for projects in Ras Al Khaimah. Contact via alqaaim.ae website.", "lastVerified": "October 2026"}, {"id": 33, "rank": 33, "companyName": "HCM Global Group", "legalName": "HCM Global Group", "website": "hcmglobalgroup.com", "email": "Not found", "phone": "Not found", "whatsapp": "Not found", "address": "UAE", "emirate": "UAE", "established": "Not confirmed", "employeeCount": "Not disclosed", "constructionCapability": "YES", "oilGasCapability": "NO", "overseasRecruitment": "YES", "mohreStatus": "CLAIMED", "category": "TIER_3", "mdaScore": 36, "priority": "LOW", "verificationStatus": "UNVERIFIED", "sourcesCount": 1, "primarySource": "hcmglobalgroup.com", "contactConfidence": "NOT_FOUND_ONLINE", "redFlags": "No contact details found; very limited data", "strengths": "Source countries stated: India, Nepal, Bangladesh, Philippines, Vietnam, Indonesia, selected African countries; good diversity for large-volume overseas sourcing", "notes": "Wide source-country diversity is the main value here. Must obtain contact details directly from hcmglobalgroup.com/uae.", "lastVerified": "October 2026"}, {"id": 34, "rank": 34, "companyName": "Arms Jobs Services LLC", "legalName": "Arms Jobs Services LLC", "website": "Not confirmed", "email": "Not found", "phone": "Not found", "whatsapp": "Not found", "address": "Sheikh Zayed Road, Dubai", "emirate": "Dubai", "established": "Not confirmed", "employeeCount": "Not disclosed", "constructionCapability": "YES", "oilGasCapability": "NO", "overseasRecruitment": "NO", "mohreStatus": "CLAIMED", "category": "TIER_3", "mdaScore": 36, "priority": "LOW", "verificationStatus": "UNVERIFIED", "sourcesCount": 1, "primarySource": "Agent research", "contactConfidence": "NOT_FOUND_ONLINE", "redFlags": "Single mention; no contact; no website confirmed", "strengths": "Sheikh Zayed Road address; construction labour supply confirmed", "notes": "Minimal data. Sheikh Zayed Road suggests Dubai mainland entity. Needs full verification.", "lastVerified": "October 2026"}];
+const FIELDS_27 = ["id","rank","companyName","legalName","website","email","phone","whatsapp","address","emirate","established","employeeCount","constructionCapability","oilGasCapability","overseasRecruitment","mohreStatus","category","mdaScore","priority","verificationStatus","sourcesCount","primarySource","contactConfidence","redFlags","strengths","notes","lastVerified"];
+const FIELD_LABELS = {"id":"ID","rank":"Rank","companyName":"Company Name","legalName":"Legal Name","website":"Website","email":"Email","phone":"Phone","whatsapp":"WhatsApp","address":"Address","emirate":"Emirate","established":"Established","employeeCount":"Employee Count","constructionCapability":"Construction","oilGasCapability":"Oil & Gas","overseasRecruitment":"Overseas Recruitment","mohreStatus":"MOHRE Status","category":"Category","mdaScore":"MDA Score","priority":"Priority","verificationStatus":"Verification","sourcesCount":"Sources","primarySource":"Primary Source","contactConfidence":"Contact Confidence","redFlags":"Red Flags","strengths":"Strengths","notes":"Notes","lastVerified":"Last Verified"};
+
+function scoreColor(s){
+  if(s>=85)return'var(--high)';
+  if(s>=70)return'var(--good)';
+  if(s>=55)return'var(--medium)';
+  return'var(--low)';
+}
+function capDot(v){
+  const cls=v==='YES'?'YES':v==='PARTIAL'?'PARTIAL':'NO';
+  return`<span class="cap"><span class="cap-dot ${cls}"></span>${v}</span>`;
+}
+function hasFlag(c){return c.redFlags&&c.redFlags!=='None'&&c.redFlags.length>3;}
+function renderCard(c){
+  const sc=scoreColor(c.mdaScore);
+  const pct=c.mdaScore+'%';
+  const contact=c.phone&&c.phone!=='Not found'&&!c.phone.startsWith('Not')?c.phone:(c.email&&!c.email.startsWith('Not')?c.email:'No contact found');
+  return`<div class="card" onclick="openModal(${c.id})">
+    <div class="card-top">
+      <div>
+        <div class="card-name">#${c.rank} ${c.companyName}</div>
+        <div class="card-emirate">${c.emirate} · ${c.established}</div>
+      </div>
+      <div class="score-ring">
+        <div class="score-num" style="color:${sc}">${c.mdaScore}</div>
+        <div class="mda-bar"><div class="mda-fill" style="width:${pct};background:${sc}"></div></div>
+        <div class="score-lbl">MDA</div>
+      </div>
+    </div>
+    <div class="badges">
+      <span class="badge ${c.priority}">${c.priority}</span>
+      <span class="badge ${c.verificationStatus}">${c.verificationStatus.replace('_',' ')}</span>
+      <span class="badge ${c.category}">${c.category.replace('_',' ')}</span>
+    </div>
+    <div class="cap-row">
+      <span style="font-size:10px;color:var(--fg3)">Const:</span>${capDot(c.constructionCapability)}
+      <span style="font-size:10px;color:var(--fg3);margin-left:4px">O&G:</span>${capDot(c.oilGasCapability)}
+      <span style="font-size:10px;color:var(--fg3);margin-left:4px">Overseas:</span>${capDot(c.overseasRecruitment)}
+    </div>
+    <div class="card-contact">${contact}</div>
+    ${hasFlag(c)?`<div class="flag-row">⚠ ${c.redFlags.substring(0,120)}${c.redFlags.length>120?'...':''}</div>`:''}</div>`;
+}
+function openModal(id){
+  const c=COMPANIES.find(x=>x.id===id);if(!c)return;
+  const sc=scoreColor(c.mdaScore);
+  let html=`<div class="modal-hdr">
+    <div>
+      <div class="modal-name">${c.companyName}</div>
+      <div style="color:var(--fg2);font-size:12px">${c.legalName}</div>
+      <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+        <span class="badge ${c.priority}">${c.priority}</span>
+        <span class="badge ${c.verificationStatus}">${c.verificationStatus.replace('_',' ')}</span>
+        <span class="badge ${c.category}">${c.category.replace('_',' ')}</span>
+      </div>
+    </div>
+    <div class="modal-score">
+      <div class="modal-score-num" style="color:${sc}">${c.mdaScore}</div>
+      <div class="modal-score-lbl">MDA Score / 100</div>
+      <div style="font-size:10px;color:var(--fg3);margin-top:2px">${c.sources_count} sources</div>
+    </div>
+    <button class="modal-close" onclick="document.getElementById('modalOverlay').classList.remove('open')">✕</button>
+  </div>`;
+  html+=`<div class="section"><div class="section-title">Contact Information</div><div class="field-grid">
+    <span class="field-key">Phone</span><span class="field-val mono">${c.phone}</span>
+    <span class="field-key">WhatsApp</span><span class="field-val mono">${c.whatsapp}</span>
+    <span class="field-key">Email</span><span class="field-val mono">${c.email}</span>
+    <span class="field-key">Website</span><span class="field-val mono accent">${c.website}</span>
+    <span class="field-key">Address</span><span class="field-val">${c.address}</span>
+    <span class="field-key">Emirate</span><span class="field-val">${c.emirate}</span>
+    <span class="field-key">Contact Conf.</span><span class="field-val">${c.contactConfidence}</span>
+  </div></div>`;
+  html+=`<div class="section"><div class="section-title">Company Profile</div><div class="field-grid">
+    <span class="field-key">Established</span><span class="field-val">${c.established}</span>
+    <span class="field-key">Employees</span><span class="field-val">${c.employeeCount}</span>
+    <span class="field-key">MOHRE Status</span><span class="field-val">${c.mohreStatus}</span>
+    <span class="field-key">Category</span><span class="field-val">${c.category}</span>
+    <span class="field-key">Sources</span><span class="field-val">${c.sourcesCount} independent sources</span>
+    <span class="field-key">Primary Source</span><span class="field-val">${c.primarySource}</span>
+  </div></div>`;
+  html+=`<div class="section"><div class="section-title">Capabilities</div><div class="field-grid">
+    <span class="field-key">Construction</span><span class="field-val">${c.constructionCapability}</span>
+    <span class="field-key">Oil & Gas</span><span class="field-val">${c.oilGasCapability}</span>
+    <span class="field-key">Overseas Recruit.</span><span class="field-val">${c.overseasRecruitment}</span>
+  </div></div>`;
+  if(c.redFlags&&c.redFlags!=='None'&&c.redFlags.length>3){
+    html+=`<div class="section"><div class="section-title">Red Flags</div><div class="flag-block">${c.redFlags}</div></div>`;
+  }
+  html+=`<div class="section"><div class="section-title">Strengths</div><div class="strength-block">${c.strengths}</div></div>`;
+  html+=`<div class="section"><div class="section-title">Notes</div><div class="notes-block">${c.notes}</div></div>`;
+  document.getElementById('modalContent').innerHTML=html;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal(e){
+  if(e.target===document.getElementById('modalOverlay'))document.getElementById('modalOverlay').classList.remove('open');
+}
+function applyFilters(){
+  const q=(document.getElementById('searchBox').value||'').toLowerCase();
+  const fp=document.getElementById('fPriority').value;
+  const fe=document.getElementById('fEmirate').value;
+  const fc=document.getElementById('fConst').value;
+  const fog=document.getElementById('fOG').value;
+  const fov=document.getElementById('fOv').value;
+  const fv=document.getElementById('fVerif').value;
+  const fs=document.getElementById('fSort').value;
+  let arr=COMPANIES.filter(c=>{
+    if(fp&&c.priority!==fp)return false;
+    if(fe&&!c.emirate.includes(fe))return false;
+    if(fc&&c.constructionCapability!==fc)return false;
+    if(fog&&c.oilGasCapability!==fog)return false;
+    if(fov&&c.overseasRecruitment!==fov)return false;
+    if(fv&&c.verificationStatus!==fv)return false;
+    if(q){
+      const hay=(c.companyName+c.emirate+c.notes+c.strengths+c.email+c.phone+c.address).toLowerCase();
+      if(!hay.includes(q))return false;
+    }
+    return true;
+  });
+  if(fs==='score')arr.sort((a,b)=>b.mdaScore-a.mdaScore);
+  else if(fs==='rank')arr.sort((a,b)=>a.rank-b.rank);
+  else if(fs==='name')arr.sort((a,b)=>a.companyName.localeCompare(b.companyName));
+  else if(fs==='emirate')arr.sort((a,b)=>a.emirate.localeCompare(b.emirate));
+  document.getElementById('grid').innerHTML=arr.length?arr.map(renderCard).join(''):`<div class="empty">No companies match the selected filters.</div>`;
+  document.getElementById('resultsBar').textContent=`Showing ${arr.length} of ${COMPANIES.length} companies`;
+}
+function exportCSV(){
+  const hdr=["id","rank","companyName","legalName","website","email","phone","whatsapp","address","emirate","established","employeeCount","constructionCapability","oilGasCapability","overseasRecruitment","mohreStatus","category","mdaScore","priority","verificationStatus","sourcesCount","primarySource","contactConfidence","redFlags","strengths","notes","lastVerified"];
+  const rows=[hdr.join(','),...COMPANIES.map(c=>hdr.map(k=>`"${String(c[k]||'').replace(/"/g,'""')}"`).join(','))];
+  const blob=new Blob([rows.join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='MANPOWER_SUPPLIERS_UAE.csv';a.click();
+}
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(COMPANIES,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='MANPOWER_SUPPLIERS_UAE.json';a.click();
+}
+function toggleTheme(){
+  const r=document.documentElement;
+  const isDark=r.getAttribute('data-theme')==='light';
+  r.setAttribute('data-theme',isDark?'dark':'light');
+  document.getElementById('themeBtn').textContent=isDark?'Light Mode':'Dark Mode';
+}
+applyFilters();
+</script>

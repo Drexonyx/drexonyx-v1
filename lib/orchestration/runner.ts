@@ -23,6 +23,7 @@ import {
   auditBoundaryViolation,
 } from './audit';
 import { isRetryable } from './retry';
+import { handleSalesStatusTransition, checkSalesDeduplicate } from './sales-writer';
 import type { TaskPlan, PlanStep, InitiatorRole, ApproverRole, StepType } from './types';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -558,8 +559,48 @@ async function processStatusTransition(
   const entityId = input.entity_id as string | undefined;
   const newStatus = input.new_status as string | undefined;
 
-  if (!entityType || !entityId || !newStatus) {
-    const reason = 'STATUS_TRANSITION step requires entity_type, entity_id, and new_status in input';
+  if (!entityType || !newStatus) {
+    const reason = 'STATUS_TRANSITION step requires entity_type and new_status in input';
+    await markStepFailed(step.id, organizationId, reason);
+    await markTaskFailed(taskId, organizationId, step.step_index, reason);
+    return { ok: false, outcome: 'TASK_FAILED', reason };
+  }
+
+  // DR 0128: Sales entity types are handled by the sales-writer module.
+  // It queries prior step outputs to extract skill data for DB writes.
+  if (entityType.startsWith('sales_')) {
+    const salesResult = await handleSalesStatusTransition({
+      entityType,
+      entityId: entityId ?? undefined,
+      newStatus,
+      stepIndex: step.step_index,
+      taskId,
+      organizationId,
+    });
+
+    if (!salesResult.ok) {
+      await markStepFailed(step.id, organizationId, salesResult.error);
+      await markTaskFailed(taskId, organizationId, step.step_index, salesResult.error);
+      return { ok: false, outcome: 'TASK_FAILED', reason: salesResult.error };
+    }
+
+    await db
+      .update(taskSteps)
+      .set({
+        status: 'SUCCEEDED',
+        output: { entity_type: entityType, entity_id: salesResult.entityId, new_status: newStatus, created: salesResult.created },
+        completed_at: now,
+        updated_at: now,
+      })
+      .where(and(eq(taskSteps.id, step.id), eq(taskSteps.organization_id, organizationId)));
+
+    const durationMs = now.getTime() - (step.started_at ?? now).getTime();
+    await auditStepSucceeded({ organizationId, taskId, stepIndex: step.step_index, durationMs });
+    return { ok: true, outcome: 'STEP_SUCCEEDED' };
+  }
+
+  if (!entityId) {
+    const reason = 'STATUS_TRANSITION step requires entity_id in input for non-sales entities';
     await markStepFailed(step.id, organizationId, reason);
     await markTaskFailed(taskId, organizationId, step.step_index, reason);
     return { ok: false, outcome: 'TASK_FAILED', reason };
@@ -640,6 +681,21 @@ async function processVerify(
 ): Promise<RunnerResult> {
   const input = (step.input ?? {}) as Record<string, unknown>;
   const checkType = (input.check_type as string | undefined) ?? 'GENERIC';
+
+  // DR 0128: SALES_DEDUP — query DB to detect duplicate lead sources before proceeding.
+  if (checkType === 'SALES_DEDUP') {
+    const platform = input.platform as string | undefined;
+    const identifier = input.identifier as string | undefined;
+    if (platform && identifier) {
+      const isDuplicate = await checkSalesDeduplicate({ platform, identifier });
+      if (isDuplicate) {
+        const reason = `VERIFY SALES_DEDUP: lead source ${platform}/${identifier} already exists`;
+        await markStepFailed(step.id, organizationId, reason);
+        await markTaskFailed(taskId, organizationId, step.step_index, reason);
+        return { ok: false, outcome: 'TASK_FAILED', reason };
+      }
+    }
+  }
 
   // Verification result is written by the step dispatcher or external system.
   // If the step carries a pre-computed result, use it; otherwise mark SUCCEEDED.

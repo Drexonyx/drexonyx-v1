@@ -14,6 +14,14 @@ import { delegateCommunication, type CommunicationDelegationParams, type Communi
 import { delegateLeadHunter, type LeadHunterDelegationParams, type LeadHunterDelegationResult } from './lead-hunter-specialist';
 import { delegateWebsiteProduction, type WebsiteProductionDelegationParams, type WebsiteProductionDelegationResult } from './website-production-specialist';
 import { delegateSiteAudit, type SiteAuditDelegationParams, type SiteAuditDelegationResult } from './site-audit-specialist';
+import {
+  delegateLeadDiscovery,
+  delegateLeadQualification,
+  delegateOutreachDrafting,
+  delegateFollowUpScheduling,
+  type LeadDiscoveryParams,
+  type LeadDiscoveryResult,
+} from './sales-discovery-specialist';
 
 // Each entry carries a typed delegate function. Callers must cast to the specific
 // agent's signature after looking up by ID — the registry stores the canonical handle.
@@ -124,6 +132,15 @@ export const SPECIALIST_AGENT_REGISTRY: ReadonlyMap<string, SpecialistAgentEntry
     {
       id: 'direct-facebook-publish',
       delegate: delegateDirectFacebookPublish as (params: DirectFacebookPublishParams) => Promise<DirectFacebookPublishResult>,
+    },
+  ],
+  // DR 0128: Sales Discovery Agent — lead lifecycle (discover, qualify, outreach draft, follow-up schedule)
+  // HARD BOUNDARY: no outreach sent in Phase 3 — human approval gate required for all outreach
+  [
+    'sales-discovery',
+    {
+      id: 'sales-discovery',
+      delegate: delegateLeadDiscovery as (params: LeadDiscoveryParams) => Promise<LeadDiscoveryResult>,
     },
   ],
 ]);

@@ -1,0 +1,1037 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NEXORA — Series A Pitch Deck</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#08091A;
+  --surface:#0D1428;
+  --surface2:#152040;
+  --border:rgba(180,200,255,0.07);
+  --border2:rgba(180,200,255,0.14);
+  --fg:#ECEEF8;
+  --fg2:rgba(236,238,248,0.60);
+  --fg3:rgba(236,238,248,0.32);
+  --accent:#3EC8B0;
+  --accent2:#8B7FFF;
+  --amber:#F59E0B;
+  --success:#34D399;
+  --warn:#F59E0B;
+  --danger:#F87171;
+  --grad:linear-gradient(135deg,#3EC8B0 0%,#8B7FFF 100%);
+  color-scheme:dark;
+}
+
+html,body{
+  height:100%;
+  width:100%;
+  overflow:hidden;
+  background:var(--bg);
+  color:var(--fg);
+  font-family:'Outfit',system-ui,sans-serif;
+  font-size:16px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── Deck shell ─────────────────────────────── */
+#deck{
+  position:relative;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+}
+
+.slide{
+  position:absolute;
+  inset:0;
+  display:none;
+  flex-direction:column;
+  overflow:hidden;
+}
+.slide.active{display:flex;}
+
+.s-inner{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  padding:56px 64px 40px;
+  overflow:hidden;
+}
+
+/* ── Nav bar ─────────────────────────────────── */
+#nav{
+  position:fixed;
+  bottom:28px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  align-items:center;
+  gap:14px;
+  background:rgba(13,20,40,0.85);
+  backdrop-filter:blur(12px);
+  border:1px solid var(--border2);
+  border-radius:40px;
+  padding:10px 20px;
+  z-index:100;
+}
+
+.nav-btn{
+  background:none;
+  border:none;
+  color:var(--fg2);
+  cursor:pointer;
+  font-size:18px;
+  line-height:1;
+  padding:4px 8px;
+  border-radius:6px;
+  transition:color .15s,background .15s;
+}
+.nav-btn:hover{color:var(--fg);background:var(--surface2);}
+.nav-btn:disabled{color:var(--fg3);cursor:default;background:none;}
+
+#dots{display:flex;gap:6px;align-items:center;}
+.dot{
+  width:7px;height:7px;
+  border-radius:50%;
+  background:var(--fg3);
+  border:none;
+  cursor:pointer;
+  transition:background .15s,transform .15s;
+  padding:0;
+}
+.dot.on{background:var(--accent);transform:scale(1.25);}
+
+#counter{
+  font-size:12px;
+  color:var(--fg3);
+  min-width:36px;
+  text-align:center;
+  font-variant-numeric:tabular-nums;
+}
+
+/* ── Concept badge ───────────────────────────── */
+.concept-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:5px 12px;
+  border-radius:20px;
+  border:1px solid rgba(243,159,11,0.35);
+  background:rgba(243,159,11,0.10);
+  color:var(--amber);
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+
+/* ── Slide label ─────────────────────────────── */
+.slide-label{
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--accent);
+  margin-bottom:10px;
+}
+
+/* ── Heading scale ───────────────────────────── */
+.h1{font-size:clamp(36px,5vw,64px);font-weight:800;line-height:1.05;text-wrap:balance;}
+.h2{font-size:clamp(26px,3.5vw,44px);font-weight:800;line-height:1.1;text-wrap:balance;}
+.h3{font-size:clamp(18px,2.2vw,26px);font-weight:700;line-height:1.2;}
+.serif{font-family:'Playfair Display',Georgia,serif;}
+.grad-text{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+.sub{color:var(--fg2);font-size:clamp(15px,1.6vw,19px);font-weight:400;margin-top:10px;}
+
+/* ── Layout helpers ──────────────────────────── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;}
+.row{display:flex;gap:16px;align-items:stretch;}
+.col{display:flex;flex-direction:column;gap:14px;}
+.flex-1{flex:1;}
+.mt-auto{margin-top:auto;}
+.mt-s{margin-top:12px;}
+.mt-m{margin-top:20px;}
+.mt-l{margin-top:32px;}
+.center{text-align:center;}
+.spacer{flex:1;}
+
+/* ── Card ────────────────────────────────────── */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:22px 22px;
+  display:flex;
+  flex-direction:column;
+}
+.card.featured{
+  border-color:rgba(62,200,176,0.30);
+  background:rgba(62,200,176,0.05);
+}
+.card.featured2{
+  border-color:rgba(139,127,255,0.30);
+  background:rgba(139,127,255,0.05);
+}
+.card-icon{
+  font-size:26px;
+  margin-bottom:10px;
+}
+.card-title{font-size:15px;font-weight:700;margin-bottom:6px;}
+.card-body{font-size:13px;color:var(--fg2);line-height:1.55;}
+
+/* ── Stat tile ───────────────────────────────── */
+.stat-tile{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:18px 16px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.stat-num{
+  font-size:clamp(22px,3vw,38px);
+  font-weight:800;
+  line-height:1;
+  font-variant-numeric:tabular-nums;
+}
+.stat-label{font-size:12px;color:var(--fg2);font-weight:500;}
+
+/* ── Section divider ─────────────────────────── */
+.divider{
+  width:40px;height:3px;
+  border-radius:2px;
+  background:var(--grad);
+  margin-bottom:20px;
+}
+
+/* ── Chart container ─────────────────────────── */
+.chart-wrap{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px 16px 10px;
+  overflow:hidden;
+}
+.chart-title{font-size:12px;font-weight:600;color:var(--fg2);margin-bottom:8px;letter-spacing:.05em;}
+
+/* ── Table ───────────────────────────────────── */
+.comp-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+}
+.comp-table th{
+  color:var(--fg3);
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  padding:8px 14px;
+  text-align:left;
+  border-bottom:1px solid var(--border2);
+}
+.comp-table td{
+  padding:9px 14px;
+  border-bottom:1px solid var(--border);
+  color:var(--fg2);
+  vertical-align:middle;
+}
+.comp-table tr:last-child td{border-bottom:none;}
+.comp-table td:first-child{color:var(--fg);font-weight:600;}
+.comp-table .nex{color:var(--accent);}
+.chk{color:var(--success);font-size:15px;}
+.xmk{color:var(--danger);font-size:15px;}
+.pmk{color:var(--warn);}
+
+/* ── Progress bar ────────────────────────────── */
+.prog-row{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.prog-bar-bg{height:7px;border-radius:4px;background:var(--surface2);overflow:hidden;}
+.prog-bar-fill{height:100%;border-radius:4px;}
+
+/* ── Concentric circles ──────────────────────── */
+.circle-stack{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  width:180px;height:180px;
+  flex-shrink:0;
+}
+.circle{
+  position:absolute;
+  border-radius:50%;
+  border:2px solid;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+}
+
+/* ── Team card ───────────────────────────────── */
+.team-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:20px 16px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  gap:8px;
+}
+.avatar{
+  width:52px;height:52px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:20px;
+  font-weight:800;
+  flex-shrink:0;
+}
+
+/* ── Pill ─────────────────────────────────────── */
+.pill{
+  display:inline-flex;
+  align-items:center;
+  padding:3px 10px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.04em;
+}
+
+/* ── Phase number ────────────────────────────── */
+.phase-num{
+  width:36px;height:36px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:800;
+  flex-shrink:0;
+}
+
+/* ── Bottom disclaimer ───────────────────────── */
+.disclaimer{
+  font-size:10px;
+  color:var(--fg3);
+  text-align:center;
+  padding-top:8px;
+  flex-shrink:0;
+}
+
+/* ── Cover specific ──────────────────────────── */
+#s1 .s-inner{
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(62,200,176,0.07) 0%,transparent 70%);
+}
+
+/* ── Closing specific ────────────────────────── */
+#s13 .s-inner{
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  background:radial-gradient(ellipse 70% 50% at 50% 50%,rgba(139,127,255,0.08) 0%,transparent 70%);
+}
+
+/* ── Responsive ──────────────────────────────── */
+@media(max-width:680px){
+  .s-inner{padding:32px 20px 24px;}
+  .g3{grid-template-columns:1fr;}
+  .g2{grid-template-columns:1fr;}
+  .g4{grid-template-columns:1fr 1fr;}
+  .h1{font-size:32px;}
+  .h2{font-size:24px;}
+}
+</style>
+</head>
+<body>
+
+<div id="deck">
+
+  <!-- S1: Cover -->
+  <div class="slide active" id="s1">
+    <div class="s-inner">
+      <div style="margin-bottom:28px">
+        <svg width="64" height="64" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="56" height="56" rx="14" fill="url(#cg1)"/>
+          <path d="M14 42V14l13 20 13-20v28" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs>
+            <linearGradient id="cg1" x1="0" y1="0" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#3EC8B0"/><stop offset="1" stop-color="#8B7FFF"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="h1 serif grad-text" style="font-size:clamp(48px,8vw,88px);letter-spacing:-.02em;margin-bottom:14px;">NEXORA</div>
+      <div class="sub" style="font-size:clamp(17px,2vw,22px);margin-bottom:32px;">Work Less. Think More.</div>
+      <div class="concept-badge" style="margin-bottom:32px;">
+        <span>⚠</span> Illustrative / Concept Project
+      </div>
+      <div style="font-size:13px;color:var(--fg3);">Series A Investor Presentation · 2026</div>
+    </div>
+    <div class="disclaimer">Portfolio sample — all data is illustrative. Not a real company or investment opportunity.</div>
+  </div>
+
+  <!-- S2: Problem -->
+  <div class="slide" id="s2">
+    <div class="s-inner">
+      <div class="slide-label">01 — Problem</div>
+      <div class="divider"></div>
+      <div class="h2" style="margin-bottom:6px;">Knowledge work is broken.</div>
+      <div class="sub" style="margin-bottom:24px;">Professionals spend most of their day on low-value repetitive tasks — not actual thinking.</div>
+      <div class="g3" style="flex:1;margin-bottom:16px;">
+        <div class="stat-tile">
+          <div class="stat-num" style="color:var(--accent);">40%</div>
+          <div class="stat-label">of work hours lost to repetitive, automatable tasks</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-num" style="color:var(--accent2);">$1.8T</div>
+          <div class="stat-label">annual productivity loss in the US alone (McKinsey est.)</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-num" style="color:var(--warn);">68%</div>
+          <div class="stat-label">of knowledge workers report burnout from task overload</div>
+        </div>
+      </div>
+      <div class="card" style="background:rgba(248,113,113,0.05);border-color:rgba(248,113,113,0.20);">
+        <div style="font-size:13px;color:var(--fg2);line-height:1.6;">
+          <strong style="color:var(--fg);">The root cause:</strong> Existing tools automate isolated actions but fail to understand <em>context</em> — so every workflow still requires a human to manually connect the dots, copy-paste between apps, and re-explain the same thing dozens of times a day.
+        </div>
+      </div>
+      <div class="disclaimer mt-auto">Illustrative / Concept Project — data is representational, not sourced</div>
+    </div>
+  </div>
+
+  <!-- S3: Solution -->
+  <div class="slide" id="s3">
+    <div class="s-inner">
+      <div class="slide-label">02 — Solution</div>
+      <div class="divider"></div>
+      <div class="h2" style="margin-bottom:6px;">An AI layer that thinks with you.</div>
+      <div class="sub" style="margin-bottom:24px;">NEXORA connects to your existing tools and handles the connective tissue of work — so you focus only on decisions that require human judgment.</div>
+      <div class="g3" style="flex:1;">
+        <div class="card">
+          <div class="card-icon">⚙️</div>
+          <div class="card-title" style="color:var(--accent);">Automate</div>
+          <div class="card-body">AutoFlow maps your recurring workflows and executes them end-to-end — no code, no scripts, no manual triggers.</div>
+        </div>
+        <div class="card featured2">
+          <div class="card-icon">🧠</div>
+          <div class="card-title" style="color:var(--accent2);">Augment</div>
+          <div class="card-body">NexAssist is your context-aware AI copilot. It knows your projects, your team, and your goals — answering and acting, not just suggesting.</div>
+          <div class="mt-s"><span class="pill" style="background:rgba(139,127,255,0.15);color:var(--accent2);">Core differentiator</span></div>
+        </div>
+        <div class="card">
+          <div class="card-icon">📊</div>
+          <div class="card-title" style="color:var(--amber);">Analyze</div>
+          <div class="card-body">WorkSense surfaces real-time productivity signals — where time actually goes, what's blocking output, what should be next.</div>
+        </div>
+      </div>
+      <div class="disclaimer">Illustrative / Concept Project</div>
+    </div>
+  </div>
+
+  <!-- S4: Market Opportunity -->
+  <div class="slide" id="s4">
+    <div class="s-inner">
+      <div class="slide-label">03 — Market Opportunity</div>
+      <div class="divider"></div>
+      <div class="h2" style="margin-bottom:6px;">A $47B total addressable market.</div>
+      <div class="sub" style="margin-bottom:24px;">The enterprise AI productivity software market is growing at 28% CAGR through 2030.</div>
+      <div class="row" style="flex:1;gap:24px;align-items:center;">
+        <div class="circle-stack" style="width:200px;height:200px;">
+          <div class="circle" style="width:200px;height:200px;border-color:rgba(62,200,176,0.20);background:rgba(62,200,176,0.03);">
+            <span style="font-size:10px;color:var(--fg3);margin-top:14px;">TAM</span>
+          </div>
+          <div class="circle" style="width:140px;height:140px;border-color:rgba(139,127,255,0.30);background:rgba(139,127,255,0.05);">
+            <span style="font-size:10px;color:var(--fg3);">SAM</span>
+          </div>
+          <div class="circle" style="width:80px;height:80px;border-color:rgba(245,158,11,0.50);background:rgba(245,158,11,0.08);">
+            <span style="font-size:9px;color:var(--amber);font-weight:700;">SOM</span>
+          </div>
+        </div>
+        <div class="col flex-1">
+          <div class="prog-row">
+            <div style="display:flex;justify-content:space-between;font-size:13px;">
+              <span style="color:var(--fg);font-weight:600;">TAM — Total Addressable Market</span>
+              <span style="color:var(--accent);font-weight:700;">$47B</span>
+            </div>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:100%;background:var(--grad);"></div></div>
+            <div style="font-size:11px;color:var(--fg3);">Enterprise + SMB AI productivity software globally</div>
+          </div>
+          <div class="prog-row">
+            <div style="display:flex;justify-content:space-between;font-size:13px;">
+              <span style="color:var(--fg);font-weight:600;">SAM — Serviceable Addressable Market</span>
+              <span style="color:var(--accent2);font-weight:700;">$12B</span>
+            </div>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:55%;background:linear-gradient(90deg,#8B7FFF,#3EC8B0);"></div></div>
+            <div style="font-size:11px;color:var(--fg3);">English-language SaaS buyers — professional services, tech, finance</div>
+          </div>
+          <div class="prog-row">
+            <div style="display:flex;justify-content:space-between;font-size:13px;">
+              <span style="color:var(--fg);font-weight:600;">SOM — Serviceable Obtainable Market</span>
+              <span style="color:var(--amber);font-weight:700;">$620M</span>
+            </div>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:18%;background:var(--amber);"></div></div>
+            <div style="font-size:11px;color:var(--fg3);">Realistic 5-year capture at current growth trajectory</div>
+          </div>
+        </div>
+      </div>
+      <div class="disclaimer">Illustrative / Concept Project — market figures are representational</div>
+    </div>
+  </div>
+
+  <!-- S5: Product -->
+  <div class="slide" id="s5">
+    <div class="s-inner">
+      <div class="slide-label">04 — Product</div>
+      <div class="divider"></div>
+      <div class="h2" style="margin-bottom:6px;">Three modules. One unified workspace.</div>
+      <div class="sub" style="margin-bottom:24px;">Each module is usable standalone. Together they create a compounding intelligence loop across your entire workflow.</div>
+      <div class="g3" style="flex:1;">
+        <div class="card featured">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+            <span style="font-size:22px;">⚙️</span>
+            <span class="card-title" style="color:var(--accent);margin:0;">AutoFlow</span>
+          </div>
+          <div class="card-body">Visual workflow builder. Connect apps with natural language commands. Handles triggers, conditions, and multi-step chains without code.</div>
+          <div class="mt-s" style="font-size:11px;color:var(--fg3);">Integrations: Slack, Notion, Gmail, Sheets, Linear, Jira</div>
+        </div>
+        <div class="card featured2">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+            <span style="font-size:22px;">🧠</span>
+            <span class="card-title" style="color:var(--accent2);margin:0;">NexAssist</span>
+          </div>
+          <div class="card-body">Context-aware AI copilot with persistent memory across all your tools. Drafts, summarizes, answers, and takes action in your voice.</div>
+          <div class="mt-s" style="font-size:11px;color:var(--fg3);">Trained on your workspace data — private, no training opt-in</div>
+        </div>
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+            <span style="font-size:22px;">📊</span>
+            <span class="card-title" style="color:var(--amber);margin:0;">WorkSense</span>
+          </div>
+          <div class="card-body">Productivity intelligence dashboard. Shows real time-use, identifies workflow bottlenecks, and recommends optimizations weekly.</div>
+          <div class="mt-s" style="font-size:11px;color:var(--fg3);">Privacy-first: aggregated signals only, no screen recording</div>
+        </div>
+      </div>
+      <div class="disclaimer">Illustrative / Concept Project</div>
+    </div>
+  </div>
+
+  <!-- S6: Business Model -->
+  <div class="slide" id="s6">
+    <div class="s-inner">
+      <div class="slide-label">05 — Business Model</div>
+      <div class="divider"></div>
+      <div class="h2" style="margin-bottom:6px;">SaaS — seat-based with usage tiers.</div>
+      <div class="sub" style="margin-bottom:24px;">PLG entry motion; land-and-expand into team and enterprise accounts.</div>
+      <div class="g3" style="flex:1;">
+        <div class="card">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--fg3);text-transform:uppercase;margin-bottom:8px;">Individual</div>
+          <div class="stat-num" style="color:var(--fg);font-size:36px;margin-bottom:4px;">$29<span style="font-size:16px;font-weight:400;color:var(--fg3);">/mo</span></div>
+          <div style="font-size:12px;color:var(--fg2);margin-bottom:14px;">1 user · All modules · 500 AutoFlow runs/mo</div>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--fg2);">
+            <div>✓ NexAssist unlimited</div>
+            <div>✓ WorkSense basic</div>
+            <div>✓ 10 integrations</div>
+          </div>
+        </div>
+        <div class="card featured">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--accent);text-transform:uppercase;">Team</div>
+            <span class="pill" style="background:rgba(62,200,176,0.15);color:var(--accent);">Most popular</span>
+          </div>
+          <div class="stat-num" style="color:var(--accent);font-size:36px;margin-bottom:4px;">$199<span style="font-size:16px;font-weight:400;color:var(--fg3);">/mo</span></div>
+          <div style="font-size:12px;color:var(--fg2);margin-bottom:14px;">Up to 10 users · Unlimited runs · Team memory</div>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--fg2);">
+            <div>✓ Everything in Individual</div>
+            <div>✓ Shared workflow library</div>
+            <div>✓ WorkSense team analytics</div>
+            <div>✓ Priority support</div>
+          </div>
+        </div>
+        <div class="card featured2">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--accent2);text-transform:uppercase;margin-bottom:8px;">Enterprise</div>
+          <div class="stat-num" style="color:var(--accent2);font-size:36px;margin-bottom:4px;">Custom</div>
+          <div style="font-size:12px;color:var(--fg2);margin-bottom:14px;">Unlimited users · SSO · SLA · Dedicated CSM</div>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--fg2);">
+            <div>✓ Everything in Team</div>
+            <div>✓ On-prem deployment option</div>
+            <div>✓ Custom AI model fine-tuning</div>
+            <div>✓ Enterprise SLA (99.9%)</div>
+          </div>
+        </div>
+      </div>
+      <div class="disclaimer">Illustrative / Concept Project</div>
+    </div>
+  </div>
+
+  <!-- S7: Traction -->
+  <div class="slide" id="s7">
+    <div class="s-inner">
+      <div class="slide-label">06 — Traction</div>
+      <div class="divider"></div>
+      <div class="h2" style="margin-bottom:6px;">0 → 12K MAU in 6 months, organic only.</div>
+      <div class="sub" style="margin-bottom:20px;">No paid acquisition. Growth driven entirely by product-led word-of-mouth.</div>
+      <div class="g4" style="margin-bottom:16px;">
+        <div class="stat-tile">
+          <div class="stat-num" style="color:var(--accent);">12K</div>
+          <div class="stat-label">Monthly Active Users</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-num" style="color:var(--success);">94%</div>
+          <div class="stat-label">Day-30 retention rate</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-num" style="color:var(--accent2);">71</div>
+          <div class="stat-label">Net Promoter Score</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-num" style="color:var(--warn);">$0</div>
+          <div class="stat-label">Paid customer acquisition cost</div>
+        </div>
+      </div>
+      <div class="chart-wrap" style="flex:1;">
+        <div class="chart-title">MAU GROWTH — JAN TO JUN (Illustrative)</div>
+        <svg viewBox="0 0 560 120" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" style="max-height:130px;">
+          <defs>
+            <linearGradient id="barG1" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#3EC8B0" stop-opacity=".9"/>
+              <stop offset="100%" stop-color="#3EC8B0" stop-opacity=".5"/>
+            </linearGradient>
+            <linearGradient id="barG2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#8B7FFF" stop-opacity=".9"/>
+              <stop offset="100%" stop-color="#3EC8B0" stop-opacity=".7"/>
+            </linearGradient>
+          </defs>
+          <!-- Grid lines -->
+          <line x1="40" y1="10" x2="540" y2="10" stroke="rgba(180,200,255,0.07)" stroke-width="1"/>
+          <line x1="40" y1="37" x2="540" y2="37" stroke="rgba(180,200,255,0.07)" stroke-width="1"/>
+          <line x1="40" y1="63" x2="540" y2="63" stroke="rgba(180,200,255,0.07)" stroke-width="1"/>
+          <line x1="40" y1="90" x2="540" y2="90" stroke="rgba(180,200,255,0.07)" stroke-width="1"/>
+          <!-- Y labels -->
+          <text x="35" y="13" fill="rgba(236,238,248,0.32)" font-size="9" text-anchor="end" font-family="Outfit,sans-serif">15K</text>
+          <text x="35" y="40" fill="rgba(236,238,248,0.32)" font-size="9" text-anchor="end" font-family="Outfit,sans-serif">10K</text>
+          <text x="35" y="66" fill="rgba(236,238,248,0.32)" font-size="9" text-anchor="end" font-family="Outfit,sans-serif">5K</text>
+          <text x="35" y="92" fill="rgba(236,238,248,0.32)" font-size="9" text-anchor="end" font-family="Outfit,sans-serif">0</text>
+          <!-- Bars: y_bottom=90, range=80px for 15000 -->
+          <!-- Jan 2.1K → h=11.2, y=78.8 -->
+          <rect x="60" y="78.8" width="50" height="11.2" rx="4" fill="url(#barG1)"/>
+          <!-- Feb 3.8K → h=20.3, y=69.7 -->
+          <rect x="144" y="69.7" width="50" height="20.3" rx="4" fill="url(#barG1)"/>
+          <!-- Mar 5.9K → h=31.5, y=58.5 -->
+          <rect x="228" y="58.5" width="50" height="31.5" rx="4" fill="url(#barG1)"/>
+          <!-- Apr 7.8K → h=41.6, y=48.4 -->
+          <rect x="312" y="48.4" width="50" height="41.6" rx="4" fill="url(#barG1)"/>
+          <!-- May 10.4K → h=55.5, y=34.5 -->
+          <rect x="396" y="34.5" width="50" height="55.5" rx="4" fill="url(#barG2)"/>
+          <!-- Jun 12.0K → h=64, y=26 -->
+          <rect x="480" y="26" width="50" height="64" rx="4" fill="url(#barG2)"/>
+          <!-- X labels -->
+          <text x="85" y="106" fill="rgba(236,238,248,0.50)" font-size="10" text-anchor="middle" font-family="Outfit,sans-serif">Jan</text>
+          <text x="169" y="106" fill="rgba(236,238,248,0.50)" font-size="10" text-anchor="middle" font-family="Outfit,sans-serif">Feb</text>
+          <text x="253" y="106" fill="rgba(236,238,248,0.50)" font-size="10" text-anchor="middle" font-family="Outfit,sans-serif">Mar</text>
+          <text x="337" y="106" fill="rgba(236,238,248,0.50)" font-size="10" text-anchor="middle" font-family="Outfit,sans-serif">Apr</text>
+          <text x="421" y="106" fill="rgba(236,238,248,0.50)" font-size="10" text-anchor="middle" font-family="Outfit,sans-serif">May</text>
+          <text x="505" y="106" fill="rgba(236,238,248,0.50)" font-size="10" text-anchor="middle" font-family="Outfit,sans-serif">Jun</text>
+          <!-- Values -->
+          <text x="85" y="75" fill="rgba(236,238,248,0.65)" font-size="9" text-anchor="middle" font-family="Outfit,sans-serif">2.1K</text>
+          <text x="169" y="66" fill="rgba(236,238,248,0.65)" font-size="9" text-anchor="middle" font-family="Outfit,sans-serif">3.8K</text>
+          <text x="253" y="55" fill="rgba(236,238,248,0.65)" font-size="9" text-anchor="middle" font-family="Outfit,sans-serif">5.9K</text>
+          <text x="337" y="45" fill="rgba(236,238,248,0.65)" font-size="9" text-anchor="middle" font-family="Outfit,sans-serif">7.8K</text>
+          <text x="421" y="31" fill="rgba(236,238,248,0.85)" font-size="9" text-anchor="middle" font-family="Outfit,sans-serif">10.4K</text>
+          <text x="505" y="23" fill="rgba(236,238,248,0.85)" font-size="9" text-anchor="middle" font-family="Outfit,sans-serif">12.0K</text>
+        </svg>
+      </div>
+      <div class="disclaimer">Illustrative / Concept Project — all figures are fictional</div>
+    </div>
+  </div>
+
+  <!-- S8: Competitive Advantage -->
+  <div class="slide" id="s8">
+    <div class="s-inner">
+      <div class="slide-label">07 — Competitive Advantage</div>
+      <div class="divider"></div>
+      <div class="h2" style="margin-bottom:6px;">Context memory is the moat.</div>
+      <div class="sub" style="margin-bottom:20px;">NEXORA is the only platform that maintains persistent cross-tool context — competitors automate actions, not understanding.</div>
+      <div style="flex:1;overflow:auto;">
+        <table class="comp-table">
+          <thead>
+            <tr>
+              <th>Capability</th>
+              <th class="nex">NEXORA</th>
+              <th>Competitor A</th>
+              <th>Competitor B</th>
+              <th>Competitor C</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Persistent cross-tool memory</td>
+              <td class="nex chk">✓</td>
+              <td class="xmk">✗</td>
+              <td class="xmk">✗</td>
+              <td class="xmk">✗</td>
+            </tr>
+            <tr>
+              <td>No-code workflow automation</td>
+              <td class="nex chk">✓</td>
+              <td class="chk">✓</td>
+              <td class="pmk">~</td>
+              <td class="xmk">✗</td>
+            </tr>
+            <tr>
+              <td>AI copilot with workspace context</td>
+              <td class="nex chk">✓</td>
+              <td class="xmk">✗</td>
+              <td class="chk">✓</td>
+              <td class="pmk">~</td>
+            </tr>
+            <tr>
+              <td>Privacy-first (no training opt-in)</td>
+              <td class="nex chk">✓</td>
+              <td class="xmk">✗</td>
+              <td class="pmk">~</td>
+              <td class="chk">✓</td>
+            </tr>
+            <tr>
+              <td>Productivity analytics</td>
+              <td class="nex chk">✓</td>
+              <td class="pmk">~</td>
+              <td class="xmk">✗</td>
+              <td class="chk">✓</td>
+            </tr>
+            <tr>
+              <td>PLG onboarding (no sales required)</td>
+              <td class="nex chk">✓</td>
+              <td class="xmk">✗</td>
+              <td class="chk">✓</td>
+              <td class="xmk">✗</td>
+            </tr>
+            <tr>
+              <td>On-prem / private cloud option</td>
+              <td class="nex chk">✓</td>
+              <td class="xmk">✗</td>
+              <td class="xmk">✗</td>
+              <td class="chk">✓</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="disclaimer" style="margin-top:8px;">Illustrative / Concept Project — competitive analysis is fictional</div>
+    </div>
+  </div>
+
+  <!-- S9: Market Segments -->
+  <div class="slide" id="s9">
+    <div class="s-inner">
+      <div class="slide-label">08 — Market Segments</div>
+      <div class="divider"></div>
+      <div class="h2" style="margin-bottom:6px;">Three ICP segments, one platform.</div>
+      <div class="sub" style="margin-bottom:24px;">Each segment has distinct pain points — NEXORA's modular architecture addresses all three with the same core product.</div>
+      <div class="g3" style="flex:1;">
+        <div class="card featured">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <div style="width:40px;height:40px;border-radius:10px;background:rgba(62,200,176,0.15);display:flex;align-items:center;justify-content:center;font-size:20px;">🏦</div>
+            <div class="card-title" style="color:var(--accent);margin:0;">Financial Services</div>
+          </div>
+          <div class="card-body">Compliance reporting, client communication workflows, research synthesis. High automation ROI; strong security requirements met by on-prem option.</div>
+          <div class="mt-s">
+            <div style="font-size:11px;color:var(--fg3);">ACV target: $2,400 – $8,000</div>
+          </div>
+        </div>
+        <div class="card featured2">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <div style="width:40px;height:40px;border-radius:10px;background:rgba(139,127,255,0.15);display:flex;align-items:center;justify-content:center;font-size:20px;">⚖️</div>
+            <div class="card-title" style="color:var(--accent2);margin:0;">Professional Services</div>
+          </div>
+          <div class="card-body">Agencies, consultancies, and law firms handling client deliverables across dozens of concurrent projects. NexAssist dramatically reduces context-switching overhead.</div>
+          <div class="mt-s">
+            <div style="font-size:11px;color:var(--fg3);">ACV target: $1,200 – $4,800</div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <div style="width:40px;height:40px;border-radius:10px;background:rgba(245,158,11,0.12);display:flex;align-items:center;justify-content:center;font-size:20px;">💻</div>
+            <div class="card-title" style="color:var(--amber);margin:0;">Technology</div>
+          </div>
+          <div class="card-body">Product teams, engineering leads, and growth teams running data-heavy workflows across Jira, Notion, Slack, and analytics tools. AutoFlow is the entry point.</div>
+          <div class="mt-s">
+            <div style="font-size:11px;color:var(--fg3);">ACV target: $2,400 – $24,000</div>
+          </div>
+        </div>
+      </div>
+      <div class="disclaimer">Illustrative / Concept Project</div>
+    </div>
+  </div>
+
+  <!-- S10: Go-to-Market -->
+  <div class="slide" id="s10">
+    <div class="s-inner">
+      <div class="slide-label">09 — Go-to-Market</div>
+      <div class="divider"></div>
+      <div class="h2" style="margin-bottom:6px;">PLG first. Enterprise second.</div>
+      <div class="sub" style="margin-bottom:24px;">A three-phase motion designed to reach $52M ARR by Year 4 without a large sales org.</div>
+      <div class="g3" style="flex:1;">
+        <div class="card featured">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+            <div class="phase-num" style="background:rgba(62,200,176,0.15);color:var(--accent);">1</div>
+            <div class="card-title" style="color:var(--accent);margin:0;">Product-Led Growth</div>
+          </div>
+          <div class="card-body">Freemium tier drives viral adoption. Referral loops built into sharing AutoFlow workflows and NexAssist templates. Target: 50K MAU in 12 months.</div>
+          <div class="mt-s"><div style="font-size:11px;color:var(--fg3);">Months 0–12</div></div>
+        </div>
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+            <div class="phase-num" style="background:rgba(139,127,255,0.15);color:var(--accent2);">2</div>
+            <div class="card-title" style="color:var(--accent2);margin:0;">SMB Expansion</div>
+          </div>
+          <div class="card-body">Self-serve Team plan. In-product nudges convert top individual users to team accounts. Content marketing + community flywheel. Target: 500 paying teams.</div>
+          <div class="mt-s"><div style="font-size:11px;color:var(--fg3);">Months 6–18</div></div>
+        </div>
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+            <div class="phase-num" style="background:rgba(245,158,11,0.12);color:var(--amber);">3</div>
+            <div class="card-title" style="color:var(--amber);margin:0;">Enterprise Motion</div>
+          </div>
+          <div class="card-body">Dedicated AE team targets F500 accounts via champions identified in PLG data. On-prem deployment unlocks regulated industries. Target: 20 enterprise logos.</div>
+          <div class="mt-s"><div style="font-size:11px;color:var(--fg3);">Months 12–30</div></div>
+        </div>
+      </div>
+      <div class="disclaimer">Illustrative / Concept Project</div>
+    </div>
+  </div>
+
+  <!-- S11: Team -->
+  <div class="slide" id="s11">
+    <div class="s-inner">
+      <div class="slide-label">10 — Team</div>
+      <div class="divider"></div>
+      <div class="h2" style="margin-bottom:6px;">Built by operators who've scaled this before.</div>
+      <div class="sub" style="margin-bottom:24px;">The founding team combines enterprise SaaS, AI research, and PLG growth expertise.</div>
+      <div class="g4" style="flex:1;">
+        <div class="team-card">
+          <div class="avatar" style="background:linear-gradient(135deg,#3EC8B0,#8B7FFF);color:#fff;">AM</div>
+          <div style="font-size:14px;font-weight:700;">Alex Morgan</div>
+          <div style="font-size:12px;color:var(--accent);font-weight:600;">CEO &amp; Co-founder</div>
+          <div style="font-size:12px;color:var(--fg2);line-height:1.5;">Former VP Product at enterprise SaaS (2K → 40K seats). Led $30M Series B.</div>
+        </div>
+        <div class="team-card">
+          <div class="avatar" style="background:linear-gradient(135deg,#8B7FFF,#3EC8B0);color:#fff;">SC</div>
+          <div style="font-size:14px;font-weight:700;">Sarah Chen</div>
+          <div style="font-size:12px;color:var(--accent2);font-weight:600;">CTO &amp; Co-founder</div>
+          <div style="font-size:12px;color:var(--fg2);line-height:1.5;">ML research background. 6 years building NLP systems at a top-10 AI lab. 14 published papers.</div>
+        </div>
+        <div class="team-card">
+          <div class="avatar" style="background:linear-gradient(135deg,#F59E0B,#3EC8B0);color:#fff;">MW</div>
+          <div style="font-size:14px;font-weight:700;">Marcus Williams</div>
+          <div style="font-size:12px;color:var(--amber);font-weight:600;">CPO</div>
+          <div style="font-size:12px;color:var(--fg2);line-height:1.5;">0→1 product lead at two PLG companies (combined $80M ARR). Obsesses over onboarding.</div>
+        </div>
+        <div class="team-card">
+          <div class="avatar" style="background:linear-gradient(135deg,#34D399,#8B7FFF);color:#fff;">PP</div>
+          <div style="font-size:14px;font-weight:700;">Priya Patel</div>
+          <div style="font-size:12px;color:var(--success);font-weight:600;">Head of Sales</div>
+          <div style="font-size:12px;color:var(--fg2);line-height:1.5;">Closed $12M+ in enterprise SaaS. Built outbound motion from scratch at two startups.</div>
+        </div>
+      </div>
+      <div class="disclaimer">Illustrative / Concept Project — all names and backgrounds are fictional</div>
+    </div>
+  </div>
+
+  <!-- S12: Financial Projections -->
+  <div class="slide" id="s12">
+    <div class="s-inner">
+      <div class="slide-label">11 — Financial Projections</div>
+      <div class="divider"></div>
+      <div class="h2" style="margin-bottom:6px;">$52M ARR by Year 4.</div>
+      <div class="sub" style="margin-bottom:16px;">Breakeven at 18 months. 3.2× net revenue retention drives efficient growth.</div>
+      <div class="g4" style="margin-bottom:14px;">
+        <div class="stat-tile">
+          <div class="stat-num" style="color:var(--accent);">$8M</div>
+          <div class="stat-label">Series A raise</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-num" style="color:var(--accent2);">18mo</div>
+          <div class="stat-label">Runway to breakeven</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-num" style="color:var(--success);">3.2×</div>
+          <div class="stat-label">Net revenue retention (Y2)</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-num" style="color:var(--warn);">Y2</div>
+          <div class="stat-label">Projected breakeven year</div>
+        </div>
+      </div>
+      <div class="chart-wrap" style="flex:1;">
+        <div class="chart-title">ARR PROJECTION Y1–Y4 (Illustrative — not a financial forecast)</div>
+        <svg viewBox="0 0 560 130" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" style="max-height:130px;">
+          <defs>
+            <linearGradient id="lineG" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#3EC8B0"/>
+              <stop offset="100%" stop-color="#8B7FFF"/>
+            </linearGradient>
+            <linearGradient id="areaG" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#8B7FFF" stop-opacity=".25"/>
+              <stop offset="100%" stop-color="#3EC8B0" stop-opacity=".03"/>
+            </linearGradient>
+          </defs>
+          <!-- Grid -->
+          <line x1="80" y1="10" x2="530" y2="10" stroke="rgba(180,200,255,0.07)" stroke-width="1"/>
+          <line x1="80" y1="36" x2="530" y2="36" stroke="rgba(180,200,255,0.07)" stroke-width="1"/>
+          <line x1="80" y1="62" x2="530" y2="62" stroke="rgba(180,200,255,0.07)" stroke-width="1"/>
+          <line x1="80" y1="88" x2="530" y2="88" stroke="rgba(180,200,255,0.07)" stroke-width="1"/>
+          <!-- Y axis labels: scale 0-55M over y 10-88 (78px range) -->
+          <text x="75" y="13" fill="rgba(236,238,248,0.32)" font-size="9" text-anchor="end" font-family="Outfit,sans-serif">$55M</text>
+          <text x="75" y="39" fill="rgba(236,238,248,0.32)" font-size="9" text-anchor="end" font-family="Outfit,sans-serif">$40M</text>
+          <text x="75" y="65" fill="rgba(236,238,248,0.32)" font-size="9" text-anchor="end" font-family="Outfit,sans-serif">$20M</text>
+          <text x="75" y="91" fill="rgba(236,238,248,0.32)" font-size="9" text-anchor="end" font-family="Outfit,sans-serif">$0</text>
+          <!-- Points: y_bottom=88, range=78px, max=55M
+               Y1=$2.4M → y=88-(2.4/55*78)=88-3.4=84.6
+               Y2=$8.1M → y=88-(8.1/55*78)=88-11.5=76.5
+               Y3=$21M  → y=88-(21/55*78)=88-29.8=58.2
+               Y4=$52M  → y=88-(52/55*78)=88-73.7=14.3
+          -->
+          <!-- Area fill -->
+          <path d="M 130,84.6 L 260,76.5 L 390,58.2 L 520,14.3 L 520,88 L 130,88 Z" fill="url(#areaG)"/>
+          <!-- Line -->
+          <polyline points="130,84.6 260,76.5 390,58.2 520,14.3" fill="none" stroke="url(#lineG)" stroke-width="2.5" stroke-linejoin="round"/>
+          <!-- Dots -->
+          <circle cx="130" cy="84.6" r="5" fill="#3EC8B0"/>
+          <circle cx="260" cy="76.5" r="5" fill="#5EC2A0"/>
+          <circle cx="390" cy="58.2" r="5" fill="#7A8FEE"/>
+          <circle cx="520" cy="14.3" r="5" fill="#8B7FFF"/>
+          <!-- X labels -->
+          <text x="130" y="106" fill="rgba(236,238,248,0.50)" font-size="10" text-anchor="middle" font-family="Outfit,sans-serif">Year 1</text>
+          <text x="260" y="106" fill="rgba(236,238,248,0.50)" font-size="10" text-anchor="middle" font-family="Outfit,sans-serif">Year 2</text>
+          <text x="390" y="106" fill="rgba(236,238,248,0.50)" font-size="10" text-anchor="middle" font-family="Outfit,sans-serif">Year 3</text>
+          <text x="520" y="106" fill="rgba(236,238,248,0.50)" font-size="10" text-anchor="middle" font-family="Outfit,sans-serif">Year 4</text>
+          <!-- Value labels -->
+          <text x="130" y="80" fill="rgba(62,200,176,0.85)" font-size="9" text-anchor="middle" font-family="Outfit,sans-serif">$2.4M</text>
+          <text x="260" y="72" fill="rgba(236,238,248,0.70)" font-size="9" text-anchor="middle" font-family="Outfit,sans-serif">$8.1M</text>
+          <text x="390" y="53" fill="rgba(236,238,248,0.70)" font-size="9" text-anchor="middle" font-family="Outfit,sans-serif">$21M</text>
+          <text x="520" y="10" fill="rgba(139,127,255,0.90)" font-size="9" text-anchor="middle" font-family="Outfit,sans-serif">$52M</text>
+        </svg>
+      </div>
+      <div class="disclaimer">Illustrative / Concept Project — not a financial forecast or investment prospectus</div>
+    </div>
+  </div>
+
+  <!-- S13: Closing -->
+  <div class="slide" id="s13">
+    <div class="s-inner">
+      <div style="margin-bottom:20px;">
+        <svg width="48" height="48" viewBox="0 0 56 56" fill="none">
+          <rect width="56" height="56" rx="14" fill="url(#cg2)"/>
+          <path d="M14 42V14l13 20 13-20v28" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs>
+            <linearGradient id="cg2" x1="0" y1="0" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#3EC8B0"/><stop offset="1" stop-color="#8B7FFF"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="h1 serif grad-text" style="font-size:clamp(40px,7vw,72px);margin-bottom:16px;">Join Us.</div>
+      <div class="sub" style="max-width:520px;margin:0 auto 32px;">We're raising a $8M Series A to build the productivity layer that knowledge work has always needed.</div>
+      <div class="card" style="max-width:480px;width:100%;margin:0 auto;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:.10em;color:var(--fg3);text-transform:uppercase;margin-bottom:14px;">Use of Funds</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+              <span style="color:var(--fg);">Engineering &amp; Infrastructure</span>
+              <span style="color:var(--accent);font-weight:700;">$4.0M</span>
+            </div>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:50%;background:var(--grad);"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+              <span style="color:var(--fg);">Sales &amp; Marketing</span>
+              <span style="color:var(--accent2);font-weight:700;">$2.8M</span>
+            </div>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:35%;background:var(--accent2);"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;">
+              <span style="color:var(--fg);">G&amp;A</span>
+              <span style="color:var(--warn);font-weight:700;">$1.2M</span>
+            </div>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:15%;background:var(--warn);"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-l concept-badge">
+        <span>⚠</span> Illustrative / Concept Project — not a real investment opportunity
+      </div>
+    </div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- Navigation -->
+<div id="nav">
+  <button class="nav-btn" id="prevBtn" onclick="nav(-1)" disabled>&#8592;</button>
+  <div id="dots"></div>
+  <button class="nav-btn" id="nextBtn" onclick="nav(1)">&#8594;</button>
+  <span id="counter">1 / 13</span>
+</div>
+
+<script>
+const slides = Array.from(document.querySelectorAll('.slide'));
+const total = slides.length;
+let cur = 0;
+
+function buildDots(){
+  const container = document.getElementById('dots');
+  slides.forEach((_,i)=>{
+    const b = document.createElement('button');
+    b.className='dot'+(i===0?' on':'');
+    b.setAttribute('aria-label','Slide '+(i+1));
+    b.onclick=()=>goTo(i);
+    container.appendChild(b);
+  });
+}
+
+function goTo(n){
+  if(n<0||n>=total)return;
+  slides[cur].classList.remove('active');
+  document.querySelectorAll('.dot')[cur].classList.remove('on');
+  cur=n;
+  slides[cur].classList.add('active');
+  document.querySelectorAll('.dot')[cur].classList.add('on');
+  document.getElementById('counter').textContent=(cur+1)+' / '+total;
+  document.getElementById('prevBtn').disabled=cur===0;
+  document.getElementById('nextBtn').disabled=cur===total-1;
+}
+
+function nav(d){goTo(cur+d);}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown')nav(1);
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp')nav(-1);
+});
+
+// Touch/swipe support
+let touchStartX=0;
+document.getElementById('deck').addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX;},{passive:true});
+document.getElementById('deck').addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-touchStartX;
+  if(Math.abs(dx)>50) nav(dx<0?1:-1);
+},{passive:true});
+
+buildDots();
+</script>
+</body>
+</html>

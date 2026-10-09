@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Overseas Recruitment Agencies — DXB/SHJ/AJM</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#0a0a0f;--bg2:#13131a;--bg3:#1c1c26;--bg4:#252535;
+  --fg:#e8e8f0;--fg2:#a0a0b8;--fg3:#6060a0;
+  --accent:#ff5a1f;--accent2:#ff7a45;
+  --p1:#22c55e;--p2:#3b82f6;--p3:#eab308;
+  --review:#f97316;--reject:#ef4444;
+  --border:#2a2a3a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:'Inter',sans-serif;font-size:14px;line-height:1.5;padding:0 0 60px}
+a{color:var(--accent2);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* Header */
+.site-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:20px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.site-header h1{font-size:20px;font-weight:700;color:var(--fg)}
+.site-header .sub{font-size:12px;color:var(--fg2);margin-top:2px}
+.logo-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);flex-shrink:0}
+
+/* Stats bar */
+.stats-bar{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;gap:20px;flex-wrap:wrap}
+.stat{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--fg2)}
+.stat-val{font-size:15px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.stat-val.p1{color:var(--p1)}
+.stat-val.p2{color:var(--p2)}
+.stat-val.p3{color:var(--p3)}
+.stat-val.review{color:var(--review)}
+.stat-val.reject{color:var(--reject)}
+
+/* Warning */
+.warning-bar{background:#1a0d00;border:1px solid #f97316;margin:16px 24px;border-radius:8px;padding:12px 16px;font-size:13px;color:#fbbf24}
+.warning-bar strong{color:#f97316}
+
+/* Controls */
+.controls{padding:16px 24px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.filter-group{display:flex;gap:6px;flex-wrap:wrap}
+.filter-btn{background:var(--bg3);border:1px solid var(--border);color:var(--fg2);padding:6px 14px;border-radius:20px;cursor:pointer;font-size:12px;transition:all .15s}
+.filter-btn:hover,.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.search-box{flex:1;min-width:200px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--fg);font-size:13px;outline:none}
+.search-box:focus{border-color:var(--accent)}
+
+/* Grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;padding:0 24px}
+
+/* Card */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all .15s;position:relative}
+.card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px}
+.card-name{font-size:14px;font-weight:600;color:var(--fg);line-height:1.3}
+.card-emirate{font-size:11px;color:var(--fg3);margin-top:2px}
+.score-ring{width:44px;height:44px;flex-shrink:0;position:relative}
+.score-ring svg{transform:rotate(-90deg)}
+.score-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace}
+
+/* Badges */
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.badge-p1{background:#14532d;color:#86efac;border:1px solid #22c55e}
+.badge-p2{background:#1e3a5f;color:#93c5fd;border:1px solid #3b82f6}
+.badge-p3{background:#451a03;color:#fde68a;border:1px solid #eab308}
+.badge-review{background:#431407;color:#fdba74;border:1px solid #f97316}
+.badge-reject{background:#450a0a;color:#fca5a5;border:1px solid #ef4444}
+.badge-fee-high{background:#450a0a;color:#fca5a5;border:1px solid #ef4444}
+.badge-fee-med{background:#451a03;color:#fde68a;border:1px solid #f59e0b}
+.badge-fee-low{background:#14532d;color:#86efac;border:1px solid #22c55e}
+
+.card-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.card-row{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--fg2);margin-bottom:4px}
+.card-row .label{color:var(--fg3);min-width:90px;font-size:11px}
+.card-row .val{color:var(--fg)}
+.card-countries{font-size:11px;color:var(--fg2);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+.card-warning{background:#1a0d00;border:1px solid #f97316;border-radius:6px;padding:6px 10px;font-size:11px;color:#fbbf24;margin-top:8px}
+
+/* Modal */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;align-items:center;justify-content:center;padding:16px}
+.overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;max-width:680px;width:100%;max-height:90vh;overflow-y:auto;padding:24px;position:relative}
+.modal-close{position:absolute;top:16px;right:16px;background:var(--bg4);border:none;color:var(--fg2);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:var(--accent);color:#fff}
+.modal h2{font-size:18px;font-weight:700;margin-bottom:4px;padding-right:40px}
+.modal-sub{color:var(--fg2);font-size:12px;margin-bottom:16px}
+.modal-section{margin-bottom:16px}
+.modal-section h3{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--fg3);margin-bottom:8px;border-bottom:1px solid var(--border);padding-bottom:4px}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.modal-field{background:var(--bg3);border-radius:6px;padding:8px 10px}
+.modal-field .mf-label{font-size:10px;color:var(--fg3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.modal-field .mf-val{font-size:13px;color:var(--fg)}
+.modal-notes{background:var(--bg3);border-radius:6px;padding:10px 12px;font-size:13px;color:var(--fg2);line-height:1.6}
+.compliance-box{background:#1a0d00;border:1px solid var(--review);border-radius:8px;padding:12px;font-size:12px;color:#fbbf24}
+.compliance-box.critical{border-color:var(--reject);background:#1a0000}
+.compliance-box.low{border-color:var(--p1);background:#001a0d;color:#86efac}
+
+/* No results */
+.no-results{padding:40px;text-align:center;color:var(--fg3)}
+
+/* Footer */
+footer{text-align:center;color:var(--fg3);font-size:11px;padding:24px;border-top:1px solid var(--border);margin-top:40px}
+
+@media(max-width:480px){
+  .grid{grid-template-columns:1fr;padding:0 12px}
+  .controls,.stats-bar,.site-header{padding-left:12px;padding-right:12px}
+  .modal{padding:16px}
+  .modal-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="site-header">
+  <div class="logo-dot"></div>
+  <div>
+    <h1>Overseas Recruitment Agencies — DXB / SHJ / AJM</h1>
+    <div class="sub">Phase 4 Research | 2026-10-08 | Drexonyx V1 | 25 companies evaluated</div>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat"><span class="stat-val" id="count-total">25</span> Total</div>
+  <div class="stat"><span class="stat-val p1" id="count-p1">2</span> P1</div>
+  <div class="stat"><span class="stat-val p2" id="count-p2">3</span> P2</div>
+  <div class="stat"><span class="stat-val p3" id="count-p3">5</span> P3</div>
+  <div class="stat"><span class="stat-val review" id="count-review">10</span> Review</div>
+  <div class="stat"><span class="stat-val reject" id="count-reject">5</span> Reject</div>
+  <div class="stat"><span class="stat-val" style="color:var(--fg3)">13</span> Eliminated</div>
+</div>
+
+<div class="warning-bar">
+  <strong>⚠️ DRAFT — NO OUTREACH SENT</strong> — All contact drafts require explicit owner approval before transmission. |
+  <strong>⚠️ WORKER FEE RISK:</strong> UAE Federal Decree-Law 33/2021, Art. 6 prohibits charging workers. Require written zero-fee declaration from ALL agencies.
+</div>
+
+<div class="controls">
+  <input class="search-box" id="search" placeholder="Search agencies, countries, notes…">
+  <div class="filter-group" id="tier-filters">
+    <button class="filter-btn active" data-tier="ALL">All</button>
+    <button class="filter-btn" data-tier="P1" style="--fc:var(--p1)">P1</button>
+    <button class="filter-btn" data-tier="P2" style="--fc:var(--p2)">P2</button>
+    <button class="filter-btn" data-tier="P3" style="--fc:var(--p3)">P3</button>
+    <button class="filter-btn" data-tier="REVIEW">Review</button>
+    <button class="filter-btn" data-tier="REJECT">Reject</button>
+  </div>
+  <div class="filter-group" id="emirate-filters">
+    <button class="filter-btn active" data-emirate="ALL">All Emirates</button>
+    <button class="filter-btn" data-emirate="Dubai">Dubai</button>
+    <button class="filter-btn" data-emirate="Sharjah">Sharjah</button>
+  </div>
+</div>
+
+<div class="grid" id="grid"></div>
+<div class="no-results" id="no-results" style="display:none">No agencies match your filters.</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal">
+    <button class="modal-close" id="modal-close">✕</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<footer>
+  Drexonyx V1 — Phase 4 Research | Overseas Recruitment Agencies DXB/SHJ/AJM |
+  25 evaluated · 13 eliminated · 2 confirmed TRUE overseas agencies |
+  Generated 2026-10-08 | INTERNAL — NOT FOR DISTRIBUTION
+</footer>
+
+<script>
+const AGENCIES = [{"id": "OLS", "name": "OLS / Overseas Labour Supply", "emirate": "Sharjah", "address": "Sharjah, UAE", "phone": "+971 6 565 7163 / +971 6 565 8544 / +971 6 565 1817", "email": "ols@eim.ae / info@olsuae.com", "website": "olsuae.com", "founded": 1979, "score": 82, "tier": "P1", "source_countries": "India, Philippines + 20 others", "construction_yes": true, "capacity_100": true, "overseas_offices": true, "mohre_licence": "Unconfirmed", "notable_clients": "China State Construction, Al Shafar Group, Naresco", "worker_fee_risk": "MEDIUM", "mobilization_weeks": "4-6", "notes": "Oldest active agency in UAE (45+ yrs). 22 source countries confirmed. TRUE OVERSEAS RECRUITMENT MODEL.", "verified": true, "type": "TRUE OVERSEAS RECRUITMENT AGENCY"}, {"id": "AJEETS", "name": "AJEETS Management & Manpower", "emirate": "Dubai", "address": "Dubai, UAE", "phone": "Via website", "email": "ajeets.com (contact form)", "website": "ajeets.com", "founded": 2005, "score": 76, "tier": "P1", "source_countries": "India, Nepal, Bangladesh, Sri Lanka, Philippines, Uganda, Kenya", "construction_yes": true, "capacity_100": true, "overseas_offices": true, "mohre_licence": "Unconfirmed", "notable_clients": "Undisclosed construction clients", "worker_fee_risk": "HIGH", "mobilization_weeks": "4-8", "notes": "Bulk specialist. Masons, carpenters, steel fixers confirmed. TRUE OVERSEAS RECRUITMENT MODEL. HIGH worker-fee risk in India/BD/NP corridors.", "verified": true, "type": "TRUE OVERSEAS RECRUITMENT AGENCY"}, {"id": "DSS", "name": "Dynamic Staffing Services", "emirate": "Dubai", "address": "Dubai, UAE", "phone": "Via website", "email": "dss-hr.com (contact form)", "website": "dss-hr.com", "founded": 1997, "score": 74, "tier": "P2", "source_countries": "India, Nepal, Bangladesh, Philippines", "construction_yes": true, "capacity_100": true, "overseas_offices": true, "mohre_licence": "Unconfirmed", "notable_clients": "Bechtel/Enka (Kosovo project 800+ workers)", "worker_fee_risk": "MEDIUM-HIGH", "mobilization_weeks": "6-10", "notes": "Large-scale project placements confirmed (800+ workers Kosovo). TRUE OVERSEAS RECRUITMENT MODEL.", "verified": true, "type": "TRUE OVERSEAS RECRUITMENT AGENCY"}, {"id": "HRI", "name": "H.R. International FZE", "emirate": "Dubai", "address": "Dubai, UAE", "phone": "Via website", "email": "hrinternational.ae", "website": "hrinternational.ae", "founded": 2000, "score": 62, "tier": "P2", "source_countries": "India (New Delhi + Mumbai), Nepal", "construction_yes": true, "capacity_100": false, "overseas_offices": true, "mohre_licence": "Unconfirmed", "notable_clients": "Multiple UAE construction projects", "worker_fee_risk": "MEDIUM", "mobilization_weeks": "6-10", "notes": "India parent company documented. Nepal subsidiary confirmed. Capacity for 100 unconfirmed.", "verified": true, "type": "TRUE OVERSEAS RECRUITMENT AGENCY"}, {"id": "MAHAD", "name": "Mahad Manpower UAE", "emirate": "Dubai", "address": "Dubai, UAE", "phone": "+971 2 633 0757", "email": "info@mahadmanpower.ae", "website": "mahadmanpower.ae", "founded": 2008, "score": 55, "tier": "P2", "source_countries": "India, Nepal, Bangladesh", "construction_yes": true, "capacity_100": true, "overseas_offices": false, "mohre_licence": "Unconfirmed", "notable_clients": "Dubai construction projects (helpers confirmed on-site)", "worker_fee_risk": "HIGH", "mobilization_weeks": "6-12", "notes": "Construction helpers on Dubai sites confirmed. HIGH WORKER FEE RISK — must get written zero-fee guarantee.", "verified": true, "type": "PARTIAL — VERIFY OVERSEAS MODEL"}, {"id": "ATG", "name": "ATG Global HR Consultancy", "emirate": "Dubai", "address": "Dubai, UAE", "phone": "+971 52 482 5265", "email": "info@atgglobal.ae", "website": "atgglobal.ae", "founded": 2010, "score": 48, "tier": "P3", "source_countries": "Pakistan (Al Tashira partner confirmed)", "construction_yes": true, "capacity_100": false, "overseas_offices": false, "mohre_licence": "Unconfirmed", "notable_clients": "Undisclosed", "worker_fee_risk": "MEDIUM", "mobilization_weeks": "8-12", "notes": "Pakistan partner Al Tashira confirmed. Construction YES. Capacity unconfirmed.", "verified": true, "type": "PARTIAL — VERIFY OVERSEAS MODEL"}, {"id": "SUNDUS", "name": "Sundus Recruitment", "emirate": "Dubai", "address": "Dubai, UAE", "phone": "Via website", "email": "sundus.jobs", "website": "sundus.jobs", "founded": 2003, "score": 47, "tier": "P3", "source_countries": "Multiple (unconfirmed)", "construction_yes": true, "capacity_100": false, "overseas_offices": false, "mohre_licence": "Unconfirmed", "notable_clients": "Undisclosed", "worker_fee_risk": "MEDIUM", "mobilization_weeks": "8-12", "notes": "ISO 45001 certified. Emirati-owned. Construction YES. Overseas network not confirmed.", "verified": true, "type": "UNCONFIRMED — VERIFY"}, {"id": "EXPERT", "name": "Expert Labor Supply Services", "emirate": "Dubai", "address": "RKM Building, Hor Al Anz East, Deira, Dubai", "phone": "Via office", "email": "N/A", "website": "N/A", "founded": 2001, "score": 45, "tier": "P3", "source_countries": "Unconfirmed", "construction_yes": true, "capacity_100": false, "overseas_offices": false, "mohre_licence": "Unconfirmed", "notable_clients": "Construction trades", "worker_fee_risk": "UNKNOWN", "mobilization_weeks": "Unknown", "notes": "Construction trades documented. Overseas network hinted but not confirmed.", "verified": false, "type": "UNCONFIRMED — VERIFY"}, {"id": "ARIES", "name": "Aries Tech Cont LLC", "emirate": "Sharjah", "address": "402 Al Saud Building, Al Arouba St, Al Nabaa, Sharjah", "phone": "Via office", "email": "N/A", "website": "N/A", "founded": 2002, "score": 42, "tier": "P3", "source_countries": "Unconfirmed", "construction_yes": true, "capacity_100": true, "overseas_offices": false, "mohre_licence": "Unconfirmed", "notable_clients": "Claimed 1,200+ placements", "worker_fee_risk": "UNKNOWN", "mobilization_weeks": "Unknown", "notes": "1,200+ placements claimed. Construction YES. Overseas model unverified.", "verified": false, "type": "UNCONFIRMED — VERIFY"}, {"id": "ALLIANCE", "name": "Alliance Recruitment Agency", "emirate": "Dubai", "address": "Dubai, UAE", "phone": "Via website", "email": "alliancerecruitmentagency.ae", "website": "alliancerecruitmentagency.ae", "founded": 2007, "score": 40, "tier": "P3", "source_countries": "India, Southeast Asia", "construction_yes": false, "capacity_100": true, "overseas_offices": true, "mohre_licence": "Unconfirmed", "notable_clients": "Undisclosed", "worker_fee_risk": "MEDIUM", "mobilization_weeks": "8-14", "notes": "Bulk hiring claims. India/SEA sourcing. Construction sector NOT confirmed.", "verified": true, "type": "UNCONFIRMED — VERIFY CONSTRUCTION"}, {"id": "SHERMAN", "name": "Sherman Global", "emirate": "Dubai/UAE", "address": "UAE (emirate unconfirmed)", "phone": "Via website", "email": "shermanglobal.ae", "website": "shermanglobal.ae", "founded": 2010, "score": 38, "tier": "REVIEW", "source_countries": "Nepal (DOFE licence 1219/074/75 confirmed)", "construction_yes": false, "capacity_100": false, "overseas_offices": true, "mohre_licence": "Unconfirmed", "notable_clients": "Undisclosed", "worker_fee_risk": "MEDIUM", "mobilization_weeks": "Unknown", "notes": "Nepal DOFE licence confirmed. Construction capability NOT verified.", "verified": true, "type": "UNCONFIRMED — VERIFY"}, {"id": "INTER_EM", "name": "Inter Emirates", "emirate": "Sharjah", "address": "Sharjah, UAE", "phone": "Via office", "email": "N/A", "website": "N/A", "founded": 2004, "score": 36, "tier": "REVIEW", "source_countries": "Southeast Asia", "construction_yes": false, "capacity_100": false, "overseas_offices": false, "mohre_licence": "Unconfirmed", "notable_clients": "Undisclosed", "worker_fee_risk": "MEDIUM", "mobilization_weeks": "Unknown", "notes": "Southeast Asia sourcing. Founded 2004. Construction capability unconfirmed.", "verified": false, "type": "UNCONFIRMED — VERIFY"}, {"id": "ONTIME", "name": "Ontime Manpower Supply", "emirate": "Dubai", "address": "Dubai, UAE", "phone": "+971 4 256 6333", "email": "ontimeuae.com", "website": "ontimeuae.com", "founded": 2001, "score": 35, "tier": "REVIEW", "source_countries": "Unconfirmed", "construction_yes": false, "capacity_100": false, "overseas_offices": false, "mohre_licence": "Unconfirmed", "notable_clients": "Undisclosed", "worker_fee_risk": "UNKNOWN", "mobilization_weeks": "Unknown", "notes": "Est. 2001. Overseas model unverified. Construction unconfirmed.", "verified": false, "type": "UNCONFIRMED — VERIFY"}, {"id": "INTERGRANDE", "name": "Intergrande BKC", "emirate": "Sharjah", "address": "Sharjah, UAE", "phone": "Via office", "email": "N/A", "website": "N/A", "founded": 2001, "score": 33, "tier": "REVIEW", "source_countries": "Unconfirmed", "construction_yes": true, "capacity_100": false, "overseas_offices": false, "mohre_licence": "Unconfirmed", "notable_clients": "Undisclosed", "worker_fee_risk": "UNKNOWN", "mobilization_weeks": "Unknown", "notes": "22+ years. Construction YES. Overseas model unverified.", "verified": false, "type": "UNCONFIRMED — VERIFY"}, {"id": "BCC", "name": "BCC Manpower Services", "emirate": "Sharjah", "address": "BCC Building, Al Zahraa Street, Sharjah", "phone": "+971 4 263 2001", "email": "N/A", "website": "N/A", "founded": 2000, "score": 32, "tier": "REVIEW", "source_countries": "Unconfirmed", "construction_yes": false, "capacity_100": false, "overseas_offices": false, "mohre_licence": "Unconfirmed", "notable_clients": "Undisclosed", "worker_fee_risk": "UNKNOWN", "mobilization_weeks": "Unknown", "notes": "Physical address confirmed. Overseas/construction model unverified.", "verified": false, "type": "UNCONFIRMED — VERIFY"}, {"id": "TABASCO", "name": "Tabasco Human Capital", "emirate": "Sharjah", "address": "Damas 2000 Building, Rolla, Sharjah", "phone": "+971 800 8222726", "email": "N/A", "website": "N/A", "founded": 2005, "score": 31, "tier": "REVIEW", "source_countries": "Unconfirmed", "construction_yes": false, "capacity_100": false, "overseas_offices": false, "mohre_licence": "Unconfirmed", "notable_clients": "Undisclosed", "worker_fee_risk": "UNKNOWN", "mobilization_weeks": "Unknown", "notes": "Toll-free number confirmed. Overseas/construction model unverified.", "verified": false, "type": "UNCONFIRMED — VERIFY"}, {"id": "MARMOOM", "name": "Marmoom Manpower", "emirate": "Sharjah", "address": "Sharjah, UAE", "phone": "Via website", "email": "marmoommanpower.com", "website": "marmoommanpower.com", "founded": 2006, "score": 30, "tier": "REVIEW", "source_countries": "Unconfirmed", "construction_yes": false, "capacity_100": false, "overseas_offices": false, "mohre_licence": "Unconfirmed", "notable_clients": "Undisclosed", "worker_fee_risk": "UNKNOWN", "mobilization_weeks": "Unknown", "notes": "Website found. All capability unverified.", "verified": false, "type": "UNCONFIRMED — VERIFY"}, {"id": "AFRIGULF", "name": "Afri Gulf Manpower", "emirate": "Dubai", "address": "Dubai, UAE", "phone": "Via website", "email": "N/A", "website": "N/A", "founded": 2008, "score": 28, "tier": "REVIEW", "source_countries": "Africa (partial)", "construction_yes": false, "capacity_100": false, "overseas_offices": false, "mohre_licence": "Unconfirmed", "notable_clients": "Construction/EPC (partial)", "worker_fee_risk": "MEDIUM", "mobilization_weeks": "Unknown", "notes": "ISO 9001. Construction/EPC PARTIAL only. Africa sourcing partial.", "verified": false, "type": "UNCONFIRMED — VERIFY"}, {"id": "SMOOTH", "name": "Smooth Manpower Supply", "emirate": "Sharjah", "address": "Sharjah, UAE", "phone": "+971 800 766 684", "email": "N/A", "website": "N/A", "founded": 2007, "score": 26, "tier": "REVIEW", "source_countries": "Unconfirmed", "construction_yes": false, "capacity_100": false, "overseas_offices": false, "mohre_licence": "Unconfirmed", "notable_clients": "Undisclosed", "worker_fee_risk": "UNKNOWN", "mobilization_weeks": "Unknown", "notes": "Conflicting Abu Dhabi listing. Overseas/construction model unverified.", "verified": false, "type": "UNCONFIRMED — VERIFY"}, {"id": "WORLDSTAR", "name": "World Star Manpower", "emirate": "Sharjah", "address": "Sharjah, UAE", "phone": "Via website", "email": "worldstarmanpower.ae", "website": "worldstarmanpower.ae", "founded": 2009, "score": 25, "tier": "REVIEW", "source_countries": "UAE-side only (no overseas sourcing)", "construction_yes": false, "capacity_100": false, "overseas_offices": false, "mohre_licence": "Unconfirmed", "notable_clients": "Undisclosed", "worker_fee_risk": "LOW (UAE-side only)", "mobilization_weeks": "N/A", "notes": "UAE-side recruitment only. Does NOT source workers from abroad. WRONG TYPE for this requirement.", "verified": true, "type": "WRONG TYPE — UAE SIDE ONLY"}, {"id": "CANDOR", "name": "Candor Management", "emirate": "Sharjah", "address": "Sharjah, UAE", "phone": "N/A", "email": "N/A", "website": "N/A", "founded": null, "score": 20, "tier": "REJECT", "source_countries": "Unconfirmed", "construction_yes": false, "capacity_100": false, "overseas_offices": false, "mohre_licence": "Unconfirmed", "notable_clients": "None", "worker_fee_risk": "UNKNOWN", "mobilization_weeks": "Unknown", "notes": "Zotero academic profile only. Not found in UAE business directories.", "verified": false, "type": "UNVERIFIED — REJECT"}, {"id": "ALQASWA", "name": "Al Qaswa HR", "emirate": "Dubai", "address": "Dubai, UAE", "phone": "Via website", "email": "N/A", "website": "N/A", "founded": 2018, "score": 18, "tier": "REJECT", "source_countries": "Unconfirmed", "construction_yes": false, "capacity_100": false, "overseas_offices": false, "mohre_licence": "Unconfirmed", "notable_clients": "None", "worker_fee_risk": "UNKNOWN", "mobilization_weeks": "Unknown", "notes": "Clutch profile, 2-9 staff. Too small for 100-worker requirement.", "verified": false, "type": "TOO SMALL — REJECT"}, {"id": "ALMARMOOM", "name": "Al Marmoom Manpower Supply LLC", "emirate": "Dubai", "address": "DIP2 Jebel Ali, Dubai", "phone": "Via office", "email": "N/A", "website": "N/A", "founded": null, "score": 17, "tier": "REJECT", "source_countries": "Unconfirmed", "construction_yes": false, "capacity_100": false, "overseas_offices": false, "mohre_licence": "Unconfirmed", "notable_clients": "None", "worker_fee_risk": "UNKNOWN", "mobilization_weeks": "Unknown", "notes": "Thin data. Physical address only.", "verified": false, "type": "INSUFFICIENT DATA — REJECT"}, {"id": "GLOBAL_LABOR", "name": "Global Labor Supply", "emirate": "Dubai", "address": "Dubai, UAE", "phone": "N/A", "email": "N/A", "website": "N/A", "founded": null, "score": 15, "tier": "REJECT", "source_countries": "Unconfirmed", "construction_yes": false, "capacity_100": false, "overseas_offices": false, "mohre_licence": "Unconfirmed", "notable_clients": "None", "worker_fee_risk": "UNKNOWN", "mobilization_weeks": "Unknown", "notes": "Unverified. No web presence found.", "verified": false, "type": "UNVERIFIED — REJECT"}, {"id": "HAMDAN", "name": "Hamdan Global", "emirate": "Dubai", "address": "Dubai, UAE", "phone": "N/A", "email": "N/A", "website": "N/A", "founded": null, "score": 12, "tier": "REJECT", "source_countries": "Unconfirmed", "construction_yes": false, "capacity_100": false, "overseas_offices": false, "mohre_licence": "Unconfirmed", "notable_clients": "None", "worker_fee_risk": "UNKNOWN", "mobilization_weeks": "Unknown", "notes": "Unverified + negative reviews found.", "verified": false, "type": "NEGATIVE REVIEWS — REJECT"}];
+
+let activeTier = 'ALL', activeEmirate = 'ALL', searchVal = '';
+
+function scoreColor(s) {
+  if (s >= 70) return '#22c55e';
+  if (s >= 55) return '#3b82f6';
+  if (s >= 40) return '#eab308';
+  if (s >= 25) return '#f97316';
+  return '#ef4444';
+}
+
+function feeBadge(r) {
+  if (!r) return '';
+  const rl = r.toUpperCase();
+  if (rl.includes('HIGH')) return '<span class="badge badge-fee-high">⚠ HIGH FEE RISK</span>';
+  if (rl.includes('MEDIUM')) return '<span class="badge badge-fee-med">MEDIUM FEE RISK</span>';
+  if (rl.includes('LOW') || rl.includes('UAE-SIDE')) return '<span class="badge badge-fee-low">LOW RISK</span>';
+  return '<span class="badge" style="background:var(--bg4);color:var(--fg2)">UNKNOWN RISK</span>';
+}
+
+function boolBadge(v, yLabel='YES', nLabel='NO') {
+  return v ? `<span class="badge" style="background:#14532d;color:#86efac;border:1px solid #22c55e">${yLabel}</span>`
+           : `<span class="badge" style="background:var(--bg4);color:var(--fg3);border:1px solid var(--border)">${nLabel}</span>`;
+}
+
+function makeCard(a) {
+  const c = scoreColor(a.score);
+  const pct = a.score/100;
+  const circ = 2*Math.PI*18;
+  const dash = circ*pct;
+  const tierClass = 'badge-'+a.tier.toLowerCase().replace('review','review').replace('reject','reject');
+  return `<div class="card" onclick="openModal('${a.id}')">
+    <div class="card-top">
+      <div>
+        <div class="card-name">${a.name}</div>
+        <div class="card-emirate">${a.emirate}</div>
+      </div>
+      <div class="score-ring">
+        <svg width="44" height="44" viewBox="0 0 44 44">
+          <circle cx="22" cy="22" r="18" fill="none" stroke="var(--bg4)" stroke-width="4"/>
+          <circle cx="22" cy="22" r="18" fill="none" stroke="${c}" stroke-width="4"
+            stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}" stroke-linecap="round"/>
+        </svg>
+        <div class="score-num" style="color:${c}">${a.score}</div>
+      </div>
+    </div>
+    <div class="card-meta">
+      <span class="badge ${tierClass}">${a.tier}</span>
+      ${feeBadge(a.worker_fee_risk)}
+      ${a.construction_yes ? '<span class="badge" style="background:#1e3a5f;color:#93c5fd;border:1px solid #3b82f6">CONSTRUCTION ✓</span>' : ''}
+    </div>
+    <div class="card-row"><span class="label">Contact</span><span class="val">${(a.email||'').split('/')[0].trim()||a.phone}</span></div>
+    <div class="card-row"><span class="label">Type</span><span class="val" style="color:${a.type.includes('TRUE')?'#22c55e':a.type.includes('WRONG')||a.type.includes('REJECT')?'#ef4444':'var(--fg2)'}">${a.type}</span></div>
+    ${a.worker_fee_risk && a.worker_fee_risk.toUpperCase().includes('HIGH') ? '<div class="card-warning">⚠️ HIGH worker-fee risk. Require written zero-fee declaration.</div>' : ''}
+    <div class="card-countries">🌍 ${a.source_countries}</div>
+  </div>`;
+}
+
+function openModal(id) {
+  const a = AGENCIES.find(x=>x.id===id);
+  if (!a) return;
+  const c = scoreColor(a.score);
+  const compBox = a.worker_fee_risk && a.worker_fee_risk.toUpperCase().includes('HIGH') ?
+    '<div class="compliance-box critical"><strong>⚠️ CRITICAL — HIGH WORKER FEE RISK</strong><br>UAE Federal Decree-Law 33/2021, Art. 6 prohibits charging workers. This agency corridor (India/BD/NP) has systemic documented fee practices. Require written zero-fee declaration before proceeding.</div>' :
+    a.worker_fee_risk && a.worker_fee_risk.toUpperCase().includes('MEDIUM') ?
+    '<div class="compliance-box"><strong>⚠️ MEDIUM WORKER FEE RISK</strong><br>Request written zero-fee declaration. MOHRE licence verification required.</div>' :
+    '<div class="compliance-box low"><strong>✅ LOWER FEE RISK</strong><br>Still require MOHRE licence verification and written zero-fee declaration.</div>';
+
+  document.getElementById('modal-body').innerHTML = `
+    <h2>${a.name}</h2>
+    <div class="modal-sub">${a.emirate} · Score: <strong style="color:${c}">${a.score}/100</strong> · <span class="badge badge-${a.tier.toLowerCase().replace('review','review')}">${a.tier}</span></div>
+    <div class="modal-section">
+      <h3>Contact</h3>
+      <div class="modal-grid">
+        <div class="modal-field"><div class="mf-label">Phone</div><div class="mf-val">${a.phone}</div></div>
+        <div class="modal-field"><div class="mf-label">Email</div><div class="mf-val">${a.email}</div></div>
+        <div class="modal-field"><div class="mf-label">Website</div><div class="mf-val"><a href="https://${a.website}" target="_blank">${a.website}</a></div></div>
+        <div class="modal-field"><div class="mf-label">Address</div><div class="mf-val">${a.address}</div></div>
+      </div>
+    </div>
+    <div class="modal-section">
+      <h3>Capability</h3>
+      <div class="modal-grid">
+        <div class="modal-field"><div class="mf-label">Founded</div><div class="mf-val">${a.founded||'Unknown'}</div></div>
+        <div class="modal-field"><div class="mf-label">Construction</div><div class="mf-val">${boolBadge(a.construction_yes)}</div></div>
+        <div class="modal-field"><div class="mf-label">Capacity 100</div><div class="mf-val">${boolBadge(a.capacity_100,'CONFIRMED','UNCONFIRMED')}</div></div>
+        <div class="modal-field"><div class="mf-label">Overseas Offices</div><div class="mf-val">${boolBadge(a.overseas_offices,'CONFIRMED','UNCONFIRMED')}</div></div>
+        <div class="modal-field"><div class="mf-label">MOHRE Licence</div><div class="mf-val">${a.mohre_licence}</div></div>
+        <div class="modal-field"><div class="mf-label">Mob. Weeks</div><div class="mf-val">${a.mobilization_weeks}</div></div>
+      </div>
+    </div>
+    <div class="modal-section">
+      <h3>Source Countries</h3>
+      <div class="modal-notes">${a.source_countries}</div>
+    </div>
+    <div class="modal-section">
+      <h3>Agency Type</h3>
+      <div class="modal-notes" style="color:${a.type.includes('TRUE')?'#22c55e':a.type.includes('WRONG')||a.type.includes('REJECT')?'#ef4444':'var(--fg2)'}">${a.type}</div>
+    </div>
+    <div class="modal-section">
+      <h3>Compliance</h3>
+      ${compBox}
+    </div>
+    <div class="modal-section">
+      <h3>Research Notes</h3>
+      <div class="modal-notes">${a.notes}</div>
+    </div>
+    ${a.notable_clients && a.notable_clients !== 'Undisclosed' && a.notable_clients !== 'None' ? `<div class="modal-section"><h3>Notable Clients</h3><div class="modal-notes">${a.notable_clients}</div></div>` : ''}
+  `;
+  document.getElementById('overlay').classList.add('open');
+}
+
+document.getElementById('modal-close').onclick = () => document.getElementById('overlay').classList.remove('open');
+document.getElementById('overlay').onclick = e => { if(e.target===document.getElementById('overlay')) document.getElementById('overlay').classList.remove('open'); };
+document.addEventListener('keydown', e => { if(e.key==='Escape') document.getElementById('overlay').classList.remove('open'); });
+
+document.querySelectorAll('[data-tier]').forEach(btn => {
+  btn.onclick = () => {
+    activeTier = btn.dataset.tier;
+    document.querySelectorAll('[data-tier]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+  };
+});
+
+document.querySelectorAll('[data-emirate]').forEach(btn => {
+  btn.onclick = () => {
+    activeEmirate = btn.dataset.emirate;
+    document.querySelectorAll('[data-emirate]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+  };
+});
+
+document.getElementById('search').oninput = e => { searchVal = e.target.value.toLowerCase(); render(); };
+
+function render() {
+  const filtered = AGENCIES.filter(a => {
+    if (activeTier !== 'ALL' && a.tier !== activeTier) return false;
+    if (activeEmirate !== 'ALL' && !a.emirate.includes(activeEmirate)) return false;
+    if (searchVal && !JSON.stringify(a).toLowerCase().includes(searchVal)) return false;
+    return true;
+  });
+  const grid = document.getElementById('grid');
+  const nr = document.getElementById('no-results');
+  if (filtered.length === 0) { grid.innerHTML=''; nr.style.display='block'; }
+  else { nr.style.display='none'; grid.innerHTML = filtered.map(makeCard).join(''); }
+  document.getElementById('count-total').textContent = filtered.length;
+}
+
+render();
+</script>
+</body>
+</html>
