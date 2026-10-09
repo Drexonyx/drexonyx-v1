@@ -406,32 +406,73 @@ export default function MDAPage() {
             ))}
           </div>
 
-          {/* Featured Digital Example — compact and contextual */}
-          <div className={styles.featuredOffer}>
-            <div className={styles.featuredOfferContent}>
-              <p className={styles.featuredOfferEyebrow}>Digital · Example Output</p>
-              <h3 className={styles.featuredOfferHeading}>
-                Restaurant Website from{' '}
-                <span className={styles.featuredOfferAccent}>AED 599</span>
-              </h3>
-              <p className={styles.featuredOfferDesc}>
-                A complete professional restaurant website — fully designed, built, and launched.
-                Menu, gallery, reservations, location. Everything your guests need to find you and
-                come back.
-              </p>
+          {/* Digital Examples Showcase — 3 tiers */}
+          <div className={styles.examplesShowcase}>
+            {/* AED 599 tier */}
+            <div className={styles.examplesTier}>
+              <div className={styles.examplesTierHeader}>
+                <span className={styles.examplesTierBadge}>AED 599</span>
+                <span className={styles.examplesTierLabel}>Starter — 5 example sites</span>
+              </div>
+              <div className={styles.examplesGrid5}>
+                {[
+                  { src: '/mda/examples/restaurant-599.png', alt: 'Restaurant website example' },
+                  { src: '/mda/examples/gym-599.png', alt: 'Gym website example' },
+                  { src: '/mda/examples/cleaning-599.png', alt: 'Cleaning company website example' },
+                  { src: '/mda/examples/cars-599.png', alt: 'Car dealership website example' },
+                  { src: '/mda/examples/pool-599.png', alt: 'Pool services website example' },
+                ].map(({ src, alt }) => (
+                  <div key={src} className={styles.exampleCard}>
+                    <Image src={src} alt={alt} width={1440} height={900} className={styles.exampleImg} quality={80} />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* AED 899 tier */}
+            <div className={styles.examplesTier}>
+              <div className={styles.examplesTierHeader}>
+                <span className={styles.examplesTierBadge}>AED 899</span>
+                <span className={styles.examplesTierLabel}>Professional — 3 example sites</span>
+              </div>
+              <div className={styles.examplesGrid3}>
+                {[
+                  { src: '/mda/examples/dental-899.png', alt: 'Dental clinic website example' },
+                  { src: '/mda/examples/realestate-899.png', alt: 'Real estate website example' },
+                  { src: '/mda/examples/hotel-899.png', alt: 'Boutique hotel website example' },
+                ].map(({ src, alt }) => (
+                  <div key={src} className={styles.exampleCard}>
+                    <Image src={src} alt={alt} width={1440} height={900} className={styles.exampleImg} quality={80} />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* AED 1899 tier */}
+            <div className={styles.examplesTier}>
+              <div className={styles.examplesTierHeader}>
+                <span className={styles.examplesTierBadge}>AED 1,899</span>
+                <span className={styles.examplesTierLabel}>Premium — ultra-professional</span>
+              </div>
+              <div className={styles.examplesGrid1}>
+                <div className={styles.exampleCardFeatured}>
+                  <Image
+                    src="/mda/examples/tech-1899.png"
+                    alt="Premium SaaS / tech company website example"
+                    width={1440}
+                    height={900}
+                    className={styles.exampleImg}
+                    quality={85}
+                    priority
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.examplesCta}>
               <CTAButton href="/start-project" variant="outline" size="sm">
                 Start Your Project →
               </CTAButton>
-            </div>
-            <div className={styles.featuredOfferPoster}>
-              <Image
-                src="/mda/MDA_MASTER_POSTER_01_RESTAURANT_WEBSITE_AED599.jpg"
-                alt="MDA restaurant website — example of a Digital Starter package output at AED 599"
-                width={1024}
-                height={1536}
-                className={styles.featuredOfferImg}
-                quality={75}
-              />
             </div>
           </div>
         </div>
