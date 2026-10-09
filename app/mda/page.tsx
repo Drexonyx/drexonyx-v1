@@ -7,6 +7,7 @@ import {
   CTAButton,
   SectionHeading,
   EndorsementFooter,
+  ExamplesTier,
 } from '@/components/mda';
 import styles from './page.module.css';
 
@@ -406,68 +407,42 @@ export default function MDAPage() {
             ))}
           </div>
 
-          {/* Digital Examples Showcase — 3 tiers */}
+          {/* Digital Examples Showcase — 3 tiers (click to enlarge) */}
           <div className={styles.examplesShowcase}>
-            {/* AED 599 tier */}
-            <div className={styles.examplesTier}>
-              <div className={styles.examplesTierHeader}>
-                <span className={styles.examplesTierBadge}>AED 599</span>
-                <span className={styles.examplesTierLabel}>Starter — 5 example sites</span>
-              </div>
-              <div className={styles.examplesGrid5}>
-                {[
-                  { src: '/mda/examples/restaurant-599.png', alt: 'Restaurant website example' },
-                  { src: '/mda/examples/gym-599.png', alt: 'Gym website example' },
-                  { src: '/mda/examples/cleaning-599.png', alt: 'Cleaning company website example' },
-                  { src: '/mda/examples/cars-599.png', alt: 'Car dealership website example' },
-                  { src: '/mda/examples/pool-599.png', alt: 'Pool services website example' },
-                ].map(({ src, alt }) => (
-                  <div key={src} className={styles.exampleCard}>
-                    <Image src={src} alt={alt} width={1440} height={900} className={styles.exampleImg} quality={80} />
-                  </div>
-                ))}
-              </div>
-            </div>
+            <ExamplesTier
+              badge="AED 599"
+              label="Starter — 5 example sites"
+              gridClass={styles.examplesGrid5}
+              examples={[
+                { src: '/mda/examples/restaurant-599.png', alt: 'Restaurant website example' },
+                { src: '/mda/examples/gym-599.png', alt: 'Gym website example' },
+                { src: '/mda/examples/cleaning-599.png', alt: 'Cleaning company website example' },
+                { src: '/mda/examples/cars-599.png', alt: 'Car dealership website example' },
+                { src: '/mda/examples/pool-599.png', alt: 'Pool services website example' },
+              ]}
+            />
 
-            {/* AED 899 tier */}
-            <div className={styles.examplesTier}>
-              <div className={styles.examplesTierHeader}>
-                <span className={styles.examplesTierBadge}>AED 899</span>
-                <span className={styles.examplesTierLabel}>Professional — 3 example sites</span>
-              </div>
-              <div className={styles.examplesGrid3}>
-                {[
-                  { src: '/mda/examples/dental-899.png', alt: 'Dental clinic website example' },
-                  { src: '/mda/examples/realestate-899.png', alt: 'Real estate website example' },
-                  { src: '/mda/examples/hotel-899.png', alt: 'Boutique hotel website example' },
-                ].map(({ src, alt }) => (
-                  <div key={src} className={styles.exampleCard}>
-                    <Image src={src} alt={alt} width={1440} height={900} className={styles.exampleImg} quality={80} />
-                  </div>
-                ))}
-              </div>
-            </div>
+            <ExamplesTier
+              badge="AED 899"
+              label="Professional — 3 example sites"
+              gridClass={styles.examplesGrid3}
+              examples={[
+                { src: '/mda/examples/dental-899.png', alt: 'Dental clinic website example' },
+                { src: '/mda/examples/realestate-899.png', alt: 'Real estate website example' },
+                { src: '/mda/examples/hotel-899.png', alt: 'Boutique hotel website example' },
+              ]}
+            />
 
-            {/* AED 1899 tier */}
-            <div className={styles.examplesTier}>
-              <div className={styles.examplesTierHeader}>
-                <span className={styles.examplesTierBadge}>AED 1,899</span>
-                <span className={styles.examplesTierLabel}>Premium — ultra-professional</span>
-              </div>
-              <div className={styles.examplesGrid1}>
-                <div className={styles.exampleCardFeatured}>
-                  <Image
-                    src="/mda/examples/tech-1899.png"
-                    alt="Premium SaaS / tech company website example"
-                    width={1440}
-                    height={900}
-                    className={styles.exampleImg}
-                    quality={85}
-                    priority
-                  />
-                </div>
-              </div>
-            </div>
+            <ExamplesTier
+              badge="AED 1,899"
+              label="Premium — ultra-professional"
+              gridClass={styles.examplesGrid1}
+              cardClass={styles.exampleCardFeatured}
+              priority
+              examples={[
+                { src: '/mda/examples/tech-1899.png', alt: 'Premium SaaS / tech company website example' },
+              ]}
+            />
 
             <div className={styles.examplesCta}>
               <CTAButton href="/start-project" variant="outline" size="sm">
