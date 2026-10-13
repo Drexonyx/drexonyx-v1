@@ -151,7 +151,7 @@ drexonyx.com/mda`,
 
 I visited dxbmarket.ae — you're clearly established in Al Barsha. The opportunity I see: a service page per job type (AC, plumbing, painting) with a WhatsApp booking button on each one would let you capture leads at the moment someone searches "AC repair Al Barsha" without them having to call first.
 
-Master Digital Agency builds exactly this for home services companies in Dubai. The investment is typically AED 3,500–6,000 for a redesign with booking flow.
+Master Digital Agency builds exactly this for home services companies in Dubai. I'd be happy to put together a focused scope and quote once I understand your goals.
 
 Are you looking to improve the site in the next month or two?
 
@@ -329,7 +329,7 @@ drexonyx.com/mda`,
 
 Since UAE Corporate Tax came into effect, more businesses are actively searching for qualified accounting firms online. If a prospect searches "corporate tax consultant Dubai" and can't find a professional website for your firm, they move to the next result.
 
-Master Digital Agency builds professional services websites for accounting firms in the UAE: services overview, regulatory credentials, team bio, and a clear enquiry form. Starting from AED 2,500.
+Master Digital Agency builds professional services websites for accounting firms in the UAE: services overview, regulatory credentials, team bio, and a clear enquiry form. I'd be happy to tailor a scope to your firm's priorities once we connect.
 
 I'd be happy to share a brief outline for al-falah-group.com.
 
@@ -387,9 +387,9 @@ drexonyx.com/mda`,
     outreach_subject: 'Your 2007 portfolio deserves a better showcase',
     outreach_body: `Hi Creative Shelf team,
 
-I found creativeshelf.ae and noted you've been in interior design since 2007 — that's real credibility. One thing worth considering: the Gmail business email (creativeshelf21@gmail.com) and the current website together may be costing you enquiries from commercial clients who judge the firm before the first call.
+I found creativeshelf.ae and noticed you've been in interior design since 2007 — that's a strong portfolio to build on. A redesigned showcase site with project filters, case studies, and a professional consultation booking flow would do real justice to that body of work and help you attract the commercial clients your projects are suited for.
 
-Master Digital Agency redesigns interior design studio websites to properly showcase project portfolios with filters, case studies, and a professional consultation booking flow. We can also set up a branded email to replace the Gmail address.
+Master Digital Agency redesigns interior design studio websites to properly showcase project portfolios and convert website visitors into enquiries. We can also help set up a branded email to complement the new site.
 
 Happy to share a mockup concept.
 
