@@ -1,0 +1,26 @@
+name: Verify & Fix Follow-ups (one-shot via Vercel)
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'check = read only | create = insert missing follow-ups'
+        required: true
+        default: 'check'
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify follow-ups for DXB Market & Creative Shelf LLC
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Call Vercel verify-followups endpoint
+        run: |
+          RESPONSE=$(curl -sf \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://www.drexonyx.com/api/internal/verify-followups?action=${{ github.event.inputs.action }}")
+          echo "$RESPONSE" | python3 -m json.tool
