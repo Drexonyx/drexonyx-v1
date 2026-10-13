@@ -20,7 +20,17 @@ jobs:
     steps:
       - name: Call Vercel verify-followups endpoint
         run: |
-          RESPONSE=$(curl -sf \
+          HTTP_CODE=$(curl -s -o /tmp/response.json -w "%{http_code}" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             "https://www.drexonyx.com/api/internal/verify-followups?action=${{ github.event.inputs.action }}")
-          echo "$RESPONSE" | python3 -m json.tool
+          echo "HTTP status: $HTTP_CODE"
+          echo "Response body:"
+          cat /tmp/response.json
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+            echo ""
+            python3 -m json.tool /tmp/response.json
+          fi
+          if [ "$HTTP_CODE" -ge 400 ]; then
+            echo "Error: HTTP $HTTP_CODE"
+            exit 1
+          fi
