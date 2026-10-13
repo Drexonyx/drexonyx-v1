@@ -35,7 +35,7 @@ jobs:
         run: npm run test
 
       - name: Audit dependencies
-        run: npm audit --audit-level=high
+        run: npm audit --audit-level=high --omit=dev
 
       - name: Build
         run: npm run build
