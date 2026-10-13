@@ -3,8 +3,8 @@
 // Authentication: same CRON_SECRET Bearer token as all other internal cron routes.
 //
 // Outreach messages created here:
-//   - Email leads (3 with verified email): channel='email', approval_status='NOT_REQUIRED'
-//     → eligible for auto-send by the sales-outreach-send cron at 09:00 UTC.
+//   - Email leads (3 with verified email): channel='email', approval_status='PENDING'
+//     → NOT eligible for auto-send until approval_status is changed to 'NOT_REQUIRED' or 'APPROVED'.
 //   - Manual/directory leads (16 without email): channel='manual', approval_status='PENDING'
 //     → visible in pipeline dashboard and daily report; not auto-queued.
 
@@ -145,7 +145,7 @@ drexonyx.com/mda`,
     opportunity: 'Website redesign with service pages per job type and WhatsApp booking',
     notes: 'Verified contact from own website. Phone: +971 585740057.',
     outreach_channel: 'email',
-    outreach_approval: 'NOT_REQUIRED',
+    outreach_approval: 'PENDING',
     outreach_subject: 'Your website could book more jobs automatically',
     outreach_body: `Hi DXB Market team,
 
@@ -323,7 +323,7 @@ drexonyx.com/mda`,
     opportunity: 'Credibility site with corporate tax services and team credentials',
     notes: 'Phone: +971 561230464. Email confirmed in directory.',
     outreach_channel: 'email',
-    outreach_approval: 'NOT_REQUIRED',
+    outreach_approval: 'PENDING',
     outreach_subject: 'A professional website that brings in Corporate Tax enquiries',
     outreach_body: `Hi Al-Falah team,
 
@@ -383,7 +383,7 @@ drexonyx.com/mda`,
     opportunity: 'Portfolio site redesign + branded email replacing Gmail',
     notes: 'Founded 2007. Gmail business email — noted weak professional signal.',
     outreach_channel: 'email',
-    outreach_approval: 'NOT_REQUIRED',
+    outreach_approval: 'PENDING',
     outreach_subject: 'Your 2007 portfolio deserves a better showcase',
     outreach_body: `Hi Creative Shelf team,
 
