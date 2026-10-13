@@ -432,10 +432,12 @@ export async function getOverdueFollowUpsWithLeadInfo(now?: Date): Promise<Follo
     })
     .from(followUps)
     .innerJoin(salesLeads, eq(salesLeads.id, followUps.lead_id))
+    .leftJoin(outreachMessages, eq(outreachMessages.id, followUps.outreach_id))
     .where(
       and(
         eq(followUps.status, 'PENDING'),
         lte(followUps.scheduled_at, cutoff),
+        isNull(outreachMessages.reply_received_at),
       ),
     )
     .orderBy(asc(followUps.scheduled_at));
