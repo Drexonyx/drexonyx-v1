@@ -1,6 +1,6 @@
 // Agency Director — central coordinator, router, and approvals gate
 
-import { ProjectState, createProject, updateProject } from '../../state/project'
+import { ProjectState, ProjectType, createProject, updateProject } from '../../state/project'
 import { ClientState } from '../../state/client'
 import { WorkflowId, getWorkflow } from '../../workflows'
 import { AgentId } from '../index'
@@ -169,7 +169,7 @@ export function initiateProject(
 
   return createProject({
     name: request.slice(0, 80),
-    type: typeMap[routing.workflowId] as any,
+    type: typeMap[routing.workflowId] as ProjectType,
     workflowId: routing.workflowId,
     assignedAgents: [routing.primaryAgent, ...routing.supportingAgents],
     clientId,
