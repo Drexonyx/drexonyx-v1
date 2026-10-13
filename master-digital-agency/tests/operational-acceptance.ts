@@ -114,7 +114,7 @@ section(2, 'LOGO / BRANDING — Beauty salon identity')
   qcGate.items.forEach(i => { i.status = 'pass' })
   const qcResult = evaluateQCGate(qcGate)
 
-  let p = updateProject(project, { status: 'delivered' })
+  const p = updateProject(project, { status: 'delivered' })
 
   field('QC items', qcGate.items.map(i => i.check).join(' | '))
   field('QC result', qcResult.overallStatus)

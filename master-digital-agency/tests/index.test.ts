@@ -3,6 +3,8 @@ import { AGENT_REGISTRY, getAgent, getAgentsByGroup } from '../agents'
 import { SKILL_REGISTRY, findSkill } from '../skills'
 import { WORKFLOWS, getWorkflow } from '../workflows'
 import { classifyRequest, initiateProject, surfaceNextBestAction } from '../agents/core/agency-director'
+import type { AgentId } from '../agents'
+import type { WorkflowId } from '../workflows'
 import { createQCGate, evaluateQCGate } from '../qc'
 import { createProject, updateProject } from '../state/project'
 import { createClient } from '../state/client'
@@ -22,7 +24,7 @@ describe('Agent Registry', () => {
   })
 
   it('throws for unknown agent', () => {
-    expect(() => getAgent('unknown-agent' as any)).toThrow()
+    expect(() => getAgent('unknown-agent' as unknown as AgentId)).toThrow()
   })
 
   it('returns correct agents by group', () => {
@@ -93,7 +95,7 @@ describe('Workflow Registry', () => {
   })
 
   it('throws for unknown workflow', () => {
-    expect(() => getWorkflow('W99' as any)).toThrow()
+    expect(() => getWorkflow('W99' as unknown as WorkflowId)).toThrow()
   })
 })
 
