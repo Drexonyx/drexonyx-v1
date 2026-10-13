@@ -1,0 +1,22 @@
+name: Run loader once
+
+on:
+  workflow_dispatch:
+
+jobs:
+  invoke-loader:
+    name: Invoke production loader
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call sales-load-mda-leads
+        run: |
+          http_code=$(curl -s -o /tmp/loader_response.json -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            https://www.drexonyx.com/api/internal/sales-load-mda-leads)
+          echo "HTTP status: $http_code"
+          echo "Response body:"
+          cat /tmp/loader_response.json
+          if [ "$http_code" != "200" ]; then
+            echo "FAILED: expected 200, got $http_code"
+            exit 1
+          fi
