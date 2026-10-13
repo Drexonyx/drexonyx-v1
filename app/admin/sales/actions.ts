@@ -55,6 +55,7 @@ export async function actionSendOutreach(
   if (rows.length === 0) return { ok: false, reason: 'No email outreach message found for this lead' };
   const { messageId, externalMessageId, publicEmail, businessName } = rows[0];
 
+  if (businessName === 'Al-Falah Accounting') return { ok: false, reason: 'Al-Falah excluded' };
   if (externalMessageId) return { ok: false, reason: 'Already sent' };
 
   // Approve

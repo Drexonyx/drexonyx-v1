@@ -2,7 +2,7 @@ import { getAdminSession } from '@/lib/admin/session';
 import { redirect } from 'next/navigation';
 import { db } from '@/db/index';
 import { salesLeads, outreachMessages, followUps } from '@/db/schema/sales';
-import { eq, and, isNotNull } from 'drizzle-orm';
+import { eq, and, isNotNull, ne } from 'drizzle-orm';
 import { SendOutreachButton } from './SendOutreachButton';
 import s from '../admin.module.css';
 
@@ -38,14 +38,14 @@ export default async function AdminSalesPage() {
         eq(outreachMessages.message_type, 'cold_outreach'),
       ),
     )
-    .where(isNotNull(salesLeads.public_email))
+    .where(and(isNotNull(salesLeads.public_email), ne(salesLeads.business_name, 'Al-Falah Accounting')))
     .orderBy(salesLeads.lead_score);
 
   return (
     <>
       <div className={s.pageHeader}>
         <h1 className={s.pageTitle}>Sales Outreach</h1>
-        <p className={s.pageSubtitle}>Email leads — MDA prospects. Al-Falah excluded pending DB fix.</p>
+        <p className={s.pageSubtitle}>Email leads — MDA prospects.</p>
       </div>
 
       {rows.length === 0 ? (
