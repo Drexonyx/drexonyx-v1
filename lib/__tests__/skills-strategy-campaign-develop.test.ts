@@ -131,14 +131,14 @@ describe('strategyCampaignDevelopSkill', () => {
     expect(mockCallAi).toHaveBeenCalledOnce();
   });
 
-  it('uses maxTokens 1024 for strategy generation', async () => {
+  it('uses maxTokens 2048 for strategy generation', async () => {
     mockSuccess(VALID_OUTPUT);
     await strategyCampaignDevelopSkill.execute(
       { objective: 'obj', targetAudience: 'aud' },
       MOCK_CONTEXT,
     );
     const call = mockCallAi.mock.calls[0][0] as { maxTokens: number };
-    expect(call.maxTokens).toBe(1024);
+    expect(call.maxTokens).toBe(2048);
   });
 
   it('error message identifies JSON parse failure for prose responses', async () => {
