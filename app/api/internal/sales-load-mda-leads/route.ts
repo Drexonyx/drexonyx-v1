@@ -329,7 +329,7 @@ drexonyx.com/mda`,
 
 Since UAE Corporate Tax came into effect, more businesses are actively searching for qualified accounting firms online. If a prospect searches "corporate tax consultant Dubai" and can't find a professional website for your firm, they move to the next result.
 
-Master Digital Agency builds professional services websites for accounting firms in the UAE: services overview, regulatory credentials, team bio, and a clear enquiry form. I'd be happy to tailor a scope to your firm's priorities once we connect.
+Master Digital Agency builds professional services websites for accounting firms in the UAE: services overview, regulatory credentials, team bio, and a clear enquiry form. The scope is tailored to your firm's priorities.
 
 I'd be happy to share a brief outline for al-falah-group.com.
 
