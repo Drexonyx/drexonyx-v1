@@ -181,11 +181,11 @@ export async function sendOutreachEmail(params: {
   const actualRecipient = isTestMode ? OUTREACH_TEST_RECIPIENT : toEmail;
   const redirected = isTestMode && toEmail !== OUTREACH_TEST_RECIPIENT;
 
-  const subject = buildOutreachSubject(msg.message_type, businessName);
   const paymentUrl = msg.message_type === 'proposal'
     ? 'https://pay.ziina.com/drexonyx/Md6AyFJ0z?source=app'
     : undefined;
-  const html = buildEmailHtml(msg.message_text, unsubscribeUrl, paymentUrl);
+  const { subject, body } = extractSubjectAndBody(msg.message_text, msg.message_type, businessName);
+  const html = buildEmailHtml(body, unsubscribeUrl, paymentUrl);
 
   // 7. Send
   const now = new Date();
@@ -338,7 +338,7 @@ export async function sendFollowUpEmail(params: {
   const text =
     messageText ??
     `Following up on our previous email regarding content collaboration for ${businessName}.`;
-  const subject = buildOutreachSubject('follow_up', businessName);
+  const { subject } = extractSubjectAndBody(text, 'follow_up', businessName);
   const html = buildEmailHtml(text, followUpUnsubscribeUrl);
 
   // 5. Send
@@ -417,11 +417,21 @@ export async function sendFollowUpEmail(params: {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function buildOutreachSubject(messageType: string, businessName: string): string {
-  if (messageType === 'follow_up') {
-    return `Following up — Master Digital Agency × ${businessName}`;
+function extractSubjectAndBody(
+  messageText: string,
+  messageType: string,
+  businessName: string,
+): { subject: string; body: string } {
+  const match = messageText.match(/^Subject:\s*(.+)\n\n([\s\S]*)$/);
+  if (match) {
+    return { subject: match[1].trim(), body: match[2] };
   }
-  return `Master Digital Agency — Content Partnership Opportunity`;
+  return {
+    subject: messageType === 'follow_up'
+      ? `Following up — Master Digital Agency × ${businessName}`
+      : `Master Digital Agency — Content Partnership Opportunity`,
+    body: messageText,
+  };
 }
 
 function buildEmailHtml(messageText: string, unsubscribeUrl?: string, paymentUrl?: string): string {

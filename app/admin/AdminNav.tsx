@@ -15,6 +15,12 @@ const NAV_SECTIONS = [
     ],
   },
   {
+    label: 'Sales',
+    items: [
+      { href: '/admin/sales', label: 'Outreach' },
+    ],
+  },
+  {
     label: 'Commercial',
     items: [
       { href: '/admin/inquiries', label: 'Inquiries' },
