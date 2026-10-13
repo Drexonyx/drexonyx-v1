@@ -1,0 +1,33 @@
+name: Fix Al-Falah DB record
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fix-db:
+    name: Correct Al-Falah outreach message text
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update outreach message text
+        run: |
+          psql "$DATABASE_URL" <<'SQLEOF'
+          UPDATE sales.outreach_messages
+          SET
+            message_text = REPLACE(
+              message_text,
+              'I''d be happy to tailor a scope to your firm''s priorities once we connect.',
+              'The scope is tailored to your firm''s priorities.'
+            ),
+            updated_at = NOW()
+          WHERE lead_id = '01a1364a-ca1f-7646-a6d0-423798a2562b'
+          RETURNING
+            id,
+            lead_id,
+            approval_status,
+            left(message_text, 250) AS message_preview;
+          SQLEOF
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
