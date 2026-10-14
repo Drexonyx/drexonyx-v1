@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import styles from './page.module.css';
 
@@ -11,29 +12,46 @@ const SERVICES = [
   {
     title: 'General Contracting',
     desc: 'Full project management from groundbreaking to handover. We coordinate all trades and ensure on-time, on-budget delivery.',
-    icon: '🏗️',
   },
   {
     title: 'Villa Construction',
     desc: 'Custom residential builds to your specification. Structural, MEP, and finishing under one contract.',
-    icon: '🏠',
   },
   {
     title: 'Fit-Out & Renovation',
     desc: 'Commercial and residential interiors. Partitioning, flooring, ceilings, MEP, and FF&E installation.',
-    icon: '🔨',
   },
   {
     title: 'Civil Works',
     desc: 'Site preparation, foundations, retaining walls, and infrastructure works across the UAE.',
-    icon: '⚙️',
   },
 ] as const;
 
 const PROJECTS = [
-  { name: 'Al Barsha Villa Complex', type: 'Residential', year: '2024', size: '12,000 sqft' },
-  { name: 'Deira Logistics Hub', type: 'Commercial', year: '2023', size: '8,500 sqft' },
-  { name: 'JVC Townhouse Development', type: 'Residential', year: '2024', size: '24,000 sqft' },
+  {
+    name: 'Al Barsha Villa Complex',
+    type: 'Residential',
+    year: '2024',
+    size: '12,000 sqft',
+    src: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=75',
+    alt: 'Modern white villa with clean architectural lines',
+  },
+  {
+    name: 'Deira Logistics Hub',
+    type: 'Commercial',
+    year: '2023',
+    size: '8,500 sqft',
+    src: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?auto=format&fit=crop&w=800&q=75',
+    alt: 'Contemporary glass commercial building exterior',
+  },
+  {
+    name: 'JVC Townhouse Development',
+    type: 'Residential',
+    year: '2024',
+    size: '24,000 sqft',
+    src: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=75',
+    alt: 'Row of modern townhouses with landscaping',
+  },
 ] as const;
 
 export default function ConstructionDemoPage() {
@@ -95,7 +113,17 @@ export default function ConstructionDemoPage() {
             </div>
           </div>
         </div>
-        <div className={styles.heroVisual} aria-hidden="true" />
+        <div className={styles.heroImageWrap}>
+          <Image
+            src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1400&q=80"
+            alt="Construction workers on an active building site at golden hour"
+            fill
+            style={{ objectFit: 'cover', objectPosition: 'center' }}
+            sizes="(max-width: 768px) 100vw, 50vw"
+            priority
+          />
+          <div className={styles.heroImageOverlay} aria-hidden="true" />
+        </div>
       </section>
 
       {/* Services */}
@@ -106,7 +134,6 @@ export default function ConstructionDemoPage() {
           <div className={styles.servicesGrid}>
             {SERVICES.map((s) => (
               <div key={s.title} className={styles.serviceCard}>
-                <span className={styles.serviceIcon}>{s.icon}</span>
                 <h3 className={styles.serviceTitle}>{s.title}</h3>
                 <p className={styles.serviceDesc}>{s.desc}</p>
               </div>
@@ -121,9 +148,17 @@ export default function ConstructionDemoPage() {
           <p className={styles.sectionEyebrow}>Recent Work</p>
           <h2 className={styles.sectionTitle}>Featured Projects</h2>
           <div className={styles.projectsGrid}>
-            {PROJECTS.map((p, i) => (
-              <div key={p.name} className={styles.projectCard} style={{ '--proj-index': i } as React.CSSProperties}>
-                <div className={styles.projectVisual} aria-hidden="true" />
+            {PROJECTS.map((p) => (
+              <div key={p.name} className={styles.projectCard}>
+                <div className={styles.projectImageWrap}>
+                  <Image
+                    src={p.src}
+                    alt={p.alt}
+                    fill
+                    style={{ objectFit: 'cover' }}
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
+                </div>
                 <div className={styles.projectInfo}>
                   <span className={styles.projectType}>{p.type}</span>
                   <h3 className={styles.projectName}>{p.name}</h3>
@@ -156,7 +191,15 @@ export default function ConstructionDemoPage() {
               ))}
             </div>
           </div>
-          <div className={styles.aboutVisual} aria-hidden="true" />
+          <div className={styles.aboutImageWrap}>
+            <Image
+              src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=900&q=80"
+              alt="Construction team working on a structural project"
+              fill
+              style={{ objectFit: 'cover', objectPosition: 'center top' }}
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+          </div>
         </div>
       </section>
 
@@ -167,19 +210,16 @@ export default function ConstructionDemoPage() {
           <h2 className={styles.sectionTitle}>Request a Free Quote</h2>
           <div className={styles.contactGrid}>
             <div className={styles.contactCard}>
-              <span className={styles.contactIcon}>📱</span>
-              <p className={styles.contactLabel}>WhatsApp Us</p>
+              <p className={styles.contactLabel}>WhatsApp</p>
               <p className={styles.contactValue}>+971 50 123 4567</p>
               <p className={styles.contactNote}>Available 8am – 6pm, Sat–Thu</p>
             </div>
             <div className={styles.contactCard}>
-              <span className={styles.contactIcon}>📞</span>
               <p className={styles.contactLabel}>Office Line</p>
               <p className={styles.contactValue}>+971 4 123 4567</p>
               <p className={styles.contactNote}>Al Quoz Industrial Area 2</p>
             </div>
             <div className={styles.contactCard}>
-              <span className={styles.contactIcon}>📍</span>
               <p className={styles.contactLabel}>Showroom</p>
               <p className={styles.contactValue}>Al Quoz, Dubai, UAE</p>
               <p className={styles.contactNote}>Open Sat–Thu, 8am – 6pm</p>

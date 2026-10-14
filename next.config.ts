@@ -1,6 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '/photo-*',
+      },
+    ],
+  },
   async redirects() {
     return [
       // Redirect bare domain to www in production.
