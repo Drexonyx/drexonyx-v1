@@ -89,10 +89,10 @@ export default function CleaningDemoPage() {
         </div>
         <div className={styles.heroImageWrap}>
           <Image
-            src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1400&q=80"
-            alt="Spotless, light-filled luxury office interior with gleaming floors and open workstations"
+            src="/demos/images/cleaning-hero.png"
+            alt="Professional cleaning operatives polishing marble floors in a glass-walled Dubai office with Burj Khalifa skyline view"
             fill
-            style={{ objectFit: 'cover', objectPosition: 'center' }}
+            style={{ objectFit: 'cover', objectPosition: 'center 30%' }}
             sizes="(max-width: 768px) 100vw, 50vw"
             priority
           />
@@ -145,14 +145,15 @@ export default function CleaningDemoPage() {
             <p className={styles.sectionEyebrow}>Why BrightSpace</p>
             <h2 className={styles.sectionTitle}>Trusted by Dubai Businesses Since 2009</h2>
             <p className={styles.aboutDesc}>
-              We were founded in 2009 with a simple belief: commercial cleaning should be
-              consistent, professional, and never disruptive to your operations. Today, we
-              serve everything from boutique co-working spaces to multi-floor corporate towers.
+              BrightSpace is an illustrative example of an established Dubai commercial cleaning
+              firm. Businesses like this are built on a simple belief: cleaning should be
+              consistent, professional, and never disruptive to your operations. They serve
+              everything from boutique co-working spaces to multi-floor corporate towers.
             </p>
             <p className={styles.aboutDesc}>
-              All BrightSpace operatives are HABC-certified, uniformed, and background-checked.
-              We carry full public liability insurance and operate fully within the Dubai Municipality
-              and Abu Dhabi Environment Agency cleaning sector guidelines.
+              In practice, compliant cleaning operators in Dubai maintain trained and uniformed
+              operatives, public liability insurance, and operate within Dubai Municipality
+              and Abu Dhabi Environment Agency sector guidelines.
             </p>
             <ul className={styles.trustPoints}>
               {[
@@ -167,6 +168,7 @@ export default function CleaningDemoPage() {
                 </li>
               ))}
             </ul>
+            <p className={styles.certNote}>All credentials and figures shown are illustrative of typical compliant cleaning operators.</p>
           </div>
         </div>
       </section>
@@ -186,8 +188,8 @@ export default function CleaningDemoPage() {
       {/* Testimonials */}
       <section className={styles.testimonialsSection}>
         <div className={styles.sectionInner}>
-          <p className={styles.sectionEyebrow}>Client Feedback</p>
-          <h2 className={styles.sectionTitle}>What Our Clients Say</h2>
+          <p className={styles.sectionEyebrow}>Client Feedback — Illustrative</p>
+          <h2 className={styles.sectionTitle}>What Clients Say</h2>
           <div className={styles.testimonialsGrid}>
             {TESTIMONIALS.map((t) => (
               <div key={t.name} className={styles.testimonialCard}>

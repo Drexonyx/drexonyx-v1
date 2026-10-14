@@ -96,10 +96,10 @@ export default function ManpowerDemoPage() {
         </div>
         <div className={styles.heroImageWrap}>
           <Image
-            src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1400&q=80"
-            alt="Diverse group of professional employees in a modern office environment"
+            src="/demos/images/manpower-hero.png"
+            alt="Diverse team of UAE workforce professionals in navy uniforms standing in front of a logistics facility with the Dubai skyline at sunset"
             fill
-            style={{ objectFit: 'cover', objectPosition: 'center top' }}
+            style={{ objectFit: 'cover', objectPosition: 'center 25%' }}
             sizes="(max-width: 768px) 100vw, 50vw"
             priority
           />
@@ -160,21 +160,22 @@ export default function ManpowerDemoPage() {
             <p className={styles.sectionEyebrow}>Why Choose Us</p>
             <h2 className={styles.sectionTitle}>Your UAE Workforce Partner</h2>
             <p className={styles.whyDesc}>
-              Since 2010, Emirates Workforce Solutions has been matching UAE employers
-              with qualified talent sourced from across the GCC, South Asia, and Southeast Asia.
-              We handle every step — from candidate sourcing and screening to visa processing,
-              medical tests, and onboarding documentation.
+              Emirates Workforce Solutions is an illustrative example of how a UAE workforce
+              specialist operates. Established agencies match UAE employers with qualified talent
+              sourced from across the GCC, South Asia, and Southeast Asia — handling sourcing,
+              screening, visa processing, medical tests, and onboarding end to end.
             </p>
             <p className={styles.whyDesc}>
-              We are registered with MOHRE (Ministry of Human Resources & Emiratisation),
-              hold a valid private employment agency licence, and are compliant with all
-              Federal Decree-Law No. 33 of 2021 employment regulations.
+              In practice, compliant private employment agencies in the UAE are registered with
+              MOHRE (Ministry of Human Resources &amp; Emiratisation), hold a valid agency licence,
+              and operate within current UAE employment legislation.
             </p>
             <div className={styles.licenceBadges}>
               {['MOHRE Licensed', 'Federal Employment Law Compliant', 'ISO 9001 Certified', 'Tasheel Partner'].map((b) => (
                 <span key={b} className={styles.licenceBadge}>{b}</span>
               ))}
             </div>
+            <p className={styles.certNote}>All credentials, figures, and statistics are illustrative of a typical compliant UAE manpower agency.</p>
           </div>
           <div className={styles.whyImageWrap}>
             <Image
@@ -203,7 +204,7 @@ export default function ManpowerDemoPage() {
       {/* Testimonials */}
       <section className={styles.testimonialsSection}>
         <div className={styles.sectionInner}>
-          <p className={styles.sectionEyebrow}>Client Testimonials</p>
+          <p className={styles.sectionEyebrow}>Client Testimonials — Illustrative</p>
           <h2 className={styles.sectionTitle}>Trusted by UAE Employers</h2>
           <div className={styles.testimonialsGrid}>
             {TESTIMONIALS.map((t) => (
