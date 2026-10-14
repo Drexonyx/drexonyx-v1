@@ -59,7 +59,7 @@ export default function ConstructionDemoPage() {
     <div className={styles.site}>
       {/* Demo banner */}
       <div className={styles.demoBanner}>
-        <span>DEMO SITE — AlNoor Contracting</span>
+        <span>DEMO SITE — AlNoor Contracting · Figures, project names &amp; certifications are illustrative</span>
         <Link href="/mda" className={styles.demoBannerLink}>
           View MDA Packages →
         </Link>
