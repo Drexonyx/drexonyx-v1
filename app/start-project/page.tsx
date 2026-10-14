@@ -75,7 +75,7 @@ export default async function StartProjectPage({
               <div className={styles.sidebarCard}>
                 <h3 className={styles.sidebarHeading}>Contact Directly</h3>
                 <p className={styles.sidebarText}>Prefer to reach out directly?</p>
-                <p className={styles.contactEmail}>drexonyx.studio@gmail.com</p>
+                <p className={styles.contactEmail}>info@drexonyx.com</p>
               </div>
 
               <div className={styles.sidebarCard}>
