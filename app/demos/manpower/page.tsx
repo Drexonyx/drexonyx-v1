@@ -10,12 +10,12 @@ export const metadata: Metadata = {
 };
 
 const INDUSTRIES = [
-  { title: 'Hospitality', desc: 'Front desk agents, waitstaff, housekeeping, F&B supervisors, and hotel management.', icon: '🏨' },
-  { title: 'Retail', desc: 'Store associates, visual merchandisers, floor supervisors, and warehouse operatives.', icon: '🛍️' },
-  { title: 'Construction & MEP', desc: 'Foremen, electricians, plumbers, HVAC technicians, and civil engineers.', icon: '⚙️' },
-  { title: 'F&B', desc: 'Chefs, sous chefs, kitchen operatives, and restaurant managers for all cuisine types.', icon: '🍽️' },
-  { title: 'Healthcare', desc: 'Nursing assistants, patient coordinators, technicians, and administrative staff.', icon: '🏥' },
-  { title: 'Facilities Management', desc: 'Building supervisors, security guards, cleaners, and maintenance technicians.', icon: '🏢' },
+  { title: 'Hospitality', desc: 'Front desk agents, waitstaff, housekeeping, F&B supervisors, and hotel management.', num: '01' },
+  { title: 'Retail', desc: 'Store associates, visual merchandisers, floor supervisors, and warehouse operatives.', num: '02' },
+  { title: 'Construction & MEP', desc: 'Foremen, electricians, plumbers, HVAC technicians, and civil engineers.', num: '03' },
+  { title: 'F&B', desc: 'Chefs, sous chefs, kitchen operatives, and restaurant managers for all cuisine types.', num: '04' },
+  { title: 'Healthcare', desc: 'Nursing assistants, patient coordinators, technicians, and administrative staff.', num: '05' },
+  { title: 'Facilities Management', desc: 'Building supervisors, security guards, cleaners, and maintenance technicians.', num: '06' },
 ] as const;
 
 const STEPS = [
@@ -23,6 +23,24 @@ const STEPS = [
   { step: '02', title: 'We Source', desc: 'Our recruiters tap an active database of 40,000+ verified candidates across the GCC and source markets.' },
   { step: '03', title: 'You Select', desc: 'Review shortlisted profiles and conduct interviews. We coordinate scheduling and logistics.' },
   { step: '04', title: 'Onboard', desc: 'We handle visa processing, medical, Emirates ID, and onboarding documentation end to end.' },
+] as const;
+
+const TESTIMONIALS = [
+  {
+    quote: "EWS sourced and onboarded 40 front-of-house staff for our hotel launch in six weeks. Every candidate was pre-screened, visa-ready, and professionally presented. Flawless execution.",
+    name: "David R.",
+    title: "General Manager — 5-Star Hotel, Downtown Dubai",
+  },
+  {
+    quote: "We've used five recruitment agencies over the years. EWS is the only one that treats manpower as a strategic function, not a transactional one. Our 12-month retention is the highest it's ever been.",
+    name: "Priya S.",
+    title: "Head of HR — Regional Retail Group, Dubai",
+  },
+  {
+    quote: "Site mobilisation for a 200-worker MEP contract, handled end to end — MOHRE documentation, medical, Emirates ID. Everything completed before day one. Exceptional team.",
+    name: "Khalid A.",
+    title: "Project Director — Infrastructure & MEP, Abu Dhabi",
+  },
 ] as const;
 
 const STATS = [
@@ -109,7 +127,7 @@ export default function ManpowerDemoPage() {
           <div className={styles.industriesGrid}>
             {INDUSTRIES.map((ind) => (
               <div key={ind.title} className={styles.industryCard}>
-                <span className={styles.industryIcon}>{ind.icon}</span>
+                <span className={styles.industryNum}>{ind.num}</span>
                 <h3 className={styles.industryTitle}>{ind.title}</h3>
                 <p className={styles.industryDesc}>{ind.desc}</p>
               </div>
@@ -179,6 +197,25 @@ export default function ManpowerDemoPage() {
             Our team will review your requirements and assign a dedicated workforce specialist within 48 hours.
           </p>
           <InquiryForm />
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className={styles.testimonialsSection}>
+        <div className={styles.sectionInner}>
+          <p className={styles.sectionEyebrow}>Client Testimonials</p>
+          <h2 className={styles.sectionTitle}>Trusted by UAE Employers</h2>
+          <div className={styles.testimonialsGrid}>
+            {TESTIMONIALS.map((t) => (
+              <div key={t.name} className={styles.testimonialCard}>
+                <p className={styles.testimonialQuote}>{t.quote}</p>
+                <div className={styles.testimonialAuthor}>
+                  <p className={styles.testimonialName}>{t.name}</p>
+                  <p className={styles.testimonialRole}>{t.title}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
