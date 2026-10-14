@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import styles from './page.module.css';
 import QuoteForm from './QuoteForm';
@@ -9,12 +10,12 @@ export const metadata: Metadata = {
 };
 
 const SERVICES = [
-  { title: 'Daily Office Cleaning', desc: 'Consistent, discreet cleaning crews that work around your schedule — early morning or after hours.', icon: '🏢' },
-  { title: 'Deep Cleaning', desc: 'Full facility deep cleans: sanitation, descaling, grout treatment, and hard-to-reach areas.', icon: '🧼' },
-  { title: 'Post-Construction Clean', desc: 'Specialist dust extraction, debris removal, and surface polishing after handover.', icon: '🔧' },
-  { title: 'Carpet & Upholstery', desc: 'Hot-water extraction and dry cleaning for carpets, rugs, sofas, and workstation chairs.', icon: '🛋️' },
-  { title: 'Window & Facade', desc: 'Interior and exterior window cleaning for commercial buildings up to 12 storeys.', icon: '🪟' },
-  { title: 'Move-In / Move-Out', desc: 'Thorough end-of-tenancy and new-property cleans accepted and signed off by building management.', icon: '📦' },
+  { title: 'Daily Office Cleaning', desc: 'Consistent, discreet cleaning crews that work around your schedule — early morning or after hours.' },
+  { title: 'Deep Cleaning', desc: 'Full facility deep cleans: sanitation, descaling, grout treatment, and hard-to-reach areas.' },
+  { title: 'Post-Construction Clean', desc: 'Specialist dust extraction, debris removal, and surface polishing after handover.' },
+  { title: 'Carpet & Upholstery', desc: 'Hot-water extraction and dry cleaning for carpets, rugs, sofas, and workstation chairs.' },
+  { title: 'Window & Facade', desc: 'Interior and exterior window cleaning for commercial buildings up to 12 storeys.' },
+  { title: 'Move-In / Move-Out', desc: 'Thorough end-of-tenancy and new-property cleans accepted and signed off by building management.' },
 ] as const;
 
 const STATS = [
@@ -67,7 +68,17 @@ export default function CleaningDemoPage() {
             <a href="#services" className={styles.heroSecondary}>Our Services ↓</a>
           </div>
         </div>
-        <div className={styles.heroVisual} aria-hidden="true" />
+        <div className={styles.heroImageWrap}>
+          <Image
+            src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1400&q=80"
+            alt="Professional cleaning operative polishing a modern office lobby"
+            fill
+            style={{ objectFit: 'cover', objectPosition: 'center' }}
+            sizes="(max-width: 768px) 100vw, 50vw"
+            priority
+          />
+          <div className={styles.heroImageOverlay} aria-hidden="true" />
+        </div>
       </section>
 
       {/* Trust stats */}
@@ -90,7 +101,6 @@ export default function CleaningDemoPage() {
           <div className={styles.servicesGrid}>
             {SERVICES.map((s) => (
               <div key={s.title} className={styles.serviceCard}>
-                <span className={styles.serviceIcon}>{s.icon}</span>
                 <h3 className={styles.serviceTitle}>{s.title}</h3>
                 <p className={styles.serviceDesc}>{s.desc}</p>
               </div>
@@ -102,7 +112,15 @@ export default function CleaningDemoPage() {
       {/* About */}
       <section id="about" className={styles.aboutSection}>
         <div className={styles.aboutInner}>
-          <div className={styles.aboutVisual} aria-hidden="true" />
+          <div className={styles.aboutImageWrap}>
+            <Image
+              src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=900&q=80"
+              alt="Clean, bright modern office space with polished floors and open workstations"
+              fill
+              style={{ objectFit: 'cover', objectPosition: 'center' }}
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+          </div>
           <div className={styles.aboutText}>
             <p className={styles.sectionEyebrow}>Why BrightSpace</p>
             <h2 className={styles.sectionTitle}>Trusted by Dubai Businesses Since 2009</h2>

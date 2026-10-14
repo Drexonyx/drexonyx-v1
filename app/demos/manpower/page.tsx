@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import styles from './page.module.css';
 import InquiryForm from './InquiryForm';
@@ -75,7 +76,17 @@ export default function ManpowerDemoPage() {
             <a href="#industries" className={styles.heroSecondary}>Industries We Serve ↓</a>
           </div>
         </div>
-        <div className={styles.heroVisual} aria-hidden="true" />
+        <div className={styles.heroImageWrap}>
+          <Image
+            src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1400&q=80"
+            alt="Diverse group of professional employees in a modern office environment"
+            fill
+            style={{ objectFit: 'cover', objectPosition: 'center top' }}
+            sizes="(max-width: 768px) 100vw, 50vw"
+            priority
+          />
+          <div className={styles.heroImageOverlay} aria-hidden="true" />
+        </div>
       </section>
 
       {/* Stats bar */}
@@ -147,7 +158,15 @@ export default function ManpowerDemoPage() {
               ))}
             </div>
           </div>
-          <div className={styles.whyVisual} aria-hidden="true" />
+          <div className={styles.whyImageWrap}>
+            <Image
+              src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=900&q=80"
+              alt="Professional businesswoman leading a team meeting in a corporate boardroom"
+              fill
+              style={{ objectFit: 'cover', objectPosition: 'center top' }}
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+          </div>
         </div>
       </section>
 

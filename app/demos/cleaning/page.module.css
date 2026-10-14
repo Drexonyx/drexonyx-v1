@@ -149,8 +149,8 @@
     min-height: auto;
     padding: 3rem 1.5rem;
   }
-  .heroVisual {
-    height: 200px !important;
+  .heroImageWrap {
+    height: 260px;
     order: -1;
   }
 }
@@ -220,23 +220,22 @@
   border-color: var(--bs-accent);
 }
 
-.heroVisual {
+.heroImageWrap {
+  position: relative;
   height: 420px;
   border-radius: 16px;
-  background:
-    linear-gradient(135deg, #e0f5f3 0%, #b2e8e3 40%, #0d9488 100%);
-  position: relative;
   overflow: hidden;
 }
 
-.heroVisual::after {
-  content: '✨';
+.heroImageOverlay {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 5rem;
-  opacity: 0.35;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(13, 148, 136, 0.12) 0%,
+    transparent 60%
+  );
+  pointer-events: none;
 }
 
 /* ── Trust Bar ── */
@@ -337,10 +336,6 @@
   box-shadow: 0 4px 16px rgba(13, 148, 136, 0.1);
 }
 
-.serviceIcon {
-  font-size: 1.875rem;
-}
-
 .serviceTitle {
   font-size: 1.0625rem;
   font-weight: 700;
@@ -368,8 +363,8 @@
     grid-template-columns: 1fr;
     gap: 2rem;
   }
-  .aboutVisual {
-    height: 200px !important;
+  .aboutImageWrap {
+    height: 240px;
   }
 }
 
@@ -409,23 +404,11 @@
   flex-shrink: 0;
 }
 
-.aboutVisual {
+.aboutImageWrap {
+  position: relative;
   height: 380px;
   border-radius: 16px;
-  background:
-    linear-gradient(150deg, #ccf0ed 0%, #7dd8d3 50%, #0d9488 100%);
-  position: relative;
   overflow: hidden;
-}
-
-.aboutVisual::after {
-  content: '🧹';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 5rem;
-  opacity: 0.3;
 }
 
 /* ── Quote section subtitle ── */
