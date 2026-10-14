@@ -610,6 +610,13 @@
   line-height: 1.6;
 }
 
+.certNote {
+  font-size: 0.75rem;
+  color: var(--ews-muted);
+  font-style: italic;
+  margin-top: 0.5rem;
+}
+
 /* ── Testimonials ── */
 .testimonialsSection {
   padding: 5rem 1.5rem;

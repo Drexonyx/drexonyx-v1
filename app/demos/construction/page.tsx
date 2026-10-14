@@ -84,7 +84,7 @@ export default function ConstructionDemoPage() {
       {/* Hero */}
       <section className={styles.hero}>
         <div className={styles.heroContent}>
-          <p className={styles.heroEyebrow}>Building UAE Since 1998</p>
+          <p className={styles.heroEyebrow}>Construction &amp; Build — Dubai, UAE</p>
           <h1 className={styles.heroTitle}>
             We Build What<br />Dubai Demands
           </h1>
@@ -115,10 +115,10 @@ export default function ConstructionDemoPage() {
         </div>
         <div className={styles.heroImageWrap}>
           <Image
-            src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1400&q=80"
-            alt="Construction workers on an active building site at golden hour"
+            src="/demos/images/construction-hero.png"
+            alt="Two engineers reviewing blueprints on an active Dubai construction site at sunset with the Burj Khalifa skyline behind"
             fill
-            style={{ objectFit: 'cover', objectPosition: 'center' }}
+            style={{ objectFit: 'cover', objectPosition: 'center 35%' }}
             sizes="(max-width: 768px) 100vw, 50vw"
             priority
           />
@@ -177,19 +177,20 @@ export default function ConstructionDemoPage() {
             <p className={styles.sectionEyebrow}>Who We Are</p>
             <h2 className={styles.sectionTitle}>Built on Trust,<br />Delivered with Precision</h2>
             <p className={styles.aboutDesc}>
-              AlNoor Contracting was founded in Dubai in 1998. For over two decades, we have
-              delivered residential and commercial construction projects across the UAE, building
-              a reputation for quality materials, skilled tradespeople, and honest project management.
+              AlNoor Contracting is an illustrative example of a well-established UAE general contractor.
+              Firms like this deliver residential and commercial construction projects across the UAE,
+              building a reputation for quality materials, skilled tradespeople, and honest project management.
             </p>
             <p className={styles.aboutDesc}>
-              All our works are fully compliant with Dubai Municipality and Trakhees regulations.
-              We hold ISO 9001 certification and are registered with the Dubai Contractors List, Grade A.
+              In practice, compliant UAE contractors maintain registration with Dubai Municipality and
+              Trakhees, ISO 9001 quality certification, and an active Dubai Contractors List classification.
             </p>
             <div className={styles.certs}>
               {['ISO 9001', 'Dubai Municipality Approved', 'Grade A Contractor', 'Trakhees Certified'].map((c) => (
                 <span key={c} className={styles.certBadge}>{c}</span>
               ))}
             </div>
+            <p className={styles.certNote}>All credentials shown are illustrative of typical UAE contractor registrations.</p>
           </div>
           <div className={styles.aboutImageWrap}>
             <Image
