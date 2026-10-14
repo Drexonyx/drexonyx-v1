@@ -1,0 +1,649 @@
+/* ─── Emirates Workforce Solutions — Manpower Demo ─── */
+/* Palette: deep navy #0c1a2e + gold #c9a227             */
+
+:root {
+  --ews-bg: #0c1a2e;
+  --ews-surface: #112235;
+  --ews-border: #1e3350;
+  --ews-text: #e8eef5;
+  --ews-muted: #7a99bc;
+  --ews-accent: #c9a227;
+  --ews-accent-dark: #a8871f;
+  --ews-accent-dim: rgba(201, 162, 39, 0.12);
+}
+
+/* ── Reset ── */
+.site * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.site {
+  font-family: var(--font-geist-sans, system-ui, sans-serif);
+  background: var(--ews-bg);
+  color: var(--ews-text);
+  min-height: 100vh;
+}
+
+/* ── Demo Banner ── */
+.demoBanner {
+  background: #1a1200;
+  border-bottom: 1px solid #3a2800;
+  padding: 0.5rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8125rem;
+  color: var(--ews-accent);
+  font-weight: 500;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.demoBannerLink {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.demoBannerLink:hover {
+  text-decoration: underline;
+}
+
+/* ── Header ── */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(12, 26, 46, 0.97);
+  border-bottom: 1px solid var(--ews-border);
+  backdrop-filter: blur(8px);
+}
+
+.headerInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.875rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logoBadge {
+  height: 38px;
+  padding: 0 0.625rem;
+  background: var(--ews-accent);
+  color: #0c1a2e;
+  font-weight: 800;
+  font-size: 0.8125rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.logoName {
+  font-weight: 700;
+  font-size: 1.0625rem;
+  color: var(--ews-text);
+}
+
+.headerNav {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+  flex-wrap: wrap;
+}
+
+.navLink {
+  color: var(--ews-muted);
+  text-decoration: none;
+  font-size: 0.9375rem;
+  transition: color 0.15s;
+}
+
+.navLink:hover {
+  color: var(--ews-text);
+}
+
+.navCta {
+  background: var(--ews-accent);
+  color: #0c1a2e;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  padding: 0.5rem 1.125rem;
+  border-radius: 7px;
+  transition: opacity 0.15s;
+}
+
+.navCta:hover {
+  opacity: 0.88;
+}
+
+/* ── Hero ── */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  min-height: 560px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 4.5rem 1.5rem;
+  gap: 3rem;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    padding: 3rem 1.5rem;
+  }
+  .heroVisual {
+    height: 220px !important;
+  }
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.heroEyebrow {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ews-accent);
+}
+
+.heroTitle {
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--ews-text);
+}
+
+.heroSubtitle {
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--ews-muted);
+  max-width: 480px;
+}
+
+.heroActions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.heroBtn {
+  background: var(--ews-accent);
+  color: #0c1a2e;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.75rem 1.75rem;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.heroBtn:hover {
+  opacity: 0.88;
+}
+
+.heroSecondary {
+  color: var(--ews-text);
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--ews-border);
+  border-radius: 8px;
+  transition: border-color 0.15s;
+}
+
+.heroSecondary:hover {
+  border-color: var(--ews-accent);
+}
+
+.heroVisual {
+  height: 440px;
+  border-radius: 16px;
+  background:
+    linear-gradient(145deg, #1a3050 0%, #0c1a2e 50%, #1e1600 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.heroVisual::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 70% 30%, rgba(201, 162, 39, 0.12) 0%, transparent 60%);
+}
+
+.heroVisual::after {
+  content: '🤝';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 5rem;
+  opacity: 0.25;
+}
+
+/* ── Stats Bar ── */
+.statsBar {
+  background: var(--ews-accent);
+  padding: 2rem 1.5rem;
+}
+
+.statsInner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-around;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  text-align: center;
+}
+
+.statNum {
+  font-size: 1.875rem;
+  font-weight: 800;
+  color: #0c1a2e;
+  font-variant-numeric: tabular-nums;
+}
+
+.statLabel {
+  font-size: 0.8125rem;
+  color: rgba(12, 26, 46, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+
+/* ── Sections ── */
+.industriesSection {
+  padding: 5rem 1.5rem;
+  background: var(--ews-surface);
+}
+
+.processSection {
+  padding: 5rem 1.5rem;
+  background: var(--ews-bg);
+}
+
+.whySection {
+  padding: 5rem 1.5rem;
+  background: var(--ews-surface);
+}
+
+.inquirySection {
+  padding: 5rem 1.5rem;
+  background: var(--ews-bg);
+}
+
+.sectionInner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.sectionEyebrow {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ews-accent);
+  margin-bottom: 0.75rem;
+}
+
+.sectionTitle {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 2.5rem;
+  color: var(--ews-text);
+}
+
+/* ── Industries ── */
+.industriesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+
+.industryCard {
+  background: var(--ews-bg);
+  border: 1px solid var(--ews-border);
+  border-radius: 12px;
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: border-color 0.2s;
+}
+
+.industryCard:hover {
+  border-color: var(--ews-accent);
+}
+
+.industryIcon {
+  font-size: 2rem;
+}
+
+.industryTitle {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--ews-text);
+}
+
+.industryDesc {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--ews-muted);
+}
+
+/* ── Process ── */
+.processGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.stepCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.75rem;
+  background: var(--ews-surface);
+  border: 1px solid var(--ews-border);
+  border-radius: 12px;
+  position: relative;
+}
+
+.stepNum {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--ews-accent);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.stepTitle {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--ews-text);
+}
+
+.stepDesc {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--ews-muted);
+}
+
+/* ── Why EWS ── */
+.whyInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .whyInner {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .whyVisual {
+    height: 200px !important;
+  }
+}
+
+.whyText {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.whyDesc {
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--ews-muted);
+}
+
+.licenceBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+  margin-top: 0.5rem;
+}
+
+.licenceBadge {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ews-accent);
+  background: var(--ews-accent-dim);
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(201, 162, 39, 0.25);
+}
+
+.whyVisual {
+  height: 380px;
+  border-radius: 16px;
+  background:
+    linear-gradient(150deg, #1a3050 0%, #0c1a2e 60%, #1e1600 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.whyVisual::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 30% 70%, rgba(201, 162, 39, 0.1) 0%, transparent 60%);
+}
+
+.whyVisual::after {
+  content: '🏆';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 5rem;
+  opacity: 0.2;
+}
+
+/* ── Inquiry subtitle ── */
+.inquirySubtitle {
+  font-size: 1.0625rem;
+  color: var(--ews-muted);
+  margin: -1.5rem 0 2rem;
+  line-height: 1.6;
+}
+
+/* ── Form styles ── */
+.form {
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.125rem;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 600px) {
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.formLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ews-text);
+}
+
+.formInput,
+.formSelect,
+.formTextarea {
+  background: var(--ews-surface);
+  border: 1px solid var(--ews-border);
+  border-radius: 8px;
+  padding: 0.6875rem 0.875rem;
+  font-size: 0.9375rem;
+  color: var(--ews-text);
+  font-family: inherit;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+
+.formInput:focus,
+.formSelect:focus,
+.formTextarea:focus {
+  outline: none;
+  border-color: var(--ews-accent);
+}
+
+.formInput::placeholder,
+.formTextarea::placeholder {
+  color: var(--ews-muted);
+}
+
+.formSelect option {
+  background: var(--ews-surface);
+  color: var(--ews-text);
+}
+
+.formTextarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.formSubmit {
+  background: var(--ews-accent);
+  color: #0c1a2e;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.8125rem 2rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: opacity 0.15s;
+}
+
+.formSubmit:hover {
+  opacity: 0.88;
+}
+
+.formSuccess {
+  background: var(--ews-accent-dim);
+  border: 1px solid rgba(201, 162, 39, 0.35);
+  border-radius: 12px;
+  padding: 2.5rem 2rem;
+  max-width: 480px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.formSuccessIcon {
+  width: 48px;
+  height: 48px;
+  background: var(--ews-accent);
+  color: #0c1a2e;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.formSuccessTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--ews-accent);
+}
+
+.formSuccessText {
+  font-size: 0.9375rem;
+  color: var(--ews-muted);
+  line-height: 1.6;
+}
+
+/* ── Company Footer ── */
+.companyFooter {
+  background: #070f1b;
+  border-top: 1px solid var(--ews-border);
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+
+.companyFooterInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.companyFooterName {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ews-text);
+}
+
+.companyFooterSub {
+  font-size: 0.875rem;
+  color: var(--ews-muted);
+}
+
+.mdaLink {
+  color: var(--ews-accent);
+  text-decoration: none;
+}
+
+.mdaLink:hover {
+  text-decoration: underline;
+}
