@@ -95,7 +95,10 @@ body {
   top: 12mm; bottom: 10mm; left: 0; right: 0;
   padding: 10mm 15mm;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
+.sect-label, .sect-rule { flex-shrink: 0; }
 
 /* ── Section label ──────────────────────────────────────── */
 .sect-label {
@@ -218,14 +221,18 @@ body {
 .demo-card {
   border: 0.4pt solid #e8e8e8;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 .demo-img {
   width: 100%;
-  height: 36mm;
+  flex: 1;
+  min-height: 40mm;
   object-fit: cover;
   object-position: top center;
   display: block;
 }
+.demo-foot { flex-shrink: 0; }
 .demo-foot {
   padding: 4mm 5mm;
   background: #fafafa;
@@ -331,6 +338,7 @@ body {
   gap: 5mm;
   padding: 8mm 0;
   border-bottom: 0.3pt solid #f0f0f0;
+  flex: 1;
 }
 .step:last-child { border-bottom: none; }
 .step-num {
@@ -369,7 +377,7 @@ body {
   padding: 7mm 6mm;
   border-left: 2pt solid #C8980A;
   background: #fafafa;
-  margin-bottom: 5mm;
+  flex: 1;
 }
 .why-title {
   font-size: 10pt;
@@ -667,8 +675,8 @@ body {
   <div class="body">
     <div class="sect-label">Company Overview</div>
     <div class="sect-rule"></div>
-    <div class="cols-2" style="gap:12mm; align-items:start;">
-      <div>
+    <div class="cols-2" style="gap:12mm; align-items:stretch; flex:1; min-height:0;">
+      <div style="display:flex; flex-direction:column;">
         <div class="gold-line"></div>
         <div class="sect-heading" style="font-size:19pt;">One Agency.<br>Every Dimension.</div>
         <p class="sect-sub" style="margin-bottom:5mm;">
@@ -698,14 +706,14 @@ body {
             <div class="stat-label">Industries</div>
           </div>
         </div>
-        <div style="margin-top:6mm; padding:5mm 6mm; border-left:2pt solid #C8980A; background:#fafafa;">
+        <div style="margin-top:auto; padding:5mm 6mm; border-left:2pt solid #C8980A; background:#fafafa;">
           <p style="font-size:9.5pt; font-style:italic; color:#333; line-height:1.65;">"We build, design, produce, automate, and deliver — across Digital, Creative, Media, and Business Solutions. One agency. Every dimension."</p>
           <div style="margin-top:3mm; font-size:7pt; font-weight:600; letter-spacing:0.12em; color:#C8980A; text-transform:uppercase;">MDA — Master Digital Agency</div>
         </div>
       </div>
-      <div>
-        <img class="overview-img" src="img/creative-crew.png" alt="DREXONYX creative team" style="height:56mm;">
-        <div style="margin-top:5mm; padding:5mm 5mm; border:0.4pt solid #e8e8e8; background:#fafafa;">
+      <div style="display:flex; flex-direction:column;">
+        <img class="overview-img" src="img/creative-crew.png" alt="DREXONYX creative team" style="flex:1; min-height:50mm; height:auto;">
+        <div style="margin-top:5mm; padding:5mm 5mm; border:0.4pt solid #e8e8e8; background:#fafafa; flex-shrink:0;">
           <div class="sect-label" style="margin-bottom:3mm;">Powered By</div>
           <p style="font-size:8.5pt; color:#333; line-height:1.6;">
             MDA operates under the DREXONYX brand umbrella — a Dubai-based creative and technology studio. DREXONYX provides the engineering systems, creative infrastructure, and operational backbone that powers every MDA engagement.
@@ -732,12 +740,12 @@ body {
   <div class="body">
     <div class="sect-label">Core Services</div>
     <div class="sect-rule"></div>
-    <div style="margin-bottom:6mm;">
+    <div style="margin-bottom:6mm; flex-shrink:0;">
       <div class="gold-line"></div>
       <div class="sect-heading" style="font-size:19pt; margin-bottom:2mm;">Four Pillars. One Agency.</div>
       <p class="sect-sub">Every service MDA delivers falls within one of four practice areas — each backed by dedicated specialists and supported by DREXONYX infrastructure.</p>
     </div>
-    <div class="cols-2" style="gap:5mm;">
+    <div class="cols-2" style="gap:5mm; flex:1; min-height:0; grid-template-rows:repeat(2,1fr);">
       <div class="pillar">
         <div class="pillar-cat">01 · Digital</div>
         <div class="pillar-title">Digital Solutions</div>
@@ -783,7 +791,7 @@ body {
         </ul>
       </div>
     </div>
-    <div style="margin-top:6mm; padding:4mm 6mm; border:0.4pt solid #e0d0a0; background:#fdfbf5; border-left:2pt solid #C8980A;">
+    <div style="margin-top:6mm; flex-shrink:0; padding:4mm 6mm; border:0.4pt solid #e0d0a0; background:#fdfbf5; border-left:2pt solid #C8980A;">
       <p style="font-size:8pt; color:#555; font-style:italic;">
         MDA engagements are scoped, designed, and delivered as complete projects — not piecemeal tasks. Every brief receives a named project lead, a defined timeline, and a clear deliverable standard.
       </p>
@@ -807,12 +815,12 @@ body {
   <div class="body">
     <div class="sect-label">Industries Served</div>
     <div class="sect-rule"></div>
-    <div style="margin-bottom:7mm;">
+    <div style="margin-bottom:7mm; flex-shrink:0;">
       <div class="gold-line"></div>
       <div class="sect-heading" style="font-size:19pt; margin-bottom:2mm;">Built for UAE Business.</div>
       <p class="sect-sub">MDA serves established and growing businesses across the commercial sectors that define the UAE economy. Our solutions are built around the real operational context of each industry — not generic templates.</p>
     </div>
-    <div class="cols-4" style="gap:4mm;">
+    <div class="cols-4" style="gap:4mm; flex:1; min-height:0; grid-template-rows:repeat(3,1fr);">
       <div class="industry-cell">
         <div class="industry-num">01</div>
         <div class="industry-name">Construction &amp; Contracting</div>
@@ -893,12 +901,12 @@ body {
   <div class="body">
     <div class="sect-label">Website Demonstrations</div>
     <div class="sect-rule"></div>
-    <div style="margin-bottom:6mm;">
+    <div style="margin-bottom:6mm; flex-shrink:0;">
       <div class="gold-line"></div>
       <div class="sect-heading" style="font-size:19pt; margin-bottom:2mm;">See the Standard Live.</div>
       <p class="sect-sub">The following are illustrative demonstration websites — live, functional builds created to show the quality and capability of MDA's digital output. Each demonstrates production-level design and real-world functionality.</p>
     </div>
-    <div class="cols-3" style="gap:5mm; align-items:start;">
+    <div class="cols-3" style="gap:5mm; flex:1; min-height:0; align-items:stretch;">
       <div class="demo-card">
         <img class="demo-img" src="i/construction.png" alt="Construction demo site">
         <div class="demo-foot">
@@ -927,7 +935,7 @@ body {
         </div>
       </div>
     </div>
-    <div style="margin-top:5mm; padding:3.5mm 5mm; border:0.4pt solid #e0d0a0; background:#fdfbf5; border-left:2pt solid #C8980A;">
+    <div style="margin-top:5mm; flex-shrink:0; padding:3.5mm 5mm; border:0.4pt solid #e0d0a0; background:#fdfbf5; border-left:2pt solid #C8980A;">
       <p style="font-size:7.5pt; color:#666; font-style:italic; line-height:1.5;">
         Demonstration websites are illustrative examples of MDA's output, designed to match the scope and quality of each commercial package. Live demos are available at the URLs above. Client-specific builds are scoped separately.
       </p>
@@ -951,12 +959,12 @@ body {
   <div class="body">
     <div class="sect-label">Commercial Packages</div>
     <div class="sect-rule"></div>
-    <div style="margin-bottom:6mm;">
+    <div style="margin-bottom:6mm; flex-shrink:0;">
       <div class="gold-line"></div>
       <div class="sect-heading" style="font-size:19pt; margin-bottom:2mm;">Clear Pricing. No Surprises.</div>
       <p class="sect-sub">MDA offers three website packages at fixed, transparent prices. Each tier is designed to match a clear stage of business need — from first-time web presence to full custom build.</p>
     </div>
-    <div class="cols-3" style="gap:5mm; align-items:stretch;">
+    <div class="cols-3" style="gap:5mm; align-items:stretch; flex:1; min-height:0;">
       <div class="pkg">
         <div class="pkg-head">
           <div class="pkg-tier">Starter</div>
@@ -1009,7 +1017,7 @@ body {
         </div>
       </div>
     </div>
-    <div style="margin-top:5mm; padding:3.5mm 6mm; border:0.4pt solid #e0d0a0; background:#fdfbf5; border-left:2pt solid #C8980A; display:flex; gap:8mm; align-items:center;">
+    <div style="margin-top:5mm; flex-shrink:0; padding:3.5mm 6mm; border:0.4pt solid #e0d0a0; background:#fdfbf5; border-left:2pt solid #C8980A; display:flex; gap:8mm; align-items:center;">
       <p style="font-size:8pt; color:#555; line-height:1.55; flex:1;">
         All packages include a professional build with mobile-responsive layout and a standards-compliant codebase. Prices are fixed — no hidden fees, no escalating retainers. Custom scopes are available on request.
       </p>
@@ -1037,18 +1045,18 @@ body {
   <div class="body">
     <div class="sect-label">Project Workflow</div>
     <div class="sect-rule"></div>
-    <div class="cols-2" style="gap:14mm; align-items:start;">
-      <div>
+    <div class="cols-2" style="gap:14mm; align-items:stretch; flex:1; min-height:0;">
+      <div style="display:flex; flex-direction:column;">
         <div class="gold-line"></div>
         <div class="sect-heading" style="font-size:19pt; margin-bottom:3mm;">From Brief to<br>Delivered.</div>
         <p class="sect-sub" style="margin-bottom:6mm;">
           Every MDA project follows a disciplined four-stage process — designed to reduce client effort, eliminate ambiguity, and produce work that performs from day one.
         </p>
-        <p class="sect-sub">
+        <p class="sect-sub" style="margin-top:auto;">
           We don't start building until the brief is clear. We don't deliver until the work meets standard. At every stage, you have a named contact and a defined next step.
         </p>
       </div>
-      <div>
+      <div style="display:flex; flex-direction:column;">
         <div class="step">
           <div class="step-num">01</div>
           <div class="step-content">
@@ -1102,13 +1110,13 @@ body {
   <div class="body">
     <div class="sect-label">Why DREXONYX × MDA</div>
     <div class="sect-rule"></div>
-    <div style="margin-bottom:7mm;">
+    <div style="margin-bottom:7mm; flex-shrink:0;">
       <div class="gold-line"></div>
       <div class="sect-heading" style="font-size:19pt; margin-bottom:2mm;">The Case for MDA.</div>
       <p class="sect-sub">The UAE market has no shortage of agencies. What it lacks is an agency that combines genuine technical depth, commercial pricing, and a reliable delivery standard — without requiring an enterprise budget.</p>
     </div>
-    <div class="cols-2" style="gap:5mm;">
-      <div>
+    <div class="cols-2" style="gap:5mm; flex:1; min-height:0; align-items:stretch;">
+      <div style="display:flex; flex-direction:column; gap:5mm;">
         <div class="why-card">
           <div class="why-title">Enterprise Infrastructure at Commercial Rates</div>
           <div class="why-desc">MDA is powered by DREXONYX — a technology and creative studio with production infrastructure, AI systems, and engineering capability typically reserved for enterprise clients. You get that backbone at package pricing.</div>
@@ -1126,7 +1134,7 @@ body {
           <div class="why-desc">Every MDA project ends with a complete, handed-over deliverable — not an ongoing dependency on our infrastructure or tools. You own what we build, and we document it for continuity.</div>
         </div>
       </div>
-      <div>
+      <div style="display:flex; flex-direction:column; gap:5mm;">
         <div class="why-card">
           <div class="why-title">Four Disciplines. One Relationship.</div>
           <div class="why-desc">Digital, Creative, Media, and Business Solutions — all under one agency. No vendor management, no brief-by-brief contractor juggling. One point of contact. One standard across every deliverable.</div>
@@ -1135,7 +1143,7 @@ body {
           <div class="why-title">Support That Outlasts the Launch</div>
           <div class="why-desc">Every MDA package includes post-launch maintenance. The Professional and Premium tiers provide ongoing rounds of updates — so the work you receive stays live, current, and functional as your business evolves.</div>
         </div>
-        <div style="padding:5mm 5mm; border:0.4pt solid #e0d0a0; background:#fdfbf5; margin-top:0;">
+        <div style="padding:5mm 5mm; border:0.4pt solid #e0d0a0; background:#fdfbf5; flex-shrink:0; margin-top:auto;">
           <div style="font-size:8pt; color:#888; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:2mm;">A DREXONYX Brand</div>
           <p style="font-size:8pt; color:#555; line-height:1.6;">MDA is the client-facing agency brand of DREXONYX. Every project, regardless of package tier, is executed by the same team, to the same engineering and creative standard.</p>
         </div>
