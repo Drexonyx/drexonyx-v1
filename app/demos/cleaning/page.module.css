@@ -260,7 +260,7 @@
 /* ── Trust Bar ── */
 .trustBar {
   background: var(--bs-accent);
-  padding: 2.5rem 1.5rem;
+  padding: 3rem 1.5rem;
 }
 
 .trustInner {
@@ -281,7 +281,7 @@
 }
 
 .trustNum {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 800;
   color: #fff;
   font-variant-numeric: tabular-nums;
@@ -342,17 +342,24 @@
 .serviceCard {
   background: var(--bs-bg);
   border: 1.5px solid var(--bs-border);
+  border-top: 3px solid var(--bs-accent);
   border-radius: 12px;
   padding: 1.75rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
 }
 
 .serviceCard:hover {
   border-color: var(--bs-accent);
-  box-shadow: 0 4px 16px rgba(13, 148, 136, 0.1);
+  box-shadow: 0 6px 24px rgba(13, 148, 136, 0.12);
+  transform: translateY(-2px);
+}
+
+.serviceIcon {
+  font-size: 1.625rem;
+  line-height: 1;
 }
 
 .serviceTitle {
@@ -623,6 +630,67 @@
   padding: 0.4rem 0.875rem;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* ── Testimonials ── */
+.testimonialsSection {
+  padding: 5rem 1.5rem;
+  background: var(--bs-bg);
+}
+
+.testimonialsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.testimonialCard {
+  background: var(--bs-surface);
+  border: 1.5px solid var(--bs-border);
+  border-radius: 16px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.testimonialCard::before {
+  content: '\201C';
+  position: absolute;
+  top: 0.75rem;
+  right: 1.25rem;
+  font-size: 5rem;
+  color: var(--bs-accent);
+  opacity: 0.1;
+  line-height: 1;
+  font-family: Georgia, serif;
+}
+
+.testimonialQuote {
+  font-size: 0.9375rem;
+  line-height: 1.75;
+  color: var(--bs-muted);
+  font-style: italic;
+  flex: 1;
+}
+
+.testimonialAuthor {
+  border-top: 1px solid var(--bs-border);
+  padding-top: 1rem;
+}
+
+.testimonialName {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--bs-text);
+}
+
+.testimonialRole {
+  font-size: 0.8125rem;
+  color: var(--bs-muted);
+  margin-top: 0.125rem;
 }
 
 /* ── Company Footer ── */

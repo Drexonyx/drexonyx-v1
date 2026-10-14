@@ -10,18 +10,37 @@ export const metadata: Metadata = {
 };
 
 const SERVICES = [
-  { title: 'Daily Office Cleaning', desc: 'Consistent, discreet cleaning crews that work around your schedule — early morning or after hours.' },
-  { title: 'Deep Cleaning', desc: 'Full facility deep cleans: sanitation, descaling, grout treatment, and hard-to-reach areas.' },
-  { title: 'Post-Construction Clean', desc: 'Specialist dust extraction, debris removal, and surface polishing after handover.' },
-  { title: 'Carpet & Upholstery', desc: 'Hot-water extraction and dry cleaning for carpets, rugs, sofas, and workstation chairs.' },
-  { title: 'Window & Facade', desc: 'Interior and exterior window cleaning for commercial buildings up to 12 storeys.' },
-  { title: 'Move-In / Move-Out', desc: 'Thorough end-of-tenancy and new-property cleans accepted and signed off by building management.' },
+  { title: 'Daily Office Cleaning', desc: 'Consistent, discreet cleaning crews that work around your schedule — early morning or after hours.', icon: '🏢' },
+  { title: 'Deep Cleaning', desc: 'Full facility deep cleans: sanitation, descaling, grout treatment, and hard-to-reach areas.', icon: '🧼' },
+  { title: 'Post-Construction Clean', desc: 'Specialist dust extraction, debris removal, and surface polishing after handover.', icon: '⚒️' },
+  { title: 'Carpet & Upholstery', desc: 'Hot-water extraction and dry cleaning for carpets, rugs, sofas, and workstation chairs.', icon: '🛋️' },
+  { title: 'Window & Facade', desc: 'Interior and exterior window cleaning for commercial buildings up to 12 storeys.', icon: '🪟' },
+  { title: 'Move-In / Move-Out', desc: 'Thorough end-of-tenancy and new-property cleans accepted and signed off by building management.', icon: '🔑' },
 ] as const;
 
 const STATS = [
   { num: '480+', label: 'Clients Served' },
   { num: '15+', label: 'Years in Dubai' },
   { num: '98%', label: 'Renewal Rate' },
+  { num: '24h', label: 'Response Time' },
+] as const;
+
+const TESTIMONIALS = [
+  {
+    quote: "BrightSpace have maintained our three-floor office for two years. Consistent, professional, never once disruptive to our operations.",
+    name: "Sarah M.",
+    title: "Office Manager — Technology Firm, DIFC",
+  },
+  {
+    quote: "We ran a single trial clean before committing. The result spoke for itself — we switched our entire portfolio immediately and haven't looked back.",
+    name: "James K.",
+    title: "Facilities Director — Hospitality Group, JBR",
+  },
+  {
+    quote: "Post-construction cleaning across 6,000 sqft of retail fit-out. Handed over on time and signed off by our project manager first time.",
+    name: "Omar A.",
+    title: "Project Manager — Retail Developer",
+  },
 ] as const;
 
 export default function CleaningDemoPage() {
@@ -70,8 +89,8 @@ export default function CleaningDemoPage() {
         </div>
         <div className={styles.heroImageWrap}>
           <Image
-            src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1400&q=80"
-            alt="Professional cleaning operative polishing a modern office lobby"
+            src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1400&q=80"
+            alt="Spotless, light-filled luxury office interior with gleaming floors and open workstations"
             fill
             style={{ objectFit: 'cover', objectPosition: 'center' }}
             sizes="(max-width: 768px) 100vw, 50vw"
@@ -101,6 +120,7 @@ export default function CleaningDemoPage() {
           <div className={styles.servicesGrid}>
             {SERVICES.map((s) => (
               <div key={s.title} className={styles.serviceCard}>
+                <span className={styles.serviceIcon}>{s.icon}</span>
                 <h3 className={styles.serviceTitle}>{s.title}</h3>
                 <p className={styles.serviceDesc}>{s.desc}</p>
               </div>
@@ -160,6 +180,25 @@ export default function CleaningDemoPage() {
             Fill in the form and our team will come back within 24 hours with a tailored proposal.
           </p>
           <QuoteForm />
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className={styles.testimonialsSection}>
+        <div className={styles.sectionInner}>
+          <p className={styles.sectionEyebrow}>Client Feedback</p>
+          <h2 className={styles.sectionTitle}>What Our Clients Say</h2>
+          <div className={styles.testimonialsGrid}>
+            {TESTIMONIALS.map((t) => (
+              <div key={t.name} className={styles.testimonialCard}>
+                <p className={styles.testimonialQuote}>{t.quote}</p>
+                <div className={styles.testimonialAuthor}>
+                  <p className={styles.testimonialName}>{t.name}</p>
+                  <p className={styles.testimonialRole}>{t.title}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
