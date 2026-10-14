@@ -194,10 +194,10 @@ export default function ConstructionDemoPage() {
           </div>
           <div className={styles.aboutImageWrap}>
             <Image
-              src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=900&q=80"
-              alt="Construction team working on a structural project"
+              src="/demos/images/construction-bottom.png"
+              alt="Construction workers on site with rebar framework and heavy machinery against a Dubai skyline at sunset"
               fill
-              style={{ objectFit: 'cover', objectPosition: 'center top' }}
+              style={{ objectFit: 'cover', objectPosition: 'center center' }}
               sizes="(max-width: 768px) 100vw, 50vw"
             />
           </div>

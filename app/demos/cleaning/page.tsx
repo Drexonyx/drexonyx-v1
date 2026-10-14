@@ -134,10 +134,10 @@ export default function CleaningDemoPage() {
         <div className={styles.aboutInner}>
           <div className={styles.aboutImageWrap}>
             <Image
-              src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=900&q=80"
-              alt="Clean, bright modern office space with polished floors and open workstations"
+              src="/demos/images/cleaning-bottom.png"
+              alt="Rope-access window cleaner on a glass skyscraper facade with Dubai city skyline in the background"
               fill
-              style={{ objectFit: 'cover', objectPosition: 'center' }}
+              style={{ objectFit: 'cover', objectPosition: 'center center' }}
               sizes="(max-width: 768px) 100vw, 50vw"
             />
           </div>
