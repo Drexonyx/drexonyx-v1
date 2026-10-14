@@ -37,7 +37,7 @@ export default function ManpowerDemoPage() {
     <div className={styles.site}>
       {/* Demo banner */}
       <div className={styles.demoBanner}>
-        <span>DEMO SITE — Emirates Workforce Solutions</span>
+        <span>DEMO SITE — Emirates Workforce Solutions · Figures, licences &amp; certifications are illustrative</span>
         <Link href="/mda" className={styles.demoBannerLink}>
           View MDA Packages →
         </Link>

@@ -29,7 +29,7 @@ export default function CleaningDemoPage() {
     <div className={styles.site}>
       {/* Demo banner */}
       <div className={styles.demoBanner}>
-        <span>DEMO SITE — BrightSpace Cleaning</span>
+        <span>DEMO SITE — BrightSpace Cleaning · Figures &amp; certifications are illustrative</span>
         <Link href="/mda" className={styles.demoBannerLink}>
           View MDA Packages →
         </Link>

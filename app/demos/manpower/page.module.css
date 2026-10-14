@@ -133,6 +133,25 @@
   opacity: 0.88;
 }
 
+@media (max-width: 640px) {
+  .headerNav {
+    gap: 1rem;
+  }
+  .navLink {
+    font-size: 0.8125rem;
+  }
+  .navCta {
+    font-size: 0.8125rem;
+    padding: 0.4375rem 0.875rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .navLink {
+    display: none;
+  }
+}
+
 /* ── Hero ── */
 .hero {
   display: grid;
