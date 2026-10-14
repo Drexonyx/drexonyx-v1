@@ -179,10 +179,10 @@ export default function ManpowerDemoPage() {
           </div>
           <div className={styles.whyImageWrap}>
             <Image
-              src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=900&q=80"
-              alt="Professional businesswoman leading a team meeting in a corporate boardroom"
+              src="/demos/images/manpower-bottom.png"
+              alt="Warehouse logistics operations at night with a worker processing parcels in a modern distribution centre"
               fill
-              style={{ objectFit: 'cover', objectPosition: 'center top' }}
+              style={{ objectFit: 'cover', objectPosition: 'center center' }}
               sizes="(max-width: 768px) 100vw, 50vw"
             />
           </div>
