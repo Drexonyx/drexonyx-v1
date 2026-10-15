@@ -873,59 +873,74 @@ body{
 /* ═══════════════════════════════════════════════════════
    PAGE 7 — WORKFLOW
 ══════════════════════════════════════════════════════════ */
-.wf-layout{
+.wf-intro{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:12mm;
-  align-items:stretch;
+  flex-shrink:0;
+  margin-bottom:5mm;
+}
+.wf-steps{
+  display:flex;
+  flex-direction:column;
   flex:1;
   min-height:0;
 }
-.wf-left{display:flex;flex-direction:column;justify-content:space-between}
-.wf-right{display:flex;flex-direction:column;justify-content:space-between;position:relative}
-.wf-right::before{content:'';position:absolute;left:7.5mm;top:0;bottom:0;width:0.5pt;background:linear-gradient(180deg,transparent 0%,rgba(200,152,10,0.25) 8%,rgba(200,152,10,0.25) 92%,transparent 100%)}
-
-.step{
+.wf-step-row{
   display:flex;
-  gap:4mm;
-  padding:10mm 0;
-  border-bottom:none;
-  flex:none;
-  position:relative;
-  z-index:1;
+  align-items:flex-start;
+  gap:6mm;
+  flex:1;
+  padding:5mm 0;
+  border-bottom:0.4pt solid rgba(200,152,10,0.1);
 }
-.step:last-child{border-bottom:none}
-.step-num{
+.wf-step-row:last-child{border-bottom:none;padding-bottom:0}
+.wf-step-num-col{
+  width:18mm;
+  flex-shrink:0;
+}
+.wf-step-num-big{
   font-family:'Playfair Display',serif;
   font-size:26pt;
   font-weight:700;
-  color:rgba(200,152,10,0.3);
+  color:rgba(200,152,10,0.28);
   line-height:1;
-  flex-shrink:0;
-  width:15mm;
-  background:#0b0b0b;
-  padding:2mm 0;
+  margin-bottom:1.5mm;
 }
-.step-content{flex:1;padding-top:1.5mm}
-.step-label{
-  font-size:6pt;
+.wf-step-phase{
+  font-size:5.5pt;
   font-weight:700;
   letter-spacing:0.22em;
   color:#C8980A;
   text-transform:uppercase;
-  margin-bottom:1.5mm;
 }
+.wf-step-vline{
+  width:0.5pt;
+  background:linear-gradient(180deg,rgba(200,152,10,0.35) 0%,rgba(200,152,10,0.12) 100%);
+  align-self:stretch;
+  flex-shrink:0;
+}
+.wf-step-body{flex:1;padding-top:1mm}
 .step-h{
   font-family:'Playfair Display',serif;
   font-size:12pt;
   font-weight:700;
   color:#ffffff;
-  margin-bottom:1.5mm;
+  margin-bottom:2mm;
 }
 .step-p{
   font-size:7.5pt;
   color:rgba(255,255,255,0.5);
   line-height:1.6;
+  margin-bottom:3mm;
+}
+.step-tags{display:flex;gap:2.5mm;flex-wrap:wrap}
+.step-tag{
+  font-size:5.5pt;
+  color:rgba(200,152,10,0.55);
+  padding:1.2mm 2.5mm;
+  border:0.3pt solid rgba(200,152,10,0.2);
+  letter-spacing:0.06em;
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -1742,76 +1757,102 @@ body{
     </div>
   </div>
   <div class="body">
-    <div class="sect-label" style="flex-shrink:0;margin-bottom:2mm">Project Workflow</div>
-    <div class="wf-layout">
-      <div class="wf-left">
+    <div class="sect-label" style="flex-shrink:0;margin-bottom:3mm">Project Workflow</div>
+    <div class="wf-intro">
+      <div>
         <div class="gold-line"></div>
-        <div class="h1" style="font-size:20pt;margin-bottom:4mm">From Brief to<br><em>Delivered.</em></div>
-        <p class="para" style="margin-bottom:5mm">
-          Every MDA project follows a disciplined four-stage process — designed to reduce client effort, eliminate ambiguity, and produce work that performs from day one.
-        </p>
-        <p class="para" style="margin-top:auto;color:rgba(255,255,255,0.4);font-size:8pt">
-          We don't start building until the brief is clear. We don't deliver until the work meets standard. At every stage, you have a named contact and a defined next step.
-        </p>
-        <!-- Process visual decoration -->
-        <div style="margin-top:8mm;flex-shrink:0">
-          <div style="height:0.4pt;background:linear-gradient(90deg,#C8980A,transparent);margin-bottom:4mm"></div>
-          <div style="display:flex;gap:3mm;align-items:center">
-            <div style="width:8mm;height:8mm;border:0.8pt solid rgba(200,152,10,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-              <div style="width:2mm;height:2mm;border-radius:50%;background:#C8980A"></div>
-            </div>
-            <div style="height:0.4pt;flex:1;background:rgba(200,152,10,0.15)"></div>
-            <div style="width:8mm;height:8mm;border:0.8pt solid rgba(200,152,10,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-              <div style="width:2mm;height:2mm;border-radius:50%;background:#C8980A"></div>
-            </div>
-            <div style="height:0.4pt;flex:1;background:rgba(200,152,10,0.15)"></div>
-            <div style="width:8mm;height:8mm;border:0.8pt solid rgba(200,152,10,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-              <div style="width:2mm;height:2mm;border-radius:50%;background:#C8980A"></div>
-            </div>
-            <div style="height:0.4pt;flex:1;background:rgba(200,152,10,0.15)"></div>
-            <div style="width:8mm;height:8mm;border:0.6pt solid #C8980A;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(200,152,10,0.08)">
-              <div style="width:2mm;height:2mm;border-radius:50%;background:#C8980A"></div>
-            </div>
-          </div>
-          <div style="display:flex;justify-content:space-between;margin-top:2mm">
-            <span style="font-size:5.5pt;color:rgba(200,152,10,0.5);letter-spacing:0.1em">DISCOVER</span>
-            <span style="font-size:5.5pt;color:rgba(200,152,10,0.5);letter-spacing:0.1em">DESIGN</span>
-            <span style="font-size:5.5pt;color:rgba(200,152,10,0.5);letter-spacing:0.1em">BUILD</span>
-            <span style="font-size:5.5pt;color:#C8980A;letter-spacing:0.1em">DELIVER</span>
+        <div class="h1" style="font-size:20pt;margin-bottom:3mm">From Brief to<br><em>Delivered.</em></div>
+        <p class="para" style="font-size:8pt">Every MDA project follows a disciplined four-stage process — designed to reduce client effort, eliminate ambiguity, and produce work that performs from day one.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;justify-content:flex-end">
+        <p class="para" style="font-size:7.5pt;color:rgba(255,255,255,0.38)">We don't start building until the brief is clear. We don't deliver until the work meets standard. At every stage, you have a named contact and a defined next step.</p>
+        <div style="margin-top:5mm;display:flex;gap:2.5mm;align-items:center">
+          <div style="width:7mm;height:7mm;border:0.7pt solid rgba(200,152,10,0.35);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:2mm;height:2mm;border-radius:50%;background:#C8980A"></div></div>
+          <div style="height:0.4pt;flex:1;background:rgba(200,152,10,0.15)"></div>
+          <div style="width:7mm;height:7mm;border:0.7pt solid rgba(200,152,10,0.35);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:2mm;height:2mm;border-radius:50%;background:#C8980A"></div></div>
+          <div style="height:0.4pt;flex:1;background:rgba(200,152,10,0.15)"></div>
+          <div style="width:7mm;height:7mm;border:0.7pt solid rgba(200,152,10,0.35);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><div style="width:2mm;height:2mm;border-radius:50%;background:#C8980A"></div></div>
+          <div style="height:0.4pt;flex:1;background:rgba(200,152,10,0.15)"></div>
+          <div style="width:7mm;height:7mm;border:0.6pt solid #C8980A;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(200,152,10,0.1)"><div style="width:2mm;height:2mm;border-radius:50%;background:#C8980A"></div></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:1.5mm">
+          <span style="font-size:5pt;color:rgba(200,152,10,0.45);letter-spacing:0.1em">DISCOVER</span>
+          <span style="font-size:5pt;color:rgba(200,152,10,0.45);letter-spacing:0.1em">DESIGN</span>
+          <span style="font-size:5pt;color:rgba(200,152,10,0.45);letter-spacing:0.1em">BUILD</span>
+          <span style="font-size:5pt;color:#C8980A;letter-spacing:0.1em">DELIVER</span>
+        </div>
+      </div>
+    </div>
+    <div class="wf-steps">
+      <div class="wf-step-row">
+        <div class="wf-step-num-col">
+          <div class="wf-step-num-big">01</div>
+          <div class="wf-step-phase">Discover</div>
+        </div>
+        <div class="wf-step-vline"></div>
+        <div class="wf-step-body">
+          <div class="step-h">Goals &amp; Strategy</div>
+          <p class="step-p">We map your business goals, target market, and commercial opportunity in a structured discovery session. The outcome is a written brief that defines deliverables, confirms audience, and locks the project timeline. Nothing moves to design until the brief is finalised and signed — removing the ambiguity that derails most agency-client relationships before they begin.</p>
+          <div class="step-tags">
+            <span class="step-tag">Business brief &amp; scope</span>
+            <span class="step-tag">Competitor analysis</span>
+            <span class="step-tag">Fixed project timeline</span>
+            <span class="step-tag">Target audience map</span>
+            <span class="step-tag">Success criteria</span>
           </div>
         </div>
       </div>
-      <div class="wf-right">
-        <div class="step">
-          <div class="step-num">01</div>
-          <div class="step-content">
-            <div class="step-label">Discover</div>
-            <div class="step-h">Goals &amp; Strategy</div>
-            <p class="step-p">We map your goals, market, and opportunity — then define a clear scope and strategy before anything is built.</p>
+      <div class="wf-step-row">
+        <div class="wf-step-num-col">
+          <div class="wf-step-num-big">02</div>
+          <div class="wf-step-phase">Design</div>
+        </div>
+        <div class="wf-step-vline"></div>
+        <div class="wf-step-body">
+          <div class="step-h">Visual &amp; UX</div>
+          <p class="step-p">Every touchpoint is crafted specifically for your brand — visual identity, UX wireframes, and messaging aligned to your audience and sector. We present three design directions before any build begins. Nothing proceeds to development without your written approval — the gate is hard, not negotiable, and protects your budget from rework.</p>
+          <div class="step-tags">
+            <span class="step-tag">Wireframes &amp; layouts</span>
+            <span class="step-tag">Visual identity assets</span>
+            <span class="step-tag">Client approval gate</span>
+            <span class="step-tag">UX flow diagrams</span>
+            <span class="step-tag">Brand guidelines</span>
           </div>
         </div>
-        <div class="step">
-          <div class="step-num">02</div>
-          <div class="step-content">
-            <div class="step-label">Design</div>
-            <div class="step-h">Visual &amp; UX</div>
-            <p class="step-p">Every touchpoint is crafted for your brand — visual identity, UX, and messaging aligned to your audience.</p>
+      </div>
+      <div class="wf-step-row">
+        <div class="wf-step-num-col">
+          <div class="wf-step-num-big">03</div>
+          <div class="wf-step-phase">Build</div>
+        </div>
+        <div class="wf-step-vline"></div>
+        <div class="wf-step-body">
+          <div class="step-h">Execution</div>
+          <p class="step-p">We execute across all disciplines simultaneously — frontend development, content setup, production, and media creation delivered on brief and on schedule. Parallel execution shortens project durations without quality trade-offs. Weekly status updates keep you informed at every stage without requiring hands-on involvement from your side.</p>
+          <div class="step-tags">
+            <span class="step-tag">Frontend development</span>
+            <span class="step-tag">CMS &amp; content setup</span>
+            <span class="step-tag">QA &amp; testing</span>
+            <span class="step-tag">Cross-browser validation</span>
+            <span class="step-tag">Production sign-off</span>
           </div>
         </div>
-        <div class="step">
-          <div class="step-num">03</div>
-          <div class="step-content">
-            <div class="step-label">Build</div>
-            <div class="step-h">Execution</div>
-            <p class="step-p">We execute with precision — code, content, and production delivered on brief, on schedule, and to spec.</p>
-          </div>
+      </div>
+      <div class="wf-step-row">
+        <div class="wf-step-num-col">
+          <div class="wf-step-num-big">04</div>
+          <div class="wf-step-phase">Deliver</div>
         </div>
-        <div class="step">
-          <div class="step-num">04</div>
-          <div class="step-content">
-            <div class="step-label">Deliver</div>
-            <div class="step-h">Launch &amp; Support</div>
-            <p class="step-p">Go live with confidence. We deploy, optimise, and hand over — with full support from launch day and beyond.</p>
+        <div class="wf-step-vline"></div>
+        <div class="wf-step-body">
+          <div class="step-h">Launch &amp; Support</div>
+          <p class="step-p">We manage the full go-live — DNS, hosting configuration, and deployment to your confirmed infrastructure. On launch day you receive the complete codebase, all creative assets, and a written handover brief. Every MDA project includes 30 days of post-launch support as standard; ongoing maintenance tiers are available for clients requiring regular updates beyond that window.</p>
+          <div class="step-tags">
+            <span class="step-tag">Full codebase handover</span>
+            <span class="step-tag">DNS &amp; hosting setup</span>
+            <span class="step-tag">30-day post-launch support</span>
+            <span class="step-tag">Admin access &amp; training</span>
+            <span class="step-tag">Post-launch review</span>
           </div>
         </div>
       </div>
@@ -1865,6 +1906,10 @@ body{
           <div class="why-title">Deliverables, Not Promises</div>
           <p class="why-desc">Every MDA project ends with a complete, handed-over deliverable — not an ongoing dependency on our tools. You own what we build, and we document it for continuity.</p>
         </div>
+        <div class="why-card">
+          <div class="why-title">Results, Not Reports</div>
+          <p class="why-desc">We measure success against the original brief — not against activity metrics. Every project closes with live, working output deployed and confirmed against its stated objectives.</p>
+        </div>
       </div>
       <div class="why-col">
         <div class="why-card">
@@ -1875,13 +1920,17 @@ body{
           <div class="why-title">Support That Outlasts the Launch</div>
           <p class="why-desc">Every MDA package includes post-launch maintenance. The Professional and Premium tiers provide ongoing rounds of updates — so the work you receive stays live, current, and functional as your business evolves.</p>
         </div>
+        <div class="why-card">
+          <div class="why-title">Speed Without Compromise</div>
+          <p class="why-desc">MDA's production infrastructure enables rapid turnaround without sacrificing output quality. Most projects move from signed scope to first deliverable within seven working days.</p>
+        </div>
         <div class="why-callout">
           <div class="why-callout-label">A DREXONYX Brand</div>
           <p class="why-callout-text">MDA is the client-facing agency brand of DREXONYX. Every project, regardless of package tier, is executed by the same team, to the same engineering and creative standard.</p>
         </div>
       </div>
     </div>
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:6mm 0">
+    <div style="margin-top:auto;padding:4mm 0">
       <div style="width:100%;text-align:center;padding:7mm 0;border-top:0.4pt solid rgba(200,152,10,0.12);border-bottom:0.4pt solid rgba(200,152,10,0.12)">
         <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:12pt;color:rgba(255,255,255,0.32);line-height:1.65">"Every client, every project, every deliverable —<br>built to the same engineering and creative standard."</p>
         <p style="font-size:6pt;letter-spacing:0.25em;color:rgba(200,152,10,0.4);text-transform:uppercase;margin-top:5mm">MDA — Master Digital Agency</p>
