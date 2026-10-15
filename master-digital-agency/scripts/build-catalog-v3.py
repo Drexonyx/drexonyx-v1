@@ -219,12 +219,27 @@ def service_page(pg_num, img_num, label, title, subtitle, description, features,
     <!-- Vertical divider -->
     <div style="flex-shrink:0;width:.4pt;background:linear-gradient(180deg,transparent,rgba(200,152,10,.18),transparent);align-self:stretch;"></div>
 
-    <!-- RIGHT: Catalog image -->
+    <!-- RIGHT: Catalog image — full natural ratio, vertically centred -->
     <div style="flex:1;min-width:0;overflow:hidden;position:relative;background:#0b0b0b;">
+      <!-- Subtle gold glow -->
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse 95% 55% at 52% 45%,rgba(200,152,10,.04) 0%,transparent 70%);pointer-events:none;z-index:0;"></div>
+      <!-- Full image at natural ratio, vertically centred -->
       <img src="data:image/jpeg;base64,{C[img_num]}"
-           style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:{img_position};display:block;">
-      <!-- Subtle left-edge gradient to blend into divider -->
-      <div style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(11,11,11,.35) 0%,transparent 18%);pointer-events:none;"></div>
+           style="position:absolute;top:50%;left:0;transform:translateY(-50%);width:100%;height:auto;display:block;z-index:1;">
+      <!-- Left edge blend into divider -->
+      <div style="position:absolute;top:0;bottom:0;left:0;width:13%;background:linear-gradient(90deg,rgba(11,11,11,.55),transparent);pointer-events:none;z-index:2;"></div>
+      <!-- Top dark fade over image edge -->
+      <div style="position:absolute;top:0;left:0;right:0;height:24%;background:linear-gradient(180deg,#0b0b0b 45%,transparent);pointer-events:none;z-index:2;"></div>
+      <!-- Bottom dark fade over image edge -->
+      <div style="position:absolute;bottom:0;left:0;right:0;height:24%;background:linear-gradient(0deg,#0b0b0b 45%,transparent);pointer-events:none;z-index:2;"></div>
+      <!-- Top dark area accent line -->
+      <div style="position:absolute;top:18mm;left:0;right:0;text-align:center;z-index:3;pointer-events:none;">
+        <div style="height:.3pt;width:16mm;background:linear-gradient(90deg,transparent,rgba(200,152,10,.22),transparent);margin:0 auto;"></div>
+      </div>
+      <!-- Bottom dark area service label -->
+      <div style="position:absolute;bottom:12mm;left:0;right:0;text-align:center;z-index:3;pointer-events:none;">
+        <div style="font-family:Inter,sans-serif;font-size:5pt;color:rgba(200,152,10,.3);letter-spacing:3pt;text-transform:uppercase;">{label}</div>
+      </div>
     </div>
 
   </div>
