@@ -32,29 +32,43 @@ for n, d in C.items():
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 def tag(s):
-    return (f'<span style="font-family:Inter,sans-serif;font-size:5.8pt;'
+    return (f'<span style="font-family:Inter,sans-serif;font-size:7pt;'
             f'color:rgba(255,255,255,.52);padding:1.3mm 3mm;'
             f'border:.3pt solid rgba(200,152,10,.22);border-radius:20mm;'
             f'white-space:nowrap;">{s}</span>')
 
 def bullet(text):
     return (f'<div style="display:flex;gap:2.5mm;align-items:flex-start;margin-bottom:2mm;">'
-            f'<span style="color:#C8980A;font-size:5pt;margin-top:.8mm;flex-shrink:0;">&#9656;</span>'
-            f'<span style="font-family:Inter,sans-serif;font-size:7pt;'
+            f'<span style="color:#C8980A;font-size:6pt;margin-top:.8mm;flex-shrink:0;">&#9656;</span>'
+            f'<span style="font-family:Inter,sans-serif;font-size:8.5pt;'
             f'color:rgba(255,255,255,.68);line-height:1.55;">{text}</span>'
             f'</div>')
 
 # ── P01 — Cover ───────────────────────────────────────────────────────────────
 def p01():
-    return (
-        '<div class="pg">'
-        '<div style="position:absolute;inset:0;display:flex;align-items:center;'
-        'justify-content:center;overflow:hidden;background:#0b0b0b;">'
-        f'<img src="data:image/jpeg;base64,{C[1]}"'
-        ' style="height:100%;width:auto;max-width:none;display:block;">'
-        '</div>'
-        '</div>'
-    )
+    return f"""<div class="pg">
+  <div style="position:absolute;inset:0;overflow:hidden;background:#0b0b0b;">
+    <img src="data:image/jpeg;base64,{C[1]}"
+         style="height:100%;width:auto;max-width:none;display:block;margin:0 auto;">
+  </div>
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 68% 68% at 50% 50%,transparent 36%,rgba(0,0,0,.78) 100%);pointer-events:none;"></div>
+  <div style="position:absolute;top:0;left:0;right:0;height:20%;background:linear-gradient(180deg,rgba(0,0,0,.65),transparent);pointer-events:none;"></div>
+  <div style="position:absolute;bottom:0;left:0;right:0;height:32%;background:linear-gradient(0deg,rgba(0,0,0,.85),transparent);pointer-events:none;"></div>
+  <div style="position:absolute;top:6mm;left:6mm;right:6mm;bottom:6mm;border:.5pt solid rgba(200,152,10,.38);pointer-events:none;"></div>
+  <div style="position:absolute;top:3mm;left:3mm;width:9mm;height:.7pt;background:#C8980A;opacity:.6;pointer-events:none;"></div>
+  <div style="position:absolute;top:3mm;left:3mm;width:.7pt;height:9mm;background:#C8980A;opacity:.6;pointer-events:none;"></div>
+  <div style="position:absolute;top:3mm;right:3mm;width:9mm;height:.7pt;background:#C8980A;opacity:.6;pointer-events:none;"></div>
+  <div style="position:absolute;top:3mm;right:3mm;width:.7pt;height:9mm;background:#C8980A;opacity:.6;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:3mm;left:3mm;width:9mm;height:.7pt;background:#C8980A;opacity:.6;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:3mm;left:3mm;width:.7pt;height:9mm;background:#C8980A;opacity:.6;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:3mm;right:3mm;width:9mm;height:.7pt;background:#C8980A;opacity:.6;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:3mm;right:3mm;width:.7pt;height:9mm;background:#C8980A;opacity:.6;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:13mm;left:0;right:0;text-align:center;pointer-events:none;">
+    <div style="font-family:Inter,sans-serif;font-size:6pt;color:rgba(200,152,10,.55);letter-spacing:3pt;text-transform:uppercase;margin-bottom:2.5mm;">MASTER DIGITAL AGENCY · A DREXONYX BRAND</div>
+    <div style="height:.35pt;width:22mm;background:linear-gradient(90deg,transparent,rgba(200,152,10,.45),transparent);margin:0 auto 3mm;"></div>
+    <div style="font-family:Inter,sans-serif;font-size:7pt;color:rgba(255,255,255,.42);letter-spacing:5pt;text-transform:uppercase;">COMPANY PROFILE</div>
+  </div>
+</div>"""
 
 # ── P02 — About Us (unchanged from v2) ───────────────────────────────────────
 def p02():
@@ -173,26 +187,26 @@ def service_page(pg_num, img_num, label, title, subtitle, description, features,
 
       <!-- Label + page number -->
       <div style="flex-shrink:0;display:flex;align-items:center;gap:3mm;margin-bottom:4.5mm;">
-        <div style="font-family:Inter,sans-serif;font-size:5.5pt;color:#C8980A;letter-spacing:3pt;text-transform:uppercase;">{label}</div>
+        <div style="font-family:Inter,sans-serif;font-size:7pt;color:#C8980A;letter-spacing:3pt;text-transform:uppercase;">{label}</div>
         <div style="flex:1;height:.3pt;background:linear-gradient(90deg,rgba(200,152,10,.3),transparent);"></div>
-        <div style="font-family:Inter,sans-serif;font-size:5.5pt;color:rgba(255,255,255,.2);letter-spacing:1.5pt;">{pg_num:02d} / 10</div>
+        <div style="font-family:Inter,sans-serif;font-size:7pt;color:rgba(255,255,255,.2);letter-spacing:1.5pt;">{pg_num:02d} / 10</div>
       </div>
 
       <!-- Title -->
       <div style="flex-shrink:0;margin-bottom:4mm;">
-        <h1 style="font-family:'Playfair Display',serif;font-size:19pt;color:#fff;line-height:1.15;font-weight:700;margin:0 0 1.5mm;">{title}</h1>
-        <div style="font-family:Inter,sans-serif;font-size:7.5pt;color:rgba(200,152,10,.75);font-style:italic;margin-bottom:3mm;">{subtitle}</div>
+        <h1 style="font-family:'Playfair Display',serif;font-size:21pt;color:#fff;line-height:1.15;font-weight:700;margin:0 0 1.5mm;">{title}</h1>
+        <div style="font-family:Inter,sans-serif;font-size:9pt;color:rgba(200,152,10,.75);font-style:italic;margin-bottom:3mm;">{subtitle}</div>
         <div style="height:.4pt;width:22mm;background:linear-gradient(90deg,#C8980A,transparent);"></div>
       </div>
 
       <!-- Description -->
       <div style="flex-shrink:0;margin-bottom:4.5mm;">
-        <p style="font-family:Inter,sans-serif;font-size:7.2pt;color:rgba(255,255,255,.72);line-height:1.7;">{description}</p>
+        <p style="font-family:Inter,sans-serif;font-size:9pt;color:rgba(255,255,255,.72);line-height:1.68;">{description}</p>
       </div>
 
       <!-- Feature list -->
       <div style="flex-shrink:0;margin-bottom:4.5mm;">
-        <div style="font-family:Inter,sans-serif;font-size:5.2pt;color:rgba(200,152,10,.5);letter-spacing:2.5pt;text-transform:uppercase;margin-bottom:3mm;">WHAT'S INCLUDED</div>
+        <div style="font-family:Inter,sans-serif;font-size:6.5pt;color:rgba(200,152,10,.5);letter-spacing:2.5pt;text-transform:uppercase;margin-bottom:3mm;">WHAT'S INCLUDED</div>
         {bullets_html}
       </div>
 
@@ -201,16 +215,16 @@ def service_page(pg_num, img_num, label, title, subtitle, description, features,
 
       <!-- Tags -->
       <div style="flex-shrink:0;margin-bottom:4mm;">
-        <div style="font-family:Inter,sans-serif;font-size:5.2pt;color:rgba(200,152,10,.4);letter-spacing:2pt;text-transform:uppercase;margin-bottom:2.5mm;">SERVICE TAGS</div>
+        <div style="font-family:Inter,sans-serif;font-size:6.5pt;color:rgba(200,152,10,.4);letter-spacing:2pt;text-transform:uppercase;margin-bottom:2.5mm;">SERVICE TAGS</div>
         {tags_html}
       </div>
 
       <!-- Bottom CTA -->
       <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;">
         <div style="padding:3mm 4mm;background:rgba(200,152,10,.06);border:.3pt solid rgba(200,152,10,.2);border-radius:.6mm;">
-          <div style="font-family:Inter,sans-serif;font-size:5.2pt;color:rgba(200,152,10,.55);letter-spacing:2pt;text-transform:uppercase;margin-bottom:1.5mm;">GET IN TOUCH</div>
-          <div style="font-family:'Playfair Display',serif;font-size:8.5pt;color:#fff;font-weight:600;">{WEBSITE}</div>
-          <div style="font-family:Inter,sans-serif;font-size:6.5pt;color:rgba(255,255,255,.45);margin-top:.8mm;">WhatsApp: {PHONE}</div>
+          <div style="font-family:Inter,sans-serif;font-size:6.5pt;color:rgba(200,152,10,.55);letter-spacing:2pt;text-transform:uppercase;margin-bottom:1.5mm;">GET IN TOUCH</div>
+          <div style="font-family:'Playfair Display',serif;font-size:10.5pt;color:#fff;font-weight:600;">{WEBSITE}</div>
+          <div style="font-family:Inter,sans-serif;font-size:8.5pt;color:rgba(255,255,255,.45);margin-top:.8mm;">WhatsApp: {PHONE}</div>
         </div>
       </div>
 
@@ -301,20 +315,14 @@ def p10():
       <div style="height:.3pt;width:14mm;background:linear-gradient(90deg,rgba(200,152,10,.4),transparent);"></div>
     </div>
 
-    <div style="flex:1;min-height:0;overflow:hidden;border-radius:.7mm;position:relative;width:100%;">
-      <img src="data:image/jpeg;base64,{C[6]}" style="width:100%;height:100%;object-fit:cover;object-position:center 40%;display:block;filter:brightness(.3);">
-      <div style="position:absolute;inset:0;background:rgba(0,0,0,.65);"></div>
-      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 7mm;">
-        <div style="text-align:left;">
-          <div style="font-family:Inter,sans-serif;font-size:5.2pt;color:rgba(200,152,10,.65);letter-spacing:2.5pt;text-transform:uppercase;margin-bottom:1.5mm;">Your Vision</div>
-          <div style="font-family:'Playfair Display',serif;font-size:12pt;color:#fff;font-weight:700;font-style:italic;line-height:1.2;">Our Execution.</div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-family:Inter,sans-serif;font-size:5.2pt;color:rgba(200,152,10,.6);letter-spacing:1.8pt;margin-bottom:1.5mm;">REACH US AT</div>
-          <div style="font-family:'Playfair Display',serif;font-size:8.5pt;color:#fff;font-weight:600;">{WEBSITE}</div>
-          <div style="font-family:Inter,sans-serif;font-size:7pt;color:rgba(255,255,255,.6);margin-top:1mm;">{PHONE}</div>
-        </div>
-      </div>
+    <div style="flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6mm 0 4mm;">
+      <div style="width:55mm;height:.4pt;background:linear-gradient(90deg,transparent,rgba(200,152,10,.42),transparent);margin-bottom:6mm;"></div>
+      <div style="font-family:'Playfair Display',serif;font-size:30pt;color:rgba(200,152,10,.13);font-weight:700;letter-spacing:5pt;text-transform:uppercase;line-height:1;margin-bottom:1.5mm;">DREXONYX</div>
+      <div style="font-family:Inter,sans-serif;font-size:6pt;color:rgba(200,152,10,.32);letter-spacing:4pt;text-transform:uppercase;margin-bottom:5mm;">× MASTER DIGITAL AGENCY</div>
+      <div style="font-family:'Playfair Display',serif;font-size:10.5pt;color:rgba(255,255,255,.22);font-style:italic;letter-spacing:.5pt;margin-bottom:6mm;">Ideas Into Impact.</div>
+      <div style="width:16mm;height:.4pt;background:linear-gradient(90deg,transparent,rgba(200,152,10,.4),transparent);margin-bottom:6mm;"></div>
+      <div style="font-family:Inter,sans-serif;font-size:8pt;color:rgba(255,255,255,.28);letter-spacing:1.5pt;margin-bottom:2.5mm;">{WEBSITE}</div>
+      <div style="font-family:Inter,sans-serif;font-size:7pt;color:rgba(255,255,255,.2);letter-spacing:.8pt;">WhatsApp: {PHONE}</div>
     </div>
 
   </div>
