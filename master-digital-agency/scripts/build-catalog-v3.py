@@ -227,11 +227,13 @@ def service_page(pg_num, img_num, label, title, subtitle, description, features,
       <img src="data:image/jpeg;base64,{C[img_num]}"
            style="position:absolute;top:50%;left:0;transform:translateY(-50%);width:100%;height:auto;display:block;z-index:1;">
       <!-- Left edge blend into divider -->
-      <div style="position:absolute;top:0;bottom:0;left:0;width:13%;background:linear-gradient(90deg,rgba(11,11,11,.55),transparent);pointer-events:none;z-index:2;"></div>
+      <div style="position:absolute;top:0;bottom:0;left:0;width:18%;background:linear-gradient(90deg,rgba(11,11,11,.88),transparent);pointer-events:none;z-index:2;"></div>
+      <!-- Right edge blend into page margin -->
+      <div style="position:absolute;top:0;bottom:0;right:0;width:14%;background:linear-gradient(270deg,rgba(11,11,11,.88),transparent);pointer-events:none;z-index:2;"></div>
       <!-- Top dark fade over image edge -->
-      <div style="position:absolute;top:0;left:0;right:0;height:24%;background:linear-gradient(180deg,#0b0b0b 45%,transparent);pointer-events:none;z-index:2;"></div>
+      <div style="position:absolute;top:0;left:0;right:0;height:26%;background:linear-gradient(180deg,#0b0b0b 42%,transparent);pointer-events:none;z-index:2;"></div>
       <!-- Bottom dark fade over image edge -->
-      <div style="position:absolute;bottom:0;left:0;right:0;height:24%;background:linear-gradient(0deg,#0b0b0b 45%,transparent);pointer-events:none;z-index:2;"></div>
+      <div style="position:absolute;bottom:0;left:0;right:0;height:26%;background:linear-gradient(0deg,#0b0b0b 42%,transparent);pointer-events:none;z-index:2;"></div>
       <!-- Top dark area accent line -->
       <div style="position:absolute;top:18mm;left:0;right:0;text-align:center;z-index:3;pointer-events:none;">
         <div style="height:.3pt;width:16mm;background:linear-gradient(90deg,transparent,rgba(200,152,10,.22),transparent);margin:0 auto;"></div>
@@ -300,8 +302,8 @@ def p10():
     </div>
 
     <div style="flex:1;min-height:0;overflow:hidden;border-radius:.7mm;position:relative;width:100%;">
-      <img src="data:image/jpeg;base64,{C[6]}" style="width:100%;height:100%;object-fit:cover;object-position:center 40%;display:block;filter:brightness(.45);">
-      <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.55) 0%,rgba(0,0,0,.05) 45%,rgba(0,0,0,.55) 100%);"></div>
+      <img src="data:image/jpeg;base64,{C[6]}" style="width:100%;height:100%;object-fit:cover;object-position:center 40%;display:block;filter:brightness(.3);">
+      <div style="position:absolute;inset:0;background:rgba(0,0,0,.65);"></div>
       <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 7mm;">
         <div style="text-align:left;">
           <div style="font-family:Inter,sans-serif;font-size:5.2pt;color:rgba(200,152,10,.65);letter-spacing:2.5pt;text-transform:uppercase;margin-bottom:1.5mm;">Your Vision</div>
