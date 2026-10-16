@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MDA Service Catalog — Print</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:#fff;}
+
+/* ── A4 page ── */
+.pg{
+  width:210mm;height:297mm;
+  display:flex;flex-direction:row;
+  overflow:hidden;position:relative;
+  background:#0a0a0a;
+  page-break-after:always;
+}
+
+/* ── Image panel ── */
+.pg-img{
+  flex:0 0 82mm;position:relative;overflow:hidden;
+}
+.pg-img img{
+  width:100%;height:100%;object-fit:cover;object-position:center top;
+}
+.pg-img-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to right,rgba(10,10,10,0.1),rgba(10,10,10,0));
+}
+.pg-num{
+  position:absolute;bottom:12mm;right:6mm;
+  font-family:'Playfair Display',serif;
+  font-size:80pt;color:rgba(200,152,10,0.04);
+  font-weight:700;line-height:1;
+}
+
+/* ── Content panel ── */
+.pg-content{
+  flex:1;padding:12mm 12mm 8mm 10mm;
+  display:flex;flex-direction:column;justify-content:space-between;
+  background:#0a0a0a;
+  border-left:0.3pt solid rgba(200,152,10,0.12);
+}
+.pg-group-header,.pg-group-includes,.pg-group-steps,.pg-group-footer{
+  display:flex;flex-direction:column;
+}
+.pg-label{
+  font-family:Inter,sans-serif;font-size:8pt;font-weight:500;
+  color:rgba(200,152,10,0.6);letter-spacing:2.5pt;text-transform:uppercase;
+  margin-bottom:4mm;
+}
+.pg-title{
+  font-family:'Playfair Display',serif;font-size:26pt;font-weight:700;
+  color:#fff;line-height:1.15;margin-bottom:2mm;
+}
+.pg-subtitle{
+  font-family:Inter,sans-serif;font-size:9.5pt;font-style:italic;
+  color:#C8980A;font-weight:300;margin-bottom:3mm;
+}
+.pg-rule{
+  width:14mm;height:1pt;
+  background:linear-gradient(90deg,#C8980A,transparent);
+  margin-bottom:3mm;
+}
+.pg-desc{
+  font-family:Inter,sans-serif;font-size:8.5pt;
+  color:rgba(255,255,255,0.65);line-height:1.65;
+}
+.pg-section-label{
+  font-family:Inter,sans-serif;font-size:7pt;font-weight:600;
+  color:rgba(200,152,10,0.6);letter-spacing:2.5pt;text-transform:uppercase;
+  margin-bottom:2.5mm;
+}
+.pg-features{
+  display:grid;grid-template-columns:1fr 1fr;gap:0 4mm;
+}
+.pg-features>div{margin-bottom:2mm!important;}
+.pg-features>div span:last-child{font-size:8pt!important;}
+.pg-steps{
+  display:flex;gap:2mm;flex-wrap:nowrap;
+}
+.pg-steps>div{
+  flex:1;padding:3mm 2.5mm!important;
+}
+.pg-steps>div>div:nth-child(1){font-size:20pt!important;}
+.pg-steps>div>div:nth-child(2){font-size:6pt!important;letter-spacing:1.5pt!important;margin-bottom:1.5mm!important;}
+.pg-steps>div>div:nth-child(3){font-size:8pt!important;margin-bottom:1.5mm!important;}
+.pg-steps>div>div:nth-child(4){font-size:6.5pt!important;}
+.pg-tags{
+  display:flex;flex-wrap:wrap;gap:1.5mm;margin-bottom:2mm;
+}
+.pg-tags>span{
+  font-size:6.5pt!important;padding:1.2mm 3.5mm!important;
+}
+.pg-footer{
+  display:flex;align-items:center;gap:4mm;flex-wrap:wrap;
+  padding-top:3mm;
+  border-top:0.3pt solid rgba(200,152,10,0.15);
+  font-family:Inter,sans-serif;font-size:5.5pt;color:rgba(255,255,255,0.3);
+  margin-top:3mm;
+}
+.pg-footer-brand{margin-left:auto;color:rgba(200,152,10,0.3);letter-spacing:0.5pt;}
+
+/* ── COVER ── */
+.pg-cover{position:relative;display:block;}
+.cover-full-img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center top;
+}
+.cover-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to right,
+    rgba(8,8,8,0.97) 0%,rgba(8,8,8,0.97) 40%,
+    rgba(8,8,8,0.85) 58%,rgba(8,8,8,0.55) 75%,
+    rgba(8,8,8,0.25) 100%);
+}
+.cover-content{
+  position:relative;z-index:2;
+  padding:18mm 16mm 14mm;
+  height:100%;display:flex;flex-direction:column;justify-content:space-between;
+}
+.cover-mda-label{
+  font-family:Inter,sans-serif;font-size:7pt;font-weight:500;
+  color:rgba(200,152,10,0.7);letter-spacing:3pt;text-transform:uppercase;
+}
+.cover-title{
+  font-family:'Playfair Display',serif;font-size:42pt;font-weight:700;
+  color:#fff;line-height:1.1;margin-top:6mm;margin-bottom:6mm;
+}
+.gold{color:#C8980A;}
+.cover-rule{
+  width:24mm;height:1pt;
+  background:linear-gradient(90deg,#C8980A,transparent);
+  margin-bottom:5mm;
+}
+.cover-sub{
+  font-family:Inter,sans-serif;font-size:10pt;
+  color:rgba(255,255,255,0.55);line-height:1.7;
+  max-width:100mm;
+}
+.cover-services{
+  display:flex;flex-direction:column;gap:4.5mm;
+}
+.cover-svc-item{
+  font-family:Inter,sans-serif;font-size:9.5pt;
+  color:rgba(255,255,255,0.65);
+  border-left:1.5pt solid rgba(200,152,10,0.3);padding-left:3mm;
+}
+.cover-contacts{
+  font-family:Inter,sans-serif;font-size:8pt;
+  color:rgba(255,255,255,0.45);
+  display:flex;gap:4mm;align-items:center;
+  flex-wrap:wrap;
+}
+.cover-dot{color:rgba(200,152,10,0.4);}
+.cover-brand{
+  font-family:Inter,sans-serif;font-size:6pt;
+  color:rgba(200,152,10,0.35);letter-spacing:2pt;text-transform:uppercase;
+  margin-top:3mm;
+}
+
+/* ── CONTACT ── */
+.pg-contact{
+  display:flex;flex-direction:column;justify-content:space-between;
+  background:#060606;padding:22mm 24mm;
+}
+.contact-content{
+  display:flex;flex-direction:column;justify-content:space-between;
+  height:100%;
+}
+.contact-label{
+  font-family:Inter,sans-serif;font-size:8pt;font-weight:500;
+  color:rgba(200,152,10,0.6);letter-spacing:3pt;text-transform:uppercase;
+}
+.contact-title{
+  font-family:'Playfair Display',serif;font-size:42pt;font-weight:700;
+  color:#fff;line-height:1.2;margin-bottom:4mm;
+}
+.contact-sub{
+  font-family:Inter,sans-serif;font-size:11pt;
+  color:rgba(255,255,255,0.4);margin-bottom:6mm;
+}
+.contact-rule{
+  width:20mm;height:1pt;
+  background:linear-gradient(90deg,#C8980A,transparent);
+}
+.contact-details{
+  display:flex;flex-direction:column;gap:10mm;
+}
+.contact-item-label{
+  font-family:Inter,sans-serif;font-size:6.5pt;font-weight:600;
+  color:rgba(200,152,10,0.55);letter-spacing:2.5pt;text-transform:uppercase;
+  margin-bottom:2mm;
+}
+.contact-item-value{
+  font-family:'Playfair Display',serif;font-size:16pt;color:#fff;
+}
+.contact-brand-block{
+  padding-top:10mm;
+  border-top:0.3pt solid rgba(200,152,10,0.2);
+}
+.contact-brand-name{
+  font-family:'Playfair Display',serif;font-size:18pt;font-weight:700;
+  color:#fff;letter-spacing:2pt;margin-bottom:3mm;
+}
+.contact-brand-sub{
+  font-family:Inter,sans-serif;font-size:6pt;
+  color:rgba(200,152,10,0.4);letter-spacing:2pt;text-transform:uppercase;
+}
+
+@media print{
+  @page{size:210mm 297mm;margin:0;}
+  body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+</style>
+</head>
+<body>
+
+<div class="pg pg-cover">
+  <img src="/home/user/drexonyx-v1/master-digital-agency/deliverables/mda-service-catalog/assets/images/cover.jpg" class="cover-full-img" alt="MDA">
+  <div class="cover-overlay"></div>
+  <div class="cover-content">
+    <div class="cover-mda-label">MDA / MASTER DIGITAL AGENCY</div>
+    <div>
+      <h1 class="cover-title">Business<br><span class="gold">Launch</span><br>Services</h1>
+      <div class="cover-rule"></div>
+      <p class="cover-sub">From Company Profile to Corporate Video —<br>Everything your business needs to launch and grow.</p>
+    </div>
+    <div class="cover-services">
+      <div class="cover-svc-item">Company Profile Design</div><div class="cover-svc-item">Website Design</div><div class="cover-svc-item">Branding Package</div><div class="cover-svc-item">Digital Launch Kit</div><div class="cover-svc-item">Posters & Social Media Creatives</div><div class="cover-svc-item">Corporate Promotional Video</div><div class="cover-svc-item">UGC Video Shorts</div>
+    </div>
+    <div>
+      <div class="cover-contacts">
+        <span>www.drexonyx.com</span>
+        <span class="cover-dot">·</span>
+        <span>info@drexonyx.com</span>
+        <span class="cover-dot">·</span>
+        <span>Dubai, UAE</span>
+      </div>
+      <div class="cover-brand">MDA IS A DREXONYX BRAND · IDEAS INTO IMPACT</div>
+    </div>
+  </div>
+</div>
+
+<div class="pg">
+  <div class="pg-img">
+    <img src="/home/user/drexonyx-v1/master-digital-agency/deliverables/mda-service-catalog/assets/images/profile.jpg" alt="">
+    <div class="pg-img-overlay"></div>
+    <div class="pg-num">02</div>
+  </div>
+  <div class="pg-content">
+    <div class="pg-group-header">
+      <div class="pg-label">DESIGN SERVICE / 01</div>
+      <h2 class="pg-title">Company Profile<br>Design</h2>
+      <p class="pg-subtitle">Present Your Business with Authority</p>
+      <div class="pg-rule"></div>
+      <p class="pg-desc">A professionally designed company profile is your most powerful first impression. We craft elegant, print-ready profiles that communicate your vision, showcase your services, and build immediate trust with clients, partners and investors.</p>
+    </div>
+    <div class="pg-group-includes">
+      <div class="pg-section-label">WHAT'S INCLUDED</div>
+      <div class="pg-features"><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Vision & Mission Page</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">About Your Company</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Services Overview</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Team Showcase</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Portfolio & Achievements</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Brand Identity Applied</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Print & Digital Formats</span></div></div>
+    </div>
+    <div class="pg-group-steps">
+      <div class="pg-section-label">HOW IT WORKS</div>
+      <div class="pg-steps"><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">01</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 01</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Brief</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">We learn your business, goals and audience</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">02</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 02</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Design</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Crafted layouts aligned to your brand</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">03</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 03</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Content</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Your copy and visuals integrated cleanly</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">04</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 04</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Revisions</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Refinements until it is perfect</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">05</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 05</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Delivery</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Print-ready PDF and editable files</div></div></div>
+    </div>
+    <div class="pg-group-footer">
+      <div class="pg-tags"><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Print-Ready PDF</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Digital Format</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">A4 Layout</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Brand Aligned</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Arabic & English</span></div>
+      <div class="pg-footer">
+        <span>www.drexonyx.com</span>
+        <span>info@drexonyx.com</span>
+        <span>Dubai, UAE</span>
+        <span class="pg-footer-brand">MDA · MASTER DIGITAL AGENCY · A DREXONYX BRAND</span>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="pg">
+  <div class="pg-img">
+    <img src="/home/user/drexonyx-v1/master-digital-agency/deliverables/mda-service-catalog/assets/images/website.jpg" alt="">
+    <div class="pg-img-overlay"></div>
+    <div class="pg-num">03</div>
+  </div>
+  <div class="pg-content">
+    <div class="pg-group-header">
+      <div class="pg-label">DIGITAL SERVICE / 02</div>
+      <h2 class="pg-title">Website Design</h2>
+      <p class="pg-subtitle">Modern Websites That Grow Your Business</p>
+      <div class="pg-rule"></div>
+      <p class="pg-desc">Your website is your 24/7 salesperson. We design fast, mobile-responsive websites that capture attention, convert visitors into customers, and reflect the quality of your brand — for restaurants, clinics, salons, companies and every business in between.</p>
+    </div>
+    <div class="pg-group-includes">
+      <div class="pg-section-label">WHAT'S INCLUDED</div>
+      <div class="pg-features"><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Custom Design & Layout</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Mobile-Responsive</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">SEO-Ready Structure</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Contact & Booking Forms</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Social Media Integration</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Speed Optimised</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Content Management</span></div></div>
+    </div>
+    <div class="pg-group-steps">
+      <div class="pg-section-label">HOW IT WORKS</div>
+      <div class="pg-steps"><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">01</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 01</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Discovery</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Understanding your business and goals</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">02</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 02</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Wireframe</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Structure and page architecture</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">03</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 03</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Design</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Visual design with your brand identity</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">04</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 04</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Build</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Full development and integration</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">05</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 05</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Launch</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Final testing and go-live handover</div></div></div>
+    </div>
+    <div class="pg-group-footer">
+      <div class="pg-tags"><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Restaurants</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Retail</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Healthcare</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Corporate</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">E-Commerce</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Landing Pages</span></div>
+      <div class="pg-footer">
+        <span>www.drexonyx.com</span>
+        <span>info@drexonyx.com</span>
+        <span>Dubai, UAE</span>
+        <span class="pg-footer-brand">MDA · MASTER DIGITAL AGENCY · A DREXONYX BRAND</span>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="pg">
+  <div class="pg-img">
+    <img src="/home/user/drexonyx-v1/master-digital-agency/deliverables/mda-service-catalog/assets/images/brand.jpg" alt="">
+    <div class="pg-img-overlay"></div>
+    <div class="pg-num">04</div>
+  </div>
+  <div class="pg-content">
+    <div class="pg-group-header">
+      <div class="pg-label">BRAND SERVICE / 03</div>
+      <h2 class="pg-title">Branding Package</h2>
+      <p class="pg-subtitle">Create a Unique Identity That People Remember</p>
+      <div class="pg-rule"></div>
+      <p class="pg-desc">From logo design to complete brand identity, we help your business stand out with a consistent and professional image across all platforms — online and offline. Every element crafted to tell your story at a glance.</p>
+    </div>
+    <div class="pg-group-includes">
+      <div class="pg-section-label">WHAT'S INCLUDED</div>
+      <div class="pg-features"><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Logo Design</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Brand Style Guide</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Color Palette System</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Typography Selection</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Business Card Design</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Letterhead & Stationery</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Brand Applications Guide</span></div></div>
+    </div>
+    <div class="pg-group-steps">
+      <div class="pg-section-label">HOW IT WORKS</div>
+      <div class="pg-steps"><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">01</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 01</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Discovery</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Brand values, audience and competitors</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">02</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 02</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Concepts</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Multiple logo directions presented</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">03</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 03</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Identity</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Full brand system developed</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">04</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 04</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Refinement</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Revisions and final approval</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">05</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 05</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Brand Book</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Complete guidelines delivered</div></div></div>
+    </div>
+    <div class="pg-group-footer">
+      <div class="pg-tags"><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Logo Design</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Brand Guide</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Stationery</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Packaging</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Signage</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Digital & Print</span></div>
+      <div class="pg-footer">
+        <span>www.drexonyx.com</span>
+        <span>info@drexonyx.com</span>
+        <span>Dubai, UAE</span>
+        <span class="pg-footer-brand">MDA · MASTER DIGITAL AGENCY · A DREXONYX BRAND</span>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="pg">
+  <div class="pg-img">
+    <img src="/home/user/drexonyx-v1/master-digital-agency/deliverables/mda-service-catalog/assets/images/launch.jpg" alt="">
+    <div class="pg-img-overlay"></div>
+    <div class="pg-num">05</div>
+  </div>
+  <div class="pg-content">
+    <div class="pg-group-header">
+      <div class="pg-label">LAUNCH SERVICE / 04</div>
+      <h2 class="pg-title">Digital Launch Kit</h2>
+      <p class="pg-subtitle">Everything Your Business Needs to Get Started Online</p>
+      <div class="pg-rule"></div>
+      <p class="pg-desc">A complete set of digital materials designed to launch your business with a strong, professional presence from day one — website, social profiles, printed materials and visual content, all unified under your brand.</p>
+    </div>
+    <div class="pg-group-includes">
+      <div class="pg-section-label">WHAT'S INCLUDED</div>
+      <div class="pg-features"><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Website Design</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Social Media Profile Setup</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Business Card Design</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Digital Menu or Brochure</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Launch Poster Set</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Email Signature Design</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Launch Checklist</span></div></div>
+    </div>
+    <div class="pg-group-steps">
+      <div class="pg-section-label">HOW IT WORKS</div>
+      <div class="pg-steps"><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">01</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 01</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Onboarding</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Gathering all brand and business info</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">02</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 02</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Assets</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Creating all visual and digital materials</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">03</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 03</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Setup</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Platform configuration and integration</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">04</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 04</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Review</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Full walkthrough and client approval</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">05</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 05</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Launch</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Your business goes live, ready to grow</div></div></div>
+    </div>
+    <div class="pg-group-footer">
+      <div class="pg-tags"><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Complete Package</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Social Profiles</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Website</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Print Materials</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Fast Turnaround</span></div>
+      <div class="pg-footer">
+        <span>www.drexonyx.com</span>
+        <span>info@drexonyx.com</span>
+        <span>Dubai, UAE</span>
+        <span class="pg-footer-brand">MDA · MASTER DIGITAL AGENCY · A DREXONYX BRAND</span>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="pg">
+  <div class="pg-img">
+    <img src="/home/user/drexonyx-v1/master-digital-agency/deliverables/mda-service-catalog/assets/images/social.jpg" alt="">
+    <div class="pg-img-overlay"></div>
+    <div class="pg-num">06</div>
+  </div>
+  <div class="pg-content">
+    <div class="pg-group-header">
+      <div class="pg-label">CREATIVE SERVICE / 05</div>
+      <h2 class="pg-title">Posters & Social<br>Media Creatives</h2>
+      <p class="pg-subtitle">Eye-Catching Designs That Bring Your Business to Life</p>
+      <div class="pg-rule"></div>
+      <p class="pg-desc">Custom designs for your products, offers, events and everyday social media content. Stand out in crowded feeds with visuals crafted to stop the scroll, communicate your message and drive real engagement.</p>
+    </div>
+    <div class="pg-group-includes">
+      <div class="pg-section-label">WHAT'S INCLUDED</div>
+      <div class="pg-features"><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Social Media Feed Posts</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Story & Reel Covers</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Promotional Posters</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Event Announcements</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Offer & Sale Designs</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Branded Content Templates</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Print-Ready Versions</span></div></div>
+    </div>
+    <div class="pg-group-steps">
+      <div class="pg-section-label">HOW IT WORKS</div>
+      <div class="pg-steps"><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">01</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 01</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Brief</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Understanding the offer, tone and goal</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">02</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 02</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Concept</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Visual direction and layout approach</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">03</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 03</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Design</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">On-brand visuals crafted to convert</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">04</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 04</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Revisions</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Adjustments until you are satisfied</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">05</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 05</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Delivery</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Final files in all required formats</div></div></div>
+    </div>
+    <div class="pg-group-footer">
+      <div class="pg-tags"><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Instagram</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Facebook</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">TikTok</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Print</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Stories</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Offers & Promotions</span></div>
+      <div class="pg-footer">
+        <span>www.drexonyx.com</span>
+        <span>info@drexonyx.com</span>
+        <span>Dubai, UAE</span>
+        <span class="pg-footer-brand">MDA · MASTER DIGITAL AGENCY · A DREXONYX BRAND</span>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="pg">
+  <div class="pg-img">
+    <img src="/home/user/drexonyx-v1/master-digital-agency/deliverables/mda-service-catalog/assets/images/video.jpg" alt="">
+    <div class="pg-img-overlay"></div>
+    <div class="pg-num">07</div>
+  </div>
+  <div class="pg-content">
+    <div class="pg-group-header">
+      <div class="pg-label">VIDEO SERVICE / 06</div>
+      <h2 class="pg-title">Corporate Promotional<br>Video</h2>
+      <p class="pg-subtitle">Tell Your Story in a Powerful Way</p>
+      <div class="pg-rule"></div>
+      <p class="pg-desc">Professional videos that showcase your business, services and brand in a way that attracts customers and builds trust. From concept to final cut — cinematic quality, compelling narrative, every time.</p>
+    </div>
+    <div class="pg-group-includes">
+      <div class="pg-section-label">WHAT'S INCLUDED</div>
+      <div class="pg-features"><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Concept & Script Development</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Professional Filming</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Full Post-Production Editing</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Color Grading & Sound Design</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Motion Graphics & Titles</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Multiple Platform Formats</span></div></div>
+    </div>
+    <div class="pg-group-steps">
+      <div class="pg-section-label">HOW IT WORKS</div>
+      <div class="pg-steps"><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">01</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 01</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Concept</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Script, storyboard and creative brief</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">02</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 02</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Pre-Prod</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Location, talent and schedule planning</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">03</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 03</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Filming</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Professional on-location production</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">04</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 04</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Edit</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Post-production, grade and sound</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">05</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 05</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Delivery</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Final video in all required resolutions</div></div></div>
+    </div>
+    <div class="pg-group-footer">
+      <div class="pg-tags"><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Company Showcase</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Services Highlight</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Product Film</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Brand Story</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Dubai Production</span></div>
+      <div class="pg-footer">
+        <span>www.drexonyx.com</span>
+        <span>info@drexonyx.com</span>
+        <span>Dubai, UAE</span>
+        <span class="pg-footer-brand">MDA · MASTER DIGITAL AGENCY · A DREXONYX BRAND</span>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="pg">
+  <div class="pg-img">
+    <img src="/home/user/drexonyx-v1/master-digital-agency/deliverables/mda-service-catalog/assets/images/ugc.jpg" alt="">
+    <div class="pg-img-overlay"></div>
+    <div class="pg-num">08</div>
+  </div>
+  <div class="pg-content">
+    <div class="pg-group-header">
+      <div class="pg-label">VIDEO SERVICE / 07</div>
+      <h2 class="pg-title">UGC Video Shorts</h2>
+      <p class="pg-subtitle">Real People. Real Content. Real Results.</p>
+      <div class="pg-rule"></div>
+      <p class="pg-desc">Authentic short-form videos that make your business stand out and connect with real customers. Crafted for Reels and TikTok — ready to post and built to grow engagement organically.</p>
+    </div>
+    <div class="pg-group-includes">
+      <div class="pg-section-label">WHAT'S INCLUDED</div>
+      <div class="pg-features"><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Script & Storyboard</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">On-Location or Studio Shoot</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Professional Editing & Grading</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Captions & Subtitles</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Platform-Optimised Formats</span></div><div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;"><span style="color:#C8980A;font-size:8px;margin-top:4px;flex-shrink:0;">&#9656;</span><span style="font-family:Inter,sans-serif;font-size:13px;color:rgba(255,255,255,0.72);line-height:1.55;">Ready-to-Post Delivery</span></div></div>
+    </div>
+    <div class="pg-group-steps">
+      <div class="pg-section-label">HOW IT WORKS</div>
+      <div class="pg-steps"><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">01</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 01</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Brief</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Concept, messaging and target audience</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">02</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 02</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Script</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Natural, authentic script written</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">03</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 03</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Shoot</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Filmed in your location or studio</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">04</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 04</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Edit</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Cut, graded, captioned and polished</div></div><div style="flex:1;padding:16px 14px;background:rgba(200,152,10,0.04);border:1px solid rgba(200,152,10,0.15);border-radius:4px;position:relative;"><div style="font-family:Inter,sans-serif;font-size:28px;color:rgba(200,152,10,0.06);font-weight:700;position:absolute;top:8px;right:10px;line-height:1;">05</div><div style="font-family:Inter,sans-serif;font-size:9px;color:rgba(200,152,10,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">STEP 05</div><div style="font-family:'Playfair Display',serif;font-size:13px;color:#fff;font-weight:600;margin-bottom:5px;">Deliver</div><div style="font-family:Inter,sans-serif;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">Ready-to-post files, all platforms</div></div></div>
+    </div>
+    <div class="pg-group-footer">
+      <div class="pg-tags"><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Reels</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">TikTok</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">YouTube Shorts</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">Authentic Content</span><span style="display:inline-block;font-family:Inter,sans-serif;font-size:10px;font-weight:500;color:rgba(200,152,10,0.85);padding:4px 12px;border:1px solid rgba(200,152,10,0.25);border-radius:20px;letter-spacing:0.5px;white-space:nowrap;">High Engagement</span></div>
+      <div class="pg-footer">
+        <span>www.drexonyx.com</span>
+        <span>info@drexonyx.com</span>
+        <span>Dubai, UAE</span>
+        <span class="pg-footer-brand">MDA · MASTER DIGITAL AGENCY · A DREXONYX BRAND</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="pg pg-contact">
+  <div class="contact-label">GET IN TOUCH</div>
+  <div>
+    <h2 class="contact-title">Let's Work<br><em>Together.</em></h2>
+    <div class="contact-sub">Digital · Creative · Media</div>
+    <div class="contact-rule"></div>
+  </div>
+  <div class="contact-details">
+    <div class="contact-item">
+      <div class="contact-item-label">WEBSITE</div>
+      <div class="contact-item-value">www.drexonyx.com</div>
+    </div>
+    <div class="contact-item">
+      <div class="contact-item-label">EMAIL</div>
+      <div class="contact-item-value">info@drexonyx.com</div>
+    </div>
+    <div class="contact-item">
+      <div class="contact-item-label">LOCATION</div>
+      <div class="contact-item-value">Dubai, United Arab Emirates</div>
+    </div>
+  </div>
+  <div class="contact-brand-block">
+    <div class="contact-brand-name">DREXONYX</div>
+    <div class="contact-brand-sub">MDA IS A DREXONYX BRAND · IDEAS INTO IMPACT</div>
+  </div>
+</div>
+</body>
+</html>
