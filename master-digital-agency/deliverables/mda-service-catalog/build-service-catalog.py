@@ -233,8 +233,34 @@ SERVICES = [
     ),
 ]
 
-GOLD   = '#C8980A'
-FONTS  = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">'
+GOLD        = '#C8980A'
+FONTS       = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">'
+PRINT_FONTS = None
+
+
+def get_embedded_en_fonts() -> str:
+    """Download Playfair Display + Inter from Google Fonts and embed as base64."""
+    import urllib.request, ssl, re, base64 as _b64
+    print('  Downloading & embedding English fonts…')
+    ctx = ssl.create_default_context()
+    ctx.load_verify_locations('/root/.ccr/ca-bundle.crt')
+    opener = urllib.request.build_opener(urllib.request.HTTPSHandler(context=ctx))
+    css_url = (
+        'https://fonts.googleapis.com/css2?'
+        'family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400'
+        '&family=Inter:wght@300;400;500;600;700'
+        '&display=swap'
+    )
+    req = urllib.request.Request(css_url, headers={'User-Agent': 'Mozilla/5.0'})
+    css_text = opener.open(req, timeout=20).read().decode('utf-8')
+    urls = re.findall(r"url\((https://fonts\.gstatic\.com/[^)]+\.(?:woff2|ttf))\)", css_text)
+    print(f'    Found {len(urls)} font URLs')
+    for url in urls:
+        data = opener.open(urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'}), timeout=15).read()
+        b64 = _b64.b64encode(data).decode()
+        mime = 'font/woff2' if url.endswith('.woff2') else 'font/ttf'
+        css_text = css_text.replace(url, f'data:{mime};base64,{b64}')
+    return f'<style>\n{css_text}\n</style>'
 
 # ─── Build web HTML ────────────────────────────────────────────────
 def build_web():
@@ -376,6 +402,9 @@ img{{max-width:100%;display:block;}}
 
 # ─── Build print HTML (A4 pages) ──────────────────────────────────
 def build_print():
+    global PRINT_FONTS
+    if PRINT_FONTS is None:
+        PRINT_FONTS = get_embedded_en_fonts()
 
     def inc_item(text):
         return (f'<div class="inc-item">'
@@ -584,7 +613,7 @@ def build_print():
 <head>
 <meta charset="UTF-8">
 <title>MDA Service Catalog — Print</title>
-{FONTS}
+{PRINT_FONTS}
 <style>
 *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0;}}
 body{{background:#fff;}}
@@ -867,14 +896,18 @@ body{{background:#fff;}}
   font-family:Inter,sans-serif;font-size:7pt;font-weight:500;
   color:rgba(200,152,10,0.7);letter-spacing:3pt;text-transform:uppercase;
 }}
-.cv-main{{display:flex;flex-direction:column;}}
+.cv-main{{display:flex;flex-direction:column;margin-top:22mm;}}
 .cv-title{{
-  font-family:'Playfair Display',serif;font-size:42pt;font-weight:700;
-  color:#fff;line-height:1.1;
+  font-family:'Playfair Display',serif;font-size:22pt;font-weight:300;
+  color:rgba(255,255,255,0.88);line-height:1.15;
   margin-top:6mm;margin-bottom:5mm;
   text-shadow:0 2px 12px rgba(0,0,0,0.9),0 0 30px rgba(0,0,0,0.8);
 }}
-.cv-gold{{color:{GOLD};}}
+.cv-gold{{
+  color:{GOLD};font-size:58pt;font-weight:700;
+  display:block;line-height:0.95;margin-block:1mm;
+  text-shadow:0 2px 16px rgba(0,0,0,0.95),0 0 40px rgba(200,152,10,0.25);
+}}
 .cv-rule{{
   width:22mm;height:1pt;
   background:linear-gradient(90deg,{GOLD},transparent);
