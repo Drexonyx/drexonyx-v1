@@ -39,7 +39,20 @@ SERVICES = [
         id='profile', img='profile', num='01', label='DESIGN SERVICE',
         title='Company Profile\nDesign',
         subtitle='Present Your Business with Authority',
-        desc='A professionally designed company profile is your most powerful first impression. We craft elegant, print-ready profiles that communicate your vision, showcase your services, and build immediate trust with clients, partners and investors.',
+        desc='A professionally designed company profile is your most powerful first impression. We craft elegant, print-ready profiles that communicate your vision, showcase your services, and build immediate trust with clients, partners and investors. Every page is structured to tell your story clearly and persuasively.',
+        highlights=[
+            dict(title='Bilingual Design', text='Arabic & English throughout'),
+            dict(title='Print & Digital', text='All formats included'),
+            dict(title='Brand Aligned', text='Reflects your identity precisely'),
+        ],
+        panel_hl='Your Business,\nPresented\nBeautifully',
+        panel_points=[
+            'Custom editorial layout — 20 to 50+ pages',
+            'Fully bilingual: Arabic and English',
+            'Print-ready A4 PDF + editable source files',
+            'Aligned to your existing brand identity',
+            'Delivered within 5–7 business days',
+        ],
         includes=['Vision & Mission Page','About Your Company','Services Overview','Team Showcase','Portfolio & Achievements','Brand Identity Applied','Print & Digital Formats'],
         steps=[
             dict(n='01', t='Brief',     d='We learn your business, goals and audience'),
@@ -54,7 +67,20 @@ SERVICES = [
         id='website', img='website', num='02', label='DIGITAL SERVICE',
         title='Website Design',
         subtitle='Modern Websites That Grow Your Business',
-        desc='Your website is your 24/7 salesperson. We design fast, mobile-responsive websites that capture attention, convert visitors into customers, and reflect the quality of your brand — for restaurants, clinics, salons, companies and every business in between.',
+        desc='Your website is your 24/7 salesperson. We design fast, mobile-responsive websites that capture attention, convert visitors into customers, and reflect the quality of your brand — for restaurants, clinics, salons, companies and every business in between. Built to rank, built to convert.',
+        highlights=[
+            dict(title='Mobile-First', text='Works on every device'),
+            dict(title='SEO-Ready', text='Built to rank & convert'),
+            dict(title='Fast Delivery', text='Live in 2–3 weeks'),
+        ],
+        panel_hl='Websites Built\nto Convert\nCustomers',
+        panel_points=[
+            'Bespoke design aligned to your brand identity',
+            'Mobile-responsive on all screen sizes',
+            'SEO-optimised structure from the ground up',
+            'Contact forms, booking & integration ready',
+            'Full handover with training & support',
+        ],
         includes=['Custom Design & Layout','Mobile-Responsive','SEO-Ready Structure','Contact & Booking Forms','Social Media Integration','Speed Optimised','Content Management'],
         steps=[
             dict(n='01', t='Discovery', d='Understanding your business and goals'),
@@ -69,7 +95,20 @@ SERVICES = [
         id='brand', img='brand', num='03', label='BRAND SERVICE',
         title='Branding Package',
         subtitle='Create a Unique Identity That People Remember',
-        desc='From logo design to complete brand identity, we help your business stand out with a consistent and professional image across all platforms — online and offline. Every element crafted to tell your story at a glance.',
+        desc='From logo design to complete brand identity, we help your business stand out with a consistent and professional image across all platforms — online and offline. Every element crafted to tell your story at a glance and leave a lasting impression on every customer you meet.',
+        highlights=[
+            dict(title='Logo System', text='All variations included'),
+            dict(title='Brand Guide', text='Complete style rules'),
+            dict(title='Stationery', text='Cards, letterhead & more'),
+        ],
+        panel_hl='An Identity\nWorth\nRemembering',
+        panel_points=[
+            'Multiple logo concepts presented',
+            'Full colour palette & typography system',
+            'Business card, letterhead & stationery',
+            'Brand style guide for consistent use',
+            'Digital & print-ready file formats',
+        ],
         includes=['Logo Design','Brand Style Guide','Color Palette System','Typography Selection','Business Card Design','Letterhead & Stationery','Brand Applications Guide'],
         steps=[
             dict(n='01', t='Discovery',  d='Brand values, audience and competitors'),
@@ -84,7 +123,20 @@ SERVICES = [
         id='launch', img='launch', num='04', label='LAUNCH SERVICE',
         title='Digital Launch Kit',
         subtitle='Everything Your Business Needs to Get Started Online',
-        desc='A complete set of digital materials designed to launch your business with a strong, professional presence from day one — website, social profiles, printed materials and visual content, all unified under your brand.',
+        desc='A complete set of digital materials designed to launch your business with a strong, professional presence from day one — website, social profiles, printed materials and visual content, all unified under your brand. Launch confidently, look professional instantly.',
+        highlights=[
+            dict(title='All-in-One', text='Website + Social + Print'),
+            dict(title='Unified Brand', text='Consistent across everything'),
+            dict(title='Fast Launch', text='Ready in 2–3 weeks'),
+        ],
+        panel_hl='Launch Strong.\nLaunch Smart.\nLaunch Now.',
+        panel_points=[
+            'Website, social media & print in one package',
+            'Unified brand identity across all touchpoints',
+            'Social media profiles set up & fully branded',
+            'Digital menu, brochure or launch poster',
+            'Email signature & digital business card',
+        ],
         includes=['Website Design','Social Media Profile Setup','Business Card Design','Digital Menu or Brochure','Launch Poster Set','Email Signature Design','Launch Checklist'],
         steps=[
             dict(n='01', t='Onboarding', d='Gathering all brand and business info'),
@@ -99,7 +151,20 @@ SERVICES = [
         id='social', img='social', num='05', label='CREATIVE SERVICE',
         title='Posters & Social\nMedia Creatives',
         subtitle='Eye-Catching Designs That Bring Your Business to Life',
-        desc='Custom designs for your products, offers, events and everyday social media content. Stand out in crowded feeds with visuals crafted to stop the scroll, communicate your message and drive real engagement.',
+        desc='Custom designs for your products, offers, events and everyday social media content. Stand out in crowded feeds with visuals crafted to stop the scroll, communicate your message and drive real engagement — across Instagram, TikTok, Facebook and every platform your customers use.',
+        highlights=[
+            dict(title='All Platforms', text='Instagram, TikTok & more'),
+            dict(title='Ready-to-Post', text='Correct sizes & formats'),
+            dict(title='Branded Content', text='Consistent visual identity'),
+        ],
+        panel_hl='Designs That\nStop the\nScroll',
+        panel_points=[
+            'Feed posts, stories, reels & covers',
+            'Offers, promotions & event announcements',
+            'On-brand visuals that communicate instantly',
+            'Print-ready versions for posters & signage',
+            'Delivered in all platform-required formats',
+        ],
         includes=['Social Media Feed Posts','Story & Reel Covers','Promotional Posters','Event Announcements','Offer & Sale Designs','Branded Content Templates','Print-Ready Versions'],
         steps=[
             dict(n='01', t='Brief',     d='Understanding the offer, tone and goal'),
@@ -114,7 +179,20 @@ SERVICES = [
         id='video', img='video', num='06', label='VIDEO SERVICE',
         title='Corporate Promotional\nVideo',
         subtitle='Tell Your Story in a Powerful Way',
-        desc='Professional videos that showcase your business, services and brand in a way that attracts customers and builds trust. From concept to final cut — cinematic quality, compelling narrative, every time.',
+        desc='Professional videos that showcase your business, services and brand in a way that attracts customers and builds trust. From concept to final cut — cinematic quality, compelling narrative, every time. Produced in Dubai with full professional crew and post-production.',
+        highlights=[
+            dict(title='Dubai Production', text='On-location professional filming'),
+            dict(title='Cinematic Quality', text='Full grade & sound design'),
+            dict(title='Multi-Platform', text='All resolutions delivered'),
+        ],
+        panel_hl='Your Story,\nTold\nCinematically',
+        panel_points=[
+            'Concept development & creative brief',
+            'Professional on-location filming in Dubai',
+            'Full post-production: edit, grade & sound',
+            'Motion graphics, titles & brand overlays',
+            'Delivered in all required resolutions',
+        ],
         includes=['Concept & Script Development','Professional Filming','Full Post-Production Editing','Color Grading & Sound Design','Motion Graphics & Titles','Multiple Platform Formats'],
         steps=[
             dict(n='01', t='Concept',  d='Script, storyboard and creative brief'),
@@ -129,7 +207,20 @@ SERVICES = [
         id='ugc', img='ugc', num='07', label='VIDEO SERVICE',
         title='UGC Video Shorts',
         subtitle='Real People. Real Content. Real Results.',
-        desc='Authentic short-form videos that make your business stand out and connect with real customers. Crafted for Reels and TikTok — ready to post and built to grow engagement organically.',
+        desc='Authentic short-form videos that make your business stand out and connect with real customers. Crafted for Reels and TikTok — ready to post and built to grow engagement organically. The most trusted format in modern digital marketing, made professionally for your brand.',
+        highlights=[
+            dict(title='Reels & TikTok', text='Platform-optimised formats'),
+            dict(title='Authentic People', text='Real, credible content'),
+            dict(title='Fast Turnaround', text='Ready to post quickly'),
+        ],
+        panel_hl='Authentic\nContent That\nConverts',
+        panel_points=[
+            'Script written for natural, authentic delivery',
+            'Filmed in your location or our studio',
+            'Professional editing, grading & captions',
+            'Optimised for Reels, TikTok & YouTube Shorts',
+            'Ready-to-post files across all platforms',
+        ],
         includes=['Script & Storyboard','On-Location or Studio Shoot','Professional Editing & Grading','Captions & Subtitles','Platform-Optimised Formats','Ready-to-Post Delivery'],
         steps=[
             dict(n='01', t='Brief',   d='Concept, messaging and target audience'),
@@ -190,7 +281,7 @@ def build_web():
     <p style="font-size:13px;font-style:italic;color:{GOLD};font-weight:300;margin-bottom:20px;">{s['subtitle']}</p>
     <div style="width:70px;height:1.5px;background:linear-gradient(90deg,{GOLD},transparent);margin-bottom:24px;"></div>
     <p style="font-size:14px;color:rgba(255,255,255,0.65);line-height:1.78;margin-bottom:32px;max-width:520px;">{s['desc']}</p>
-    <div style="font-size:10px;font-weight:600;color:rgba(200,152,10,0.6);letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;">WHAT'S INCLUDED</div>
+    <div style="font-size:10px;font-weight:600;color:rgba(200,152,10,0.6);letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;">WHAT\'S INCLUDED</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 20px;margin-bottom:32px;">{inc}</div>
     <div style="font-size:10px;font-weight:600;color:rgba(200,152,10,0.6);letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;">HOW IT WORKS</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px;">{steps}</div>
@@ -265,7 +356,7 @@ img{{max-width:100%;display:block;}}
 
 <section id="contact">
   <div style="font-size:10px;font-weight:500;color:rgba(200,152,10,0.6);letter-spacing:4px;text-transform:uppercase;margin-bottom:24px;">GET STARTED</div>
-  <h2 style="font-family:\'Playfair Display\',serif;font-size:clamp(36px,5vw,64px);font-weight:700;color:#fff;line-height:1.2;margin-bottom:16px;">Let's Work<br><em>Together.</em></h2>
+  <h2 style="font-family:\'Playfair Display\',serif;font-size:clamp(36px,5vw,64px);font-weight:700;color:#fff;line-height:1.2;margin-bottom:16px;">Let\'s Work<br><em>Together.</em></h2>
   <p style="font-size:14px;color:rgba(255,255,255,0.5);line-height:1.8;max-width:480px;margin-bottom:48px;">Digital · Creative · Media</p>
   <div style="width:80px;height:1.5px;background:linear-gradient(90deg,{GOLD},transparent);margin-bottom:48px;"></div>
   <div style="display:flex;gap:64px;justify-content:center;flex-wrap:wrap;margin-bottom:64px;">
@@ -301,12 +392,26 @@ def build_print():
     def tag_pill(t):
         return f'<span class="tag">{t}</span>'
 
+    def hl_item(title, text):
+        return (f'<div class="hl-item">'
+                f'<div class="hl-title">{title}</div>'
+                f'<div class="hl-text">{text}</div>'
+                f'</div>')
+
+    def panel_point(text):
+        return (f'<div class="panel-item">'
+                f'<div class="panel-bullet"></div>'
+                f'<div class="panel-item-text">{text}</div>'
+                f'</div>')
+
     def svc_page(s, pg_num):
-        title_html   = s['title'].replace('\n', '<br>')
-        includes_html = ''.join(inc_item(f) for f in s['includes'])
-        steps_html    = ''.join(step_card(st['n'], st['t'], st['d']) for st in s['steps'])
-        tags_html     = ''.join(tag_pill(t) for t in s['tags'])
-        img_path      = f'{IMG_DIR}/{s["img"]}.jpg'
+        title_html      = s['title'].replace('\n', '<br>')
+        includes_html   = ''.join(inc_item(f) for f in s['includes'])
+        steps_html      = ''.join(step_card(st['n'], st['t'], st['d']) for st in s['steps'])
+        tags_html       = ''.join(tag_pill(t) for t in s['tags'])
+        highlights_html = ''.join(hl_item(h['title'], h['text']) for h in s['highlights'])
+        panel_html      = ''.join(panel_point(p) for p in s['panel_points'])
+        panel_hl_html   = s['panel_hl'].replace('\n', '<br>')
 
         return f'''
 <div class="pg pg-svc">
@@ -320,31 +425,52 @@ def build_print():
   <!-- Two-column body -->
   <div class="pg-body">
 
-    <!-- LEFT: all content -->
+    <!-- LEFT: grouped into 3 blocks for space-between distribution -->
     <div class="pg-left">
-      <div class="svc-label">{s['label']} &nbsp;/&nbsp; {s['num']}</div>
-      <div class="svc-label-rule"></div>
-      <div class="svc-accent"></div>
-      <h2 class="svc-title">{title_html}</h2>
-      <p class="svc-sub">{s['subtitle']}</p>
-      <div class="svc-rule"></div>
-      <p class="svc-desc">{s['desc']}</p>
 
-      <div class="sect-div"></div>
-      <div class="sect-head">WHAT'S INCLUDED</div>
-      <div class="inc-grid">{includes_html}</div>
+      <!-- Block A: title + desc + highlights -->
+      <div class="lft-a">
+        <div class="svc-label">{s['label']} &nbsp;/&nbsp; {s['num']}</div>
+        <div class="svc-label-rule"></div>
+        <div class="svc-accent"></div>
+        <h2 class="svc-title">{title_html}</h2>
+        <p class="svc-sub">{s['subtitle']}</p>
+        <div class="svc-rule"></div>
+        <p class="svc-desc">{s['desc']}</p>
+        <div class="highlights">{highlights_html}</div>
+      </div>
 
-      <div class="sect-div"></div>
-      <div class="sect-head">HOW IT WORKS</div>
-      <div class="steps-row">{steps_html}</div>
+      <!-- Block B: includes + steps -->
+      <div class="lft-b">
+        <div class="sect-head">WHAT'S INCLUDED</div>
+        <div class="sect-sub-div"></div>
+        <div class="inc-grid">{includes_html}</div>
+        <div class="sect-gap"></div>
+        <div class="sect-head">HOW IT WORKS</div>
+        <div class="sect-sub-div"></div>
+        <div class="steps-row">{steps_html}</div>
+      </div>
 
-      <div class="sect-div"></div>
-      <div class="tags-row">{tags_html}</div>
+      <!-- Block C: tags -->
+      <div class="lft-c">
+        <div class="tags-row">{tags_html}</div>
+      </div>
+
     </div>
 
-    <!-- RIGHT: service image -->
+    <!-- RIGHT: dark editorial panel -->
     <div class="pg-right">
-      <img src="{img_path}" class="svc-img" alt="{s['title'].replace(chr(10), ' ')}">
+      <div class="svc-panel">
+        <div class="panel-ghost">{s['num']}</div>
+        <div class="panel-bar"></div>
+        <div class="panel-cat">{s['label']}</div>
+        <div class="panel-hl">{panel_hl_html}</div>
+        <div class="panel-div"></div>
+        <div class="panel-list">{panel_html}</div>
+        <div class="panel-foot">
+          <div class="panel-foot-text">MDA — MASTER DIGITAL AGENCY</div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -388,7 +514,7 @@ def build_print():
 <div class="pg pg-contact">
   <div class="ct-label">GET IN TOUCH</div>
   <div class="ct-main">
-    <h2 class="ct-title">Let's Work<br><em>Together.</em></h2>
+    <h2 class="ct-title">Let\'s Work<br><em>Together.</em></h2>
     <p class="ct-sub">Digital · Creative · Media</p>
     <div class="ct-rule"></div>
   </div>
@@ -462,20 +588,74 @@ body{{background:#fff;}}
 .pg-body{{
   flex:1;
   display:flex;gap:8mm;
-  padding:5mm 14mm 0;
+  padding:5mm 14mm 4mm;
   min-height:0;
 }}
 
-/* LEFT column — all text content */
+/* LEFT column — 3-block space-between layout */
 .pg-left{{
   flex:1;
   display:flex;flex-direction:column;
+  justify-content:space-between;
   min-width:0;
 }}
+.lft-a{{flex-shrink:0;}}
+.lft-b{{flex-shrink:0;}}
+.lft-c{{flex-shrink:0;}}
 
-/* RIGHT column — image */
-.pg-right{{width:76mm;flex-shrink:0;}}
-.svc-img{{width:76mm;height:100%;object-fit:cover;object-position:center top;display:block;}}
+/* RIGHT column — dark editorial panel */
+.pg-right{{width:72mm;flex-shrink:0;}}
+
+/* ── Dark editorial panel ── */
+.svc-panel{{
+  width:72mm;height:100%;
+  background:linear-gradient(155deg,#0d0d0d 0%,#181108 60%,#0f0c04 100%);
+  display:flex;flex-direction:column;
+  padding:8mm 7mm;
+  position:relative;overflow:hidden;
+}}
+.panel-ghost{{
+  position:absolute;bottom:-10mm;right:-5mm;
+  font-family:'Playfair Display',serif;font-size:110pt;font-weight:700;
+  color:rgba(200,152,10,0.055);line-height:1;
+  pointer-events:none;user-select:none;
+}}
+.panel-bar{{
+  width:12mm;height:2pt;background:{GOLD};
+  margin-bottom:5.5mm;flex-shrink:0;
+}}
+.panel-cat{{
+  font-family:Inter,sans-serif;font-size:6pt;font-weight:700;
+  letter-spacing:2.5pt;color:rgba(200,152,10,0.65);
+  text-transform:uppercase;margin-bottom:4.5mm;flex-shrink:0;
+}}
+.panel-hl{{
+  font-family:'Playfair Display',serif;font-size:17pt;font-weight:700;
+  color:#fff;line-height:1.22;
+  margin-bottom:5mm;flex-shrink:0;
+}}
+.panel-div{{
+  height:0.5pt;background:rgba(200,152,10,0.2);
+  margin-bottom:5mm;flex-shrink:0;
+}}
+.panel-list{{flex:1;display:flex;flex-direction:column;gap:3mm;}}
+.panel-item{{display:flex;align-items:flex-start;gap:3mm;}}
+.panel-bullet{{
+  width:3.5pt;height:3.5pt;background:{GOLD};
+  border-radius:50%;margin-top:3.5pt;flex-shrink:0;
+}}
+.panel-item-text{{
+  font-family:Inter,sans-serif;font-size:8pt;
+  color:rgba(255,255,255,0.72);line-height:1.5;
+}}
+.panel-foot{{
+  border-top:0.5pt solid rgba(200,152,10,0.15);
+  padding-top:3.5mm;margin-top:4mm;flex-shrink:0;
+}}
+.panel-foot-text{{
+  font-family:Inter,sans-serif;font-size:5.5pt;
+  color:rgba(200,152,10,0.5);letter-spacing:2pt;text-transform:uppercase;
+}}
 
 /* Section label */
 .svc-label{{
@@ -509,16 +689,43 @@ body{{background:#fff;}}
   margin-bottom:3mm;flex-shrink:0;
 }}
 .svc-desc{{
-  font-family:Inter,sans-serif;font-size:9pt;
-  color:#444;line-height:1.72;
+  font-family:Inter,sans-serif;font-size:8.8pt;
+  color:#444;line-height:1.7;
+  flex-shrink:0;margin-bottom:3.5mm;
+}}
+
+/* Highlights — 3-column strip fills the gap */
+.highlights{{
+  display:flex;gap:2mm;
+  margin-bottom:0;flex-shrink:0;
+}}
+.hl-item{{
   flex:1;
+  background:#f7f3e8;
+  border-left:2pt solid rgba(200,152,10,0.5);
+  padding:2.5mm 3mm;
+}}
+.hl-title{{
+  font-family:'Playfair Display',serif;font-size:8pt;font-weight:600;
+  color:#1a1a1a;margin-bottom:0.8mm;
+}}
+.hl-text{{
+  font-family:Inter,sans-serif;font-size:6.8pt;
+  color:#888;line-height:1.35;
 }}
 
 /* Section divider */
 .sect-div{{
   height:0.4pt;background:rgba(200,152,10,0.2);
-  margin:3.5mm 0 2.5mm;flex-shrink:0;
+  margin:3mm 0 2.5mm;flex-shrink:0;
 }}
+/* Subtle divider under section heading */
+.sect-sub-div{{
+  height:0.3pt;background:rgba(200,152,10,0.15);
+  margin-bottom:2.5mm;flex-shrink:0;
+}}
+/* Small gap between includes and steps */
+.sect-gap{{height:3.5mm;flex-shrink:0;}}
 
 /* Section heading */
 .sect-head{{

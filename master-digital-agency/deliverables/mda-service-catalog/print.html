@@ -46,20 +46,74 @@ body{background:#fff;}
 .pg-body{
   flex:1;
   display:flex;gap:8mm;
-  padding:5mm 14mm 0;
+  padding:5mm 14mm 4mm;
   min-height:0;
 }
 
-/* LEFT column — all text content */
+/* LEFT column — 3-block space-between layout */
 .pg-left{
   flex:1;
   display:flex;flex-direction:column;
+  justify-content:space-between;
   min-width:0;
 }
+.lft-a{flex-shrink:0;}
+.lft-b{flex-shrink:0;}
+.lft-c{flex-shrink:0;}
 
-/* RIGHT column — image */
-.pg-right{width:76mm;flex-shrink:0;}
-.svc-img{width:76mm;height:100%;object-fit:cover;object-position:center top;display:block;}
+/* RIGHT column — dark editorial panel */
+.pg-right{width:72mm;flex-shrink:0;}
+
+/* ── Dark editorial panel ── */
+.svc-panel{
+  width:72mm;height:100%;
+  background:linear-gradient(155deg,#0d0d0d 0%,#181108 60%,#0f0c04 100%);
+  display:flex;flex-direction:column;
+  padding:8mm 7mm;
+  position:relative;overflow:hidden;
+}
+.panel-ghost{
+  position:absolute;bottom:-10mm;right:-5mm;
+  font-family:'Playfair Display',serif;font-size:110pt;font-weight:700;
+  color:rgba(200,152,10,0.055);line-height:1;
+  pointer-events:none;user-select:none;
+}
+.panel-bar{
+  width:12mm;height:2pt;background:#C8980A;
+  margin-bottom:5.5mm;flex-shrink:0;
+}
+.panel-cat{
+  font-family:Inter,sans-serif;font-size:6pt;font-weight:700;
+  letter-spacing:2.5pt;color:rgba(200,152,10,0.65);
+  text-transform:uppercase;margin-bottom:4.5mm;flex-shrink:0;
+}
+.panel-hl{
+  font-family:'Playfair Display',serif;font-size:17pt;font-weight:700;
+  color:#fff;line-height:1.22;
+  margin-bottom:5mm;flex-shrink:0;
+}
+.panel-div{
+  height:0.5pt;background:rgba(200,152,10,0.2);
+  margin-bottom:5mm;flex-shrink:0;
+}
+.panel-list{flex:1;display:flex;flex-direction:column;gap:3mm;}
+.panel-item{display:flex;align-items:flex-start;gap:3mm;}
+.panel-bullet{
+  width:3.5pt;height:3.5pt;background:#C8980A;
+  border-radius:50%;margin-top:3.5pt;flex-shrink:0;
+}
+.panel-item-text{
+  font-family:Inter,sans-serif;font-size:8pt;
+  color:rgba(255,255,255,0.72);line-height:1.5;
+}
+.panel-foot{
+  border-top:0.5pt solid rgba(200,152,10,0.15);
+  padding-top:3.5mm;margin-top:4mm;flex-shrink:0;
+}
+.panel-foot-text{
+  font-family:Inter,sans-serif;font-size:5.5pt;
+  color:rgba(200,152,10,0.5);letter-spacing:2pt;text-transform:uppercase;
+}
 
 /* Section label */
 .svc-label{
@@ -93,16 +147,43 @@ body{background:#fff;}
   margin-bottom:3mm;flex-shrink:0;
 }
 .svc-desc{
-  font-family:Inter,sans-serif;font-size:9pt;
-  color:#444;line-height:1.72;
+  font-family:Inter,sans-serif;font-size:8.8pt;
+  color:#444;line-height:1.7;
+  flex-shrink:0;margin-bottom:3.5mm;
+}
+
+/* Highlights — 3-column strip fills the gap */
+.highlights{
+  display:flex;gap:2mm;
+  margin-bottom:0;flex-shrink:0;
+}
+.hl-item{
   flex:1;
+  background:#f7f3e8;
+  border-left:2pt solid rgba(200,152,10,0.5);
+  padding:2.5mm 3mm;
+}
+.hl-title{
+  font-family:'Playfair Display',serif;font-size:8pt;font-weight:600;
+  color:#1a1a1a;margin-bottom:0.8mm;
+}
+.hl-text{
+  font-family:Inter,sans-serif;font-size:6.8pt;
+  color:#888;line-height:1.35;
 }
 
 /* Section divider */
 .sect-div{
   height:0.4pt;background:rgba(200,152,10,0.2);
-  margin:3.5mm 0 2.5mm;flex-shrink:0;
+  margin:3mm 0 2.5mm;flex-shrink:0;
 }
+/* Subtle divider under section heading */
+.sect-sub-div{
+  height:0.3pt;background:rgba(200,152,10,0.15);
+  margin-bottom:2.5mm;flex-shrink:0;
+}
+/* Small gap between includes and steps */
+.sect-gap{height:3.5mm;flex-shrink:0;}
 
 /* Section heading */
 .sect-head{
@@ -328,31 +409,52 @@ body{background:#fff;}
   <!-- Two-column body -->
   <div class="pg-body">
 
-    <!-- LEFT: all content -->
+    <!-- LEFT: grouped into 3 blocks for space-between distribution -->
     <div class="pg-left">
-      <div class="svc-label">DESIGN SERVICE &nbsp;/&nbsp; 01</div>
-      <div class="svc-label-rule"></div>
-      <div class="svc-accent"></div>
-      <h2 class="svc-title">Company Profile<br>Design</h2>
-      <p class="svc-sub">Present Your Business with Authority</p>
-      <div class="svc-rule"></div>
-      <p class="svc-desc">A professionally designed company profile is your most powerful first impression. We craft elegant, print-ready profiles that communicate your vision, showcase your services, and build immediate trust with clients, partners and investors.</p>
 
-      <div class="sect-div"></div>
-      <div class="sect-head">WHAT'S INCLUDED</div>
-      <div class="inc-grid"><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Vision & Mission Page</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>About Your Company</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Services Overview</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Team Showcase</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Portfolio & Achievements</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Brand Identity Applied</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Print & Digital Formats</span></div></div>
+      <!-- Block A: title + desc + highlights -->
+      <div class="lft-a">
+        <div class="svc-label">DESIGN SERVICE &nbsp;/&nbsp; 01</div>
+        <div class="svc-label-rule"></div>
+        <div class="svc-accent"></div>
+        <h2 class="svc-title">Company Profile<br>Design</h2>
+        <p class="svc-sub">Present Your Business with Authority</p>
+        <div class="svc-rule"></div>
+        <p class="svc-desc">A professionally designed company profile is your most powerful first impression. We craft elegant, print-ready profiles that communicate your vision, showcase your services, and build immediate trust with clients, partners and investors. Every page is structured to tell your story clearly and persuasively.</p>
+        <div class="highlights"><div class="hl-item"><div class="hl-title">Bilingual Design</div><div class="hl-text">Arabic & English throughout</div></div><div class="hl-item"><div class="hl-title">Print & Digital</div><div class="hl-text">All formats included</div></div><div class="hl-item"><div class="hl-title">Brand Aligned</div><div class="hl-text">Reflects your identity precisely</div></div></div>
+      </div>
 
-      <div class="sect-div"></div>
-      <div class="sect-head">HOW IT WORKS</div>
-      <div class="steps-row"><div class="step"><div class="step-n">STEP 01</div><div class="step-t">Brief</div><div class="step-d">We learn your business, goals and audience</div></div><div class="step"><div class="step-n">STEP 02</div><div class="step-t">Design</div><div class="step-d">Crafted layouts aligned to your brand</div></div><div class="step"><div class="step-n">STEP 03</div><div class="step-t">Content</div><div class="step-d">Your copy and visuals integrated cleanly</div></div><div class="step"><div class="step-n">STEP 04</div><div class="step-t">Revisions</div><div class="step-d">Refinements until it is perfect</div></div><div class="step"><div class="step-n">STEP 05</div><div class="step-t">Delivery</div><div class="step-d">Print-ready PDF and editable files</div></div></div>
+      <!-- Block B: includes + steps -->
+      <div class="lft-b">
+        <div class="sect-head">WHAT'S INCLUDED</div>
+        <div class="sect-sub-div"></div>
+        <div class="inc-grid"><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Vision & Mission Page</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>About Your Company</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Services Overview</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Team Showcase</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Portfolio & Achievements</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Brand Identity Applied</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Print & Digital Formats</span></div></div>
+        <div class="sect-gap"></div>
+        <div class="sect-head">HOW IT WORKS</div>
+        <div class="sect-sub-div"></div>
+        <div class="steps-row"><div class="step"><div class="step-n">STEP 01</div><div class="step-t">Brief</div><div class="step-d">We learn your business, goals and audience</div></div><div class="step"><div class="step-n">STEP 02</div><div class="step-t">Design</div><div class="step-d">Crafted layouts aligned to your brand</div></div><div class="step"><div class="step-n">STEP 03</div><div class="step-t">Content</div><div class="step-d">Your copy and visuals integrated cleanly</div></div><div class="step"><div class="step-n">STEP 04</div><div class="step-t">Revisions</div><div class="step-d">Refinements until it is perfect</div></div><div class="step"><div class="step-n">STEP 05</div><div class="step-t">Delivery</div><div class="step-d">Print-ready PDF and editable files</div></div></div>
+      </div>
 
-      <div class="sect-div"></div>
-      <div class="tags-row"><span class="tag">Print-Ready PDF</span><span class="tag">Digital Format</span><span class="tag">A4 Layout</span><span class="tag">Brand Aligned</span><span class="tag">Arabic & English</span></div>
+      <!-- Block C: tags -->
+      <div class="lft-c">
+        <div class="tags-row"><span class="tag">Print-Ready PDF</span><span class="tag">Digital Format</span><span class="tag">A4 Layout</span><span class="tag">Brand Aligned</span><span class="tag">Arabic & English</span></div>
+      </div>
+
     </div>
 
-    <!-- RIGHT: service image -->
+    <!-- RIGHT: dark editorial panel -->
     <div class="pg-right">
-      <img src="/home/user/drexonyx-v1/master-digital-agency/deliverables/mda-service-catalog/assets/images/profile.jpg" class="svc-img" alt="Company Profile Design">
+      <div class="svc-panel">
+        <div class="panel-ghost">01</div>
+        <div class="panel-bar"></div>
+        <div class="panel-cat">DESIGN SERVICE</div>
+        <div class="panel-hl">Your Business,<br>Presented<br>Beautifully</div>
+        <div class="panel-div"></div>
+        <div class="panel-list"><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Custom editorial layout — 20 to 50+ pages</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Fully bilingual: Arabic and English</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Print-ready A4 PDF + editable source files</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Aligned to your existing brand identity</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Delivered within 5–7 business days</div></div></div>
+        <div class="panel-foot">
+          <div class="panel-foot-text">MDA — MASTER DIGITAL AGENCY</div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -375,31 +477,52 @@ body{background:#fff;}
   <!-- Two-column body -->
   <div class="pg-body">
 
-    <!-- LEFT: all content -->
+    <!-- LEFT: grouped into 3 blocks for space-between distribution -->
     <div class="pg-left">
-      <div class="svc-label">DIGITAL SERVICE &nbsp;/&nbsp; 02</div>
-      <div class="svc-label-rule"></div>
-      <div class="svc-accent"></div>
-      <h2 class="svc-title">Website Design</h2>
-      <p class="svc-sub">Modern Websites That Grow Your Business</p>
-      <div class="svc-rule"></div>
-      <p class="svc-desc">Your website is your 24/7 salesperson. We design fast, mobile-responsive websites that capture attention, convert visitors into customers, and reflect the quality of your brand — for restaurants, clinics, salons, companies and every business in between.</p>
 
-      <div class="sect-div"></div>
-      <div class="sect-head">WHAT'S INCLUDED</div>
-      <div class="inc-grid"><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Custom Design & Layout</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Mobile-Responsive</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>SEO-Ready Structure</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Contact & Booking Forms</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Social Media Integration</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Speed Optimised</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Content Management</span></div></div>
+      <!-- Block A: title + desc + highlights -->
+      <div class="lft-a">
+        <div class="svc-label">DIGITAL SERVICE &nbsp;/&nbsp; 02</div>
+        <div class="svc-label-rule"></div>
+        <div class="svc-accent"></div>
+        <h2 class="svc-title">Website Design</h2>
+        <p class="svc-sub">Modern Websites That Grow Your Business</p>
+        <div class="svc-rule"></div>
+        <p class="svc-desc">Your website is your 24/7 salesperson. We design fast, mobile-responsive websites that capture attention, convert visitors into customers, and reflect the quality of your brand — for restaurants, clinics, salons, companies and every business in between. Built to rank, built to convert.</p>
+        <div class="highlights"><div class="hl-item"><div class="hl-title">Mobile-First</div><div class="hl-text">Works on every device</div></div><div class="hl-item"><div class="hl-title">SEO-Ready</div><div class="hl-text">Built to rank & convert</div></div><div class="hl-item"><div class="hl-title">Fast Delivery</div><div class="hl-text">Live in 2–3 weeks</div></div></div>
+      </div>
 
-      <div class="sect-div"></div>
-      <div class="sect-head">HOW IT WORKS</div>
-      <div class="steps-row"><div class="step"><div class="step-n">STEP 01</div><div class="step-t">Discovery</div><div class="step-d">Understanding your business and goals</div></div><div class="step"><div class="step-n">STEP 02</div><div class="step-t">Wireframe</div><div class="step-d">Structure and page architecture</div></div><div class="step"><div class="step-n">STEP 03</div><div class="step-t">Design</div><div class="step-d">Visual design with your brand identity</div></div><div class="step"><div class="step-n">STEP 04</div><div class="step-t">Build</div><div class="step-d">Full development and integration</div></div><div class="step"><div class="step-n">STEP 05</div><div class="step-t">Launch</div><div class="step-d">Final testing and go-live handover</div></div></div>
+      <!-- Block B: includes + steps -->
+      <div class="lft-b">
+        <div class="sect-head">WHAT'S INCLUDED</div>
+        <div class="sect-sub-div"></div>
+        <div class="inc-grid"><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Custom Design & Layout</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Mobile-Responsive</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>SEO-Ready Structure</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Contact & Booking Forms</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Social Media Integration</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Speed Optimised</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Content Management</span></div></div>
+        <div class="sect-gap"></div>
+        <div class="sect-head">HOW IT WORKS</div>
+        <div class="sect-sub-div"></div>
+        <div class="steps-row"><div class="step"><div class="step-n">STEP 01</div><div class="step-t">Discovery</div><div class="step-d">Understanding your business and goals</div></div><div class="step"><div class="step-n">STEP 02</div><div class="step-t">Wireframe</div><div class="step-d">Structure and page architecture</div></div><div class="step"><div class="step-n">STEP 03</div><div class="step-t">Design</div><div class="step-d">Visual design with your brand identity</div></div><div class="step"><div class="step-n">STEP 04</div><div class="step-t">Build</div><div class="step-d">Full development and integration</div></div><div class="step"><div class="step-n">STEP 05</div><div class="step-t">Launch</div><div class="step-d">Final testing and go-live handover</div></div></div>
+      </div>
 
-      <div class="sect-div"></div>
-      <div class="tags-row"><span class="tag">Restaurants</span><span class="tag">Retail</span><span class="tag">Healthcare</span><span class="tag">Corporate</span><span class="tag">E-Commerce</span><span class="tag">Landing Pages</span></div>
+      <!-- Block C: tags -->
+      <div class="lft-c">
+        <div class="tags-row"><span class="tag">Restaurants</span><span class="tag">Retail</span><span class="tag">Healthcare</span><span class="tag">Corporate</span><span class="tag">E-Commerce</span><span class="tag">Landing Pages</span></div>
+      </div>
+
     </div>
 
-    <!-- RIGHT: service image -->
+    <!-- RIGHT: dark editorial panel -->
     <div class="pg-right">
-      <img src="/home/user/drexonyx-v1/master-digital-agency/deliverables/mda-service-catalog/assets/images/website.jpg" class="svc-img" alt="Website Design">
+      <div class="svc-panel">
+        <div class="panel-ghost">02</div>
+        <div class="panel-bar"></div>
+        <div class="panel-cat">DIGITAL SERVICE</div>
+        <div class="panel-hl">Websites Built<br>to Convert<br>Customers</div>
+        <div class="panel-div"></div>
+        <div class="panel-list"><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Bespoke design aligned to your brand identity</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Mobile-responsive on all screen sizes</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">SEO-optimised structure from the ground up</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Contact forms, booking & integration ready</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Full handover with training & support</div></div></div>
+        <div class="panel-foot">
+          <div class="panel-foot-text">MDA — MASTER DIGITAL AGENCY</div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -422,31 +545,52 @@ body{background:#fff;}
   <!-- Two-column body -->
   <div class="pg-body">
 
-    <!-- LEFT: all content -->
+    <!-- LEFT: grouped into 3 blocks for space-between distribution -->
     <div class="pg-left">
-      <div class="svc-label">BRAND SERVICE &nbsp;/&nbsp; 03</div>
-      <div class="svc-label-rule"></div>
-      <div class="svc-accent"></div>
-      <h2 class="svc-title">Branding Package</h2>
-      <p class="svc-sub">Create a Unique Identity That People Remember</p>
-      <div class="svc-rule"></div>
-      <p class="svc-desc">From logo design to complete brand identity, we help your business stand out with a consistent and professional image across all platforms — online and offline. Every element crafted to tell your story at a glance.</p>
 
-      <div class="sect-div"></div>
-      <div class="sect-head">WHAT'S INCLUDED</div>
-      <div class="inc-grid"><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Logo Design</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Brand Style Guide</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Color Palette System</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Typography Selection</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Business Card Design</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Letterhead & Stationery</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Brand Applications Guide</span></div></div>
+      <!-- Block A: title + desc + highlights -->
+      <div class="lft-a">
+        <div class="svc-label">BRAND SERVICE &nbsp;/&nbsp; 03</div>
+        <div class="svc-label-rule"></div>
+        <div class="svc-accent"></div>
+        <h2 class="svc-title">Branding Package</h2>
+        <p class="svc-sub">Create a Unique Identity That People Remember</p>
+        <div class="svc-rule"></div>
+        <p class="svc-desc">From logo design to complete brand identity, we help your business stand out with a consistent and professional image across all platforms — online and offline. Every element crafted to tell your story at a glance and leave a lasting impression on every customer you meet.</p>
+        <div class="highlights"><div class="hl-item"><div class="hl-title">Logo System</div><div class="hl-text">All variations included</div></div><div class="hl-item"><div class="hl-title">Brand Guide</div><div class="hl-text">Complete style rules</div></div><div class="hl-item"><div class="hl-title">Stationery</div><div class="hl-text">Cards, letterhead & more</div></div></div>
+      </div>
 
-      <div class="sect-div"></div>
-      <div class="sect-head">HOW IT WORKS</div>
-      <div class="steps-row"><div class="step"><div class="step-n">STEP 01</div><div class="step-t">Discovery</div><div class="step-d">Brand values, audience and competitors</div></div><div class="step"><div class="step-n">STEP 02</div><div class="step-t">Concepts</div><div class="step-d">Multiple logo directions presented</div></div><div class="step"><div class="step-n">STEP 03</div><div class="step-t">Identity</div><div class="step-d">Full brand system developed</div></div><div class="step"><div class="step-n">STEP 04</div><div class="step-t">Refinement</div><div class="step-d">Revisions and final approval</div></div><div class="step"><div class="step-n">STEP 05</div><div class="step-t">Brand Book</div><div class="step-d">Complete guidelines delivered</div></div></div>
+      <!-- Block B: includes + steps -->
+      <div class="lft-b">
+        <div class="sect-head">WHAT'S INCLUDED</div>
+        <div class="sect-sub-div"></div>
+        <div class="inc-grid"><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Logo Design</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Brand Style Guide</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Color Palette System</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Typography Selection</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Business Card Design</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Letterhead & Stationery</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Brand Applications Guide</span></div></div>
+        <div class="sect-gap"></div>
+        <div class="sect-head">HOW IT WORKS</div>
+        <div class="sect-sub-div"></div>
+        <div class="steps-row"><div class="step"><div class="step-n">STEP 01</div><div class="step-t">Discovery</div><div class="step-d">Brand values, audience and competitors</div></div><div class="step"><div class="step-n">STEP 02</div><div class="step-t">Concepts</div><div class="step-d">Multiple logo directions presented</div></div><div class="step"><div class="step-n">STEP 03</div><div class="step-t">Identity</div><div class="step-d">Full brand system developed</div></div><div class="step"><div class="step-n">STEP 04</div><div class="step-t">Refinement</div><div class="step-d">Revisions and final approval</div></div><div class="step"><div class="step-n">STEP 05</div><div class="step-t">Brand Book</div><div class="step-d">Complete guidelines delivered</div></div></div>
+      </div>
 
-      <div class="sect-div"></div>
-      <div class="tags-row"><span class="tag">Logo Design</span><span class="tag">Brand Guide</span><span class="tag">Stationery</span><span class="tag">Packaging</span><span class="tag">Signage</span><span class="tag">Digital & Print</span></div>
+      <!-- Block C: tags -->
+      <div class="lft-c">
+        <div class="tags-row"><span class="tag">Logo Design</span><span class="tag">Brand Guide</span><span class="tag">Stationery</span><span class="tag">Packaging</span><span class="tag">Signage</span><span class="tag">Digital & Print</span></div>
+      </div>
+
     </div>
 
-    <!-- RIGHT: service image -->
+    <!-- RIGHT: dark editorial panel -->
     <div class="pg-right">
-      <img src="/home/user/drexonyx-v1/master-digital-agency/deliverables/mda-service-catalog/assets/images/brand.jpg" class="svc-img" alt="Branding Package">
+      <div class="svc-panel">
+        <div class="panel-ghost">03</div>
+        <div class="panel-bar"></div>
+        <div class="panel-cat">BRAND SERVICE</div>
+        <div class="panel-hl">An Identity<br>Worth<br>Remembering</div>
+        <div class="panel-div"></div>
+        <div class="panel-list"><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Multiple logo concepts presented</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Full colour palette & typography system</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Business card, letterhead & stationery</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Brand style guide for consistent use</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Digital & print-ready file formats</div></div></div>
+        <div class="panel-foot">
+          <div class="panel-foot-text">MDA — MASTER DIGITAL AGENCY</div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -469,31 +613,52 @@ body{background:#fff;}
   <!-- Two-column body -->
   <div class="pg-body">
 
-    <!-- LEFT: all content -->
+    <!-- LEFT: grouped into 3 blocks for space-between distribution -->
     <div class="pg-left">
-      <div class="svc-label">LAUNCH SERVICE &nbsp;/&nbsp; 04</div>
-      <div class="svc-label-rule"></div>
-      <div class="svc-accent"></div>
-      <h2 class="svc-title">Digital Launch Kit</h2>
-      <p class="svc-sub">Everything Your Business Needs to Get Started Online</p>
-      <div class="svc-rule"></div>
-      <p class="svc-desc">A complete set of digital materials designed to launch your business with a strong, professional presence from day one — website, social profiles, printed materials and visual content, all unified under your brand.</p>
 
-      <div class="sect-div"></div>
-      <div class="sect-head">WHAT'S INCLUDED</div>
-      <div class="inc-grid"><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Website Design</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Social Media Profile Setup</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Business Card Design</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Digital Menu or Brochure</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Launch Poster Set</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Email Signature Design</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Launch Checklist</span></div></div>
+      <!-- Block A: title + desc + highlights -->
+      <div class="lft-a">
+        <div class="svc-label">LAUNCH SERVICE &nbsp;/&nbsp; 04</div>
+        <div class="svc-label-rule"></div>
+        <div class="svc-accent"></div>
+        <h2 class="svc-title">Digital Launch Kit</h2>
+        <p class="svc-sub">Everything Your Business Needs to Get Started Online</p>
+        <div class="svc-rule"></div>
+        <p class="svc-desc">A complete set of digital materials designed to launch your business with a strong, professional presence from day one — website, social profiles, printed materials and visual content, all unified under your brand. Launch confidently, look professional instantly.</p>
+        <div class="highlights"><div class="hl-item"><div class="hl-title">All-in-One</div><div class="hl-text">Website + Social + Print</div></div><div class="hl-item"><div class="hl-title">Unified Brand</div><div class="hl-text">Consistent across everything</div></div><div class="hl-item"><div class="hl-title">Fast Launch</div><div class="hl-text">Ready in 2–3 weeks</div></div></div>
+      </div>
 
-      <div class="sect-div"></div>
-      <div class="sect-head">HOW IT WORKS</div>
-      <div class="steps-row"><div class="step"><div class="step-n">STEP 01</div><div class="step-t">Onboarding</div><div class="step-d">Gathering all brand and business info</div></div><div class="step"><div class="step-n">STEP 02</div><div class="step-t">Assets</div><div class="step-d">Creating all visual and digital materials</div></div><div class="step"><div class="step-n">STEP 03</div><div class="step-t">Setup</div><div class="step-d">Platform configuration and integration</div></div><div class="step"><div class="step-n">STEP 04</div><div class="step-t">Review</div><div class="step-d">Full walkthrough and client approval</div></div><div class="step"><div class="step-n">STEP 05</div><div class="step-t">Launch</div><div class="step-d">Your business goes live, ready to grow</div></div></div>
+      <!-- Block B: includes + steps -->
+      <div class="lft-b">
+        <div class="sect-head">WHAT'S INCLUDED</div>
+        <div class="sect-sub-div"></div>
+        <div class="inc-grid"><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Website Design</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Social Media Profile Setup</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Business Card Design</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Digital Menu or Brochure</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Launch Poster Set</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Email Signature Design</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Launch Checklist</span></div></div>
+        <div class="sect-gap"></div>
+        <div class="sect-head">HOW IT WORKS</div>
+        <div class="sect-sub-div"></div>
+        <div class="steps-row"><div class="step"><div class="step-n">STEP 01</div><div class="step-t">Onboarding</div><div class="step-d">Gathering all brand and business info</div></div><div class="step"><div class="step-n">STEP 02</div><div class="step-t">Assets</div><div class="step-d">Creating all visual and digital materials</div></div><div class="step"><div class="step-n">STEP 03</div><div class="step-t">Setup</div><div class="step-d">Platform configuration and integration</div></div><div class="step"><div class="step-n">STEP 04</div><div class="step-t">Review</div><div class="step-d">Full walkthrough and client approval</div></div><div class="step"><div class="step-n">STEP 05</div><div class="step-t">Launch</div><div class="step-d">Your business goes live, ready to grow</div></div></div>
+      </div>
 
-      <div class="sect-div"></div>
-      <div class="tags-row"><span class="tag">Complete Package</span><span class="tag">Social Profiles</span><span class="tag">Website</span><span class="tag">Print Materials</span><span class="tag">Fast Turnaround</span></div>
+      <!-- Block C: tags -->
+      <div class="lft-c">
+        <div class="tags-row"><span class="tag">Complete Package</span><span class="tag">Social Profiles</span><span class="tag">Website</span><span class="tag">Print Materials</span><span class="tag">Fast Turnaround</span></div>
+      </div>
+
     </div>
 
-    <!-- RIGHT: service image -->
+    <!-- RIGHT: dark editorial panel -->
     <div class="pg-right">
-      <img src="/home/user/drexonyx-v1/master-digital-agency/deliverables/mda-service-catalog/assets/images/launch.jpg" class="svc-img" alt="Digital Launch Kit">
+      <div class="svc-panel">
+        <div class="panel-ghost">04</div>
+        <div class="panel-bar"></div>
+        <div class="panel-cat">LAUNCH SERVICE</div>
+        <div class="panel-hl">Launch Strong.<br>Launch Smart.<br>Launch Now.</div>
+        <div class="panel-div"></div>
+        <div class="panel-list"><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Website, social media & print in one package</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Unified brand identity across all touchpoints</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Social media profiles set up & fully branded</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Digital menu, brochure or launch poster</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Email signature & digital business card</div></div></div>
+        <div class="panel-foot">
+          <div class="panel-foot-text">MDA — MASTER DIGITAL AGENCY</div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -516,31 +681,52 @@ body{background:#fff;}
   <!-- Two-column body -->
   <div class="pg-body">
 
-    <!-- LEFT: all content -->
+    <!-- LEFT: grouped into 3 blocks for space-between distribution -->
     <div class="pg-left">
-      <div class="svc-label">CREATIVE SERVICE &nbsp;/&nbsp; 05</div>
-      <div class="svc-label-rule"></div>
-      <div class="svc-accent"></div>
-      <h2 class="svc-title">Posters & Social<br>Media Creatives</h2>
-      <p class="svc-sub">Eye-Catching Designs That Bring Your Business to Life</p>
-      <div class="svc-rule"></div>
-      <p class="svc-desc">Custom designs for your products, offers, events and everyday social media content. Stand out in crowded feeds with visuals crafted to stop the scroll, communicate your message and drive real engagement.</p>
 
-      <div class="sect-div"></div>
-      <div class="sect-head">WHAT'S INCLUDED</div>
-      <div class="inc-grid"><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Social Media Feed Posts</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Story & Reel Covers</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Promotional Posters</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Event Announcements</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Offer & Sale Designs</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Branded Content Templates</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Print-Ready Versions</span></div></div>
+      <!-- Block A: title + desc + highlights -->
+      <div class="lft-a">
+        <div class="svc-label">CREATIVE SERVICE &nbsp;/&nbsp; 05</div>
+        <div class="svc-label-rule"></div>
+        <div class="svc-accent"></div>
+        <h2 class="svc-title">Posters & Social<br>Media Creatives</h2>
+        <p class="svc-sub">Eye-Catching Designs That Bring Your Business to Life</p>
+        <div class="svc-rule"></div>
+        <p class="svc-desc">Custom designs for your products, offers, events and everyday social media content. Stand out in crowded feeds with visuals crafted to stop the scroll, communicate your message and drive real engagement — across Instagram, TikTok, Facebook and every platform your customers use.</p>
+        <div class="highlights"><div class="hl-item"><div class="hl-title">All Platforms</div><div class="hl-text">Instagram, TikTok & more</div></div><div class="hl-item"><div class="hl-title">Ready-to-Post</div><div class="hl-text">Correct sizes & formats</div></div><div class="hl-item"><div class="hl-title">Branded Content</div><div class="hl-text">Consistent visual identity</div></div></div>
+      </div>
 
-      <div class="sect-div"></div>
-      <div class="sect-head">HOW IT WORKS</div>
-      <div class="steps-row"><div class="step"><div class="step-n">STEP 01</div><div class="step-t">Brief</div><div class="step-d">Understanding the offer, tone and goal</div></div><div class="step"><div class="step-n">STEP 02</div><div class="step-t">Concept</div><div class="step-d">Visual direction and layout approach</div></div><div class="step"><div class="step-n">STEP 03</div><div class="step-t">Design</div><div class="step-d">On-brand visuals crafted to convert</div></div><div class="step"><div class="step-n">STEP 04</div><div class="step-t">Revisions</div><div class="step-d">Adjustments until you are satisfied</div></div><div class="step"><div class="step-n">STEP 05</div><div class="step-t">Delivery</div><div class="step-d">Final files in all required formats</div></div></div>
+      <!-- Block B: includes + steps -->
+      <div class="lft-b">
+        <div class="sect-head">WHAT'S INCLUDED</div>
+        <div class="sect-sub-div"></div>
+        <div class="inc-grid"><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Social Media Feed Posts</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Story & Reel Covers</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Promotional Posters</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Event Announcements</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Offer & Sale Designs</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Branded Content Templates</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Print-Ready Versions</span></div></div>
+        <div class="sect-gap"></div>
+        <div class="sect-head">HOW IT WORKS</div>
+        <div class="sect-sub-div"></div>
+        <div class="steps-row"><div class="step"><div class="step-n">STEP 01</div><div class="step-t">Brief</div><div class="step-d">Understanding the offer, tone and goal</div></div><div class="step"><div class="step-n">STEP 02</div><div class="step-t">Concept</div><div class="step-d">Visual direction and layout approach</div></div><div class="step"><div class="step-n">STEP 03</div><div class="step-t">Design</div><div class="step-d">On-brand visuals crafted to convert</div></div><div class="step"><div class="step-n">STEP 04</div><div class="step-t">Revisions</div><div class="step-d">Adjustments until you are satisfied</div></div><div class="step"><div class="step-n">STEP 05</div><div class="step-t">Delivery</div><div class="step-d">Final files in all required formats</div></div></div>
+      </div>
 
-      <div class="sect-div"></div>
-      <div class="tags-row"><span class="tag">Instagram</span><span class="tag">Facebook</span><span class="tag">TikTok</span><span class="tag">Print</span><span class="tag">Stories</span><span class="tag">Offers & Promotions</span></div>
+      <!-- Block C: tags -->
+      <div class="lft-c">
+        <div class="tags-row"><span class="tag">Instagram</span><span class="tag">Facebook</span><span class="tag">TikTok</span><span class="tag">Print</span><span class="tag">Stories</span><span class="tag">Offers & Promotions</span></div>
+      </div>
+
     </div>
 
-    <!-- RIGHT: service image -->
+    <!-- RIGHT: dark editorial panel -->
     <div class="pg-right">
-      <img src="/home/user/drexonyx-v1/master-digital-agency/deliverables/mda-service-catalog/assets/images/social.jpg" class="svc-img" alt="Posters & Social Media Creatives">
+      <div class="svc-panel">
+        <div class="panel-ghost">05</div>
+        <div class="panel-bar"></div>
+        <div class="panel-cat">CREATIVE SERVICE</div>
+        <div class="panel-hl">Designs That<br>Stop the<br>Scroll</div>
+        <div class="panel-div"></div>
+        <div class="panel-list"><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Feed posts, stories, reels & covers</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Offers, promotions & event announcements</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">On-brand visuals that communicate instantly</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Print-ready versions for posters & signage</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Delivered in all platform-required formats</div></div></div>
+        <div class="panel-foot">
+          <div class="panel-foot-text">MDA — MASTER DIGITAL AGENCY</div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -563,31 +749,52 @@ body{background:#fff;}
   <!-- Two-column body -->
   <div class="pg-body">
 
-    <!-- LEFT: all content -->
+    <!-- LEFT: grouped into 3 blocks for space-between distribution -->
     <div class="pg-left">
-      <div class="svc-label">VIDEO SERVICE &nbsp;/&nbsp; 06</div>
-      <div class="svc-label-rule"></div>
-      <div class="svc-accent"></div>
-      <h2 class="svc-title">Corporate Promotional<br>Video</h2>
-      <p class="svc-sub">Tell Your Story in a Powerful Way</p>
-      <div class="svc-rule"></div>
-      <p class="svc-desc">Professional videos that showcase your business, services and brand in a way that attracts customers and builds trust. From concept to final cut — cinematic quality, compelling narrative, every time.</p>
 
-      <div class="sect-div"></div>
-      <div class="sect-head">WHAT'S INCLUDED</div>
-      <div class="inc-grid"><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Concept & Script Development</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Professional Filming</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Full Post-Production Editing</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Color Grading & Sound Design</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Motion Graphics & Titles</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Multiple Platform Formats</span></div></div>
+      <!-- Block A: title + desc + highlights -->
+      <div class="lft-a">
+        <div class="svc-label">VIDEO SERVICE &nbsp;/&nbsp; 06</div>
+        <div class="svc-label-rule"></div>
+        <div class="svc-accent"></div>
+        <h2 class="svc-title">Corporate Promotional<br>Video</h2>
+        <p class="svc-sub">Tell Your Story in a Powerful Way</p>
+        <div class="svc-rule"></div>
+        <p class="svc-desc">Professional videos that showcase your business, services and brand in a way that attracts customers and builds trust. From concept to final cut — cinematic quality, compelling narrative, every time. Produced in Dubai with full professional crew and post-production.</p>
+        <div class="highlights"><div class="hl-item"><div class="hl-title">Dubai Production</div><div class="hl-text">On-location professional filming</div></div><div class="hl-item"><div class="hl-title">Cinematic Quality</div><div class="hl-text">Full grade & sound design</div></div><div class="hl-item"><div class="hl-title">Multi-Platform</div><div class="hl-text">All resolutions delivered</div></div></div>
+      </div>
 
-      <div class="sect-div"></div>
-      <div class="sect-head">HOW IT WORKS</div>
-      <div class="steps-row"><div class="step"><div class="step-n">STEP 01</div><div class="step-t">Concept</div><div class="step-d">Script, storyboard and creative brief</div></div><div class="step"><div class="step-n">STEP 02</div><div class="step-t">Pre-Prod</div><div class="step-d">Location, talent and schedule planning</div></div><div class="step"><div class="step-n">STEP 03</div><div class="step-t">Filming</div><div class="step-d">Professional on-location production</div></div><div class="step"><div class="step-n">STEP 04</div><div class="step-t">Edit</div><div class="step-d">Post-production, grade and sound</div></div><div class="step"><div class="step-n">STEP 05</div><div class="step-t">Delivery</div><div class="step-d">Final video in all required resolutions</div></div></div>
+      <!-- Block B: includes + steps -->
+      <div class="lft-b">
+        <div class="sect-head">WHAT'S INCLUDED</div>
+        <div class="sect-sub-div"></div>
+        <div class="inc-grid"><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Concept & Script Development</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Professional Filming</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Full Post-Production Editing</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Color Grading & Sound Design</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Motion Graphics & Titles</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Multiple Platform Formats</span></div></div>
+        <div class="sect-gap"></div>
+        <div class="sect-head">HOW IT WORKS</div>
+        <div class="sect-sub-div"></div>
+        <div class="steps-row"><div class="step"><div class="step-n">STEP 01</div><div class="step-t">Concept</div><div class="step-d">Script, storyboard and creative brief</div></div><div class="step"><div class="step-n">STEP 02</div><div class="step-t">Pre-Prod</div><div class="step-d">Location, talent and schedule planning</div></div><div class="step"><div class="step-n">STEP 03</div><div class="step-t">Filming</div><div class="step-d">Professional on-location production</div></div><div class="step"><div class="step-n">STEP 04</div><div class="step-t">Edit</div><div class="step-d">Post-production, grade and sound</div></div><div class="step"><div class="step-n">STEP 05</div><div class="step-t">Delivery</div><div class="step-d">Final video in all required resolutions</div></div></div>
+      </div>
 
-      <div class="sect-div"></div>
-      <div class="tags-row"><span class="tag">Company Showcase</span><span class="tag">Services Highlight</span><span class="tag">Product Film</span><span class="tag">Brand Story</span><span class="tag">Dubai Production</span></div>
+      <!-- Block C: tags -->
+      <div class="lft-c">
+        <div class="tags-row"><span class="tag">Company Showcase</span><span class="tag">Services Highlight</span><span class="tag">Product Film</span><span class="tag">Brand Story</span><span class="tag">Dubai Production</span></div>
+      </div>
+
     </div>
 
-    <!-- RIGHT: service image -->
+    <!-- RIGHT: dark editorial panel -->
     <div class="pg-right">
-      <img src="/home/user/drexonyx-v1/master-digital-agency/deliverables/mda-service-catalog/assets/images/video.jpg" class="svc-img" alt="Corporate Promotional Video">
+      <div class="svc-panel">
+        <div class="panel-ghost">06</div>
+        <div class="panel-bar"></div>
+        <div class="panel-cat">VIDEO SERVICE</div>
+        <div class="panel-hl">Your Story,<br>Told<br>Cinematically</div>
+        <div class="panel-div"></div>
+        <div class="panel-list"><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Concept development & creative brief</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Professional on-location filming in Dubai</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Full post-production: edit, grade & sound</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Motion graphics, titles & brand overlays</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Delivered in all required resolutions</div></div></div>
+        <div class="panel-foot">
+          <div class="panel-foot-text">MDA — MASTER DIGITAL AGENCY</div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -610,31 +817,52 @@ body{background:#fff;}
   <!-- Two-column body -->
   <div class="pg-body">
 
-    <!-- LEFT: all content -->
+    <!-- LEFT: grouped into 3 blocks for space-between distribution -->
     <div class="pg-left">
-      <div class="svc-label">VIDEO SERVICE &nbsp;/&nbsp; 07</div>
-      <div class="svc-label-rule"></div>
-      <div class="svc-accent"></div>
-      <h2 class="svc-title">UGC Video Shorts</h2>
-      <p class="svc-sub">Real People. Real Content. Real Results.</p>
-      <div class="svc-rule"></div>
-      <p class="svc-desc">Authentic short-form videos that make your business stand out and connect with real customers. Crafted for Reels and TikTok — ready to post and built to grow engagement organically.</p>
 
-      <div class="sect-div"></div>
-      <div class="sect-head">WHAT'S INCLUDED</div>
-      <div class="inc-grid"><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Script & Storyboard</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>On-Location or Studio Shoot</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Professional Editing & Grading</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Captions & Subtitles</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Platform-Optimised Formats</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Ready-to-Post Delivery</span></div></div>
+      <!-- Block A: title + desc + highlights -->
+      <div class="lft-a">
+        <div class="svc-label">VIDEO SERVICE &nbsp;/&nbsp; 07</div>
+        <div class="svc-label-rule"></div>
+        <div class="svc-accent"></div>
+        <h2 class="svc-title">UGC Video Shorts</h2>
+        <p class="svc-sub">Real People. Real Content. Real Results.</p>
+        <div class="svc-rule"></div>
+        <p class="svc-desc">Authentic short-form videos that make your business stand out and connect with real customers. Crafted for Reels and TikTok — ready to post and built to grow engagement organically. The most trusted format in modern digital marketing, made professionally for your brand.</p>
+        <div class="highlights"><div class="hl-item"><div class="hl-title">Reels & TikTok</div><div class="hl-text">Platform-optimised formats</div></div><div class="hl-item"><div class="hl-title">Authentic People</div><div class="hl-text">Real, credible content</div></div><div class="hl-item"><div class="hl-title">Fast Turnaround</div><div class="hl-text">Ready to post quickly</div></div></div>
+      </div>
 
-      <div class="sect-div"></div>
-      <div class="sect-head">HOW IT WORKS</div>
-      <div class="steps-row"><div class="step"><div class="step-n">STEP 01</div><div class="step-t">Brief</div><div class="step-d">Concept, messaging and target audience</div></div><div class="step"><div class="step-n">STEP 02</div><div class="step-t">Script</div><div class="step-d">Natural, authentic script written</div></div><div class="step"><div class="step-n">STEP 03</div><div class="step-t">Shoot</div><div class="step-d">Filmed in your location or studio</div></div><div class="step"><div class="step-n">STEP 04</div><div class="step-t">Edit</div><div class="step-d">Cut, graded, captioned and polished</div></div><div class="step"><div class="step-n">STEP 05</div><div class="step-t">Deliver</div><div class="step-d">Ready-to-post files, all platforms</div></div></div>
+      <!-- Block B: includes + steps -->
+      <div class="lft-b">
+        <div class="sect-head">WHAT'S INCLUDED</div>
+        <div class="sect-sub-div"></div>
+        <div class="inc-grid"><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Script & Storyboard</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>On-Location or Studio Shoot</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Professional Editing & Grading</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Captions & Subtitles</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Platform-Optimised Formats</span></div><div class="inc-item"><span class="inc-dot">&#9658;</span><span>Ready-to-Post Delivery</span></div></div>
+        <div class="sect-gap"></div>
+        <div class="sect-head">HOW IT WORKS</div>
+        <div class="sect-sub-div"></div>
+        <div class="steps-row"><div class="step"><div class="step-n">STEP 01</div><div class="step-t">Brief</div><div class="step-d">Concept, messaging and target audience</div></div><div class="step"><div class="step-n">STEP 02</div><div class="step-t">Script</div><div class="step-d">Natural, authentic script written</div></div><div class="step"><div class="step-n">STEP 03</div><div class="step-t">Shoot</div><div class="step-d">Filmed in your location or studio</div></div><div class="step"><div class="step-n">STEP 04</div><div class="step-t">Edit</div><div class="step-d">Cut, graded, captioned and polished</div></div><div class="step"><div class="step-n">STEP 05</div><div class="step-t">Deliver</div><div class="step-d">Ready-to-post files, all platforms</div></div></div>
+      </div>
 
-      <div class="sect-div"></div>
-      <div class="tags-row"><span class="tag">Reels</span><span class="tag">TikTok</span><span class="tag">YouTube Shorts</span><span class="tag">Authentic Content</span><span class="tag">High Engagement</span></div>
+      <!-- Block C: tags -->
+      <div class="lft-c">
+        <div class="tags-row"><span class="tag">Reels</span><span class="tag">TikTok</span><span class="tag">YouTube Shorts</span><span class="tag">Authentic Content</span><span class="tag">High Engagement</span></div>
+      </div>
+
     </div>
 
-    <!-- RIGHT: service image -->
+    <!-- RIGHT: dark editorial panel -->
     <div class="pg-right">
-      <img src="/home/user/drexonyx-v1/master-digital-agency/deliverables/mda-service-catalog/assets/images/ugc.jpg" class="svc-img" alt="UGC Video Shorts">
+      <div class="svc-panel">
+        <div class="panel-ghost">07</div>
+        <div class="panel-bar"></div>
+        <div class="panel-cat">VIDEO SERVICE</div>
+        <div class="panel-hl">Authentic<br>Content That<br>Converts</div>
+        <div class="panel-div"></div>
+        <div class="panel-list"><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Script written for natural, authentic delivery</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Filmed in your location or our studio</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Professional editing, grading & captions</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Optimised for Reels, TikTok & YouTube Shorts</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">Ready-to-post files across all platforms</div></div></div>
+        <div class="panel-foot">
+          <div class="panel-foot-text">MDA — MASTER DIGITAL AGENCY</div>
+        </div>
+      </div>
     </div>
 
   </div>
