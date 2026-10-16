@@ -169,98 +169,77 @@ def p02():
   <div style="position:absolute;bottom:0;left:0;right:0;height:.7pt;background:linear-gradient(90deg,transparent,#C8980A,transparent);"></div>
 </div>"""
 
-# ── Service page: LEFT text + RIGHT catalog image ─────────────────────────────
-def service_page(pg_num, img_num, label, title, subtitle, description, features, tags_list, img_position="center 30%"):
+# ── Service page: text-first, small thumbnail, specs tiles, no CTA ───────────
+def service_page(pg_num, img_num, label, title, subtitle, description, features, tags_list, specs, img_position="center 30%"):
     bullets_html = ''.join(bullet(f) for f in features)
-    tags_html = '<div style="display:flex;flex-wrap:wrap;gap:1.5mm;">' + ''.join(tag(t) for t in tags_list) + '</div>'
+    tags_html = ('<div style="display:flex;flex-wrap:wrap;gap:1.5mm;">'
+                 + ''.join(tag(t) for t in tags_list) + '</div>')
+
+    specs_html = ''
+    for spec in specs:
+        specs_html += (
+            f'<div style="padding:2.5mm 3mm;background:rgba(200,152,10,.04);'
+            f'border:.3pt solid rgba(200,152,10,.18);border-radius:.5mm;margin-bottom:2mm;">'
+            f'<div style="font-family:Inter,sans-serif;font-size:5.5pt;color:rgba(200,152,10,.45);'
+            f'letter-spacing:2pt;text-transform:uppercase;margin-bottom:1.5mm;">{spec["label"]}</div>'
+            f'<div style="font-family:\'Playfair Display\',serif;font-size:9.5pt;color:#fff;'
+            f'font-weight:600;line-height:1.2;">{spec["value"]}</div>'
+            f'</div>'
+        )
 
     return f"""
 <div class="pg" style="background:#0b0b0b;">
   <div style="position:absolute;top:0;left:0;right:0;height:.8pt;background:linear-gradient(90deg,transparent,#C8980A,transparent);"></div>
-  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 55% 55% at 25% 45%,rgba(200,152,10,.045) 0%,transparent 65%);pointer-events:none;"></div>
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 65% at 18% 42%,rgba(200,152,10,.04) 0%,transparent 60%);pointer-events:none;"></div>
+  <div style="position:absolute;bottom:18mm;right:10mm;font-family:'Playfair Display',serif;font-size:88pt;color:rgba(200,152,10,.04);font-weight:700;line-height:1;pointer-events:none;user-select:none;z-index:0;">{pg_num:02d}</div>
 
-  <!-- Two-column layout -->
-  <div style="position:absolute;top:0;left:0;right:0;bottom:8mm;display:flex;">
+  <div style="position:absolute;top:0;left:0;right:0;bottom:8mm;padding:12mm 14mm 6mm;display:flex;flex-direction:column;z-index:1;">
 
-    <!-- LEFT: Text column -->
-    <div style="flex:0 0 48%;display:flex;flex-direction:column;padding:12mm 10mm 8mm 14mm;min-width:0;overflow:hidden;">
+    <div style="flex-shrink:0;display:flex;align-items:center;gap:3mm;margin-bottom:5mm;">
+      <div style="font-family:Inter,sans-serif;font-size:7pt;color:#C8980A;letter-spacing:3pt;text-transform:uppercase;">{label}</div>
+      <div style="flex:1;height:.3pt;background:linear-gradient(90deg,rgba(200,152,10,.3),transparent);"></div>
+      <div style="font-family:Inter,sans-serif;font-size:7pt;color:rgba(255,255,255,.2);letter-spacing:1.5pt;">{pg_num:02d} / 10</div>
+    </div>
 
-      <!-- Label + page number -->
-      <div style="flex-shrink:0;display:flex;align-items:center;gap:3mm;margin-bottom:4.5mm;">
-        <div style="font-family:Inter,sans-serif;font-size:7pt;color:#C8980A;letter-spacing:3pt;text-transform:uppercase;">{label}</div>
-        <div style="flex:1;height:.3pt;background:linear-gradient(90deg,rgba(200,152,10,.3),transparent);"></div>
-        <div style="font-family:Inter,sans-serif;font-size:7pt;color:rgba(255,255,255,.2);letter-spacing:1.5pt;">{pg_num:02d} / 10</div>
+    <div style="flex-shrink:0;display:flex;gap:7mm;align-items:flex-start;margin-bottom:6mm;">
+      <div style="flex:1;min-width:0;">
+        <h1 style="font-family:'Playfair Display',serif;font-size:26pt;color:#fff;line-height:1.1;font-weight:700;margin:0 0 2mm;">{title}</h1>
+        <div style="font-family:Inter,sans-serif;font-size:9.5pt;color:rgba(200,152,10,.75);font-style:italic;margin-bottom:3mm;">{subtitle}</div>
+        <div style="height:.4pt;width:24mm;background:linear-gradient(90deg,#C8980A,transparent);"></div>
       </div>
-
-      <!-- Title -->
-      <div style="flex-shrink:0;margin-bottom:4mm;">
-        <h1 style="font-family:'Playfair Display',serif;font-size:21pt;color:#fff;line-height:1.15;font-weight:700;margin:0 0 1.5mm;">{title}</h1>
-        <div style="font-family:Inter,sans-serif;font-size:9pt;color:rgba(200,152,10,.75);font-style:italic;margin-bottom:3mm;">{subtitle}</div>
-        <div style="height:.4pt;width:22mm;background:linear-gradient(90deg,#C8980A,transparent);"></div>
+      <div style="flex:0 0 38mm;overflow:hidden;border-radius:.8mm;border:.4pt solid rgba(200,152,10,.2);position:relative;">
+        <img src="data:image/jpeg;base64,{C[img_num]}" style="width:100%;height:auto;display:block;">
+        <div style="position:absolute;top:0;left:0;right:0;height:40%;background:linear-gradient(180deg,rgba(11,11,11,.65),transparent);pointer-events:none;"></div>
+        <div style="position:absolute;bottom:0;left:0;right:0;height:40%;background:linear-gradient(0deg,rgba(11,11,11,.65),transparent);pointer-events:none;"></div>
+        <div style="position:absolute;left:0;top:0;bottom:0;width:25%;background:linear-gradient(90deg,rgba(11,11,11,.5),transparent);pointer-events:none;"></div>
       </div>
+    </div>
 
-      <!-- Description -->
-      <div style="flex-shrink:0;margin-bottom:4.5mm;">
-        <p style="font-family:Inter,sans-serif;font-size:9pt;color:rgba(255,255,255,.72);line-height:1.68;">{description}</p>
-      </div>
+    <div style="flex-shrink:0;margin-bottom:6mm;">
+      <p style="font-family:Inter,sans-serif;font-size:9.5pt;color:rgba(255,255,255,.72);line-height:1.7;">{description}</p>
+    </div>
 
-      <!-- Feature list -->
-      <div style="flex-shrink:0;margin-bottom:4.5mm;">
-        <div style="font-family:Inter,sans-serif;font-size:6.5pt;color:rgba(200,152,10,.5);letter-spacing:2.5pt;text-transform:uppercase;margin-bottom:3mm;">WHAT'S INCLUDED</div>
+    <div style="flex-shrink:0;display:flex;gap:8mm;margin-bottom:6mm;">
+      <div style="flex:0 0 56%;min-width:0;">
+        <div style="font-family:Inter,sans-serif;font-size:6.5pt;color:rgba(200,152,10,.5);letter-spacing:2.5pt;text-transform:uppercase;margin-bottom:3.5mm;">WHAT'S INCLUDED</div>
         {bullets_html}
       </div>
-
-      <!-- Divider -->
-      <div style="flex-shrink:0;height:.3pt;background:rgba(200,152,10,.15);margin-bottom:4mm;"></div>
-
-      <!-- Tags -->
-      <div style="flex-shrink:0;margin-bottom:4mm;">
-        <div style="font-family:Inter,sans-serif;font-size:6.5pt;color:rgba(200,152,10,.4);letter-spacing:2pt;text-transform:uppercase;margin-bottom:2.5mm;">SERVICE TAGS</div>
-        {tags_html}
-      </div>
-
-      <!-- Bottom CTA -->
-      <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;">
-        <div style="padding:3mm 4mm;background:rgba(200,152,10,.06);border:.3pt solid rgba(200,152,10,.2);border-radius:.6mm;">
-          <div style="font-family:Inter,sans-serif;font-size:6.5pt;color:rgba(200,152,10,.55);letter-spacing:2pt;text-transform:uppercase;margin-bottom:1.5mm;">GET IN TOUCH</div>
-          <div style="font-family:'Playfair Display',serif;font-size:10.5pt;color:#fff;font-weight:600;">{WEBSITE}</div>
-          <div style="font-family:Inter,sans-serif;font-size:8.5pt;color:rgba(255,255,255,.45);margin-top:.8mm;">WhatsApp: {PHONE}</div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Vertical divider -->
-    <div style="flex-shrink:0;width:.4pt;background:linear-gradient(180deg,transparent,rgba(200,152,10,.18),transparent);align-self:stretch;"></div>
-
-    <!-- RIGHT: Catalog image — full natural ratio, vertically centred -->
-    <div style="flex:1;min-width:0;overflow:hidden;position:relative;background:#0b0b0b;">
-      <!-- Subtle gold glow -->
-      <div style="position:absolute;inset:0;background:radial-gradient(ellipse 95% 55% at 52% 45%,rgba(200,152,10,.04) 0%,transparent 70%);pointer-events:none;z-index:0;"></div>
-      <!-- Full image at natural ratio, vertically centred -->
-      <img src="data:image/jpeg;base64,{C[img_num]}"
-           style="position:absolute;top:50%;left:0;transform:translateY(-50%);width:100%;height:auto;display:block;z-index:1;">
-      <!-- Left edge blend into divider -->
-      <div style="position:absolute;top:0;bottom:0;left:0;width:18%;background:linear-gradient(90deg,rgba(11,11,11,.88),transparent);pointer-events:none;z-index:2;"></div>
-      <!-- Right edge blend into page margin -->
-      <div style="position:absolute;top:0;bottom:0;right:0;width:14%;background:linear-gradient(270deg,rgba(11,11,11,.88),transparent);pointer-events:none;z-index:2;"></div>
-      <!-- Top dark fade over image edge -->
-      <div style="position:absolute;top:0;left:0;right:0;height:26%;background:linear-gradient(180deg,#0b0b0b 42%,transparent);pointer-events:none;z-index:2;"></div>
-      <!-- Bottom dark fade over image edge -->
-      <div style="position:absolute;bottom:0;left:0;right:0;height:26%;background:linear-gradient(0deg,#0b0b0b 42%,transparent);pointer-events:none;z-index:2;"></div>
-      <!-- Top dark area accent line -->
-      <div style="position:absolute;top:18mm;left:0;right:0;text-align:center;z-index:3;pointer-events:none;">
-        <div style="height:.3pt;width:16mm;background:linear-gradient(90deg,transparent,rgba(200,152,10,.22),transparent);margin:0 auto;"></div>
-      </div>
-      <!-- Bottom dark area service label -->
-      <div style="position:absolute;bottom:12mm;left:0;right:0;text-align:center;z-index:3;pointer-events:none;">
-        <div style="font-family:Inter,sans-serif;font-size:5pt;color:rgba(200,152,10,.3);letter-spacing:3pt;text-transform:uppercase;">{label}</div>
+      <div style="flex:1;min-width:0;">
+        {specs_html}
       </div>
     </div>
+
+    <div style="flex-shrink:0;height:.3pt;background:rgba(200,152,10,.15);margin-bottom:4mm;"></div>
+
+    <div style="flex-shrink:0;">
+      <div style="font-family:Inter,sans-serif;font-size:6.5pt;color:rgba(200,152,10,.4);letter-spacing:2pt;text-transform:uppercase;margin-bottom:2.5mm;">SERVICE TAGS</div>
+      {tags_html}
+    </div>
+
+    <div style="flex:1;min-height:0;"></div>
 
   </div>
 
-  <!-- Footer -->
   <div style="position:absolute;bottom:0;left:0;right:0;height:8mm;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:space-between;padding:0 14mm;">
     <span style="font-family:Inter,sans-serif;font-size:5.2pt;color:rgba(200,152,10,.5);letter-spacing:2pt;">DREXONYX × MDA &nbsp;·&nbsp; MASTER DIGITAL AGENCY</span>
     <span style="font-family:Inter,sans-serif;font-size:5.2pt;color:rgba(255,255,255,.28);letter-spacing:1.5pt;">{pg_num:02d} / 10</span>
@@ -351,6 +330,12 @@ SERVICES = [
             "Delivered in 5–10 working days",
         ],
         tags_list=["Website Design","Landing Pages","Mobile Optimised","SEO Setup","WhatsApp Integration"],
+        specs=[
+            dict(label="Timeline", value="5–10 Working Days"),
+            dict(label="Format",   value="Web-Optimised"),
+            dict(label="Languages",value="Arabic & English"),
+            dict(label="Handover", value="Full Codebase"),
+        ],
         img_position="center 20%",
     ),
     dict(
@@ -367,6 +352,12 @@ SERVICES = [
             "Delivered with source files on handover",
         ],
         tags_list=["Company Profile","Brand Identity","Print Design","Arabic / English","PDF"],
+        specs=[
+            dict(label="Timeline", value="3–7 Working Days"),
+            dict(label="Format",   value="Print & Digital PDF"),
+            dict(label="Languages",value="Arabic & English"),
+            dict(label="Length",   value="10–25 Pages"),
+        ],
         img_position="center 25%",
     ),
     dict(
@@ -383,6 +374,12 @@ SERVICES = [
             "Print-ready files in all required formats",
         ],
         tags_list=["Brand Identity","Logo Design","Brand Guidelines","Stationery","Social Media Graphics"],
+        specs=[
+            dict(label="Timeline",   value="5–10 Working Days"),
+            dict(label="Formats",    value="All Industry Formats"),
+            dict(label="Directions", value="3 Logo Concepts"),
+            dict(label="Handover",   value="Full Brand Guide"),
+        ],
         img_position="center 30%",
     ),
     dict(
@@ -399,6 +396,12 @@ SERVICES = [
             "Delivered within an agreed timeline",
         ],
         tags_list=["Website","Company Profile","Branding","All-in-One","Fixed Price"],
+        specs=[
+            dict(label="Timeline", value="7–14 Working Days"),
+            dict(label="Format",   value="Web + PDF + Print"),
+            dict(label="Languages",value="Arabic & English"),
+            dict(label="Scope",    value="All-in-One Bundle"),
+        ],
         img_position="center 25%",
     ),
     dict(
@@ -415,6 +418,12 @@ SERVICES = [
             "Delivered in web-optimised and broadcast formats",
         ],
         tags_list=["Video Production","Brand Video","Corporate Film","Post-Production","Social Media"],
+        specs=[
+            dict(label="Timeline",    value="7–14 Working Days"),
+            dict(label="Duration",    value="60–90 Seconds"),
+            dict(label="Format",      value="Web & Broadcast"),
+            dict(label="Deliverable", value="Full Post-Production"),
+        ],
         img_position="center 35%",
     ),
     dict(
@@ -431,6 +440,12 @@ SERVICES = [
             "Delivered in high-resolution & web-ready formats",
         ],
         tags_list=["Social Media","Graphic Design","Posters","Stories","Arabic / English"],
+        specs=[
+            dict(label="Timeline", value="3–5 Working Days"),
+            dict(label="Format",   value="High-Res & Web-Ready"),
+            dict(label="Languages",value="Arabic & English"),
+            dict(label="Scope",    value="Posts & Stories"),
+        ],
         img_position="center 25%",
     ),
     dict(
@@ -447,6 +462,12 @@ SERVICES = [
             "Ready to post across all platforms",
         ],
         tags_list=["UGC Video","Short-Form Content","TikTok","Instagram Reels","YouTube Shorts"],
+        specs=[
+            dict(label="Timeline",  value="5–7 Working Days"),
+            dict(label="Duration",  value="15–60 Seconds"),
+            dict(label="Platforms", value="TikTok · Reels · Shorts"),
+            dict(label="Output",    value="Multiple Variations"),
+        ],
         img_position="center 20%",
     ),
 ]
