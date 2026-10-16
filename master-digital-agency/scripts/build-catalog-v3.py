@@ -170,7 +170,7 @@ def p02():
 </div>"""
 
 # ── Service page: text-first, small thumbnail, specs tiles, no CTA ───────────
-def service_page(pg_num, img_num, label, title, subtitle, description, features, tags_list, specs, img_position="center 30%"):
+def service_page(pg_num, img_num, label, title, subtitle, description, features, tags_list, specs, who_for, img_position="center 30%"):
     bullets_html = ''.join(bullet(f) for f in features)
     tags_html = ('<div style="display:flex;flex-wrap:wrap;gap:1.5mm;">'
                  + ''.join(tag(t) for t in tags_list) + '</div>')
@@ -186,6 +186,17 @@ def service_page(pg_num, img_num, label, title, subtitle, description, features,
             f'font-weight:600;line-height:1.2;">{spec["value"]}</div>'
             f'</div>'
         )
+
+    who_html = '<div style="display:flex;gap:3mm;">'
+    for w in who_for:
+        who_html += (
+            f'<div style="flex:1;padding:3mm 3.5mm;background:rgba(255,255,255,.02);'
+            f'border:.3pt solid rgba(200,152,10,.18);border-radius:.6mm;text-align:center;">'
+            f'<div style="font-family:Inter,sans-serif;font-size:7.5pt;font-weight:500;'
+            f'color:rgba(255,255,255,.58);line-height:1.45;">{w}</div>'
+            f'</div>'
+        )
+    who_html += '</div>'
 
     return f"""
 <div class="pg" style="background:#0b0b0b;">
@@ -234,6 +245,12 @@ def service_page(pg_num, img_num, label, title, subtitle, description, features,
     <div style="flex-shrink:0;">
       <div style="font-family:Inter,sans-serif;font-size:6.5pt;color:rgba(200,152,10,.4);letter-spacing:2pt;text-transform:uppercase;margin-bottom:2.5mm;">SERVICE TAGS</div>
       {tags_html}
+    </div>
+
+    <div style="flex-shrink:0;margin-top:5mm;">
+      <div style="height:.3pt;background:rgba(200,152,10,.13);margin-bottom:4mm;"></div>
+      <div style="font-family:Inter,sans-serif;font-size:6.5pt;color:rgba(200,152,10,.4);letter-spacing:2pt;text-transform:uppercase;margin-bottom:2.5mm;">WHO IT'S FOR</div>
+      {who_html}
     </div>
 
     <div style="flex:1;min-height:0;"></div>
@@ -320,7 +337,7 @@ SERVICES = [
         label="WEBSITE DESIGN",
         title="Professional Website Design",
         subtitle="Modern websites built to grow your business",
-        description="We design and develop custom websites for businesses across the UAE — from clean landing pages to full multi-page sites. Every website is mobile-responsive, fast, and built for real business results.",
+        description="We design and develop custom websites for businesses across the UAE — from clean landing pages to full multi-page sites. Every website is mobile-responsive, fast-loading, and engineered for real business outcomes. Our process covers strategy, design, development, and launch — with full codebase handover so you own every asset, every line of code, and full control from day one.",
         features=[
             "5–20 page websites built from scratch to brief",
             "Fully mobile-responsive across all devices",
@@ -336,6 +353,7 @@ SERVICES = [
             dict(label="Languages",value="Arabic & English"),
             dict(label="Handover", value="Full Codebase"),
         ],
+        who_for=["Newly Registered Businesses", "Established Brands Redesigning", "Service & Consulting Companies"],
         img_position="center 20%",
     ),
     dict(
@@ -343,7 +361,7 @@ SERVICES = [
         label="COMPANY PROFILE",
         title="Company Profile Design",
         subtitle="Make a powerful first impression",
-        description="A professionally designed company profile establishes credibility and communicates your value clearly. Our profiles are crafted for proposals, client presentations, government submissions, and investor meetings.",
+        description="A professionally designed company profile establishes credibility and communicates your value clearly to decision-makers. Our profiles are crafted for proposals, client presentations, government submissions, and investor meetings — tailored to your industry, brand voice, and use case, and delivered in print-ready and digital formats in both Arabic and English.",
         features=[
             "10–25 page PDF design tailored to your brand",
             "Custom layout adapted to your industry",
@@ -358,6 +376,7 @@ SERVICES = [
             dict(label="Languages",value="Arabic & English"),
             dict(label="Length",   value="10–25 Pages"),
         ],
+        who_for=["Government & Corporate Tenders", "Investment & Investor Proposals", "New Market Entry Presentations"],
         img_position="center 25%",
     ),
     dict(
@@ -365,7 +384,7 @@ SERVICES = [
         label="BRANDING PACKAGE",
         title="Complete Brand Identity",
         subtitle="Build a strong, recognisable business identity",
-        description="Your brand is more than a logo — it's the visual language of your business. Our branding packages give you a complete identity system: logo, colour palette, typography, and usage guidelines across all touchpoints.",
+        description="Your brand is more than a logo — it is the visual language and first impression of your entire business. Our branding packages give you a complete identity system that works across every touchpoint: digital screens, printed materials, social media, and physical spaces. Three logo directions are presented for approval, ensuring the final identity is both distinctive and strategically built for your market.",
         features=[
             "Logo design with 3 directions presented for approval",
             "Brand style guide: colours, fonts, usage rules",
@@ -380,6 +399,7 @@ SERVICES = [
             dict(label="Directions", value="3 Logo Concepts"),
             dict(label="Handover",   value="Full Brand Guide"),
         ],
+        who_for=["New Businesses & Startups", "Companies Rebranding", "Franchise & Multi-Location Brands"],
         img_position="center 30%",
     ),
     dict(
@@ -387,7 +407,7 @@ SERVICES = [
         label="DIGITAL LAUNCH KIT",
         title="Digital Launch Kit",
         subtitle="Everything you need to launch from day one",
-        description="The Digital Launch Kit bundles your website, company profile, and brand identity into one complete package at a single fixed price. Designed for newly registered businesses that need a professional presence fast.",
+        description="The Digital Launch Kit bundles your website, company profile, and brand identity into one complete package at a single fixed price — designed for newly registered businesses that need a professional presence fast. From your first digital touchpoint to your printed handout, every element is created to the same standard, built to represent your brand at its best from day one.",
         features=[
             "Professional website (5–10 pages)",
             "Company profile PDF in Arabic & English",
@@ -402,6 +422,7 @@ SERVICES = [
             dict(label="Languages",value="Arabic & English"),
             dict(label="Scope",    value="All-in-One Bundle"),
         ],
+        who_for=["Newly Licensed Businesses", "Startups Entering UAE Market", "Solo Founders & Consultants"],
         img_position="center 25%",
     ),
     dict(
@@ -409,7 +430,7 @@ SERVICES = [
         label="PROMOTIONAL VIDEO",
         title="Corporate Promotional Video",
         subtitle="Tell your story in a powerful way",
-        description="Professional video production that showcases your business, team, and services. Delivered post-production ready — suitable for websites, social media, exhibitions, and client presentations.",
+        description="Professional video production that captures the essence of your business, team, and services in a compelling visual format. From concept and scripting through colour grading and final export, every frame is crafted to reflect your brand at its best — suitable for websites, social media campaigns, exhibitions, investor presentations, and client pitches.",
         features=[
             "Concept development & script writing",
             "Professional filming & direction",
@@ -424,6 +445,7 @@ SERVICES = [
             dict(label="Format",      value="Web & Broadcast"),
             dict(label="Deliverable", value="Full Post-Production"),
         ],
+        who_for=["Product & Service Launches", "Corporate Brand Campaigns", "Exhibition & Event Presentations"],
         img_position="center 35%",
     ),
     dict(
@@ -431,7 +453,7 @@ SERVICES = [
         label="SOCIAL MEDIA CREATIVES",
         title="Posters & Social Media Creatives",
         subtitle="Eye-catching visuals for print and digital",
-        description="We design scroll-stopping social media posts, stories, and event posters that reflect your brand identity and drive engagement. Consistent, professional, and ready to post or print.",
+        description="We design scroll-stopping social media posts, stories, and event posters that reflect your brand identity and drive real engagement. Each piece is created to platform-specific dimensions — optimised for feed, story, and event formats. Delivered as final artwork and editable templates in both Arabic and English, ready to post, print, or adapt across campaigns.",
         features=[
             "Social media post & story templates",
             "Event announcements & promotional posters",
@@ -446,6 +468,7 @@ SERVICES = [
             dict(label="Languages",value="Arabic & English"),
             dict(label="Scope",    value="Posts & Stories"),
         ],
+        who_for=["Active Social Media Accounts", "Event & Campaign Promotions", "Online Businesses & Stores"],
         img_position="center 25%",
     ),
     dict(
@@ -453,7 +476,7 @@ SERVICES = [
         label="UGC VIDEO SHORTS",
         title="UGC Video Shorts",
         subtitle="Real people. Real content. Real results.",
-        description="Authentic short-form videos that connect with customers and build trust on TikTok, Instagram Reels, and YouTube Shorts. Created with real people in your environment — not stock footage.",
+        description="Authentic short-form videos that connect with your audience and build brand trust on TikTok, Instagram Reels, and YouTube Shorts. Filmed on location with real people and real environments — not stock footage. Each shoot produces multiple content variations, giving you a bank of platform-ready assets designed to perform, engage, and convert.",
         features=[
             "Concept & script development",
             "On-location filming with real talent",
@@ -468,6 +491,7 @@ SERVICES = [
             dict(label="Platforms", value="TikTok · Reels · Shorts"),
             dict(label="Output",    value="Multiple Variations"),
         ],
+        who_for=["E-commerce & F&B Brands", "App & Service Launches", "Creator & Influencer Campaigns"],
         img_position="center 20%",
     ),
 ]
