@@ -1,7 +1,39 @@
 #!/usr/bin/env python3
 """MDA Service Catalog — Arabic version — web HTML + print-ready A4 PDF"""
-import os, subprocess
+import os, subprocess, base64, urllib.request
 from PIL import Image
+
+
+def _fetch_font_b64(url: str) -> str:
+    """Download a font file and return it as a base64 string (cached on disk)."""
+    cache_path = os.path.join('/tmp', os.path.basename(url) + '.b64')
+    if os.path.exists(cache_path):
+        with open(cache_path) as f:
+            return f.read().strip()
+    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+    with urllib.request.urlopen(req, timeout=20) as r:
+        data = r.read()
+    b64 = base64.b64encode(data).decode()
+    with open(cache_path, 'w') as f:
+        f.write(b64)
+    return b64
+
+
+def get_embedded_fonts() -> str:
+    """Return <style> block with Cairo embedded as base64 woff2 (no Google Fonts network call)."""
+    print('  Loading Cairo font…')
+    ar = _fetch_font_b64('https://fonts.gstatic.com/s/cairo/v31/SLXVc1nY6HkvangtZmpQdkhzfH5lkSscQyyS4J0.woff2')
+    la = _fetch_font_b64('https://fonts.gstatic.com/s/cairo/v31/SLXVc1nY6HkvangtZmpQdkhzfH5lkSscRiyS.woff2')
+    return (
+        '<style>\n'
+        '@font-face{font-family:"Cairo";font-style:normal;font-weight:100 900;'
+        f'src:url("data:font/woff2;base64,{ar}") format("woff2");'
+        'unicode-range:U+0600-06FF,U+0750-077F,U+FB50-FDFF,U+FE70-FEFC;}\n'
+        '@font-face{font-family:"Cairo";font-style:normal;font-weight:100 900;'
+        f'src:url("data:font/woff2;base64,{la}") format("woff2");'
+        'unicode-range:U+0000-00FF,U+0100-02BA,U+2000-206F,U+20AC,U+FEFF,U+FFFD;}\n'
+        '</style>'
+    )
 
 SCRATCHPAD = '/tmp/claude-0/-home-user-drexonyx-v1/5d986d79-a6f1-5fda-b8f6-602f57ae3b36/scratchpad'
 CAT_DIR    = f'{SCRATCHPAD}/catalog_pages'
@@ -234,16 +266,14 @@ SERVICES = [
 ]
 
 GOLD  = '#C8980A'
-FONTS = (
-    '<link rel="preconnect" href="https://fonts.googleapis.com">'
-    '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
-    '<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400'
-    '&family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">'
-)
+FONTS = None  # resolved at build time via get_embedded_fonts()
 
 
 # ─── Build print HTML (A4 pages) ──────────────────────────────────
 def build_print():
+    global FONTS
+    if FONTS is None:
+        FONTS = get_embedded_fonts()
 
     def inc_item(text):
         return (f'<div class="inc-item">'
