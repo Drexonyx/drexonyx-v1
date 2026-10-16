@@ -588,10 +588,14 @@ body{{background:#fff;}}
 }}
 .cover-overlay{{
   position:absolute;inset:0;
-  background:linear-gradient(to right,
-    rgba(8,8,8,0.97) 0%,rgba(8,8,8,0.97) 40%,
-    rgba(8,8,8,0.80) 55%,rgba(8,8,8,0.30) 68%,
-    rgba(8,8,8,0.00) 100%);
+  background:
+    linear-gradient(to right,
+      rgba(8,8,8,0.96) 0%,rgba(8,8,8,0.96) 16%,
+      rgba(8,8,8,0.45) 30%,rgba(8,8,8,0.00) 46%),
+    linear-gradient(to bottom,
+      rgba(8,8,8,0.00) 0%,rgba(8,8,8,0.00) 22%,
+      rgba(8,8,8,0.72) 36%,rgba(8,8,8,0.86) 55%,
+      rgba(8,8,8,0.82) 100%);
 }}
 .cover-content{{
   position:relative;z-index:2;
@@ -605,6 +609,7 @@ body{{background:#fff;}}
 .cover-title{{
   font-family:'Playfair Display',serif;font-size:42pt;font-weight:700;
   color:#fff;line-height:1.1;margin-top:6mm;margin-bottom:6mm;
+  text-shadow:0 2px 12px rgba(0,0,0,0.95),0 0 35px rgba(0,0,0,0.85);
 }}
 .gold{{color:#C8980A;}}
 .cover-rule{{
@@ -616,6 +621,7 @@ body{{background:#fff;}}
   font-family:Inter,sans-serif;font-size:10pt;
   color:rgba(255,255,255,0.55);line-height:1.7;
   max-width:100mm;
+  text-shadow:0 1px 6px rgba(0,0,0,0.95);
 }}
 .cover-services{{
   display:flex;flex-direction:column;gap:4.5mm;
@@ -624,6 +630,7 @@ body{{background:#fff;}}
   font-family:Inter,sans-serif;font-size:9.5pt;
   color:rgba(255,255,255,0.65);
   border-left:1.5pt solid rgba(200,152,10,0.3);padding-left:3mm;
+  text-shadow:0 1px 6px rgba(0,0,0,0.95);
 }}
 .cover-contacts{{
   font-family:Inter,sans-serif;font-size:8pt;
