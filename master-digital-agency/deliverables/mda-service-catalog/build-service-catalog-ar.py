@@ -1,37 +1,22 @@
 #!/usr/bin/env python3
 """MDA Service Catalog — Arabic version — web HTML + print-ready A4 PDF"""
-import os, subprocess, base64, urllib.request
+import os, subprocess, base64
 from PIL import Image
 
 
-def _fetch_font_b64(url: str) -> str:
-    """Download a font file and return it as a base64 string (cached on disk)."""
-    cache_path = os.path.join('/tmp', os.path.basename(url) + '.b64')
-    if os.path.exists(cache_path):
-        with open(cache_path) as f:
-            return f.read().strip()
-    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-    with urllib.request.urlopen(req, timeout=20) as r:
-        data = r.read()
-    b64 = base64.b64encode(data).decode()
-    with open(cache_path, 'w') as f:
-        f.write(b64)
-    return b64
-
-
 def get_embedded_fonts() -> str:
-    """Return <style> block with Cairo embedded as base64 woff2 (no Google Fonts network call)."""
-    print('  Loading Cairo font…')
-    ar = _fetch_font_b64('https://fonts.gstatic.com/s/cairo/v31/SLXVc1nY6HkvangtZmpQdkhzfH5lkSscQyyS4J0.woff2')
-    la = _fetch_font_b64('https://fonts.gstatic.com/s/cairo/v31/SLXVc1nY6HkvangtZmpQdkhzfH5lkSscRiyS.woff2')
+    """Return <style> block with Cairo variable font embedded as base64 TTF."""
+    print('  Embedding Cairo font from local assets…')
+    font_path = os.path.join(
+        '/home/user/drexonyx-v1/master-digital-agency/deliverables/mda-service-catalog',
+        'assets/fonts/Cairo-Variable.ttf'
+    )
+    with open(font_path, 'rb') as f:
+        b64 = base64.b64encode(f.read()).decode()
     return (
         '<style>\n'
         '@font-face{font-family:"Cairo";font-style:normal;font-weight:100 900;'
-        f'src:url("data:font/woff2;base64,{ar}") format("woff2");'
-        'unicode-range:U+0600-06FF,U+0750-077F,U+FB50-FDFF,U+FE70-FEFC;}\n'
-        '@font-face{font-family:"Cairo";font-style:normal;font-weight:100 900;'
-        f'src:url("data:font/woff2;base64,{la}") format("woff2");'
-        'unicode-range:U+0000-00FF,U+0100-02BA,U+2000-206F,U+20AC,U+FEFF,U+FFFD;}\n'
+        f'src:url("data:font/ttf;base64,{b64}") format("truetype");}}\n'
         '</style>'
     )
 
@@ -507,12 +492,16 @@ body{{
 }}
 .cv-main{{display:flex;flex-direction:column;}}
 .cv-title{{
-  font-family:Amiri,serif;font-size:42pt;font-weight:700;
-  color:#fff;line-height:1.2;
+  font-family:Cairo,sans-serif;font-size:22pt;font-weight:300;
+  color:rgba(255,255,255,0.88);line-height:1.15;
   margin-top:6mm;margin-bottom:5mm;
   text-shadow:0 2px 12px rgba(0,0,0,0.9),0 0 30px rgba(0,0,0,0.8);
 }}
-.cv-gold{{color:{GOLD};}}
+.cv-gold{{
+  color:{GOLD};font-size:58pt;font-weight:700;
+  display:block;line-height:0.95;margin-block:1mm;
+  text-shadow:0 2px 16px rgba(0,0,0,0.95),0 0 40px rgba(200,152,10,0.25);
+}}
 .cv-rule{{
   width:22mm;height:1pt;
   background:linear-gradient(270deg,{GOLD},transparent);
@@ -527,7 +516,7 @@ body{{
 .cv-services{{display:flex;flex-direction:column;gap:0;}}
 .cv-svc-row{{
   display:flex;align-items:center;gap:3mm;
-  flex-direction:row-reverse;
+  flex-direction:row;
   padding:3mm 0;
   border-bottom:0.3pt solid rgba(200,152,10,0.12);
 }}
@@ -545,13 +534,13 @@ body{{
   font-family:Cairo,sans-serif;font-size:9pt;
   color:rgba(255,255,255,0.85);
   text-shadow:0 1px 5px rgba(0,0,0,0.9);
-  flex:1;
+  flex:1;text-align:right;
 }}
 .cv-foot{{}}
 .cv-contacts{{
   font-family:Cairo,sans-serif;font-size:8pt;
   color:rgba(255,255,255,0.55);
-  display:flex;gap:4mm;align-items:center;flex-direction:row-reverse;
+  display:flex;gap:4mm;align-items:center;justify-content:flex-end;
 }}
 .cv-dot{{color:rgba(200,152,10,0.4);}}
 .cv-brand-line{{
@@ -601,7 +590,7 @@ body{{
   width:10mm;height:2pt;background:{GOLD};margin-bottom:4mm;margin-right:auto;
 }}
 .svc-title{{
-  font-family:Amiri,serif;font-size:22pt;font-weight:700;
+  font-family:Cairo,sans-serif;font-size:22pt;font-weight:700;
   color:#fff;line-height:1.25;margin-bottom:2mm;
 }}
 .svc-sub{{
@@ -675,7 +664,7 @@ body{{
   color:rgba(200,152,10,0.55);letter-spacing:0;margin-bottom:1.5mm;
 }}
 .step-t{{
-  font-family:Amiri,serif;font-size:8.5pt;font-weight:700;
+  font-family:Cairo,sans-serif;font-size:8.5pt;font-weight:700;
   color:#fff;margin-bottom:1.5mm;
 }}
 .step-d{{
@@ -702,7 +691,7 @@ body{{
 }}
 .panel-ghost{{
   position:absolute;bottom:-10mm;left:-5mm;
-  font-family:Amiri,serif;font-size:110pt;font-weight:700;
+  font-family:Cairo,sans-serif;font-size:110pt;font-weight:700;
   color:rgba(200,152,10,0.055);line-height:1;
   pointer-events:none;user-select:none;
 }}
@@ -713,7 +702,7 @@ body{{
   margin-bottom:4.5mm;flex-shrink:0;
 }}
 .panel-hl{{
-  font-family:Amiri,serif;font-size:17pt;font-weight:700;
+  font-family:Cairo,sans-serif;font-size:17pt;font-weight:700;
   color:#fff;line-height:1.35;margin-bottom:5mm;flex-shrink:0;
 }}
 .panel-div{{height:0.5pt;background:rgba(200,152,10,0.2);margin-bottom:5mm;flex-shrink:0;}}
@@ -734,7 +723,7 @@ body{{
 }}
 .ft-brand{{font-family:Cairo,sans-serif;font-size:6pt;font-weight:700;color:rgba(200,152,10,0.5);letter-spacing:0;}}
 .ft-doc{{font-family:Cairo,sans-serif;font-size:6pt;color:rgba(255,255,255,0.25);}}
-.ft-num{{font-family:Amiri,serif;font-size:8pt;color:rgba(200,152,10,0.4);}}
+.ft-num{{font-family:Cairo,sans-serif;font-size:8pt;color:rgba(200,152,10,0.4);}}
 
 /* ══ CONTACT PAGE ══ */
 .pg-contact{{
@@ -765,7 +754,7 @@ body{{
 }}
 .ct-ghost{{
   position:absolute;left:-5mm;bottom:-10mm;
-  font-family:Amiri,serif;font-size:140pt;font-weight:700;
+  font-family:Cairo,sans-serif;font-size:140pt;font-weight:700;
   color:rgba(200,152,10,0.05);line-height:1;
   pointer-events:none;user-select:none;
 }}
@@ -776,7 +765,7 @@ body{{
   margin-bottom:5mm;
 }}
 .ct-title{{
-  font-family:Amiri,serif;font-size:44pt;font-weight:700;
+  font-family:Cairo,sans-serif;font-size:44pt;font-weight:700;
   color:#fff;line-height:1.2;margin-bottom:5mm;
 }}
 .ct-title em{{color:{GOLD};font-style:italic;}}
@@ -813,14 +802,14 @@ body{{
   padding-top:4mm;flex-shrink:0;
   flex-direction:row-reverse;
 }}
-.ct-brand-name{{font-family:Amiri,serif;font-size:18pt;font-weight:700;color:#fff;letter-spacing:0;}}
+.ct-brand-name{{font-family:Cairo,sans-serif;font-size:18pt;font-weight:700;color:#fff;letter-spacing:0;}}
 .ct-brand-right{{text-align:left;}}
 .ct-brand-sub{{
   font-family:Cairo,sans-serif;font-size:6pt;
   color:rgba(200,152,10,0.70);letter-spacing:0;
   margin-bottom:2mm;
 }}
-.ct-brand-tagline{{font-family:Amiri,serif;font-size:9pt;font-style:italic;color:rgba(255,255,255,0.55);}}
+.ct-brand-tagline{{font-family:Cairo,sans-serif;font-size:9pt;font-style:italic;color:rgba(255,255,255,0.55);}}
 .ct-right{{width:90mm;flex-shrink:0;}}
 .ct-panel{{
   width:90mm;height:100%;
@@ -833,7 +822,7 @@ body{{
 }}
 .ct-panel-ghost{{
   position:absolute;bottom:-12mm;left:-6mm;
-  font-family:Amiri,serif;font-size:120pt;font-weight:700;
+  font-family:Cairo,sans-serif;font-size:120pt;font-weight:700;
   color:rgba(200,152,10,0.07);line-height:1;
   pointer-events:none;user-select:none;
 }}
@@ -843,7 +832,7 @@ body{{
   margin-bottom:4.5mm;flex-shrink:0;
 }}
 .ct-panel-hl{{
-  font-family:Amiri,serif;font-size:26pt;font-weight:700;
+  font-family:Cairo,sans-serif;font-size:26pt;font-weight:700;
   color:#fff;line-height:1.3;margin-bottom:6mm;flex-shrink:0;
 }}
 .ct-cards{{flex:1;display:flex;flex-direction:column;gap:4mm;}}
