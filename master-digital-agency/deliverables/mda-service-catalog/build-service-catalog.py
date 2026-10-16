@@ -938,7 +938,7 @@ body{{background:#fff;}}
 }}
 .ct-hdr-r{{
   font-family:Inter,sans-serif;font-size:6.5pt;
-  color:rgba(255,255,255,0.25);letter-spacing:1.5pt;text-transform:uppercase;
+  color:rgba(255,255,255,0.50);letter-spacing:1.5pt;text-transform:uppercase;
 }}
 /* 2-column body */
 .ct-cols{{
@@ -958,7 +958,7 @@ body{{background:#fff;}}
 .ct-left-top{{flex-shrink:0;}}
 .ct-eyebrow{{
   font-family:Inter,sans-serif;font-size:7.5pt;font-weight:600;
-  color:rgba(200,152,10,0.65);letter-spacing:3pt;text-transform:uppercase;
+  color:rgba(200,152,10,0.90);letter-spacing:3pt;text-transform:uppercase;
   margin-bottom:5mm;
 }}
 .ct-title{{
@@ -972,15 +972,15 @@ body{{background:#fff;}}
   margin-bottom:5mm;
 }}
 .ct-tagline{{
-  font-family:Inter,sans-serif;font-size:9pt;
-  color:rgba(255,255,255,0.45);line-height:1.75;
+  font-family:Inter,sans-serif;font-size:9.5pt;
+  color:rgba(255,255,255,0.78);line-height:1.75;
 }}
 /* Service list in left column */
 .ct-svc-list{{
   flex:1;display:flex;flex-direction:column;justify-content:space-evenly;
   padding:6mm 0;position:relative;z-index:1;
-  border-top:0.3pt solid rgba(200,152,10,0.15);
-  border-bottom:0.3pt solid rgba(200,152,10,0.15);
+  border-top:0.4pt solid rgba(200,152,10,0.25);
+  border-bottom:0.4pt solid rgba(200,152,10,0.25);
   margin:5mm 0;
 }}
 .ct-svc-row{{
@@ -992,17 +992,17 @@ body{{background:#fff;}}
   color:{GOLD};letter-spacing:1pt;width:5mm;flex-shrink:0;
 }}
 .ct-svc-dot{{
-  width:2.5pt;height:2.5pt;background:rgba(200,152,10,0.35);
+  width:2.5pt;height:2.5pt;background:rgba(200,152,10,0.60);
   border-radius:50%;flex-shrink:0;
 }}
 .ct-svc-name{{
-  font-family:Inter,sans-serif;font-size:8.5pt;
-  color:rgba(255,255,255,0.65);
+  font-family:Inter,sans-serif;font-size:9pt;
+  color:rgba(255,255,255,0.85);
 }}
 .ct-brand-row{{
   display:flex;justify-content:space-between;align-items:flex-end;
   position:relative;z-index:1;
-  border-top:0.3pt solid rgba(200,152,10,0.15);
+  border-top:0.4pt solid rgba(200,152,10,0.25);
   padding-top:4mm;flex-shrink:0;
 }}
 .ct-brand-name{{
@@ -1012,12 +1012,12 @@ body{{background:#fff;}}
 .ct-brand-right{{text-align:right;}}
 .ct-brand-sub{{
   font-family:Inter,sans-serif;font-size:6pt;
-  color:rgba(200,152,10,0.45);letter-spacing:2pt;text-transform:uppercase;
+  color:rgba(200,152,10,0.70);letter-spacing:2pt;text-transform:uppercase;
   margin-bottom:2mm;
 }}
 .ct-brand-tagline{{
   font-family:'Playfair Display',serif;font-size:9pt;font-style:italic;
-  color:rgba(255,255,255,0.3);
+  color:rgba(255,255,255,0.55);
 }}
 /* Right editorial panel */
 .ct-right{{
@@ -1025,25 +1025,25 @@ body{{background:#fff;}}
 }}
 .ct-panel{{
   width:90mm;height:100%;
-  background:linear-gradient(155deg,#080808 0%,#100d05 60%,#0a0800 100%);
+  background:linear-gradient(155deg,#0e0e0e 0%,#181108 60%,#100c02 100%);
   display:flex;flex-direction:column;
   padding:12mm 9mm;
   position:relative;overflow:hidden;
-  border-left:0.5pt solid rgba(200,152,10,0.12);
+  border-left:0.5pt solid rgba(200,152,10,0.20);
 }}
 .ct-panel-ghost{{
   position:absolute;bottom:-12mm;right:-6mm;
   font-family:'Playfair Display',serif;font-size:120pt;font-weight:700;
-  color:rgba(200,152,10,0.055);line-height:1;
+  color:rgba(200,152,10,0.07);line-height:1;
   pointer-events:none;user-select:none;
 }}
 .ct-panel-cat{{
   font-family:Inter,sans-serif;font-size:6pt;font-weight:700;
-  letter-spacing:2.5pt;color:rgba(200,152,10,0.65);text-transform:uppercase;
+  letter-spacing:2.5pt;color:rgba(200,152,10,0.90);text-transform:uppercase;
   margin-bottom:4.5mm;flex-shrink:0;
 }}
 .ct-panel-hl{{
-  font-family:'Playfair Display',serif;font-size:22pt;font-weight:700;
+  font-family:'Playfair Display',serif;font-size:24pt;font-weight:700;
   color:#fff;line-height:1.2;margin-bottom:6mm;flex-shrink:0;
 }}
 .ct-cards{{
@@ -1052,21 +1052,21 @@ body{{background:#fff;}}
 .ct-crd{{
   flex:1;
   padding:3.5mm 4mm;
-  background:rgba(255,255,255,0.03);
-  border:0.4pt solid rgba(200,152,10,0.12);
-  border-top:1.5pt solid rgba(200,152,10,0.45);
+  background:rgba(255,255,255,0.05);
+  border:0.5pt solid rgba(200,152,10,0.20);
+  border-top:1.5pt solid rgba(200,152,10,0.65);
 }}
 .ct-crd-label{{
   font-family:Inter,sans-serif;font-size:6pt;font-weight:700;
-  color:rgba(200,152,10,0.55);letter-spacing:2.5pt;text-transform:uppercase;
+  color:rgba(200,152,10,0.85);letter-spacing:2.5pt;text-transform:uppercase;
   margin-bottom:2mm;
 }}
 .ct-crd-val{{
-  font-family:Inter,sans-serif;font-size:8.5pt;
-  color:rgba(255,255,255,0.75);line-height:1.45;
+  font-family:Inter,sans-serif;font-size:9.5pt;
+  color:rgba(255,255,255,0.90);line-height:1.45;
 }}
 .ct-panel-foot{{
-  border-top:0.5pt solid rgba(200,152,10,0.15);
+  border-top:0.5pt solid rgba(200,152,10,0.25);
   padding-top:3.5mm;margin-top:5mm;flex-shrink:0;
 }}
 </style>
