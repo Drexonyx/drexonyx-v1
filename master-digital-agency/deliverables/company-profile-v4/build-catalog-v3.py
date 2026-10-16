@@ -175,115 +175,112 @@ def p02():
   <div style="position:absolute;bottom:0;left:0;right:0;height:.7pt;background:linear-gradient(90deg,transparent,#C8980A,transparent);"></div>
 </div>"""
 
-# ── Service page: text-first, small thumbnail, specs tiles, no CTA ───────────
+# ── Service page: lateral split — sidebar + full-width banner ─────────────────
 def service_page(pg_num, img_num, label, title, subtitle, description, features, tags_list, specs, who_for, process_steps, img_position="center 30%"):
-    bullets_html = ''.join(bullet(f) for f in features)
+    bullets_html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 3mm;">'
+    bullets_html += ''.join(bullet(f) for f in features)
+    bullets_html += '</div>'
+
     tags_html = ('<div style="display:flex;flex-wrap:wrap;gap:1.5mm;">'
                  + ''.join(tag(t) for t in tags_list) + '</div>')
 
     specs_html = ''
     for spec in specs:
         specs_html += (
-            f'<div style="padding:2.5mm 3mm;background:rgba(200,152,10,.04);'
-            f'border:.3pt solid rgba(200,152,10,.18);border-radius:.5mm;margin-bottom:2mm;">'
-            f'<div style="font-family:Inter,sans-serif;font-size:5.5pt;color:rgba(200,152,10,.45);'
-            f'letter-spacing:2pt;text-transform:uppercase;margin-bottom:1.5mm;">{spec["label"]}</div>'
-            f'<div style="font-family:\'Playfair Display\',serif;font-size:9.5pt;color:#fff;'
+            f'<div style="padding:2mm 2.5mm;background:rgba(200,152,10,.04);'
+            f'border:.3pt solid rgba(200,152,10,.15);border-radius:.5mm;margin-bottom:2mm;">'
+            f'<div style="font-family:Inter,sans-serif;font-size:5pt;color:rgba(200,152,10,.4);'
+            f'letter-spacing:2pt;text-transform:uppercase;margin-bottom:.8mm;">{spec["label"]}</div>'
+            f'<div style="font-family:\'Playfair Display\',serif;font-size:8.5pt;color:#fff;'
             f'font-weight:600;line-height:1.2;">{spec["value"]}</div>'
             f'</div>'
         )
 
-    who_html = '<div style="display:flex;gap:3mm;">'
+    who_html = '<div style="display:flex;flex-direction:column;gap:1.5mm;">'
     for w in who_for:
         who_html += (
-            f'<div style="flex:1;padding:3mm 3.5mm;background:rgba(255,255,255,.02);'
-            f'border:.3pt solid rgba(200,152,10,.18);border-radius:.6mm;text-align:center;">'
-            f'<div style="font-family:Inter,sans-serif;font-size:7.5pt;font-weight:500;'
-            f'color:rgba(255,255,255,.58);line-height:1.45;">{w}</div>'
+            f'<div style="padding:2mm 2.5mm 2mm 3mm;border-left:.4pt solid rgba(200,152,10,.3);">'
+            f'<div style="font-family:Inter,sans-serif;font-size:6.5pt;font-weight:400;'
+            f'color:rgba(255,255,255,.5);line-height:1.4;">{w}</div>'
             f'</div>'
         )
     who_html += '</div>'
 
-    proc_html = '<div style="display:flex;gap:3.5mm;">'
+    proc_html = '<div style="display:flex;gap:3mm;">'
     for i, step in enumerate(process_steps):
         proc_html += (
-            f'<div style="flex:1;padding:3.5mm 3.5mm 3mm;background:rgba(200,152,10,.04);'
-            f'border:.3pt solid rgba(200,152,10,.18);border-radius:.6mm;position:relative;">'
-            f'<div style="font-family:Inter,sans-serif;font-size:16pt;color:rgba(200,152,10,.08);'
-            f'font-weight:700;position:absolute;top:2mm;right:3mm;line-height:1;">{i+1:02d}</div>'
-            f'<div style="font-family:Inter,sans-serif;font-size:5.2pt;color:rgba(200,152,10,.42);'
-            f'letter-spacing:2pt;text-transform:uppercase;margin-bottom:2mm;">STEP {i+1}</div>'
-            f'<div style="font-family:\'Playfair Display\',serif;font-size:8.5pt;color:#fff;'
-            f'font-weight:600;line-height:1.3;margin-bottom:1.5mm;">{step["title"]}</div>'
-            f'<div style="font-family:Inter,sans-serif;font-size:7pt;color:rgba(255,255,255,.48);'
-            f'line-height:1.5;">{step["desc"]}</div>'
+            f'<div style="flex:1;padding:3mm 3mm 2.5mm;background:rgba(200,152,10,.04);'
+            f'border:.3pt solid rgba(200,152,10,.18);border-radius:.5mm;position:relative;">'
+            f'<div style="font-family:Inter,sans-serif;font-size:14pt;color:rgba(200,152,10,.07);'
+            f'font-weight:700;position:absolute;top:1.5mm;right:2.5mm;line-height:1;">{i+1:02d}</div>'
+            f'<div style="font-family:Inter,sans-serif;font-size:5pt;color:rgba(200,152,10,.4);'
+            f'letter-spacing:2pt;text-transform:uppercase;margin-bottom:1.5mm;">STEP {i+1}</div>'
+            f'<div style="font-family:\'Playfair Display\',serif;font-size:8pt;color:#fff;'
+            f'font-weight:600;line-height:1.3;margin-bottom:1mm;">{step["title"]}</div>'
+            f'<div style="font-family:Inter,sans-serif;font-size:6.5pt;color:rgba(255,255,255,.45);'
+            f'line-height:1.45;">{step["desc"]}</div>'
             f'</div>'
         )
     proc_html += '</div>'
 
     return f"""
 <div class="pg" style="background:#0b0b0b;">
-  <div style="position:absolute;top:0;left:0;right:0;height:.8pt;background:linear-gradient(90deg,transparent,#C8980A,transparent);"></div>
-  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 65% at 18% 42%,rgba(200,152,10,.04) 0%,transparent 60%);pointer-events:none;"></div>
-  <div style="position:absolute;bottom:18mm;right:10mm;font-family:'Playfair Display',serif;font-size:88pt;color:rgba(200,152,10,.04);font-weight:700;line-height:1;pointer-events:none;user-select:none;z-index:0;">{pg_num:02d}</div>
+  <div style="position:absolute;top:0;left:0;right:0;height:.8pt;background:linear-gradient(90deg,transparent,#C8980A,transparent);z-index:3;"></div>
 
-  <div style="position:absolute;top:0;left:0;right:0;bottom:8mm;padding:12mm 14mm 6mm;display:flex;flex-direction:column;justify-content:space-between;z-index:1;">
+  <div style="position:absolute;top:0;left:0;bottom:8mm;width:60mm;background:rgba(0,0,0,.2);border-right:.3pt solid rgba(200,152,10,.15);padding:12mm 8mm 6mm 10mm;display:flex;flex-direction:column;overflow:hidden;z-index:1;">
+    <div style="position:absolute;bottom:6mm;left:0;right:0;text-align:center;font-family:'Playfair Display',serif;font-size:82pt;color:rgba(200,152,10,.045);font-weight:700;line-height:1;pointer-events:none;user-select:none;">{pg_num:02d}</div>
+    <div style="font-family:Inter,sans-serif;font-size:5.5pt;color:#C8980A;letter-spacing:3pt;text-transform:uppercase;margin-bottom:3.5mm;">{label}</div>
+    <div style="height:.3pt;background:linear-gradient(90deg,rgba(200,152,10,.45),transparent);margin-bottom:5mm;"></div>
+    <div style="font-family:Inter,sans-serif;font-size:5pt;color:rgba(200,152,10,.38);letter-spacing:2pt;text-transform:uppercase;margin-bottom:3mm;">OVERVIEW</div>
+    {specs_html}
+    <div style="height:.3pt;background:rgba(200,152,10,.1);margin:4mm 0;"></div>
+    <div style="font-family:Inter,sans-serif;font-size:5pt;color:rgba(200,152,10,.38);letter-spacing:2pt;text-transform:uppercase;margin-bottom:3mm;">WHO IT'S FOR</div>
+    {who_html}
+    <div style="flex:1;min-height:0;"></div>
+    <div style="height:.3pt;background:rgba(200,152,10,.1);margin-bottom:3mm;"></div>
+    {tags_html}
+  </div>
+
+  <div style="position:absolute;top:0;left:60mm;right:0;bottom:8mm;padding:12mm 14mm 6mm 9mm;display:flex;flex-direction:column;justify-content:space-between;z-index:1;">
 
     <div style="display:flex;align-items:center;gap:3mm;">
-      <div style="font-family:Inter,sans-serif;font-size:7pt;color:#C8980A;letter-spacing:3pt;text-transform:uppercase;">{label}</div>
-      <div style="flex:1;height:.3pt;background:linear-gradient(90deg,rgba(200,152,10,.3),transparent);"></div>
-      <div style="font-family:Inter,sans-serif;font-size:7pt;color:rgba(255,255,255,.2);letter-spacing:1.5pt;">{pg_num:02d} / 10</div>
-    </div>
-
-    <div style="display:flex;gap:7mm;align-items:flex-start;">
-      <div style="flex:1;min-width:0;">
-        <h1 style="font-family:'Playfair Display',serif;font-size:26pt;color:#fff;line-height:1.1;font-weight:700;margin:0 0 2mm;">{title}</h1>
-        <div style="font-family:Inter,sans-serif;font-size:9.5pt;color:rgba(200,152,10,.75);font-style:italic;margin-bottom:3mm;">{subtitle}</div>
-        <div style="height:.4pt;width:24mm;background:linear-gradient(90deg,#C8980A,transparent);"></div>
-      </div>
-      <div style="flex:0 0 38mm;height:32mm;overflow:hidden;border-radius:.8mm;border:.4pt solid rgba(200,152,10,.2);position:relative;">
-        <img src="data:image/jpeg;base64,{C[img_num]}" style="width:100%;height:100%;object-fit:cover;object-position:{img_position};display:block;">
-        <div style="position:absolute;top:0;left:0;right:0;height:40%;background:linear-gradient(180deg,rgba(11,11,11,.65),transparent);pointer-events:none;"></div>
-        <div style="position:absolute;bottom:0;left:0;right:0;height:40%;background:linear-gradient(0deg,rgba(11,11,11,.65),transparent);pointer-events:none;"></div>
-        <div style="position:absolute;left:0;top:0;bottom:0;width:25%;background:linear-gradient(90deg,rgba(11,11,11,.5),transparent);pointer-events:none;"></div>
-      </div>
+      <div style="flex:1;height:.3pt;background:linear-gradient(90deg,rgba(200,152,10,.2),transparent);"></div>
+      <div style="font-family:Inter,sans-serif;font-size:6.5pt;color:rgba(255,255,255,.2);letter-spacing:1.5pt;">{pg_num:02d} / 10</div>
     </div>
 
     <div>
-      <p style="font-family:Inter,sans-serif;font-size:9pt;color:rgba(255,255,255,.68);line-height:1.65;">{description}</p>
+      <h1 style="font-family:'Playfair Display',serif;font-size:23pt;color:#fff;line-height:1.1;font-weight:700;margin:0 0 2mm;">{title}</h1>
+      <div style="font-family:Inter,sans-serif;font-size:9pt;color:rgba(200,152,10,.75);font-style:italic;margin-bottom:2.5mm;">{subtitle}</div>
+      <div style="height:.4pt;width:18mm;background:linear-gradient(90deg,#C8980A,transparent);"></div>
     </div>
 
-    <div style="display:flex;gap:8mm;">
-      <div style="flex:0 0 56%;min-width:0;">
-        <div style="font-family:Inter,sans-serif;font-size:6.5pt;color:rgba(200,152,10,.5);letter-spacing:2.5pt;text-transform:uppercase;margin-bottom:3.5mm;">WHAT'S INCLUDED</div>
-        {bullets_html}
-      </div>
-      <div style="flex:1;min-width:0;">
-        {specs_html}
-      </div>
+    <div style="height:52mm;overflow:hidden;border-radius:.8mm;border:.4pt solid rgba(200,152,10,.2);position:relative;flex-shrink:0;">
+      <img src="data:image/jpeg;base64,{C[img_num]}" style="width:100%;height:100%;object-fit:cover;object-position:{img_position};display:block;">
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,11,11,.45) 0%,transparent 30%,transparent 70%,rgba(11,11,11,.45) 100%);pointer-events:none;"></div>
+      <div style="position:absolute;left:0;top:0;bottom:0;width:8%;background:linear-gradient(90deg,rgba(11,11,11,.5),transparent);pointer-events:none;"></div>
     </div>
 
     <div>
-      <div style="font-family:Inter,sans-serif;font-size:6.5pt;color:rgba(200,152,10,.45);letter-spacing:2.5pt;text-transform:uppercase;margin-bottom:3mm;">HOW IT WORKS</div>
+      <p style="font-family:Inter,sans-serif;font-size:8.5pt;color:rgba(255,255,255,.65);line-height:1.65;">{description}</p>
+    </div>
+
+    <div>
+      <div style="font-family:Inter,sans-serif;font-size:5.5pt;color:rgba(200,152,10,.42);letter-spacing:2.5pt;text-transform:uppercase;margin-bottom:2.5mm;">WHAT'S INCLUDED</div>
+      {bullets_html}
+    </div>
+
+    <div>
+      <div style="font-family:Inter,sans-serif;font-size:5.5pt;color:rgba(200,152,10,.42);letter-spacing:2.5pt;text-transform:uppercase;margin-bottom:2.5mm;">HOW IT WORKS</div>
       {proc_html}
     </div>
 
-    <div>
-      <div style="height:.3pt;background:rgba(200,152,10,.15);margin-bottom:3.5mm;"></div>
-      <div style="font-family:Inter,sans-serif;font-size:6.5pt;color:rgba(200,152,10,.4);letter-spacing:2pt;text-transform:uppercase;margin-bottom:2.5mm;">SERVICE TAGS</div>
-      {tags_html}
-      <div style="height:.3pt;background:rgba(200,152,10,.13);margin-top:3.5mm;margin-bottom:3mm;"></div>
-      <div style="font-family:Inter,sans-serif;font-size:6.5pt;color:rgba(200,152,10,.4);letter-spacing:2pt;text-transform:uppercase;margin-bottom:2.5mm;">WHO IT'S FOR</div>
-      {who_html}
-    </div>
-
   </div>
 
-  <div style="position:absolute;bottom:0;left:0;right:0;height:8mm;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:space-between;padding:0 14mm;">
+  <div style="position:absolute;bottom:0;left:0;right:0;height:8mm;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:space-between;padding:0 14mm;z-index:2;">
     <span style="font-family:Inter,sans-serif;font-size:5.2pt;color:rgba(200,152,10,.5);letter-spacing:2pt;">DREXONYX × MDA &nbsp;·&nbsp; MASTER DIGITAL AGENCY</span>
     <span style="font-family:Inter,sans-serif;font-size:5.2pt;color:rgba(255,255,255,.28);letter-spacing:1.5pt;">{pg_num:02d} / 10</span>
   </div>
-  <div style="position:absolute;bottom:0;left:0;right:0;height:.7pt;background:linear-gradient(90deg,transparent,#C8980A,transparent);"></div>
+  <div style="position:absolute;bottom:0;left:0;right:0;height:.7pt;background:linear-gradient(90deg,transparent,#C8980A,transparent);z-index:3;"></div>
 </div>"""
 
 # ── P10 — Contact (unchanged from v2) ────────────────────────────────────────
