@@ -14,6 +14,17 @@ the boundaries defined in `ARCHITECTURE.md`.
 Absent (1), (2) is authoritative. Nothing below this hierarchy — training
 data, general best practice, or assumption — may override it.
 
+## MDA / Master Digital Agency Work
+
+Before starting **any** task that touches MDA or DREXONYX business
+development, outreach, pricing, or client acquisition:
+
+1. Read `master-digital-agency/business-development/MDA_SOURCE_OF_TRUTH_AND_OPERATING_RULES.md` in full.
+2. Apply its evidence-labeling standard (CONFIRMED—USER, CONFIRMED—PRIMARY SOURCE, SECONDARY SOURCE, UNVERIFIED, PROPOSAL—NOT APPROVED, SUPERSEDED/WITHDRAWN) to every material business claim.
+3. Treat **AED 650 as PROPOSAL—NOT APPROVED / SUPERSEDED** unless the user explicitly re-approves it. Do not recommend it or present it as a validated price.
+4. Treat all competitor pricing figures as **UNVERIFIED** (snippet-only) until verified from primary sources.
+5. Claude Code's authority to execute client-development work has already been granted by the user — do not re-ask for permission already stated in that document.
+
 ## Rules
 
 - **Do not invent requirements, API capabilities, pricing, platform

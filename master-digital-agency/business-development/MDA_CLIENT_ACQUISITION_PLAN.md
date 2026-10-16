@@ -23,7 +23,7 @@ This service is chosen because:
 
 ---
 
-## 3. Test Offer (Unvalidated Until Pricing Research Is Complete)
+## 3. Test Offer (Scope Defined — Price NOT APPROVED)
 
 | Parameter | Value |
 |---|---|
@@ -33,13 +33,18 @@ This service is chosen because:
 | Consistency | Visual identity applied throughout |
 | Revisions | Two rounds included |
 | Turnaround | 3 business days after all content received |
-| Proposed price | **AED 650** |
+| Proposed price | **TBD — see pricing note below** |
 
-> **Important:** AED 650 is a proposed introductory test price, not a validated market rate.
-> See `DUBAI_COMPANY_PROFILE_PRICING_RESEARCH.md` for market context before treating it as final.
-> Pricing research suggests the market minimum for comparable scope starts around AED 800–899.
-> AED 650 is deliberately below market to attract the first client and build portfolio.
-> Once two or three clients are served, review and increase the price.
+> **PRICING STATUS — SUPERSEDED/WITHDRAWN:**
+> AED 650 was previously proposed but was explicitly rejected by the user as too high without adequate primary-source evidence. It is **NOT an approved price** and must not be quoted to any client.
+>
+> **No MDA price is currently approved.** Before issuing any quotation:
+> 1. Complete primary-source pricing verification (see `DUBAI_COMPANY_PROFILE_PRICING_RESEARCH.md`).
+> 2. Confirm delivery economics.
+> 3. Present a recommendation to the user with evidence.
+> 4. Obtain explicit user approval.
+>
+> All competitor benchmark figures (AED 800, 899, 1,500, etc.) are **UNVERIFIED** — sourced from Google search snippets only and must not be presented as confirmed market rates.
 
 **Not included in this offer:**
 - Content writing or copywriting
@@ -120,7 +125,7 @@ Scope:
 - Print-ready PDF (digital distribution)
 - Delivery: 3 business days after all content received
 
-Price: AED [AMOUNT] (excl. VAT)
+Price: AED [APPROVED AMOUNT — do not fill until user approves a price] (excl. VAT)
   5% UAE VAT: AED [VAT AMOUNT]
   Total: AED [TOTAL]
 

@@ -17,6 +17,16 @@ Research date: 2026-10-16
 
 ---
 
+## Evidence Labels Used in This File
+
+- **UNVERIFIED:** Source is a Google search snippet only; the original provider page could not be loaded. Price, inclusions, and date cannot be confirmed directly.
+- **PROPOSAL — NOT APPROVED:** A suggested MDA price or offer that the user has not yet approved.
+- **SUPERSEDED/WITHDRAWN:** A price or figure that was previously proposed but has been explicitly withdrawn.
+
+All provider prices below carry the **UNVERIFIED** label unless upgraded after primary-source verification.
+
+---
+
 ## Pricing Evidence by Provider
 
 ### 1. companyprofilemaker.ae (Dubai)
@@ -31,7 +41,7 @@ Research date: 2026-10-16
 
 **Source:** Google search snippet — `companyprofilemaker.ae` (exact page URL: https://companyprofilemaker.ae/)
 **Accessed:** 2026-10-16
-**Verification:** Snippet only — page could not be loaded directly. Treat combined bundle pricing (400 AED) with caution; it appears discounted from the design-only price and may be a promotional rate.
+**Evidence label: UNVERIFIED** — snippet only; page could not be loaded directly. Treat combined bundle pricing (400 AED) with caution; it appears discounted from the design-only price and may be a promotional rate.
 **Revisions, turnaround, and VAT:** Not stated in snippet.
 
 ---
@@ -46,7 +56,7 @@ Research date: 2026-10-16
 
 **Source:** Google search snippet — https://www.integrateitsolutions.com/abu-dhabi-profile-design.php
 **Accessed:** 2026-10-16
-**Verification:** Snippet only.
+**Evidence label: UNVERIFIED** — snippet only.
 **Notes:** This provider is based in Abu Dhabi but explicitly serves Dubai. The bilingual 30-page premium tier at AED 2,800 includes Arabic + English. Content writing inclusion not confirmed from snippet.
 
 ---
@@ -61,7 +71,7 @@ Research date: 2026-10-16
 
 **Source:** Google search snippet — https://labeeb.ae/ (company profile page)
 **Accessed:** 2026-10-16
-**Verification:** Snippet only.
+**Evidence label: UNVERIFIED** — snippet only.
 **Notes:** Labeeb includes content writing in its packages. The prices above therefore cover design + copywriting combined, not design only. Comparing directly with design-only prices from other providers requires adjusting for this scope difference.
 
 ---
@@ -76,7 +86,7 @@ Research date: 2026-10-16
 
 **Source:** Google search snippet — https://digitalshack.ae/company-profile-design-dubai/
 **Accessed:** 2026-10-16
-**Verification:** Snippet only.
+**Evidence label: UNVERIFIED** — snippet only.
 **Notes:** The AED 2,000–3,500 range for design only is explicitly stated as excluding content writing. The upper bound of AED 6,000 is for a complex 12-page profile with special illustrations.
 
 ---
@@ -89,7 +99,7 @@ Research date: 2026-10-16
 
 **Source:** Google search snippet — https://www.dandelion-me.com/company-profile-abu-dhabi.html
 **Accessed:** 2026-10-16
-**Verification:** Snippet only. No page-count or revision detail in snippet.
+**Evidence label: UNVERIFIED** — snippet only. No page-count or revision detail in snippet.
 
 ---
 
@@ -187,81 +197,60 @@ Research date: 2026-10-16
 
 ---
 
-## Pricing Assessment for AED 650 Proposed Test Offer
+## AED 650 Status — SUPERSEDED/WITHDRAWN
 
-**Scope for comparison:** 8 pages, design only, 2 revisions, PDF delivery.
+> **SUPERSEDED/WITHDRAWN — DO NOT USE AS AN APPROVED PRICE**
+>
+> AED 650 was proposed earlier as an introductory test price for an 8-page company profile. The user explicitly rejected it as too high without adequate primary-source pricing evidence. It must not be:
+> - Quoted to any client
+> - Listed in any MDA offer document as an approved price
+> - Treated as a market benchmark or recommendation
+>
+> If the user re-approves AED 650 with explicit confirmation, update this section to reflect that, with the date and the user's statement.
 
-| Benchmark | AED | vs AED 650 |
+**Scope for reference (not an active offer):** 8 pages, design only, 2 revisions, PDF delivery.
+
+| Benchmark | AED | Notes |
 |---|---|---|
-| Integrate IT Solutions (8 pages) | 800 | 19% cheaper |
-| companyprofilemaker.ae (4–5 pages) | 899 | 28% cheaper |
-| Dandelion starting price | 1,500 | 57% cheaper |
-| Digital Shack (design only) | 2,000–3,500 | 67–81% cheaper |
-| Fiverr UAE seller (4 pages) | ~440 | AED 650 is **higher** |
+| Integrate IT Solutions (8 pages) | 800 | UNVERIFIED (snippet) |
+| companyprofilemaker.ae (4–5 pages) | 899 | UNVERIFIED (snippet) |
+| Dandelion starting price | 1,500 | UNVERIFIED (snippet) |
+| Digital Shack (design only) | 2,000–3,500 | UNVERIFIED (snippet) |
+| Fiverr UAE seller (4 pages) | ~440 | UNVERIFIED (snippet) |
 
-**Conclusion:** AED 650 for 8 pages is below the market minimum for design-only work from Dubai-based providers (AED 800 for comparable scope). It is above the Fiverr marketplace baseline (~AED 440 for fewer pages).
-
-AED 650 is positioned as an intentional introductory price to attract a first client and build a UAE-based portfolio. It is not a sustainable long-term price for 8 pages of professional design work. Once 2–3 clients have been served, the price should be reviewed against the AED 800–1,599 market band for design-only work.
+All benchmark figures above are **UNVERIFIED** — sourced from Google search snippets only; original provider pages could not be loaded. Do not state these as confirmed market rates.
 
 ---
 
-## Recommended MDA Pricing Strategy
+## MDA Pricing — Status: NO APPROVED PRICE
 
-### Offer A — Starter Company Profile
+**No MDA price has been approved by the user.** The tiers below are illustrative proposals for discussion only. None may be quoted to a client until the user explicitly approves a price and offer scope.
 
-| Item | Value |
-|---|---|
-| Price | **AED 650** (introductory) → AED 900 after first 3 clients |
-| Pages | Up to 8 |
-| Output | PDF, digital distribution ready |
-| Content | Client provides all content |
-| Revisions | 2 rounds |
-| Turnaround | 3 business days after content received |
-| Excluded | Content writing, translation, source files, printing |
-| Ideal customer | New businesses, cleaners, small consultants wanting a quick first profile |
-| Rationale | Below market minimum to attract first clients and build portfolio. Clearly positioned as introductory pricing. Do not sustain this price long-term. |
+**Required before approving any price:**
+1. Verify at least 2–3 competitor prices directly from their official pages (record URL, access date, exact displayed price, page count, inclusions, VAT status).
+2. Confirm MDA's own delivery economics (hours per project, tools, revisions workflow).
+3. Present evidence and assumptions to the user; mark the recommendation clearly as a recommendation, not a decision.
+4. Obtain explicit user approval with the price and scope recorded.
 
----
+### Draft Tier Structure (PROPOSAL — NOT APPROVED)
 
-### Offer B — Standard Company Profile
+| Tier | Draft Price (AED) | Pages | Notes |
+|---|---|---|---|
+| Starter | TBD | Up to 8 | Introductory; client provides all content |
+| Standard | TBD | Up to 12 | Light copy editing included |
+| Premium Bilingual | TBD | Up to 20 | Arabic + English separate files |
 
-| Item | Value |
-|---|---|
-| Price | **AED 1,200** |
-| Pages | Up to 12 |
-| Output | Print-ready PDF + web-optimised PDF |
-| Content | Client provides; light copy editing included |
-| Revisions | 3 rounds |
-| Turnaround | 5 business days after content received |
-| Excluded | Full copywriting, translation, source files, printing |
-| Ideal customer | Established SMEs needing a complete, polished profile for business development |
-| Rationale | Below the AED 1,500–2,800 market mid-range for comparable scope; competitive for clients who want more than the starter but are price-sensitive. |
+Specific AED figures are intentionally left blank until primary-source research confirms comparable market rates and the user approves an offer.
 
 ---
 
-### Offer C — Premium Bilingual Company Profile
+## Add-on Pricing Suggestions (PROPOSAL — NOT APPROVED)
 
-| Item | Value |
-|---|---|
-| Price | **AED 2,500** |
-| Pages | Up to 20 |
-| Output | Print-ready PDF (Arabic + English), separate files |
-| Content | Client provides Arabic + English text |
-| Revisions | 3 rounds per language |
-| Turnaround | 7 business days after full content received |
-| Excluded | Content writing, printing, source files (available as add-on) |
-| Ideal customer | Mid-size companies targeting government or corporate clients who require a bilingual formal profile |
-| Rationale | Slightly below the Integrate IT Solutions AED 2,800 benchmark for 30-page bilingual. Positions MDA as accessible for bilingual work while preserving margin. |
-
----
-
-## Add-on Pricing Suggestions (for future offers)
-
-| Add-on | Suggested Price (AED) |
-|---|---|
-| Content writing (per page) | 150 |
-| Arabic translation (per page) | 100 |
-| Editable source files (InDesign/Illustrator) | 300 |
-| 3rd revision round | 200 |
-| Rush delivery (<48 hrs) | +50% of base price |
-| Extra pages beyond package | 80 per page |
+| Add-on | Draft Price (AED) | Notes |
+|---|---|---|
+| Content writing (per page) | TBD | — |
+| Arabic translation (per page) | TBD | — |
+| Editable source files (InDesign/Illustrator) | TBD | — |
+| 3rd revision round | TBD | — |
+| Rush delivery (<48 hrs) | TBD | — |
+| Extra pages beyond package | TBD | — |
