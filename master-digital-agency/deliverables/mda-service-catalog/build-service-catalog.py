@@ -405,39 +405,38 @@ def build_print():
         includes_html = ''.join(feature_item(f) for f in s['includes'])
         steps_html    = ''.join(step_card(st['n'], st['t'], st['d']) for st in s['steps'])
         tags_html     = ''.join(tag_pill(t) for t in s['tags'])
-        title_html    = s['title'].replace('\n', '<br>')
         img_path      = f'{IMG_DIR}/{s["img"]}.jpg'
 
         return f'''
 <div class="pg">
-  <div class="pg-img">
-    <img src="{img_path}" alt="">
-    <div class="pg-img-overlay"></div>
-    <div class="pg-num">{pg_num:02d}</div>
-  </div>
-  <div class="pg-content">
-    <div class="pg-group-header">
+  <img src="{img_path}" class="pg-bg" alt="">
+  <div class="pg-overlay"></div>
+  <div class="pg-body">
+    <div class="pg-top">
       <div class="pg-label">{s['label']} / {s['num']}</div>
-      <h2 class="pg-title">{title_html}</h2>
-      <p class="pg-subtitle">{s['subtitle']}</p>
-      <div class="pg-rule"></div>
-      <p class="pg-desc">{s['desc']}</p>
     </div>
-    <div class="pg-group-includes">
-      <div class="pg-section-label">WHAT'S INCLUDED</div>
-      <div class="pg-features">{includes_html}</div>
-    </div>
-    <div class="pg-group-steps">
-      <div class="pg-section-label">HOW IT WORKS</div>
-      <div class="pg-steps">{steps_html}</div>
-    </div>
-    <div class="pg-group-footer">
-      <div class="pg-tags">{tags_html}</div>
-      <div class="pg-footer">
-        <span>www.drexonyx.com</span>
-        <span>info@drexonyx.com</span>
-        <span>Dubai, UAE</span>
-        <span class="pg-footer-brand">MDA · MASTER DIGITAL AGENCY · A DREXONYX BRAND</span>
+    <div class="pg-content">
+      <div>
+        <div class="pg-rule"></div>
+        <p class="pg-subtitle">{s['subtitle']}</p>
+        <p class="pg-desc">{s['desc']}</p>
+      </div>
+      <div>
+        <div class="pg-section-label">WHAT'S INCLUDED</div>
+        <div class="pg-features">{includes_html}</div>
+      </div>
+      <div>
+        <div class="pg-section-label">HOW IT WORKS</div>
+        <div class="pg-steps">{steps_html}</div>
+      </div>
+      <div>
+        <div class="pg-tags">{tags_html}</div>
+        <div class="pg-footer">
+          <span>www.drexonyx.com</span>
+          <span>info@drexonyx.com</span>
+          <span>Dubai, UAE</span>
+          <span class="pg-footer-brand">MDA · MASTER DIGITAL AGENCY · A DREXONYX BRAND</span>
+        </div>
       </div>
     </div>
   </div>
@@ -512,99 +511,74 @@ def build_print():
 *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0;}}
 body{{background:#fff;}}
 
-/* ── A4 page ── */
+/* ── A4 page (full-bleed) ── */
 .pg{{
   width:210mm;height:297mm;
-  display:flex;flex-direction:row;
-  overflow:hidden;position:relative;
-  background:#0a0a0a;
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;
   page-break-after:always;
 }}
-
-/* ── Image panel ── */
-.pg-img{{
-  flex:0 0 82mm;position:relative;overflow:hidden;
+.pg-bg{{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center top;z-index:0;
 }}
-.pg-img img{{
-  width:100%;height:100%;object-fit:cover;object-position:center top;
+.pg-overlay{{
+  position:absolute;inset:0;z-index:1;
+  background:linear-gradient(to bottom,
+    rgba(5,5,5,0.20)  0%,
+    rgba(5,5,5,0.20) 21%,
+    rgba(5,5,5,0.93) 29%,
+    rgba(5,5,5,0.97) 35%,
+    rgba(5,5,5,0.97) 100%
+  );
 }}
-.pg-img-overlay{{
-  position:absolute;inset:0;
-  background:linear-gradient(to right,rgba(10,10,10,0.1),rgba(10,10,10,0));
-}}
-.pg-num{{
-  position:absolute;bottom:12mm;right:6mm;
-  font-family:'Playfair Display',serif;
-  font-size:80pt;color:rgba(200,152,10,0.04);
-  font-weight:700;line-height:1;
-}}
-
-/* ── Content panel ── */
-.pg-content{{
-  flex:1;padding:12mm 12mm 8mm 10mm;
-  display:flex;flex-direction:column;justify-content:space-between;
-  background:#0a0a0a;
-  border-left:0.3pt solid rgba(200,152,10,0.12);
-}}
-.pg-group-header,.pg-group-includes,.pg-group-steps,.pg-group-footer{{
+.pg-body{{
+  position:relative;z-index:2;
   display:flex;flex-direction:column;
+  height:100%;
+  padding:10mm 14mm 10mm 14mm;
+}}
+.pg-top{{
+  flex:0 0 34%;display:flex;flex-direction:column;justify-content:flex-start;
 }}
 .pg-label{{
-  font-family:Inter,sans-serif;font-size:8pt;font-weight:500;
-  color:rgba(200,152,10,0.6);letter-spacing:2.5pt;text-transform:uppercase;
-  margin-bottom:4mm;
+  font-family:Inter,sans-serif;font-size:7.5pt;font-weight:500;
+  color:rgba(200,152,10,0.75);letter-spacing:2.5pt;text-transform:uppercase;
+  text-shadow:0 1px 4px rgba(0,0,0,0.8);
 }}
-.pg-title{{
-  font-family:'Playfair Display',serif;font-size:26pt;font-weight:700;
-  color:#fff;line-height:1.15;margin-bottom:2mm;
-}}
-.pg-subtitle{{
-  font-family:Inter,sans-serif;font-size:9.5pt;font-style:italic;
-  color:#C8980A;font-weight:300;margin-bottom:3mm;
+.pg-content{{
+  flex:1;display:flex;flex-direction:column;justify-content:space-between;
 }}
 .pg-rule{{
   width:14mm;height:1pt;
   background:linear-gradient(90deg,#C8980A,transparent);
   margin-bottom:3mm;
 }}
+.pg-subtitle{{
+  font-family:Inter,sans-serif;font-size:9.5pt;font-style:italic;
+  color:#C8980A;font-weight:300;margin-bottom:2.5mm;
+}}
 .pg-desc{{
   font-family:Inter,sans-serif;font-size:8.5pt;
-  color:rgba(255,255,255,0.65);line-height:1.65;
+  color:rgba(255,255,255,0.75);line-height:1.65;max-width:160mm;
 }}
 .pg-section-label{{
   font-family:Inter,sans-serif;font-size:7pt;font-weight:600;
-  color:rgba(200,152,10,0.6);letter-spacing:2.5pt;text-transform:uppercase;
-  margin-bottom:2.5mm;
+  color:rgba(200,152,10,0.65);letter-spacing:2.5pt;text-transform:uppercase;
+  margin-bottom:2mm;
 }}
 .pg-features{{
-  display:grid;grid-template-columns:1fr 1fr;gap:0 4mm;
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5mm 6mm;
 }}
-.pg-features>div{{margin-bottom:2mm!important;}}
-.pg-features>div span:last-child{{font-size:8pt!important;}}
-.pg-steps{{
-  display:flex;gap:2mm;flex-wrap:nowrap;
-}}
-.pg-steps>div{{
-  flex:1;padding:3mm 2.5mm!important;
-}}
-.pg-steps>div>div:nth-child(1){{font-size:20pt!important;}}
-.pg-steps>div>div:nth-child(2){{font-size:6pt!important;letter-spacing:1.5pt!important;margin-bottom:1.5mm!important;}}
-.pg-steps>div>div:nth-child(3){{font-size:8pt!important;margin-bottom:1.5mm!important;}}
-.pg-steps>div>div:nth-child(4){{font-size:6.5pt!important;}}
-.pg-tags{{
-  display:flex;flex-wrap:wrap;gap:1.5mm;margin-bottom:2mm;
-}}
-.pg-tags>span{{
-  font-size:6.5pt!important;padding:1.2mm 3.5mm!important;
-}}
+.pg-steps{{display:flex;gap:2.5mm;}}
+.pg-tags{{display:flex;flex-wrap:wrap;gap:1.5mm;}}
 .pg-footer{{
-  display:flex;align-items:center;gap:4mm;flex-wrap:wrap;
+  display:flex;align-items:center;gap:5mm;flex-wrap:wrap;
   padding-top:3mm;
-  border-top:0.3pt solid rgba(200,152,10,0.15);
-  font-family:Inter,sans-serif;font-size:5.5pt;color:rgba(255,255,255,0.3);
-  margin-top:3mm;
+  border-top:0.4pt solid rgba(200,152,10,0.2);
+  font-family:Inter,sans-serif;font-size:5.5pt;color:rgba(255,255,255,0.35);
 }}
-.pg-footer-brand{{margin-left:auto;color:rgba(200,152,10,0.3);letter-spacing:0.5pt;}}
+.pg-footer-brand{{margin-left:auto;color:rgba(200,152,10,0.35);letter-spacing:0.5pt;}}
 
 /* ── COVER ── */
 .pg-cover{{position:relative;display:block;}}
