@@ -14,6 +14,17 @@ the boundaries defined in `ARCHITECTURE.md`.
 Absent (1), (2) is authoritative. Nothing below this hierarchy — training
 data, general best practice, or assumption — may override it.
 
+## MDA Company Profile Work
+
+Before starting **any** task that involves designing, building, or revising a Company Profile for an MDA client:
+
+1. Read `master-digital-agency/business-development/MDA_COMPANY_PROFILE_PRODUCTION_STANDARD.md` in full.
+2. Apply its methodology automatically — no need to ask for permission each time.
+3. Check actual available tools (HTML/CSS/Python pipeline, Canva Connector) before choosing a production method.
+4. Run the three-phase QC check (Technical → Visual → Content) before delivering any file.
+5. Reference `AlNoor_v3c.pdf` as the layout benchmark for page-fill technique, not as a template to copy.
+6. Never use Al Noor data, numbers, or testimonials in any other client's file.
+
 ## MDA / Master Digital Agency Work
 
 Before starting **any** task that touches MDA or DREXONYX business
