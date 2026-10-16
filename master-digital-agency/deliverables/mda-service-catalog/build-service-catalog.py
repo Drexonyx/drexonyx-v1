@@ -453,9 +453,9 @@ def build_print():
       <h1 class="cover-title">Business<br><span class="gold">Launch</span><br>Services</h1>
       <div class="cover-rule"></div>
       <p class="cover-sub">From Company Profile to Corporate Video —<br>Everything your business needs to launch and grow.</p>
-    </div>
-    <div class="cover-services">
-      {''.join(f"""<div class="cover-svc-item">{s['title'].replace(chr(10),' ')}</div>""" for s in SERVICES)}
+      <div class="cover-services" style="margin-top:7mm;">
+        {''.join(f"""<div class="cover-svc-item">{s['title'].replace(chr(10),' ')}</div>""" for s in SERVICES)}
+      </div>
     </div>
     <div>
       <div class="cover-contacts">
@@ -590,12 +590,12 @@ body{{background:#fff;}}
   position:absolute;inset:0;
   background:
     linear-gradient(to right,
-      rgba(8,8,8,0.96) 0%,rgba(8,8,8,0.96) 16%,
-      rgba(8,8,8,0.45) 30%,rgba(8,8,8,0.00) 46%),
+      rgba(8,8,8,0.97) 0%,rgba(8,8,8,0.97) 16%,
+      rgba(8,8,8,0.52) 30%,rgba(8,8,8,0.00) 46%),
     linear-gradient(to bottom,
-      rgba(8,8,8,0.00) 0%,rgba(8,8,8,0.00) 22%,
-      rgba(8,8,8,0.72) 36%,rgba(8,8,8,0.86) 55%,
-      rgba(8,8,8,0.82) 100%);
+      rgba(8,8,8,0.00) 0%,rgba(8,8,8,0.00) 13%,
+      rgba(8,8,8,0.22) 20%,rgba(8,8,8,0.95) 28%,
+      rgba(8,8,8,0.97) 50%,rgba(8,8,8,0.95) 100%);
 }}
 .cover-content{{
   position:relative;z-index:2;
