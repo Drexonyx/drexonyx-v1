@@ -495,7 +495,7 @@ def build_print():
       <div class="cv-rule"></div>
       <p class="cv-sub">From Company Profile to Corporate Video —<br>Everything your business needs to launch and grow.</p>
       <div class="cv-services">
-        {''.join(f"""<div class="cv-svc">{s['title'].replace(chr(10),' ')}</div>""" for s in SERVICES)}
+        {''.join(f"""<div class="cv-svc-row"><span class="cv-svc-num">{s['num']}</span><span class="cv-svc-dot-sm"></span><span class="cv-svc-name">{s['title'].replace(chr(10),' ')}</span></div>""" for s in SERVICES)}
       </div>
     </div>
     <div class="cv-foot">
@@ -512,29 +512,43 @@ def build_print():
     # ── Contact / back page ──────────────────────────────────────
     contact_pg = f'''
 <div class="pg pg-contact">
-  <div class="ct-label">GET IN TOUCH</div>
-  <div class="ct-main">
-    <h2 class="ct-title">Let\'s Work<br><em>Together.</em></h2>
-    <p class="ct-sub">Digital · Creative · Media</p>
-    <div class="ct-rule"></div>
+  <div class="ct-hdr">
+    <span class="ct-hdr-l">MDA — MASTER DIGITAL AGENCY</span>
+    <span class="ct-hdr-r">A DREXONYX BRAND · SERVICE CATALOG 2026</span>
   </div>
-  <div class="ct-details">
-    <div class="ct-item">
-      <div class="ct-item-l">WEBSITE</div>
-      <div class="ct-item-v">www.drexonyx.com</div>
+  <div class="ct-body">
+    <div class="ct-ghost">MDA</div>
+    <div class="ct-headline">
+      <div class="ct-eyebrow">GET IN TOUCH</div>
+      <h2 class="ct-title">Let\'s Work<br><em>Together.</em></h2>
+      <div class="ct-gold-rule"></div>
+      <p class="ct-tagline">Ready to launch your business identity? Our team is available to discuss your project, timeline and budget — no obligation.</p>
     </div>
-    <div class="ct-item">
-      <div class="ct-item-l">EMAIL</div>
-      <div class="ct-item-v">info@drexonyx.com</div>
+    <div class="ct-grid">
+      <div class="ct-card">
+        <div class="ct-card-label">WEBSITE</div>
+        <div class="ct-card-val">www.drexonyx.com</div>
+      </div>
+      <div class="ct-card">
+        <div class="ct-card-label">EMAIL</div>
+        <div class="ct-card-val-sm">info@drexonyx.com</div>
+      </div>
+      <div class="ct-card">
+        <div class="ct-card-label">LOCATION</div>
+        <div class="ct-card-val-sm">Dubai,<br>United Arab Emirates</div>
+      </div>
+      <div class="ct-card">
+        <div class="ct-card-label">WORKING HOURS</div>
+        <div class="ct-card-val-sm">Sunday – Thursday<br>9:00 AM – 6:00 PM GST</div>
+      </div>
     </div>
-    <div class="ct-item">
-      <div class="ct-item-l">LOCATION</div>
-      <div class="ct-item-v">Dubai, United Arab Emirates</div>
+    <div class="ct-brand-row">
+      <div class="ct-brand-name">DREXONYX</div>
+      <div class="ct-brand-right">
+        <div class="ct-brand-sub">MDA IS A DREXONYX BRAND</div>
+        <div class="ct-brand-tagline">Ideas into Impact</div>
+      </div>
     </div>
-  </div>
-  <div class="ct-brand">
-    <div class="ct-brand-name">DREXONYX</div>
-    <div class="ct-brand-sub">MDA IS A DREXONYX BRAND · IDEAS INTO IMPACT</div>
   </div>
 </div>'''
 
@@ -847,12 +861,24 @@ body{{background:#fff;}}
   max-width:100mm;margin-bottom:7mm;
   text-shadow:0 1px 6px rgba(0,0,0,0.9);
 }}
-.cv-services{{display:flex;flex-direction:column;gap:4mm;}}
-.cv-svc{{
-  font-family:Inter,sans-serif;font-size:9.5pt;
-  color:rgba(255,255,255,0.65);
-  border-left:1.5pt solid rgba(200,152,10,0.3);
-  padding-left:3mm;
+.cv-services{{display:flex;flex-direction:column;gap:0;}}
+.cv-svc-row{{
+  display:flex;align-items:center;gap:3mm;
+  padding:2.8mm 0;
+  border-bottom:0.3pt solid rgba(200,152,10,0.12);
+}}
+.cv-svc-row:first-child{{border-top:0.3pt solid rgba(200,152,10,0.12);}}
+.cv-svc-num{{
+  font-family:Inter,sans-serif;font-size:7pt;font-weight:700;
+  color:{GOLD};letter-spacing:1pt;width:6mm;flex-shrink:0;
+}}
+.cv-svc-dot-sm{{
+  width:3pt;height:3pt;background:rgba(200,152,10,0.35);
+  border-radius:50%;flex-shrink:0;
+}}
+.cv-svc-name{{
+  font-family:Inter,sans-serif;font-size:9pt;
+  color:rgba(255,255,255,0.72);
   text-shadow:0 1px 5px rgba(0,0,0,0.9);
 }}
 .cv-foot{{}}
@@ -873,44 +899,94 @@ body{{background:#fff;}}
 ══════════════════════════════════════════════ */
 .pg-contact{{
   background:#060606;
-  display:flex;flex-direction:column;justify-content:space-between;
-  padding:22mm 24mm;
+  display:flex;flex-direction:column;
 }}
-.ct-label{{
-  font-family:Inter,sans-serif;font-size:8pt;font-weight:500;
-  color:rgba(200,152,10,0.6);letter-spacing:3pt;text-transform:uppercase;
+.ct-hdr{{
+  display:flex;justify-content:space-between;align-items:baseline;
+  padding:8mm 18mm 5mm;
+  border-bottom:0.4pt solid rgba(200,152,10,0.15);
+  flex-shrink:0;
 }}
-.ct-main{{}}
-.ct-title{{
-  font-family:'Playfair Display',serif;font-size:42pt;font-weight:700;
-  color:#fff;line-height:1.2;margin-bottom:5mm;
-}}
-.ct-sub{{
-  font-family:Inter,sans-serif;font-size:11pt;
-  color:rgba(255,255,255,0.4);margin-bottom:6mm;
-}}
-.ct-rule{{
-  width:60mm;height:1pt;
-  background:linear-gradient(90deg,{GOLD},transparent);
-}}
-.ct-details{{display:flex;flex-direction:column;gap:8mm;}}
-.ct-item{{border-left:2pt solid rgba(200,152,10,0.3);padding-left:6mm;}}
-.ct-item-l{{
-  font-family:Inter,sans-serif;font-size:7.5pt;font-weight:600;
+.ct-hdr-l{{
+  font-family:Inter,sans-serif;font-size:6.5pt;font-weight:700;
   color:rgba(200,152,10,0.6);letter-spacing:2.5pt;text-transform:uppercase;
+}}
+.ct-hdr-r{{
+  font-family:Inter,sans-serif;font-size:6.5pt;
+  color:rgba(255,255,255,0.25);letter-spacing:1.5pt;text-transform:uppercase;
+}}
+.ct-body{{
+  flex:1;display:flex;flex-direction:column;justify-content:space-between;
+  padding:14mm 18mm 12mm;
+  position:relative;overflow:hidden;
+}}
+.ct-ghost{{
+  position:absolute;right:-8mm;bottom:-15mm;
+  font-family:'Playfair Display',serif;font-size:160pt;font-weight:700;
+  color:rgba(200,152,10,0.04);line-height:1;
+  pointer-events:none;user-select:none;letter-spacing:-5pt;
+}}
+.ct-headline{{}}
+.ct-eyebrow{{
+  font-family:Inter,sans-serif;font-size:7.5pt;font-weight:600;
+  color:rgba(200,152,10,0.6);letter-spacing:3pt;text-transform:uppercase;
+  margin-bottom:4mm;
+}}
+.ct-title{{
+  font-family:'Playfair Display',serif;font-size:38pt;font-weight:700;
+  color:#fff;line-height:1.15;margin-bottom:5mm;
+}}
+.ct-title em{{color:{GOLD};font-style:italic;}}
+.ct-gold-rule{{
+  width:50mm;height:1pt;
+  background:linear-gradient(90deg,{GOLD},transparent);
+  margin-bottom:5mm;
+}}
+.ct-tagline{{
+  font-family:Inter,sans-serif;font-size:9.5pt;
+  color:rgba(255,255,255,0.38);line-height:1.65;
+  max-width:120mm;
+}}
+.ct-grid{{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:4mm;
+  position:relative;z-index:1;
+}}
+.ct-card{{
+  background:rgba(255,255,255,0.03);
+  border:0.5pt solid rgba(200,152,10,0.15);
+  border-top:1.5pt solid rgba(200,152,10,0.5);
+  padding:4mm 5mm;
+}}
+.ct-card-label{{
+  font-family:Inter,sans-serif;font-size:6.5pt;font-weight:700;
+  color:rgba(200,152,10,0.55);letter-spacing:2.5pt;text-transform:uppercase;
+  margin-bottom:2.5mm;
+}}
+.ct-card-val{{
+  font-family:'Playfair Display',serif;font-size:11pt;color:#fff;line-height:1.35;
+}}
+.ct-card-val-sm{{
+  font-family:Inter,sans-serif;font-size:8.5pt;
+  color:rgba(255,255,255,0.72);line-height:1.6;
+}}
+.ct-brand-row{{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  position:relative;z-index:1;
+}}
+.ct-brand-name{{
+  font-family:'Playfair Display',serif;font-size:22pt;font-weight:700;
+  color:#fff;letter-spacing:3pt;
+}}
+.ct-brand-right{{text-align:right;}}
+.ct-brand-sub{{
+  font-family:Inter,sans-serif;font-size:6pt;
+  color:rgba(200,152,10,0.4);letter-spacing:2pt;text-transform:uppercase;
   margin-bottom:2mm;
 }}
-.ct-item-v{{
-  font-family:'Playfair Display',serif;font-size:16pt;color:#fff;
-}}
-.ct-brand{{text-align:center;}}
-.ct-brand-name{{
-  font-family:'Playfair Display',serif;font-size:28pt;font-weight:700;
-  color:#fff;letter-spacing:2pt;margin-bottom:4mm;
-}}
-.ct-brand-sub{{
-  font-family:Inter,sans-serif;font-size:7pt;
-  color:rgba(200,152,10,0.45);letter-spacing:2.5pt;text-transform:uppercase;
+.ct-brand-tagline{{
+  font-family:'Playfair Display',serif;font-size:9pt;font-style:italic;
+  color:rgba(255,255,255,0.25);
 }}
 </style>
 </head>
