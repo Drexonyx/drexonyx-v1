@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>MDA — ماستر ديجيتال إيجنسي | كاتالوج الخدمات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:Cairo,sans-serif;background:#111;color:#fff;
+  direction:rtl;text-align:right;
+}
+
+/* ─── A4 BASE ─── */
+.pg{
+  width:210mm;height:297mm;
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;
+  flex-shrink:0;
+}
+@page{size:210mm 297mm;margin:0;}
+
+/* ══ COVER ══ */
+.pg-cover{position:relative;display:block;}
+.cv-img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center top;
+}
+.cv-overlay{
+  position:absolute;inset:0;
+  background:
+    linear-gradient(to left,
+      rgba(5,5,5,0.97) 0%,rgba(5,5,5,0.97) 14%,
+      rgba(5,5,5,0.55) 30%,rgba(5,5,5,0.00) 48%),
+    linear-gradient(to bottom,
+      rgba(5,5,5,0.00) 0%,rgba(5,5,5,0.00) 12%,
+      rgba(5,5,5,0.18) 20%,rgba(5,5,5,0.95) 28%,
+      rgba(5,5,5,0.97) 100%);
+}
+.cv-body{
+  position:relative;z-index:2;
+  padding:18mm 16mm 14mm;
+  height:100%;display:flex;flex-direction:column;justify-content:space-between;
+  direction:rtl;text-align:right;
+}
+.cv-top-label{
+  font-family:Cairo,sans-serif;font-size:7pt;font-weight:500;
+  color:rgba(200,152,10,0.7);letter-spacing:0;text-transform:uppercase;
+}
+.cv-main{display:flex;flex-direction:column;}
+.cv-title{
+  font-family:Amiri,serif;font-size:42pt;font-weight:700;
+  color:#fff;line-height:1.2;
+  margin-top:6mm;margin-bottom:5mm;
+  text-shadow:0 2px 12px rgba(0,0,0,0.9),0 0 30px rgba(0,0,0,0.8);
+}
+.cv-gold{color:#C8980A;}
+.cv-rule{
+  width:22mm;height:1pt;
+  background:linear-gradient(270deg,#C8980A,transparent);
+  margin-bottom:4.5mm;
+}
+.cv-sub{
+  font-family:Cairo,sans-serif;font-size:10pt;
+  color:rgba(255,255,255,0.72);line-height:1.7;
+  max-width:100mm;margin-bottom:7mm;
+  text-shadow:0 1px 6px rgba(0,0,0,0.9);
+}
+.cv-services{display:flex;flex-direction:column;gap:0;}
+.cv-svc-row{
+  display:flex;align-items:center;gap:3mm;
+  flex-direction:row-reverse;
+  padding:3mm 0;
+  border-bottom:0.3pt solid rgba(200,152,10,0.12);
+}
+.cv-svc-row:first-child{border-top:0.3pt solid rgba(200,152,10,0.12);}
+.cv-svc-num{
+  font-family:Cairo,sans-serif;font-size:7pt;font-weight:700;
+  color:#C8980A;letter-spacing:0;
+  width:6mm;flex-shrink:0;text-align:center;
+}
+.cv-svc-dot-sm{
+  width:3pt;height:3pt;background:rgba(200,152,10,0.35);
+  border-radius:50%;flex-shrink:0;
+}
+.cv-svc-name{
+  font-family:Cairo,sans-serif;font-size:9pt;
+  color:rgba(255,255,255,0.85);
+  text-shadow:0 1px 5px rgba(0,0,0,0.9);
+  flex:1;
+}
+.cv-foot{}
+.cv-contacts{
+  font-family:Cairo,sans-serif;font-size:8pt;
+  color:rgba(255,255,255,0.55);
+  display:flex;gap:4mm;align-items:center;flex-direction:row-reverse;
+}
+.cv-dot{color:rgba(200,152,10,0.4);}
+.cv-brand-line{
+  font-family:Cairo,sans-serif;font-size:6pt;
+  color:rgba(200,152,10,0.5);letter-spacing:0;
+  margin-top:3mm;
+}
+
+/* ══ SERVICE PAGES ══ */
+.pg-svc{background:#0a0a0a;}
+.pg-hdr{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:4mm 14mm;
+  border-bottom:0.4pt solid rgba(200,152,10,0.15);
+  flex-shrink:0;
+}
+.pg-hdr-l{
+  font-family:Cairo,sans-serif;font-size:6.5pt;font-weight:600;
+  color:rgba(200,152,10,0.7);letter-spacing:0;
+}
+.pg-hdr-r{
+  font-family:Cairo,sans-serif;font-size:6.5pt;
+  color:rgba(255,255,255,0.35);letter-spacing:0;
+}
+.pg-hdr-rule{
+  height:0.5pt;background:linear-gradient(270deg,#C8980A 0%,rgba(200,152,10,0.3) 40%,transparent 100%);
+  flex-shrink:0;
+}
+.pg-body{
+  flex:1;display:flex;overflow:hidden;
+}
+.pg-left{
+  flex:1;display:flex;flex-direction:column;justify-content:space-between;
+  padding:8mm 14mm 8mm 12mm;overflow:hidden;
+}
+/* Block A: service title + highlights */
+.lft-a{flex-shrink:0;}
+.svc-label{
+  font-family:Cairo,sans-serif;font-size:6.5pt;font-weight:700;
+  color:rgba(200,152,10,0.75);letter-spacing:0;text-transform:uppercase;
+  margin-bottom:2mm;
+}
+.svc-label-rule{
+  height:0.4pt;background:rgba(200,152,10,0.2);margin-bottom:3mm;
+}
+.svc-accent{
+  width:10mm;height:2pt;background:#C8980A;margin-bottom:4mm;margin-right:auto;
+}
+.svc-title{
+  font-family:Amiri,serif;font-size:22pt;font-weight:700;
+  color:#fff;line-height:1.25;margin-bottom:2mm;
+}
+.svc-sub{
+  font-family:Cairo,sans-serif;font-size:9pt;font-style:italic;
+  color:#C8980A;font-weight:400;margin-bottom:3.5mm;
+}
+.svc-rule{
+  width:40mm;height:1pt;
+  background:linear-gradient(270deg,#C8980A,transparent);
+  margin-bottom:3.5mm;margin-right:auto;
+}
+.svc-desc{
+  font-family:Cairo,sans-serif;font-size:8pt;
+  color:rgba(255,255,255,0.70);line-height:1.75;
+  margin-bottom:4mm;
+}
+.highlights{display:flex;gap:3mm;flex-direction:row-reverse;}
+.hl-item{
+  flex:1;padding:3mm 3.5mm;
+  background:rgba(200,152,10,0.05);
+  border:0.4pt solid rgba(200,152,10,0.18);
+  border-top:1.5pt solid rgba(200,152,10,0.6);
+}
+.hl-title{
+  font-family:Cairo,sans-serif;font-size:7.5pt;font-weight:700;
+  color:#fff;margin-bottom:1.5mm;
+}
+.hl-text{
+  font-family:Cairo,sans-serif;font-size:6.5pt;
+  color:rgba(200,152,10,0.75);
+}
+/* Block B */
+.lft-b{flex-shrink:0;}
+.sect-div{
+  height:0.4pt;
+  background:linear-gradient(270deg,rgba(200,152,10,0.4),rgba(200,152,10,0.1) 60%,transparent);
+  margin-bottom:4mm;
+}
+.sect-sub-div{
+  height:0.3pt;background:rgba(200,152,10,0.15);margin-bottom:3mm;
+}
+.sect-gap{height:3.5mm;flex-shrink:0;}
+.sect-head{
+  font-family:Cairo,sans-serif;font-size:6.5pt;font-weight:700;
+  color:rgba(200,152,10,0.80);letter-spacing:0;text-transform:uppercase;
+  margin-bottom:2mm;
+}
+.inc-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:1.5mm 5mm;
+  margin-bottom:3mm;
+}
+.inc-item{
+  display:flex;gap:2.5mm;align-items:flex-start;
+  flex-direction:row-reverse;
+}
+.inc-dot{
+  color:#C8980A;font-size:5pt;margin-top:2.5pt;flex-shrink:0;
+}
+.inc-item span:last-child{
+  font-family:Cairo,sans-serif;font-size:7.5pt;
+  color:rgba(255,255,255,0.75);line-height:1.45;
+}
+.steps-row{display:flex;gap:2.5mm;flex-direction:row-reverse;}
+.step{
+  flex:1;padding:2.5mm 3mm;
+  background:rgba(200,152,10,0.04);
+  border:0.4pt solid rgba(200,152,10,0.15);
+}
+.step-n{
+  font-family:Cairo,sans-serif;font-size:5.5pt;
+  color:rgba(200,152,10,0.55);letter-spacing:0;margin-bottom:1.5mm;
+}
+.step-t{
+  font-family:Amiri,serif;font-size:8.5pt;font-weight:700;
+  color:#fff;margin-bottom:1.5mm;
+}
+.step-d{
+  font-family:Cairo,sans-serif;font-size:6.5pt;
+  color:rgba(255,255,255,0.50);line-height:1.45;
+}
+/* Block C */
+.lft-c{flex-shrink:0;}
+.tags-row{display:flex;gap:2mm;flex-wrap:wrap;flex-direction:row-reverse;}
+.tag{
+  font-family:Cairo,sans-serif;font-size:6pt;
+  color:rgba(200,152,10,0.85);padding:1.8mm 3.5mm;
+  border:0.5pt solid rgba(200,152,10,0.3);
+}
+
+/* Right panel (dark editorial) */
+.pg-right{width:72mm;flex-shrink:0;}
+.svc-panel{
+  width:72mm;height:100%;
+  background:linear-gradient(155deg,#0d0d0d 0%,#181108 60%,#0f0c04 100%);
+  display:flex;flex-direction:column;padding:8mm 7mm;
+  position:relative;overflow:hidden;
+  direction:rtl;text-align:right;
+}
+.panel-ghost{
+  position:absolute;bottom:-10mm;left:-5mm;
+  font-family:Amiri,serif;font-size:110pt;font-weight:700;
+  color:rgba(200,152,10,0.055);line-height:1;
+  pointer-events:none;user-select:none;
+}
+.panel-bar{width:12mm;height:2pt;background:#C8980A;margin-bottom:5.5mm;flex-shrink:0;margin-right:auto;}
+.panel-cat{
+  font-family:Cairo,sans-serif;font-size:6pt;font-weight:700;
+  letter-spacing:0;color:rgba(200,152,10,0.80);text-transform:uppercase;
+  margin-bottom:4.5mm;flex-shrink:0;
+}
+.panel-hl{
+  font-family:Amiri,serif;font-size:17pt;font-weight:700;
+  color:#fff;line-height:1.35;margin-bottom:5mm;flex-shrink:0;
+}
+.panel-div{height:0.5pt;background:rgba(200,152,10,0.2);margin-bottom:5mm;flex-shrink:0;}
+.panel-list{flex:1;display:flex;flex-direction:column;gap:3mm;}
+.panel-item{display:flex;align-items:flex-start;gap:3mm;flex-direction:row-reverse;}
+.panel-bullet{width:3.5pt;height:3.5pt;background:#C8980A;border-radius:50%;margin-top:3.5pt;flex-shrink:0;}
+.panel-item-text{font-family:Cairo,sans-serif;font-size:7.5pt;color:rgba(255,255,255,0.80);line-height:1.6;}
+.panel-foot{border-top:0.5pt solid rgba(200,152,10,0.2);padding-top:3.5mm;margin-top:4mm;flex-shrink:0;}
+.panel-foot-text{font-family:Cairo,sans-serif;font-size:5.5pt;color:rgba(200,152,10,0.60);letter-spacing:0;}
+
+/* Footer strip */
+.pg-footer{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:3mm 14mm;
+  border-top:0.4pt solid rgba(200,152,10,0.12);
+  flex-shrink:0;
+  flex-direction:row-reverse;
+}
+.ft-brand{font-family:Cairo,sans-serif;font-size:6pt;font-weight:700;color:rgba(200,152,10,0.5);letter-spacing:0;}
+.ft-doc{font-family:Cairo,sans-serif;font-size:6pt;color:rgba(255,255,255,0.25);}
+.ft-num{font-family:Amiri,serif;font-size:8pt;color:rgba(200,152,10,0.4);}
+
+/* ══ CONTACT PAGE ══ */
+.pg-contact{
+  background:linear-gradient(155deg,#0d0d0d 0%,#181108 60%,#0f0c04 100%);
+  display:flex;flex-direction:column;
+  direction:rtl;
+}
+.ct-hdr{
+  display:flex;justify-content:space-between;align-items:baseline;
+  padding:8mm 18mm 5mm;
+  border-bottom:0.4pt solid rgba(200,152,10,0.15);
+  flex-shrink:0;
+  flex-direction:row-reverse;
+}
+.ct-hdr-l{
+  font-family:Cairo,sans-serif;font-size:6.5pt;font-weight:700;
+  color:rgba(200,152,10,0.6);letter-spacing:0;
+}
+.ct-hdr-r{
+  font-family:Cairo,sans-serif;font-size:6.5pt;
+  color:rgba(255,255,255,0.50);letter-spacing:0;
+}
+.ct-cols{flex:1;display:flex;overflow:hidden;flex-direction:row-reverse;}
+.ct-left{
+  flex:1;display:flex;flex-direction:column;justify-content:space-between;
+  padding:14mm 18mm 12mm 8mm;
+  position:relative;overflow:hidden;
+}
+.ct-ghost{
+  position:absolute;left:-5mm;bottom:-10mm;
+  font-family:Amiri,serif;font-size:140pt;font-weight:700;
+  color:rgba(200,152,10,0.05);line-height:1;
+  pointer-events:none;user-select:none;
+}
+.ct-left-top{flex-shrink:0;}
+.ct-eyebrow{
+  font-family:Cairo,sans-serif;font-size:7.5pt;font-weight:600;
+  color:rgba(200,152,10,0.90);letter-spacing:0;text-transform:uppercase;
+  margin-bottom:5mm;
+}
+.ct-title{
+  font-family:Amiri,serif;font-size:44pt;font-weight:700;
+  color:#fff;line-height:1.2;margin-bottom:5mm;
+}
+.ct-title em{color:#C8980A;font-style:italic;}
+.ct-gold-rule{
+  width:45mm;height:1.5pt;
+  background:linear-gradient(270deg,#C8980A,transparent);
+  margin-bottom:5mm;margin-right:auto;
+}
+.ct-tagline{
+  font-family:Cairo,sans-serif;font-size:9.5pt;
+  color:rgba(255,255,255,0.78);line-height:1.75;
+}
+.ct-svc-list{
+  flex:1;display:flex;flex-direction:column;justify-content:space-evenly;
+  padding:6mm 0;position:relative;z-index:1;
+  border-top:0.4pt solid rgba(200,152,10,0.25);
+  border-bottom:0.4pt solid rgba(200,152,10,0.25);
+  margin:5mm 0;
+}
+.ct-svc-row{
+  display:flex;align-items:center;gap:3mm;
+  padding:1mm 0;flex-direction:row-reverse;
+}
+.ct-svc-num{
+  font-family:Cairo,sans-serif;font-size:7pt;font-weight:700;
+  color:#C8980A;letter-spacing:0;width:5mm;flex-shrink:0;text-align:center;
+}
+.ct-svc-dot{width:2.5pt;height:2.5pt;background:rgba(200,152,10,0.60);border-radius:50%;flex-shrink:0;}
+.ct-svc-name{font-family:Cairo,sans-serif;font-size:9pt;color:rgba(255,255,255,0.85);flex:1;}
+.ct-brand-row{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  position:relative;z-index:1;
+  border-top:0.4pt solid rgba(200,152,10,0.25);
+  padding-top:4mm;flex-shrink:0;
+  flex-direction:row-reverse;
+}
+.ct-brand-name{font-family:Amiri,serif;font-size:18pt;font-weight:700;color:#fff;letter-spacing:0;}
+.ct-brand-right{text-align:left;}
+.ct-brand-sub{
+  font-family:Cairo,sans-serif;font-size:6pt;
+  color:rgba(200,152,10,0.70);letter-spacing:0;
+  margin-bottom:2mm;
+}
+.ct-brand-tagline{font-family:Amiri,serif;font-size:9pt;font-style:italic;color:rgba(255,255,255,0.55);}
+.ct-right{width:90mm;flex-shrink:0;}
+.ct-panel{
+  width:90mm;height:100%;
+  background:linear-gradient(155deg,#0e0e0e 0%,#181108 60%,#100c02 100%);
+  display:flex;flex-direction:column;
+  padding:12mm 9mm;
+  position:relative;overflow:hidden;
+  border-right:0.5pt solid rgba(200,152,10,0.20);
+  direction:rtl;text-align:right;
+}
+.ct-panel-ghost{
+  position:absolute;bottom:-12mm;left:-6mm;
+  font-family:Amiri,serif;font-size:120pt;font-weight:700;
+  color:rgba(200,152,10,0.07);line-height:1;
+  pointer-events:none;user-select:none;
+}
+.ct-panel-cat{
+  font-family:Cairo,sans-serif;font-size:6pt;font-weight:700;
+  letter-spacing:0;color:rgba(200,152,10,0.90);
+  margin-bottom:4.5mm;flex-shrink:0;
+}
+.ct-panel-hl{
+  font-family:Amiri,serif;font-size:26pt;font-weight:700;
+  color:#fff;line-height:1.3;margin-bottom:6mm;flex-shrink:0;
+}
+.ct-cards{flex:1;display:flex;flex-direction:column;gap:4mm;}
+.ct-crd{
+  flex:1;padding:3.5mm 4mm;
+  background:rgba(255,255,255,0.05);
+  border:0.5pt solid rgba(200,152,10,0.20);
+  border-top:1.5pt solid rgba(200,152,10,0.65);
+}
+.ct-crd-label{
+  font-family:Cairo,sans-serif;font-size:6pt;font-weight:700;
+  color:rgba(200,152,10,0.85);letter-spacing:0;
+  margin-bottom:2mm;
+}
+.ct-crd-val{
+  font-family:Cairo,sans-serif;font-size:9.5pt;
+  color:rgba(255,255,255,0.90);line-height:1.45;
+  direction:ltr;text-align:right;
+}
+.ct-panel-foot{border-top:0.5pt solid rgba(200,152,10,0.25);padding-top:3.5mm;margin-top:5mm;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<div class="pg pg-cover">
+  <img src="/home/user/drexonyx-v1/master-digital-agency/deliverables/mda-service-catalog/assets/images/cover.jpg" class="cv-img" alt="MDA">
+  <div class="cv-overlay"></div>
+  <div class="cv-body">
+    <div class="cv-top-label">MDA / ماستر ديجيتال إيجنسي</div>
+    <div class="cv-main">
+      <h1 class="cv-title">خدمات<br><span class="cv-gold">إطلاق</span><br>الأعمال</h1>
+      <div class="cv-rule"></div>
+      <p class="cv-sub">من البروفايل الشركاتي إلى الفيديو المؤسسي —<br>كل ما تحتاجه لإطلاق أعمالك ونموها.</p>
+      <div class="cv-services">
+        <div class="cv-svc-row"><span class="cv-svc-num">01</span><span class="cv-svc-dot-sm"></span><span class="cv-svc-name">تصميم البروفايل الشركاتي</span></div><div class="cv-svc-row"><span class="cv-svc-num">02</span><span class="cv-svc-dot-sm"></span><span class="cv-svc-name">تصميم المواقع الإلكترونية</span></div><div class="cv-svc-row"><span class="cv-svc-num">03</span><span class="cv-svc-dot-sm"></span><span class="cv-svc-name">حزمة الهوية التجارية</span></div><div class="cv-svc-row"><span class="cv-svc-num">04</span><span class="cv-svc-dot-sm"></span><span class="cv-svc-name">حزمة الإطلاق الرقمي</span></div><div class="cv-svc-row"><span class="cv-svc-num">05</span><span class="cv-svc-dot-sm"></span><span class="cv-svc-name">تصميم البوسترات ومحتوى السوشيال</span></div><div class="cv-svc-row"><span class="cv-svc-num">06</span><span class="cv-svc-dot-sm"></span><span class="cv-svc-name">الفيديو الترويجي المؤسسي</span></div><div class="cv-svc-row"><span class="cv-svc-num">07</span><span class="cv-svc-dot-sm"></span><span class="cv-svc-name">مقاطع الفيديو القصيرة UGC</span></div>
+      </div>
+    </div>
+    <div class="cv-foot">
+      <div class="cv-contacts">
+        <span>www.drexonyx.com</span><span class="cv-dot">·</span>
+        <span>info@drexonyx.com</span><span class="cv-dot">·</span>
+        <span>دبي، الإمارات العربية المتحدة</span>
+      </div>
+      <div class="cv-brand-line">MDA علامة تجارية من DREXONYX · أفكار تُحدث أثراً</div>
+    </div>
+  </div>
+</div>
+
+<div class="pg pg-svc">
+  <div class="pg-hdr">
+    <span class="pg-hdr-l">MDA — ماستر ديجيتال إيجنسي</span>
+    <span class="pg-hdr-r">علامة تجارية من DREXONYX &nbsp;·&nbsp; كاتالوج الخدمات 2026</span>
+  </div>
+  <div class="pg-hdr-rule"></div>
+  <div class="pg-body">
+    <div class="pg-left">
+      <div class="lft-a">
+        <div class="svc-label">خدمة التصميم &nbsp;/&nbsp; 01</div>
+        <div class="svc-label-rule"></div>
+        <div class="svc-accent"></div>
+        <h2 class="svc-title">تصميم البروفايل<br>الشركاتي</h2>
+        <p class="svc-sub">قدّم أعمالك بأسلوب يُلهم الثقة</p>
+        <div class="svc-rule"></div>
+        <p class="svc-desc">البروفايل الشركاتي الاحترافي هو أقوى انطباع أول تتركه على عملائك. نصمّم بروفايلات أنيقة وجاهزة للطباعة تعكس رؤيتك وتُبرز خدماتك وتبني الثقة مع العملاء والشركاء والمستثمرين. كل صفحة مُهيكلة لتحكي قصتك بوضوح وإقناع.</p>
+        <div class="highlights"><div class="hl-item"><div class="hl-title">تصميم ثنائي اللغة</div><div class="hl-text">عربي وإنجليزي</div></div><div class="hl-item"><div class="hl-title">طباعة ورقمي</div><div class="hl-text">جميع الصيغ متضمنة</div></div><div class="hl-item"><div class="hl-title">هوية متناسقة</div><div class="hl-text">يعكس هويتك بدقة</div></div></div>
+      </div>
+      <div class="lft-b">
+        <div class="sect-head">ما يشمله</div>
+        <div class="sect-sub-div"></div>
+        <div class="inc-grid"><div class="inc-item"><span class="inc-dot">&#9668;</span><span>صفحة الرؤية والرسالة</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>نبذة عن شركتك</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>نظرة عامة على الخدمات</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>تعريف بالفريق</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>المحفظة والإنجازات</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>تطبيق الهوية التجارية</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>صيغ الطباعة والرقمية</span></div></div>
+        <div class="sect-gap"></div>
+        <div class="sect-head">آلية العمل</div>
+        <div class="sect-sub-div"></div>
+        <div class="steps-row"><div class="step"><div class="step-n">الخطوة 01</div><div class="step-t">الإحاطة</div><div class="step-d">نتعرف على أعمالك وأهدافك وجمهورك</div></div><div class="step"><div class="step-n">الخطوة 02</div><div class="step-t">التصميم</div><div class="step-d">تخطيطات مُصممة لتتناسب مع هويتك</div></div><div class="step"><div class="step-n">الخطوة 03</div><div class="step-t">المحتوى</div><div class="step-d">دمج نصوصك ومرئياتك بشكل منظم</div></div><div class="step"><div class="step-n">الخطوة 04</div><div class="step-t">المراجعة</div><div class="step-d">تعديلات حتى يصل إلى الكمال</div></div><div class="step"><div class="step-n">الخطوة 05</div><div class="step-t">التسليم</div><div class="step-d">PDF جاهز للطباعة وملفات للتعديل</div></div></div>
+      </div>
+      <div class="lft-c">
+        <div class="tags-row"><span class="tag">PDF جاهز للطباعة</span><span class="tag">صيغة رقمية</span><span class="tag">تخطيط A4</span><span class="tag">منسجم مع الهوية</span><span class="tag">عربي وإنجليزي</span></div>
+      </div>
+    </div>
+    <div class="pg-right">
+      <div class="svc-panel">
+        <div class="panel-ghost">01</div>
+        <div class="panel-bar"></div>
+        <div class="panel-cat">خدمة التصميم</div>
+        <div class="panel-hl">أعمالك،<br>بشكل<br>احترافي</div>
+        <div class="panel-div"></div>
+        <div class="panel-list"><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">تخطيط تحريري مخصص — من 20 إلى 50+ صفحة</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">ثنائي اللغة بالكامل: عربي وإنجليزي</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">PDF جاهز للطباعة + ملفات قابلة للتعديل</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">منسجم مع هويتك التجارية الحالية</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">يُسلَّم خلال 5–7 أيام عمل</div></div></div>
+        <div class="panel-foot">
+          <div class="panel-foot-text">MDA — ماستر ديجيتال إيجنسي</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pg-footer">
+    <span class="ft-brand">DREXONYX × MDA</span>
+    <span class="ft-doc">كاتالوج الخدمات — سري</span>
+    <span class="ft-num">02</span>
+  </div>
+</div>
+<div class="pg pg-svc">
+  <div class="pg-hdr">
+    <span class="pg-hdr-l">MDA — ماستر ديجيتال إيجنسي</span>
+    <span class="pg-hdr-r">علامة تجارية من DREXONYX &nbsp;·&nbsp; كاتالوج الخدمات 2026</span>
+  </div>
+  <div class="pg-hdr-rule"></div>
+  <div class="pg-body">
+    <div class="pg-left">
+      <div class="lft-a">
+        <div class="svc-label">خدمة رقمية &nbsp;/&nbsp; 02</div>
+        <div class="svc-label-rule"></div>
+        <div class="svc-accent"></div>
+        <h2 class="svc-title">تصميم المواقع<br>الإلكترونية</h2>
+        <p class="svc-sub">مواقع حديثة تنمّي أعمالك</p>
+        <div class="svc-rule"></div>
+        <p class="svc-desc">موقعك الإلكتروني هو مندوب مبيعاتك على مدار الساعة. نصمّم مواقع سريعة ومتجاوبة مع الجوال تجذب الانتباه وتحوّل الزوار إلى عملاء وتعكس جودة علامتك التجارية — للمطاعم والعيادات والصالونات والشركات وكل الأعمال. مبنية للترتيب، مبنية للتحويل.</p>
+        <div class="highlights"><div class="hl-item"><div class="hl-title">أولوية الجوال</div><div class="hl-text">يعمل على كل الأجهزة</div></div><div class="hl-item"><div class="hl-title">محسّن لمحركات البحث</div><div class="hl-text">مبني للترتيب والتحويل</div></div><div class="hl-item"><div class="hl-title">تسليم سريع</div><div class="hl-text">جاهز خلال 2–3 أسابيع</div></div></div>
+      </div>
+      <div class="lft-b">
+        <div class="sect-head">ما يشمله</div>
+        <div class="sect-sub-div"></div>
+        <div class="inc-grid"><div class="inc-item"><span class="inc-dot">&#9668;</span><span>تصميم وتخطيط مخصص</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>متجاوب مع الجوال</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>هيكل محسّن لـ SEO</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>نماذج التواصل والحجز</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>تكامل السوشيال ميديا</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>محسّن للسرعة</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>إدارة المحتوى</span></div></div>
+        <div class="sect-gap"></div>
+        <div class="sect-head">آلية العمل</div>
+        <div class="sect-sub-div"></div>
+        <div class="steps-row"><div class="step"><div class="step-n">الخطوة 01</div><div class="step-t">الاستكشاف</div><div class="step-d">فهم أعمالك وأهدافك</div></div><div class="step"><div class="step-n">الخطوة 02</div><div class="step-t">التصميم الهيكلي</div><div class="step-d">هيكل وبنية الصفحات</div></div><div class="step"><div class="step-n">الخطوة 03</div><div class="step-t">التصميم</div><div class="step-d">تصميم مرئي بهويتك التجارية</div></div><div class="step"><div class="step-n">الخطوة 04</div><div class="step-t">البناء</div><div class="step-d">تطوير كامل وتكامل</div></div><div class="step"><div class="step-n">الخطوة 05</div><div class="step-t">الإطلاق</div><div class="step-d">اختبار نهائي وتسليم</div></div></div>
+      </div>
+      <div class="lft-c">
+        <div class="tags-row"><span class="tag">مطاعم</span><span class="tag">تجزئة</span><span class="tag">رعاية صحية</span><span class="tag">شركات</span><span class="tag">تجارة إلكترونية</span><span class="tag">صفحات هبوط</span></div>
+      </div>
+    </div>
+    <div class="pg-right">
+      <div class="svc-panel">
+        <div class="panel-ghost">02</div>
+        <div class="panel-bar"></div>
+        <div class="panel-cat">خدمة رقمية</div>
+        <div class="panel-hl">مواقع مبنية<br>لتحويل<br>الزوار</div>
+        <div class="panel-div"></div>
+        <div class="panel-list"><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">تصميم فريد منسجم مع هويتك التجارية</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">متجاوب مع الجوال على جميع الشاشات</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">هيكل محسّن لمحركات البحث من الأساس</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">نماذج تواصل وحجز وتكامل جاهزة</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">تسليم كامل مع التدريب والدعم</div></div></div>
+        <div class="panel-foot">
+          <div class="panel-foot-text">MDA — ماستر ديجيتال إيجنسي</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pg-footer">
+    <span class="ft-brand">DREXONYX × MDA</span>
+    <span class="ft-doc">كاتالوج الخدمات — سري</span>
+    <span class="ft-num">03</span>
+  </div>
+</div>
+<div class="pg pg-svc">
+  <div class="pg-hdr">
+    <span class="pg-hdr-l">MDA — ماستر ديجيتال إيجنسي</span>
+    <span class="pg-hdr-r">علامة تجارية من DREXONYX &nbsp;·&nbsp; كاتالوج الخدمات 2026</span>
+  </div>
+  <div class="pg-hdr-rule"></div>
+  <div class="pg-body">
+    <div class="pg-left">
+      <div class="lft-a">
+        <div class="svc-label">خدمة العلامة التجارية &nbsp;/&nbsp; 03</div>
+        <div class="svc-label-rule"></div>
+        <div class="svc-accent"></div>
+        <h2 class="svc-title">حزمة الهوية<br>التجارية</h2>
+        <p class="svc-sub">هوية مميزة تبقى في الذاكرة</p>
+        <div class="svc-rule"></div>
+        <p class="svc-desc">من تصميم الشعار إلى هوية العلامة التجارية الكاملة، نساعد أعمالك على التميز بصورة احترافية ومتناسقة عبر جميع المنصات — إلكترونياً وورقياً. كل عنصر مُصمم ليحكي قصتك بلمحة واحدة ويترك انطباعاً دائماً لدى كل عميل تلتقيه.</p>
+        <div class="highlights"><div class="hl-item"><div class="hl-title">نظام الشعار</div><div class="hl-text">جميع المتغيرات متضمنة</div></div><div class="hl-item"><div class="hl-title">دليل العلامة</div><div class="hl-text">قواعد الأسلوب الكاملة</div></div><div class="hl-item"><div class="hl-title">القرطاسية</div><div class="hl-text">بطاقات وترويسات والمزيد</div></div></div>
+      </div>
+      <div class="lft-b">
+        <div class="sect-head">ما يشمله</div>
+        <div class="sect-sub-div"></div>
+        <div class="inc-grid"><div class="inc-item"><span class="inc-dot">&#9668;</span><span>تصميم الشعار</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>دليل أسلوب العلامة</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>نظام لوحة الألوان</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>اختيار الطباعة</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>تصميم بطاقة الأعمال</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>الترويسة والقرطاسية</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>دليل تطبيقات العلامة</span></div></div>
+        <div class="sect-gap"></div>
+        <div class="sect-head">آلية العمل</div>
+        <div class="sect-sub-div"></div>
+        <div class="steps-row"><div class="step"><div class="step-n">الخطوة 01</div><div class="step-t">الاستكشاف</div><div class="step-d">قيم العلامة والجمهور والمنافسين</div></div><div class="step"><div class="step-n">الخطوة 02</div><div class="step-t">المفاهيم</div><div class="step-d">عدة اتجاهات للشعار</div></div><div class="step"><div class="step-n">الخطوة 03</div><div class="step-t">الهوية</div><div class="step-d">نظام العلامة الكامل</div></div><div class="step"><div class="step-n">الخطوة 04</div><div class="step-t">التحسين</div><div class="step-d">مراجعات وموافقة نهائية</div></div><div class="step"><div class="step-n">الخطوة 05</div><div class="step-t">كتاب العلامة</div><div class="step-d">دليل شامل مُسلَّم</div></div></div>
+      </div>
+      <div class="lft-c">
+        <div class="tags-row"><span class="tag">تصميم الشعار</span><span class="tag">دليل العلامة</span><span class="tag">القرطاسية</span><span class="tag">التغليف</span><span class="tag">اللافتات</span><span class="tag">رقمي وطباعي</span></div>
+      </div>
+    </div>
+    <div class="pg-right">
+      <div class="svc-panel">
+        <div class="panel-ghost">03</div>
+        <div class="panel-bar"></div>
+        <div class="panel-cat">خدمة العلامة التجارية</div>
+        <div class="panel-hl">هوية<br>تستحق<br>أن تُذكر</div>
+        <div class="panel-div"></div>
+        <div class="panel-list"><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">عدة مفاهيم للشعار للاختيار</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">لوحة ألوان كاملة ونظام طباعي</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">بطاقة أعمال وترويسة وقرطاسية</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">دليل أسلوب العلامة للاستخدام المتناسق</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">ملفات جاهزة للطباعة والرقمية</div></div></div>
+        <div class="panel-foot">
+          <div class="panel-foot-text">MDA — ماستر ديجيتال إيجنسي</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pg-footer">
+    <span class="ft-brand">DREXONYX × MDA</span>
+    <span class="ft-doc">كاتالوج الخدمات — سري</span>
+    <span class="ft-num">04</span>
+  </div>
+</div>
+<div class="pg pg-svc">
+  <div class="pg-hdr">
+    <span class="pg-hdr-l">MDA — ماستر ديجيتال إيجنسي</span>
+    <span class="pg-hdr-r">علامة تجارية من DREXONYX &nbsp;·&nbsp; كاتالوج الخدمات 2026</span>
+  </div>
+  <div class="pg-hdr-rule"></div>
+  <div class="pg-body">
+    <div class="pg-left">
+      <div class="lft-a">
+        <div class="svc-label">خدمة الإطلاق &nbsp;/&nbsp; 04</div>
+        <div class="svc-label-rule"></div>
+        <div class="svc-accent"></div>
+        <h2 class="svc-title">حزمة الإطلاق<br>الرقمي</h2>
+        <p class="svc-sub">كل ما تحتاجه للانطلاق في العالم الرقمي</p>
+        <div class="svc-rule"></div>
+        <p class="svc-desc">مجموعة كاملة من المواد الرقمية المصممة لإطلاق أعمالك بحضور قوي واحترافي منذ اليوم الأول — موقع إلكتروني وصفحات سوشيال ميديا ومواد مطبوعة ومحتوى مرئي، كلها موحدة تحت علامتك التجارية. انطلق بثقة، واظهر باحترافية فورية.</p>
+        <div class="highlights"><div class="hl-item"><div class="hl-title">متكامل في واحد</div><div class="hl-text">موقع + سوشيال + طباعة</div></div><div class="hl-item"><div class="hl-title">علامة موحدة</div><div class="hl-text">متناسق عبر كل شيء</div></div><div class="hl-item"><div class="hl-title">إطلاق سريع</div><div class="hl-text">جاهز خلال 2–3 أسابيع</div></div></div>
+      </div>
+      <div class="lft-b">
+        <div class="sect-head">ما يشمله</div>
+        <div class="sect-sub-div"></div>
+        <div class="inc-grid"><div class="inc-item"><span class="inc-dot">&#9668;</span><span>تصميم الموقع</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>إعداد صفحات السوشيال</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>تصميم بطاقة الأعمال</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>قائمة أو كتيب رقمي</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>مجموعة بوسترات الإطلاق</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>تصميم توقيع البريد</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>قائمة فحص الإطلاق</span></div></div>
+        <div class="sect-gap"></div>
+        <div class="sect-head">آلية العمل</div>
+        <div class="sect-sub-div"></div>
+        <div class="steps-row"><div class="step"><div class="step-n">الخطوة 01</div><div class="step-t">الإعداد</div><div class="step-d">جمع معلومات العلامة والأعمال</div></div><div class="step"><div class="step-n">الخطوة 02</div><div class="step-t">المواد</div><div class="step-d">إنشاء جميع المواد المرئية والرقمية</div></div><div class="step"><div class="step-n">الخطوة 03</div><div class="step-t">التهيئة</div><div class="step-d">تكوين المنصات والتكامل</div></div><div class="step"><div class="step-n">الخطوة 04</div><div class="step-t">المراجعة</div><div class="step-d">جلسة استعراض كاملة وموافقة العميل</div></div><div class="step"><div class="step-n">الخطوة 05</div><div class="step-t">الإطلاق</div><div class="step-d">أعمالك على الهواء، جاهزة للنمو</div></div></div>
+      </div>
+      <div class="lft-c">
+        <div class="tags-row"><span class="tag">حزمة كاملة</span><span class="tag">صفحات سوشيال</span><span class="tag">موقع إلكتروني</span><span class="tag">مواد مطبوعة</span><span class="tag">تسليم سريع</span></div>
+      </div>
+    </div>
+    <div class="pg-right">
+      <div class="svc-panel">
+        <div class="panel-ghost">04</div>
+        <div class="panel-bar"></div>
+        <div class="panel-cat">خدمة الإطلاق</div>
+        <div class="panel-hl">انطلق قوياً.<br>انطلق بذكاء.<br>انطلق الآن.</div>
+        <div class="panel-div"></div>
+        <div class="panel-list"><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">الموقع والسوشيال ميديا والطباعة في حزمة واحدة</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">هوية علامة تجارية موحدة عبر جميع نقاط التواصل</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">إعداد صفحات السوشيال ميديا وتعليمها بالكامل</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">قائمة رقمية أو كتيب أو بوستر إطلاق</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">توقيع بريد إلكتروني وبطاقة أعمال رقمية</div></div></div>
+        <div class="panel-foot">
+          <div class="panel-foot-text">MDA — ماستر ديجيتال إيجنسي</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pg-footer">
+    <span class="ft-brand">DREXONYX × MDA</span>
+    <span class="ft-doc">كاتالوج الخدمات — سري</span>
+    <span class="ft-num">05</span>
+  </div>
+</div>
+<div class="pg pg-svc">
+  <div class="pg-hdr">
+    <span class="pg-hdr-l">MDA — ماستر ديجيتال إيجنسي</span>
+    <span class="pg-hdr-r">علامة تجارية من DREXONYX &nbsp;·&nbsp; كاتالوج الخدمات 2026</span>
+  </div>
+  <div class="pg-hdr-rule"></div>
+  <div class="pg-body">
+    <div class="pg-left">
+      <div class="lft-a">
+        <div class="svc-label">خدمة إبداعية &nbsp;/&nbsp; 05</div>
+        <div class="svc-label-rule"></div>
+        <div class="svc-accent"></div>
+        <h2 class="svc-title">تصميم البوسترات<br>ومحتوى السوشيال</h2>
+        <p class="svc-sub">تصاميم جذابة تُحيي علامتك التجارية</p>
+        <div class="svc-rule"></div>
+        <p class="svc-desc">تصاميم مخصصة لمنتجاتك وعروضك وفعالياتك ومحتوى السوشيال ميديا اليومي. تميّز في الفيدات المزدحمة بمرئيات مُصممة لتوقف التمرير وتوصل رسالتك وتحفز التفاعل الحقيقي — عبر إنستغرام وتيك توك وفيسبوك وكل منصة يستخدمها عملاؤك.</p>
+        <div class="highlights"><div class="hl-item"><div class="hl-title">كل المنصات</div><div class="hl-text">إنستغرام وتيك توك والمزيد</div></div><div class="hl-item"><div class="hl-title">جاهز للنشر</div><div class="hl-text">أبعاد وصيغ صحيحة</div></div><div class="hl-item"><div class="hl-title">محتوى بهويتك</div><div class="hl-text">هوية بصرية متناسقة</div></div></div>
+      </div>
+      <div class="lft-b">
+        <div class="sect-head">ما يشمله</div>
+        <div class="sect-sub-div"></div>
+        <div class="inc-grid"><div class="inc-item"><span class="inc-dot">&#9668;</span><span>منشورات فيد السوشيال</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>أغلفة القصص والريلز</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>بوسترات ترويجية</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>إعلانات الفعاليات</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>تصاميم العروض والتخفيضات</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>قوالب محتوى بعلامتك</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>نسخ جاهزة للطباعة</span></div></div>
+        <div class="sect-gap"></div>
+        <div class="sect-head">آلية العمل</div>
+        <div class="sect-sub-div"></div>
+        <div class="steps-row"><div class="step"><div class="step-n">الخطوة 01</div><div class="step-t">الإحاطة</div><div class="step-d">فهم العرض والنبرة والهدف</div></div><div class="step"><div class="step-n">الخطوة 02</div><div class="step-t">المفهوم</div><div class="step-d">الاتجاه المرئي ونهج التخطيط</div></div><div class="step"><div class="step-n">الخطوة 03</div><div class="step-t">التصميم</div><div class="step-d">مرئيات بعلامتك مُصممة للتحويل</div></div><div class="step"><div class="step-n">الخطوة 04</div><div class="step-t">المراجعة</div><div class="step-d">تعديلات حتى تكون راضياً</div></div><div class="step"><div class="step-n">الخطوة 05</div><div class="step-t">التسليم</div><div class="step-d">الملفات النهائية بجميع الصيغ المطلوبة</div></div></div>
+      </div>
+      <div class="lft-c">
+        <div class="tags-row"><span class="tag">إنستغرام</span><span class="tag">فيسبوك</span><span class="tag">تيك توك</span><span class="tag">طباعة</span><span class="tag">قصص</span><span class="tag">عروض وترويجات</span></div>
+      </div>
+    </div>
+    <div class="pg-right">
+      <div class="svc-panel">
+        <div class="panel-ghost">05</div>
+        <div class="panel-bar"></div>
+        <div class="panel-cat">خدمة إبداعية</div>
+        <div class="panel-hl">تصاميم<br>توقف<br>التمرير</div>
+        <div class="panel-div"></div>
+        <div class="panel-list"><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">منشورات الفيد والقصص والريلز والأغلفة</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">عروض وترويجات وإعلانات الفعاليات</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">مرئيات بعلامتك تعبّر بشكل فوري</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">نسخ جاهزة للطباعة كبوسترات ولافتات</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">تسليم بجميع صيغ المنصات المطلوبة</div></div></div>
+        <div class="panel-foot">
+          <div class="panel-foot-text">MDA — ماستر ديجيتال إيجنسي</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pg-footer">
+    <span class="ft-brand">DREXONYX × MDA</span>
+    <span class="ft-doc">كاتالوج الخدمات — سري</span>
+    <span class="ft-num">06</span>
+  </div>
+</div>
+<div class="pg pg-svc">
+  <div class="pg-hdr">
+    <span class="pg-hdr-l">MDA — ماستر ديجيتال إيجنسي</span>
+    <span class="pg-hdr-r">علامة تجارية من DREXONYX &nbsp;·&nbsp; كاتالوج الخدمات 2026</span>
+  </div>
+  <div class="pg-hdr-rule"></div>
+  <div class="pg-body">
+    <div class="pg-left">
+      <div class="lft-a">
+        <div class="svc-label">خدمة الفيديو &nbsp;/&nbsp; 06</div>
+        <div class="svc-label-rule"></div>
+        <div class="svc-accent"></div>
+        <h2 class="svc-title">الفيديو الترويجي<br>المؤسسي</h2>
+        <p class="svc-sub">احكِ قصتك بأسلوب مؤثر</p>
+        <div class="svc-rule"></div>
+        <p class="svc-desc">فيديوهات احترافية تعرض أعمالك وخدماتك وعلامتك التجارية بطريقة تجذب العملاء وتبني الثقة. من المفهوم حتى التسليم النهائي — جودة سينمائية وسرد قصصي مقنع، في كل مرة. يُنتج في دبي مع فريق احترافي كامل وما بعد الإنتاج.</p>
+        <div class="highlights"><div class="hl-item"><div class="hl-title">إنتاج دبي</div><div class="hl-text">تصوير احترافي في الموقع</div></div><div class="hl-item"><div class="hl-title">جودة سينمائية</div><div class="hl-text">تصحيح ألوان وتصميم صوت كامل</div></div><div class="hl-item"><div class="hl-title">متعدد المنصات</div><div class="hl-text">جميع الدقات مُسلَّمة</div></div></div>
+      </div>
+      <div class="lft-b">
+        <div class="sect-head">ما يشمله</div>
+        <div class="sect-sub-div"></div>
+        <div class="inc-grid"><div class="inc-item"><span class="inc-dot">&#9668;</span><span>تطوير المفهوم والسكريبت</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>تصوير احترافي</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>تحرير ما بعد الإنتاج</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>تصحيح الألوان وتصميم الصوت</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>موشن غرافيك وعناوين</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>صيغ متعددة للمنصات</span></div></div>
+        <div class="sect-gap"></div>
+        <div class="sect-head">آلية العمل</div>
+        <div class="sect-sub-div"></div>
+        <div class="steps-row"><div class="step"><div class="step-n">الخطوة 01</div><div class="step-t">المفهوم</div><div class="step-d">السكريبت واللوحة المصورة والإحاطة</div></div><div class="step"><div class="step-n">الخطوة 02</div><div class="step-t">ما قبل الإنتاج</div><div class="step-d">الموقع والمواهب وجدولة التصوير</div></div><div class="step"><div class="step-n">الخطوة 03</div><div class="step-t">التصوير</div><div class="step-d">إنتاج احترافي في الموقع</div></div><div class="step"><div class="step-n">الخطوة 04</div><div class="step-t">المونتاج</div><div class="step-d">ما بعد الإنتاج والألوان والصوت</div></div><div class="step"><div class="step-n">الخطوة 05</div><div class="step-t">التسليم</div><div class="step-d">الفيديو النهائي بجميع الدقات</div></div></div>
+      </div>
+      <div class="lft-c">
+        <div class="tags-row"><span class="tag">عرض الشركة</span><span class="tag">إبراز الخدمات</span><span class="tag">فيلم المنتج</span><span class="tag">قصة العلامة</span><span class="tag">إنتاج دبي</span></div>
+      </div>
+    </div>
+    <div class="pg-right">
+      <div class="svc-panel">
+        <div class="panel-ghost">06</div>
+        <div class="panel-bar"></div>
+        <div class="panel-cat">خدمة الفيديو</div>
+        <div class="panel-hl">قصتك،<br>مُروَاة<br>سينمائياً</div>
+        <div class="panel-div"></div>
+        <div class="panel-list"><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">تطوير المفهوم والإحاطة الإبداعية</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">تصوير احترافي في الموقع بدبي</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">ما بعد إنتاج كامل: مونتاج وألوان وصوت</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">موشن غرافيك وعناوين وتراكبات العلامة</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">تسليم بجميع الدقات المطلوبة</div></div></div>
+        <div class="panel-foot">
+          <div class="panel-foot-text">MDA — ماستر ديجيتال إيجنسي</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pg-footer">
+    <span class="ft-brand">DREXONYX × MDA</span>
+    <span class="ft-doc">كاتالوج الخدمات — سري</span>
+    <span class="ft-num">07</span>
+  </div>
+</div>
+<div class="pg pg-svc">
+  <div class="pg-hdr">
+    <span class="pg-hdr-l">MDA — ماستر ديجيتال إيجنسي</span>
+    <span class="pg-hdr-r">علامة تجارية من DREXONYX &nbsp;·&nbsp; كاتالوج الخدمات 2026</span>
+  </div>
+  <div class="pg-hdr-rule"></div>
+  <div class="pg-body">
+    <div class="pg-left">
+      <div class="lft-a">
+        <div class="svc-label">خدمة الفيديو &nbsp;/&nbsp; 07</div>
+        <div class="svc-label-rule"></div>
+        <div class="svc-accent"></div>
+        <h2 class="svc-title">مقاطع الفيديو<br>القصيرة UGC</h2>
+        <p class="svc-sub">أشخاص حقيقيون. محتوى حقيقي. نتائج حقيقية.</p>
+        <div class="svc-rule"></div>
+        <p class="svc-desc">فيديوهات قصيرة أصيلة تجعل أعمالك تبرز وتتواصل مع العملاء الحقيقيين. مُصممة للريلز وتيك توك — جاهزة للنشر ومبنية لتنمية التفاعل بشكل طبيعي. الصيغة الأكثر ثقة في التسويق الرقمي الحديث، مُنتجة باحترافية لعلامتك.</p>
+        <div class="highlights"><div class="hl-item"><div class="hl-title">ريلز وتيك توك</div><div class="hl-text">صيغ محسّنة للمنصات</div></div><div class="hl-item"><div class="hl-title">أشخاص أصيلون</div><div class="hl-text">محتوى حقيقي وموثوق</div></div><div class="hl-item"><div class="hl-title">تسليم سريع</div><div class="hl-text">جاهز للنشر بسرعة</div></div></div>
+      </div>
+      <div class="lft-b">
+        <div class="sect-head">ما يشمله</div>
+        <div class="sect-sub-div"></div>
+        <div class="inc-grid"><div class="inc-item"><span class="inc-dot">&#9668;</span><span>السكريبت واللوحة المصورة</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>تصوير في الموقع أو الاستوديو</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>مونتاج وتصحيح ألوان احترافي</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>مقاطع صوتية وترجمة</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>صيغ محسّنة للمنصات</span></div><div class="inc-item"><span class="inc-dot">&#9668;</span><span>تسليم جاهز للنشر</span></div></div>
+        <div class="sect-gap"></div>
+        <div class="sect-head">آلية العمل</div>
+        <div class="sect-sub-div"></div>
+        <div class="steps-row"><div class="step"><div class="step-n">الخطوة 01</div><div class="step-t">الإحاطة</div><div class="step-d">المفهوم والرسائل والجمهور المستهدف</div></div><div class="step"><div class="step-n">الخطوة 02</div><div class="step-t">السكريبت</div><div class="step-d">سكريبت طبيعي وأصيل مكتوب</div></div><div class="step"><div class="step-n">الخطوة 03</div><div class="step-t">التصوير</div><div class="step-d">مُصوَّر في موقعك أو الاستوديو</div></div><div class="step"><div class="step-n">الخطوة 04</div><div class="step-t">المونتاج</div><div class="step-d">مُعدَّل، مُصحَّح الألوان، مُترجَم</div></div><div class="step"><div class="step-n">الخطوة 05</div><div class="step-t">التسليم</div><div class="step-d">ملفات جاهزة للنشر، جميع المنصات</div></div></div>
+      </div>
+      <div class="lft-c">
+        <div class="tags-row"><span class="tag">ريلز</span><span class="tag">تيك توك</span><span class="tag">يوتيوب شورتس</span><span class="tag">محتوى أصيل</span><span class="tag">تفاعل عالي</span></div>
+      </div>
+    </div>
+    <div class="pg-right">
+      <div class="svc-panel">
+        <div class="panel-ghost">07</div>
+        <div class="panel-bar"></div>
+        <div class="panel-cat">خدمة الفيديو</div>
+        <div class="panel-hl">محتوى أصيل<br>يُحوّل<br>المشاهدين</div>
+        <div class="panel-div"></div>
+        <div class="panel-list"><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">سكريبت مكتوب لتقديم طبيعي وأصيل</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">تصوير في موقعك أو في استوديونا</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">مونتاج احترافي وتصحيح ألوان ومقاطع صوتية</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">محسّن للريلز وتيك توك ويوتيوب شورتس</div></div><div class="panel-item"><div class="panel-bullet"></div><div class="panel-item-text">ملفات جاهزة للنشر على جميع المنصات</div></div></div>
+        <div class="panel-foot">
+          <div class="panel-foot-text">MDA — ماستر ديجيتال إيجنسي</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="pg-footer">
+    <span class="ft-brand">DREXONYX × MDA</span>
+    <span class="ft-doc">كاتالوج الخدمات — سري</span>
+    <span class="ft-num">08</span>
+  </div>
+</div>
+
+<div class="pg pg-contact">
+  <div class="ct-hdr">
+    <span class="ct-hdr-l">MDA — ماستر ديجيتال إيجنسي</span>
+    <span class="ct-hdr-r">علامة تجارية من DREXONYX · كاتالوج الخدمات 2026</span>
+  </div>
+  <div class="ct-cols">
+    <div class="ct-left">
+      <div class="ct-ghost">MDA</div>
+      <div class="ct-left-top">
+        <div class="ct-eyebrow">تواصل معنا</div>
+        <h2 class="ct-title">لنعمل<br><em>معاً.</em></h2>
+        <div class="ct-gold-rule"></div>
+        <p class="ct-tagline">من البروفايل الشركاتي إلى الفيديو المؤسسي —<br>كل ما تحتاجه لإطلاق أعمالك ونموها.</p>
+      </div>
+      <div class="ct-svc-list">
+        <div class="ct-svc-row"><span class="ct-svc-num">01</span><span class="ct-svc-dot"></span><span class="ct-svc-name">تصميم البروفايل الشركاتي</span></div>
+        <div class="ct-svc-row"><span class="ct-svc-num">02</span><span class="ct-svc-dot"></span><span class="ct-svc-name">تصميم المواقع الإلكترونية</span></div>
+        <div class="ct-svc-row"><span class="ct-svc-num">03</span><span class="ct-svc-dot"></span><span class="ct-svc-name">حزمة الهوية التجارية</span></div>
+        <div class="ct-svc-row"><span class="ct-svc-num">04</span><span class="ct-svc-dot"></span><span class="ct-svc-name">حزمة الإطلاق الرقمي</span></div>
+        <div class="ct-svc-row"><span class="ct-svc-num">05</span><span class="ct-svc-dot"></span><span class="ct-svc-name">تصميم البوسترات ومحتوى السوشيال</span></div>
+        <div class="ct-svc-row"><span class="ct-svc-num">06</span><span class="ct-svc-dot"></span><span class="ct-svc-name">الفيديو الترويجي المؤسسي</span></div>
+        <div class="ct-svc-row"><span class="ct-svc-num">07</span><span class="ct-svc-dot"></span><span class="ct-svc-name">مقاطع الفيديو القصيرة UGC</span></div>
+      </div>
+      <div class="ct-brand-row">
+        <div class="ct-brand-name">DREXONYX</div>
+        <div class="ct-brand-right">
+          <div class="ct-brand-sub">MDA علامة تجارية من DREXONYX</div>
+          <div class="ct-brand-tagline">أفكار تُحدث أثراً</div>
+        </div>
+      </div>
+    </div>
+    <div class="ct-right">
+      <div class="ct-panel">
+        <div class="ct-panel-ghost">09</div>
+        <div class="panel-bar"></div>
+        <div class="ct-panel-cat">تواصل معنا</div>
+        <div class="ct-panel-hl">ابدأ مشروعك<br>اليوم.</div>
+        <div class="panel-div"></div>
+        <div class="ct-cards">
+          <div class="ct-crd">
+            <div class="ct-crd-label">الموقع الإلكتروني</div>
+            <div class="ct-crd-val">www.drexonyx.com</div>
+          </div>
+          <div class="ct-crd">
+            <div class="ct-crd-label">البريد الإلكتروني</div>
+            <div class="ct-crd-val">info@drexonyx.com</div>
+          </div>
+          <div class="ct-crd">
+            <div class="ct-crd-label">الموقع</div>
+            <div class="ct-crd-val">دبي،<br>الإمارات العربية المتحدة</div>
+          </div>
+          <div class="ct-crd">
+            <div class="ct-crd-label">ساعات العمل</div>
+            <div class="ct-crd-val">الأحد – الخميس<br>9 صباحاً – 6 مساءً (توقيت الخليج)</div>
+          </div>
+        </div>
+        <div class="ct-panel-foot">
+          <div class="panel-foot-text">MDA — ماستر ديجيتال إيجنسي</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
