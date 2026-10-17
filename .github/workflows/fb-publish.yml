@@ -11,7 +11,12 @@ on:
         required: true
         type: string
       image_path:
-        description: 'Repo-relative path to image file (leave empty for text-only post)'
+        description: 'Repo-relative path to image file (leave empty for video or text-only post)'
+        required: false
+        default: ''
+        type: string
+      video_path:
+        description: 'Repo-relative path to video file (leave empty for image or text-only post)'
         required: false
         default: ''
         type: string
@@ -59,10 +64,10 @@ jobs:
           IMAGE_PATH: ${{ inputs.image_path }}
         run: node scripts/fb-publish.mjs --qc "${{ inputs.message }}"
 
-      # Text-only publish — skipped when dry_run is true or image_path is set.
+      # Text-only publish — skipped when dry_run is true, or image_path or video_path is set.
       # POST_MESSAGE is set as an env var — never interpolated into the shell string.
       - name: Publish text post to Facebook Page
-        if: ${{ !inputs.dry_run && inputs.image_path == '' }}
+        if: ${{ !inputs.dry_run && inputs.image_path == '' && inputs.video_path == '' }}
         env:
           META_PAGE_ACCESS_TOKEN: ${{ secrets.META_PAGE_ACCESS_TOKEN }}
           META_PAGE_ID_1: ${{ secrets.META_PAGE_ID_1 }}
@@ -83,11 +88,33 @@ jobs:
           POST_MESSAGE: ${{ inputs.message }}
         run: node scripts/fb-publish.mjs --image-post "$POST_MESSAGE"
 
-      # Commit updated publish log back to main after a successful image post.
+      # Video QC: validates video file (format, size, existence) and caption.
+      # Skipped when dry_run or no video_path.
+      - name: QC check (video + caption)
+        if: ${{ !inputs.dry_run && inputs.video_path != '' }}
+        env:
+          VIDEO_PATH: ${{ inputs.video_path }}
+        run: node scripts/fb-publish.mjs --qc "${{ inputs.message }}"
+
+      # Video post — QC already passed above. Skipped when dry_run or no video.
+      # VIDEO_PATH points to a file checked out from the repo (no external URL).
+      # LOG_PATH enables duplicate detection and publish logging.
+      # POST_MESSAGE is set as an env var — never interpolated into the shell string.
+      - name: Publish video post to Facebook Page
+        if: ${{ !inputs.dry_run && inputs.video_path != '' }}
+        env:
+          META_PAGE_ACCESS_TOKEN: ${{ secrets.META_PAGE_ACCESS_TOKEN }}
+          META_PAGE_ID_1: ${{ secrets.META_PAGE_ID_1 }}
+          VIDEO_PATH: ${{ inputs.video_path }}
+          LOG_PATH: assets/facebook/publish-log.json
+          POST_MESSAGE: ${{ inputs.message }}
+        run: node scripts/fb-publish.mjs --video-post "$POST_MESSAGE"
+
+      # Commit updated publish log back to main after a successful image or video post.
       # Uses [skip ci] to avoid re-triggering workflows.
       # Fails gracefully if the log has no staged changes (e.g. dry_run).
       - name: Commit publish log
-        if: ${{ !inputs.dry_run && inputs.image_path != '' }}
+        if: ${{ !inputs.dry_run && (inputs.image_path != '' || inputs.video_path != '') }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

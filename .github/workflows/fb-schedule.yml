@@ -1,9 +1,10 @@
 name: Facebook Daily Campaign
 
-# Dispatch-only on main — registered here so GitHub indexes the workflow.
-# The Routine fires this daily targeting the campaign branch, which carries
-# campaign.json, the post images, and the full workflow logic.
+# Fires daily at 07:00 UTC (11:00 AM Dubai/UAE time).
+# Also dispatchable manually for catch-up or one-off date override.
 on:
+  schedule:
+    - cron: '0 7 * * *'
   workflow_dispatch:
     inputs:
       override_date:
@@ -37,7 +38,7 @@ jobs:
 
       # Resolve today's post from campaign.json.
       # Sets SKIP, DAY, MEDIA_TYPE, IMAGE_PATH, VIDEO_PATH in GITHUB_OUTPUT.
-      # Writes post message to /tmp/post-message.txt to avoid shell injection.
+      # Writes post message to /tmp/post-message.txt.
       # Exits cleanly (SKIP=true) when no entry matches or already published.
       - name: Resolve today's post
         id: resolve
