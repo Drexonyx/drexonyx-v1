@@ -46,32 +46,46 @@
 
 .logoDivider {
   width: 1px;
-  height: 28px;
-  background: rgba(200, 152, 10, 0.3);
+  height: 32px;
+  background: linear-gradient(to bottom, #C8980A 0%, #2563EB 100%);
   flex-shrink: 0;
+  opacity: 0.7;
 }
 
-.logoText {
+.logoMda {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   flex-shrink: 0;
 }
 
-.logoName {
-  font-size: 0.875rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--drex-text);
+.mdaName {
+  font-size: 1.0625rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #e2e2e4;
   line-height: 1;
   white-space: nowrap;
 }
 
-.logoTagline {
-  font-size: 0.5rem;
+.mdaA {
+  color: #2563EB;
+}
+
+.mdaSub {
+  font-size: 0.4375rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--drex-text-muted);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.mdaBrand {
+  font-size: 0.4375rem;
   font-weight: 500;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--drex-accent);
   line-height: 1;

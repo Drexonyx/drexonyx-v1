@@ -37,9 +37,10 @@ export default function Navigation() {
               />
             </div>
             <div className={styles.logoDivider} aria-hidden="true" />
-            <div className={styles.logoText}>
-              <span className={styles.logoName}>DREXONYX</span>
-              <span className={styles.logoTagline}>Creative · Digital · Technology</span>
+            <div className={styles.logoMda}>
+              <span className={styles.mdaName}>MD<span className={styles.mdaA}>A</span></span>
+              <span className={styles.mdaSub}>MASTER DIGITAL AGENCY</span>
+              <span className={styles.mdaBrand}>A DREXONYX Brand</span>
             </div>
           </Link>
 
