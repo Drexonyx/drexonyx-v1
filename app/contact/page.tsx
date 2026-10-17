@@ -34,10 +34,10 @@ export default function ContactPage() {
             <div className={styles.contactBlock}>
               <div className={styles.contactLabel}>Email</div>
               <a
-                href="mailto:drexonyx.studio@gmail.com"
+                href="mailto:info@drexonyx.com"
                 className={styles.contactEmail}
               >
-                drexonyx.studio@gmail.com
+                info@drexonyx.com
               </a>
             </div>
             <div className={styles.contactBlock}>

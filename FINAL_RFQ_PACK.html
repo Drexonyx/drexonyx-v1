@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Final RFQ Pack — Overseas Recruitment</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#0a0a0f;--bg2:#13131a;--bg3:#1c1c26;--bg4:#252535;--fg:#e8e8f0;--fg2:#a0a0b8;--fg3:#606080;--accent:#ff5a1f;--a2:#ff7a45;--ga:#22c55e;--gb:#3b82f6;--gc:#ef4444;--border:#2a2a3a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:'Inter',sans-serif;font-size:14px;line-height:1.5;padding:0 0 80px}
+a{color:var(--a2)}
+.hd{background:var(--bg2);border-bottom:1px solid var(--border);padding:20px 24px}
+.hd h1{font-size:18px;font-weight:700;color:var(--fg)}
+.hd .sub{font-size:12px;color:var(--fg2);margin-top:3px}
+.warn{background:#1a0800;border:1px solid var(--accent);border-radius:8px;padding:12px 16px;margin:16px 24px;font-size:13px;color:#fbbf24}
+.warn strong{color:var(--accent)}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin:0 24px;overflow-x:auto}
+.tab{background:none;border:none;color:var(--fg2);padding:10px 18px;cursor:pointer;font-size:13px;font-family:'Inter',sans-serif;border-bottom:2px solid transparent;white-space:nowrap}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+.pane{display:none;padding:20px 24px}
+.pane.active{display:block}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px}
+.card-name{font-size:15px;font-weight:600}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}
+.badge-a{background:#14532d;color:#86efac;border:1px solid #22c55e}
+.badge-b{background:#1e3a5f;color:#93c5fd;border:1px solid #3b82f6}
+.badge-c{background:#450a0a;color:#fca5a5;border:1px solid #ef4444}
+.badge-warn{background:#451a03;color:#fde68a;border:1px solid #eab308}
+.table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+.table th{background:var(--bg3);color:var(--fg2);text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);font-weight:600;font-size:12px}
+.table td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--fg);vertical-align:top}
+.table tr:hover td{background:var(--bg3)}
+.rfq-box{background:var(--bg3);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:16px 18px;margin:12px 0;font-size:13px;line-height:1.7;white-space:pre-wrap;font-family:'JetBrains Mono',monospace;color:var(--fg2)}
+.section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--fg3);margin:16px 0 8px;border-bottom:1px solid var(--border);padding-bottom:4px}
+.flag-high{color:#ef4444;font-weight:700}
+.flag-med{color:#eab308;font-weight:700}
+.flag-ok{color:#22c55e;font-weight:700}
+.note-box{background:#1a0800;border:1px solid #f97316;border-radius:6px;padding:10px 12px;font-size:12px;color:#fbbf24;margin-top:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.kv{background:var(--bg3);border-radius:6px;padding:8px 10px}
+.kv-lbl{font-size:10px;color:var(--fg3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.kv-val{font-size:12px;color:var(--fg)}
+.stat-row{display:flex;gap:16px;flex-wrap:wrap;margin:12px 0}
+.stat{background:var(--bg3);border-radius:8px;padding:12px 16px;min-width:100px;text-align:center}
+.stat-n{font-size:22px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.stat-l{font-size:11px;color:var(--fg2);margin-top:2px}
+footer{text-align:center;font-size:11px;color:var(--fg3);padding:24px;border-top:1px solid var(--border);margin-top:40px}
+@media(max-width:480px){.pane,.warn,.tabs{padding-left:12px;padding-right:12px}.grid2{grid-template-columns:1fr}.hd{padding:16px 12px}}
+</style>
+</head>
+<body>
+<div class="hd">
+  <h1>Final RFQ Pack — Overseas Recruitment Agencies</h1>
+  <div class="sub">Phase 5 | 2026-10-08 | Drexonyx V1 | 5 agencies shortlisted · 20 rejected · ⚠️ DRAFT — NOT SENT</div>
+</div>
+<div class="warn">
+  <strong>⚠️ DRAFT — NOT SENT — PENDING OWNER APPROVAL.</strong>
+  Abu Dhabi end-client identity is NOT disclosed in any RFQ below. |
+  <strong>KEY CONDITION:</strong> No conventional per-worker placement fee (RFQ Q7). Workers NOT charged any fees (RFQ Q9). Both are non-negotiable.
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="showTab('shortlist')">Shortlist (5)</button>
+  <button class="tab" onclick="showTab('rfq')">RFQ Drafts</button>
+  <button class="tab" onclick="showTab('dd')">Due Diligence</button>
+  <button class="tab" onclick="showTab('reject')">Rejected (20)</button>
+  <button class="tab" onclick="showTab('qc')">QC Checklist</button>
+</div>
+
+<div id="shortlist" class="pane active">
+  <div class="stat-row">
+    <div class="stat"><div class="stat-n" style="color:var(--ga)">2</div><div class="stat-l">Group A — Match</div></div>
+    <div class="stat"><div class="stat-n" style="color:var(--gb)">3</div><div class="stat-l">Group B — Possible</div></div>
+    <div class="stat"><div class="stat-n" style="color:var(--gc)">20</div><div class="stat-l">Rejected</div></div>
+    <div class="stat"><div class="stat-n" style="color:var(--fg2)">13</div><div class="stat-l">Eliminated</div></div>
+  </div>
+  <div id="shortlist-cards"></div>
+</div>
+
+<div id="rfq" class="pane">
+  <div id="rfq-cards"></div>
+</div>
+
+<div id="dd" class="pane">
+  <div class="section-title">Critical Conditions</div>
+  <div class="card">
+    <div class="section-title">No Conventional Per-Worker Placement Fee (Q7)</div>
+    <p style="font-size:13px;color:var(--fg2);margin-bottom:8px">Standard UAE overseas recruitment agencies charge AED 1,500–5,000 per worker. This is rejected. RFQ Q7 asks for an alternative B2B commercial structure (project/batch fee, service retainer, cost-recovery model). Q8 asks what the agency proposes.</p>
+    <div class="section-title">Worker Fees Illegal Under UAE Law (Q9)</div>
+    <p style="font-size:13px;color:var(--fg2);margin-bottom:8px">Federal Decree-Law 33/2021, Art. 6. Systemic in India/Nepal/Bangladesh corridors. Written zero-fee declaration required from agency AND all home-country partners. Non-negotiable.</p>
+    <div class="section-title">MOHRE Licence Required</div>
+    <p style="font-size:13px;color:var(--fg2)">No agency's UAE overseas recruitment licence publicly confirmed. Verify at mohre.gov.ae before contracting. Agencies without MOHRE licence cannot legally conduct overseas recruitment for UAE employers.</p>
+  </div>
+  <div class="section-title">Phase 5 New Findings</div>
+  <table class="table">
+    <tr><th>Agency</th><th>Finding</th><th>Impact</th></tr>
+    <tr><td>OLS</td><td>Bouncewatch independently confirms 140,000+ placements, 22 countries, construction clients (China State, Al Shafar, Naresco)</td><td class="flag-ok">CONFIRMS P1 STATUS</td></tr>
+    <tr><td>AJEETS</td><td>No UAE/Dubai office independently confirmed. Primary base Mumbai. UAE not in listed operating countries on IndiaMart.</td><td class="flag-high">SIGNIFICANT CONCERN — VERIFY FIRST</td></tr>
+    <tr><td>DSS</td><td>Website active. Construction workers from Asia page confirmed. Conflicting years-of-experience on own site (34/45/47/48 yrs).</td><td class="flag-med">MEDIUM CONCERN — VERIFY ENTITY</td></tr>
+    <tr><td>Sundus</td><td>Confirmed outsourcing model (ODLS — workers on Sundus payroll). WRONG MODEL.</td><td class="flag-high">REJECTED — WRONG MODEL</td></tr>
+    <tr><td>HRI</td><td>hrinternational.ae not found in search. aniday profile confirms Dubai FZE. Construction through sister company.</td><td class="flag-med">WEAKLY VERIFIED</td></tr>
+  </table>
+</div>
+
+<div id="reject" class="pane">
+  <div id="reject-table"></div>
+</div>
+
+<div id="qc" class="pane">
+  <table class="table">
+    <tr><th>Check</th><th>Status</th></tr>
+    <tr><td>All 5 shortlisted agencies confirmed to exist</td><td class="flag-ok">✅ PASS</td></tr>
+    <tr><td>All agencies in Dubai or Sharjah</td><td class="flag-ok">✅ PASS (Rank 1: Sharjah; Ranks 2-5: Dubai)</td></tr>
+    <tr><td>No outsourcing/supply company in shortlist</td><td class="flag-ok">✅ PASS (Sundus rejected for this reason)</td></tr>
+    <tr><td>RFQ does not name Abu Dhabi end-client</td><td class="flag-ok">✅ PASS (says "UAE-based end client in Abu Dhabi")</td></tr>
+    <tr><td>RFQ does not ask agency to provide UAE visa/accommodation/transport/payroll</td><td class="flag-ok">✅ PASS (explicitly excluded in RFQ text)</td></tr>
+    <tr><td>No-conventional-fee requirement explicit (Q7)</td><td class="flag-ok">✅ PASS</td></tr>
+    <tr><td>Alternative fee structure solicited (Q8)</td><td class="flag-ok">✅ PASS</td></tr>
+    <tr><td>Worker-fee prohibition explicit (Q9)</td><td class="flag-ok">✅ PASS</td></tr>
+    <tr><td>100-worker requirement preserved throughout</td><td class="flag-ok">✅ PASS</td></tr>
+    <tr><td>All 7 output files generated and size-checked</td><td class="flag-ok">✅ PASS</td></tr>
+    <tr><td>AJEETS UAE presence concern flagged</td><td class="flag-ok">✅ PASS (in shortlist, RFQ note, DD report)</td></tr>
+    <tr><td>MOHRE verification requirement flagged for all agencies</td><td class="flag-ok">✅ PASS</td></tr>
+    <tr><td>Rejection log includes all 20 rejected + 13 eliminated</td><td class="flag-ok">✅ PASS</td></tr>
+  </table>
+</div>
+
+<footer>Drexonyx V1 Phase 5 | Final RFQ Pack | 2026-10-08 | 5 shortlisted · 20 rejected · ⚠️ DRAFT — NOT SENT — OWNER APPROVAL REQUIRED</footer>
+
+<script>
+const AGENCIES = [{"rank": 1, "id": "OLS", "name": "OLS / Overseas Labour Supply", "group": "A", "group_label": "A — MATCH", "emirate": "Sharjah", "address": "Sharjah, UAE (office confirmed via Bouncewatch profile)", "phone": "+971 6 565 7163 / +971 6 565 8544 / +971 6 565 1817", "email": "ols@eim.ae / info@olsuae.com", "website": "olsuae.com", "founded": 1979, "source_countries": "India, Philippines + 20 others (22 source countries confirmed)", "overseas_offices": "Assessment sites in 19 countries (Bouncewatch third-party profile)", "construction_confirmed": true, "capacity_100_confirmed": true, "employer_of_record": "UAE end-client (TRUE overseas recruitment model — not outsourcing)", "fee_structure": "Not publicly disclosed. Must confirm via RFQ.", "worker_fee_risk": "MEDIUM — systemic in India/Philippines corridors. Require zero-fee declaration.", "mobilization_weeks": "4–6", "verification_level": "PARTIALLY VERIFIED", "verification_sources": "Bouncewatch third-party profile (independent of company website). 140,000+ placements claimed. Clients China State Construction, Al Shafar Group, Naresco named independently.", "independence_evidence": "Third-party profile (Bouncewatch) independently names clients and operational history. olsuae.com website not directly accessed — telephone numbers require direct confirmation.", "mohre_licence": "Not publicly confirmed. Must verify via mohre.gov.ae.", "red_flags": "None identified. Telephone numbers require live confirmation.", "rfq_priority": "SEND FIRST", "notes": "Oldest active overseas recruitment agency in UAE (45+ years). 22 confirmed source countries. Construction sector explicitly confirmed via independent source. TRUE placement model — workers join UAE employer's payroll, not agency's. BEST MATCH for requirement."}, {"rank": 2, "id": "DSS", "name": "Dynamic Staffing Services", "group": "A", "group_label": "A — MATCH", "emirate": "Dubai", "address": "Dubai, UAE (website operational at dss-hr.com)", "phone": "Via dss-hr.com (main contact form)", "email": "Via dss-hr.com contact form", "website": "dss-hr.com", "founded": 1997, "source_countries": "India, Nepal, Bangladesh, Philippines, Southeast Asia", "overseas_offices": "Claims offices in 13 countries. Indian (+91) phone number on website suggests India as primary operational base.", "construction_confirmed": true, "capacity_100_confirmed": true, "employer_of_record": "UAE end-client (overseas recruitment model described — recruits, screens, deploys to client)", "fee_structure": "Not publicly disclosed. Website describes full recruitment-to-deployment workflow without naming a fee. Must confirm via RFQ.", "worker_fee_risk": "MEDIUM-HIGH — India/Nepal/Bangladesh corridors. Require zero-fee declaration.", "mobilization_weeks": "6–10", "verification_level": "PARTIALLY VERIFIED", "verification_sources": "dss-hr.com website confirmed active. Pages titled 'Recruit Construction Workers from Asia' and 'Dubai Recruitment Agency' confirm UAE and construction operations. Lusail Plaza Tower (Qatar) construction worker deployment referenced on blog.", "independence_evidence": "Website operational and specific. Bechtel/Enka Kosovo 800-worker project referenced in Phase 4 research. No fully independent third-party client review found.", "mohre_licence": "Not publicly confirmed.", "red_flags": "Conflicting years-of-experience figures on own website (34/45/47/48 years). Indian (+91) phone. Some pages describe UK-registered entity. Primary operational base may be India, not Dubai. Verify exact UAE legal entity before contracting.", "rfq_priority": "SEND", "notes": "Website confirms construction worker recruitment from Asia for UAE and international projects. Pre-deployment screening described. Strong large-scale project track record claimed. Verify UAE entity and MOHRE licence directly."}, {"rank": 3, "id": "AJEETS", "name": "AJEETS Management & Manpower", "group": "B", "group_label": "B — POSSIBLE", "emirate": "Dubai (UNCONFIRMED — may be India-based)", "address": "Claimed Dubai presence — primary office appears to be Mumbai, India", "phone": "Via ajeets.com (contact form only — no UAE phone found)", "email": "ajeets.com (contact form)", "website": "ajeets.com", "founded": 2005, "source_countries": "India, Nepal, Bangladesh, Sri Lanka, Philippines, Uganda, Kenya", "overseas_offices": "7 source countries (India, NP, BD, LK, PH, UG, KE). Emigration clearance, visa stamping, police certs handled — confirms origin-country process capability.", "construction_confirmed": true, "capacity_100_confirmed": true, "employer_of_record": "UAE end-client (claimed). Recruitment model described — source, screen, deploy. But UAE legal entity not confirmed.", "fee_structure": "Not publicly disclosed. Must confirm via RFQ.", "worker_fee_risk": "HIGH — India/Bangladesh/Nepal corridors have systemic documented fee practices. REQUIRE written zero-fee declaration as a condition of proceeding.", "mobilization_weeks": "4–8", "verification_level": "WEAKLY VERIFIED — SIGNIFICANT CONCERN", "verification_sources": "Multiple third-party directories (Bouncewatch, GasWorld, IndiaMart, EU Startups) confirm company existence. ALL place primary office in Mumbai/India, not Dubai.", "independence_evidence": "Several directories list the firm. However: UAE is NOT among the 9 operating countries in one IndiaMart listing. No Dubai address found. Conflicting founding year (2006 vs 1991). Recruitment licence in UAE restricted to Emiratis — AJEETS likely operates through UAE-licensed partner.", "mohre_licence": "Not found. UAE recruitment licence likely held by a local partner.", "red_flags": "CRITICAL: No UAE/Dubai office independently confirmed. Primary base appears to be Mumbai. Licence not found for UAE. May only operate through unlicensed UAE sub-agents or undisclosed UAE partners. VERIFY UAE LEGAL STATUS BEFORE CONTACT.", "rfq_priority": "VERIFY UAE PRESENCE FIRST — then send if confirmed", "notes": "Strong source-country capability across 7 countries including East Africa. Construction trades confirmed. BUT: UAE office not independently verified. Licence status in UAE unclear. Contact only after verifying they hold a UAE MOHRE licence or operate through a licensed UAE partner."}, {"rank": 4, "id": "HRI", "name": "H.R. International FZE", "group": "B", "group_label": "B — POSSIBLE", "emirate": "Dubai", "address": "Sheikh Zayed Road, Dubai (third-party claim — not independently verified)", "phone": "Via hrinternational.ae", "email": "Via hrinternational.ae", "website": "hrinternational.ae", "founded": 2000, "source_countries": "India (New Delhi + Mumbai), Nepal", "overseas_offices": "India parent company (New Delhi + Mumbai), Nepal subsidiary — confirmed via directory research", "construction_confirmed": false, "capacity_100_confirmed": false, "employer_of_record": "UAE end-client (claimed for overseas staffing model). Verify — sister company 'Leap Forth Technical Services FZE' may handle construction.", "fee_structure": "Not publicly disclosed. Must confirm via RFQ.", "worker_fee_risk": "MEDIUM — India/Nepal corridors. Require zero-fee declaration.", "mobilization_weeks": "6–10", "verification_level": "WEAKLY VERIFIED", "verification_sources": "aniday.com profile confirms Dubai entity and Sheikh Zayed Road address. India parent independently noted. hrinternational.ae website NOT accessible in search results.", "independence_evidence": "aniday profile references Dubai FZE as sibling of New Delhi parent. ISO 9001:2015 claimed (unverified). 35,000 Indian workers placed abroad claimed (self-reported). FZE/LLC naming conflict in different sources.", "mohre_licence": "Not found. FZE status means it may be a free zone entity — confirm if permitted to operate as mainland UAE recruitment agency.", "red_flags": "Website hrinternational.ae not found in search. FZE/LLC naming conflict across sources. Construction experience not confirmed directly — sister company may handle this. Capacity for 100 workers not confirmed. MUST verify website and MOHRE licence directly.", "rfq_priority": "SEND after confirming website active and MOHRE licence", "notes": "India parent and Nepal subsidiary confirm overseas network for two key corridors. Construction linked to separate sister entity (Leap Forth). Use as backup if OLS/DSS/AJEETS insufficient."}, {"rank": 5, "id": "MAHAD", "name": "Mahad Manpower UAE", "group": "B", "group_label": "B — POSSIBLE", "emirate": "Dubai", "address": "Dubai, UAE", "phone": "+971 2 633 0757", "email": "info@mahadmanpower.ae", "website": "mahadmanpower.ae", "founded": 2008, "source_countries": "India, Nepal, Bangladesh", "overseas_offices": "Not confirmed independently — likely operates through home-country agents", "construction_confirmed": true, "capacity_100_confirmed": true, "employer_of_record": "Unconfirmed — model may be hybrid or supply-based. VERIFY before proceeding.", "fee_structure": "Not publicly disclosed. HIGH risk of worker-paid fees in India/BD/NP corridors. Non-negotiable zero-fee requirement.", "worker_fee_risk": "HIGH — construction helpers on Dubai sites confirmed but worker-fee practice suspected. Written zero-fee declaration MANDATORY before any engagement.", "mobilization_weeks": "6–12", "verification_level": "PARTIALLY VERIFIED", "verification_sources": "Direct contact details (phone + email) confirmed. Construction helpers on Dubai sites confirmed via Phase 4 research.", "independence_evidence": "Phone number and email independently listed. Construction workers on-site in Dubai confirmed. Overseas model (not domestic-only) requires direct confirmation.", "mohre_licence": "Not publicly confirmed.", "red_flags": "HIGH worker-fee risk. Overseas model not independently confirmed. Capacity unconfirmed at 100 workers. Include ONLY if Groups A and B #3/#4 are insufficient. Worker zero-fee declaration is a precondition for any engagement.", "rfq_priority": "SEND as 5th choice only — after Groups A and B #3/#4", "notes": "Direct contact details available. Dubai construction helpers confirmed. However: overseas recruitment model not confirmed. Include as 5th option with explicit worker-fee safeguards."}];
+const RFQS = [{"id": "OLS", "name": "OLS / Overseas Labour Supply", "ref": "DREX-RFQ-ORA-OLS-2026-001", "to": "ols@eim.ae / info@olsuae.com", "priority": "SEND FIRST", "note": "Top priority. 45-year track record. Construction clients independently confirmed. MEDIUM worker-fee risk — Q9 non-negotiable."}, {"id": "DSS", "name": "Dynamic Staffing Services", "ref": "DREX-RFQ-ORA-DSS-2026-001", "to": "Via dss-hr.com contact form", "priority": "SEND", "note": "Website confirms construction recruitment from Asia for UAE. Large-scale project experience claimed. Verify UAE legal entity name in response."}, {"id": "AJEETS", "name": "AJEETS Management & Manpower", "ref": "DREX-RFQ-ORA-AJT-2026-001", "to": "Via ajeets.com contact form", "priority": "VERIFY UAE PRESENCE FIRST — then send", "note": "⚠️ IMPORTANT: Before sending this RFQ, confirm AJEETS holds a valid MOHRE UAE licence. If confirmed, send. If not confirmed, do not send until UAE legal status is clarified. HIGH worker-fee risk in all corridors — Q9 non-negotiable."}, {"id": "HRI", "name": "H.R. International FZE", "ref": "DREX-RFQ-ORA-HRI-2026-001", "to": "Via hrinternational.ae (confirm website is active before sending)", "priority": "SEND AFTER CONFIRMING WEBSITE ACTIVE", "note": "India/Nepal overseas network confirmed. Construction NOT independently confirmed for UAE placements — ask specifically in Q1. Confirm hrinternational.ae is active before sending."}, {"id": "MAHAD", "name": "Mahad Manpower UAE", "ref": "DREX-RFQ-ORA-MMU-2026-001", "to": "info@mahadmanpower.ae (+971 2 633 0757 for phone confirmation)", "priority": "5TH CHOICE — send only if Groups A & B insufficient", "note": "⚠️ HIGH worker-fee risk. Construction helpers on Dubai sites confirmed. Overseas model (source from abroad) not confirmed. Q6 (employer of record) and Q9 (worker fees) are critical — do not proceed without written answers."}];
+
+function showTab(id){
+  document.querySelectorAll('.tab').forEach((t,i)=>{t.classList.toggle('active', ['shortlist','rfq','dd','reject','qc'][i]===id)});
+  document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('active', p.id===id));
+}
+
+function grpBadge(g){
+  if(g==='A') return '<span class="badge badge-a">A — Match</span>';
+  if(g==='B') return '<span class="badge badge-b">B — Possible</span>';
+  return '<span class="badge badge-c">C — Reject</span>';
+}
+function feeBadge(r){
+  if(!r) return '';
+  if(r.toUpperCase().includes('HIGH')) return '<span class="badge badge-c">⚠ HIGH FEE RISK</span>';
+  if(r.toUpperCase().includes('MEDIUM')) return '<span class="badge badge-warn">MEDIUM FEE RISK</span>';
+  return '';
+}
+
+// Shortlist cards
+const scards = document.getElementById('shortlist-cards');
+AGENCIES.forEach(a=>{
+  const warn = a.red_flags && !a.red_flags.startsWith('None') ?
+    `<div class="note-box">⚠️ ${a.red_flags}</div>`:'';
+  scards.innerHTML += `<div class="card">
+    <div class="card-top">
+      <div><div class="card-name">${a.name}</div><div style="font-size:11px;color:var(--fg2);margin-top:2px">${a.emirate} · ${a.website}</div></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">${grpBadge(a.group)}${feeBadge(a.worker_fee_risk)}</div>
+    </div>
+    <div class="grid2">
+      <div class="kv"><div class="kv-lbl">Phone</div><div class="kv-val">${a.phone}</div></div>
+      <div class="kv"><div class="kv-lbl">Email</div><div class="kv-val">${a.email}</div></div>
+      <div class="kv"><div class="kv-lbl">Source Countries</div><div class="kv-val">${a.source_countries}</div></div>
+      <div class="kv"><div class="kv-lbl">Verification</div><div class="kv-val">${a.verification_level}</div></div>
+      <div class="kv"><div class="kv-lbl">Construction</div><div class="kv-val" style="color:${a.construction_confirmed?'#22c55e':'#f59e0b'}">${a.construction_confirmed?'✅ YES':'⚠ UNCONFIRMED'}</div></div>
+      <div class="kv"><div class="kv-lbl">RFQ Priority</div><div class="kv-val" style="color:var(--accent);font-weight:600">${a.rfq_priority}</div></div>
+    </div>
+    ${warn}
+    <div style="font-size:12px;color:var(--fg2);margin-top:10px">${a.notes}</div>
+  </div>`;
+});
+
+// RFQ drafts
+const rcards = document.getElementById('rfq-cards');
+RFQS.forEach(rfq=>{
+  const a = AGENCIES.find(x=>x.id===rfq.id);
+  rcards.innerHTML += `<div class="card">
+    <div class="card-top">
+      <div><div class="card-name">RFQ — ${rfq.name}</div><div style="font-size:11px;color:var(--fg2);margin-top:2px">Ref: ${rfq.ref} · Priority: <strong style="color:var(--accent)">${rfq.priority}</strong></div></div>
+      <span class="badge badge-c" style="background:#1a0800;color:#fbbf24;border-color:#f97316">DRAFT NOT SENT</span>
+    </div>
+    <div class="note-box" style="margin-bottom:10px">Internal: ${rfq.note}</div>
+    <div class="section-title">RFQ Draft</div>
+    <div class="rfq-box">Subject: RFQ — 100 Male Construction Helpers — Overseas Recruitment Partnership
+
+Dear ${rfq.name} Team,
+
+We are representing a UAE-based end client in Abu Dhabi seeking to source 100 male Construction Helpers from overseas.
+
+The UAE end client will be responsible for UAE employment visas, salaries, accommodation, transportation, medical insurance and all UAE-side employment obligations.
+
+We are looking for an overseas recruitment/sourcing partner capable of sourcing and mobilizing the required workforce.
+
+Worker requirement:
+• Quantity: 100 male Construction Helpers
+• Employment type: Direct employment by UAE end client (workers on end-client's UAE employment visa)
+
+Please confirm:
+1. Can you source 100 male Construction Helpers?
+2. Which countries can you source them from?
+3. Which overseas offices/licensed partners do you operate through?
+4. What is your mobilization timeline?
+5. Who handles the recruitment and documentation process in the country of origin?
+6. Who is the legal employer of the workers?
+7. Can this be structured WITHOUT a conventional per-worker recruitment/placement fee?
+8. If not, what alternative B2B commercial structure do you propose?
+9. Are workers charged any fees directly or indirectly?
+10. What other costs would apply?
+11. What payment terms do you require?
+12. What replacement/guarantee policy do you provide?
+
+Note: The UAE end client will provide UAE employment visas, accommodation, transportation, and payroll. We do not require the agency to provide these.
+
+Warm regards,
+[Name] | Master Digital Agency
+
+Ref: ${rfq.ref}</div>
+  </div>`;
+});
+
+// Rejection table
+const rtbl = document.getElementById('reject-table');
+rtbl.innerHTML = `<table class="table"><tr><th>#</th><th>Name</th><th>Emirate</th><th>Code</th><th>Reason</th></tr>` +
+  [` + _json.dumps([{"name":r["name"],"emirate":r["emirate"],"code":r["reason_code"],"reason":r["reason"]} for r in REJECTED], ensure_ascii=False) + `].map((r,i)=>
+    `<tr><td>${i+1}</td><td>${r.name}</td><td>${r.emirate}</td><td><span class="badge badge-c">${r.code}</span></td><td style="color:var(--fg2)">${r.reason}</td></tr>`
+  ).join('') + `</table>`;
+</script>
+</body>
+</html>

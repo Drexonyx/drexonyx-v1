@@ -1,0 +1,428 @@
+/* MDA Design System — Shared Component Styles */
+
+/* ── MDA Logo ──────────────────────────────────────────────────────────────── */
+.mdaLogo {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0;
+  line-height: 1;
+}
+
+.mdaLogoSm { --_mono: 1.125rem; --_desc: 0.5rem;    --_end: 0.45rem;   --_asset-h: 20px; }
+.mdaLogoMd { --_mono: 1.5rem;   --_desc: 0.625rem;  --_end: 0.5rem;    --_asset-h: 28px; }
+.mdaLogoLg { --_mono: 2.25rem;  --_desc: 0.75rem;   --_end: 0.5625rem; --_asset-h: 44px; }
+
+.mdaLogoMark {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1em;
+}
+
+.mdaLogoMonogram {
+  font-size: var(--_mono, 1.5rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--drex-accent);
+  line-height: 1;
+  display: block;
+}
+
+.mdaLogoDescriptor {
+  font-size: var(--_desc, 0.625rem);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--drex-text-secondary);
+  display: block;
+  line-height: 1.3;
+}
+
+/* Asset slot — sized by size-class variable; replaces text mark when assetSrc is set */
+.mdaLogoAsset {
+  display: block;
+  height: var(--_asset-h, 28px);
+  width: auto;
+  max-width: 200px;
+  object-fit: contain;
+}
+
+.mdaLogoEndorsement {
+  font-size: var(--_end, 0.5rem);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--drex-text-muted);
+  display: block;
+  margin-top: 0.4em;
+  line-height: 1.2;
+}
+
+/* ── ServiceBadge ─────────────────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2em 0.7em;
+  border-radius: 99px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.badgeDigital {
+  color: var(--mda-digital);
+  background: var(--mda-glow-blue);
+  border-color: rgba(29, 140, 248, 0.22);
+}
+
+.badgeCreative {
+  color: var(--drex-accent);
+  background: var(--mda-glow-gold);
+  border-color: var(--mda-border-gold);
+}
+
+.badgeMedia {
+  color: #a78bfa;
+  background: var(--mda-glow-purple);
+  border-color: rgba(124, 58, 237, 0.22);
+}
+
+.badgeSolutions {
+  color: #4ade80;
+  background: var(--mda-glow-green);
+  border-color: rgba(22, 163, 74, 0.22);
+}
+
+/* ── CTAButton ────────────────────────────────────────────────────────────── */
+.ctaBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+  border-radius: var(--mda-radius);
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background var(--drex-duration) var(--drex-ease),
+    color var(--drex-duration) var(--drex-ease),
+    border-color var(--drex-duration) var(--drex-ease),
+    box-shadow var(--drex-duration) var(--drex-ease);
+  text-decoration: none;
+  border: 1.5px solid transparent;
+  line-height: 1;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.ctaBtnSm  { padding: 0.55em 1.1em; font-size: 0.8125rem; }
+.ctaBtnMd  { padding: 0.7em 1.6em;  font-size: 0.9375rem; }
+.ctaBtnLg  { padding: 0.85em 2em;   font-size: 1rem; }
+
+.ctaBtnPrimary {
+  background: var(--drex-accent);
+  color: #0a0a0a;
+  border-color: var(--drex-accent);
+}
+.ctaBtnPrimary:hover {
+  background: var(--drex-accent-dim);
+  border-color: var(--drex-accent-dim);
+  box-shadow: 0 0 18px var(--mda-glow-gold);
+}
+
+.ctaBtnSecondary {
+  background: transparent;
+  color: var(--drex-accent);
+  border-color: var(--mda-border-gold);
+}
+.ctaBtnSecondary:hover {
+  background: var(--mda-glow-gold);
+  border-color: var(--drex-accent);
+}
+
+.ctaBtnOutline {
+  background: transparent;
+  color: var(--drex-text);
+  border-color: var(--drex-border);
+}
+.ctaBtnOutline:hover {
+  color: var(--drex-accent);
+  border-color: var(--mda-border-gold);
+  background: var(--mda-glow-gold);
+}
+
+.ctaBtnDigital {
+  background: var(--mda-digital);
+  color: #fff;
+  border-color: var(--mda-digital);
+}
+.ctaBtnDigital:hover {
+  box-shadow: 0 0 18px var(--mda-glow-blue);
+  filter: brightness(1.1);
+}
+
+/* ── EndorsementFooter ────────────────────────────────────────────────────── */
+.endorsement {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--drex-text-muted);
+}
+
+.endorsementDot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--drex-text-muted);
+  flex-shrink: 0;
+}
+
+.endorsementMark {
+  color: var(--drex-accent);
+}
+
+/* ── ServiceCard ──────────────────────────────────────────────────────────── */
+.serviceCard {
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: var(--mda-radius-lg);
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+  transition:
+    border-color var(--drex-duration) var(--drex-ease),
+    box-shadow var(--drex-duration) var(--drex-ease);
+}
+
+.serviceCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--_card-accent, var(--drex-accent));
+  border-radius: var(--mda-radius-lg) var(--mda-radius-lg) 0 0;
+}
+
+.serviceCard:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+.serviceCardDigital   { --_card-accent: var(--mda-digital);   }
+.serviceCardCreative  { --_card-accent: var(--mda-creative);  }
+.serviceCardMedia     { --_card-accent: var(--mda-media);     }
+.serviceCardSolutions { --_card-accent: var(--mda-solutions); }
+
+.serviceCardTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--drex-text);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.serviceCardDesc {
+  font-size: 0.875rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.65;
+  max-width: none;
+  flex: 1;
+}
+
+.serviceCardFooter {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+/* ── SectionHeading ───────────────────────────────────────────────────────── */
+.sectionHeading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 720px;
+}
+
+.sectionEyebrow {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--drex-accent);
+}
+
+.sectionTitle {
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: var(--drex-text);
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.sectionDesc {
+  font-size: 1rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.7;
+  max-width: 68ch;
+  margin-top: 0.25rem;
+}
+
+/* ── BrandHeader ──────────────────────────────────────────────────────────── */
+.brandHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2.5rem 0;
+  border-bottom: 1px solid var(--drex-border);
+}
+
+.brandHeaderTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.brandHeaderMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.brandHeaderHeadline {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--drex-text);
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.brandHeaderSub {
+  font-size: 1.0625rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.6;
+  max-width: 60ch;
+}
+
+.brandHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* ── Hero ─────────────────────────────────────────────────────────────────── */
+.hero {
+  padding: 6rem 0 5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.heroInner {
+  max-width: var(--drex-container);
+  margin: 0 auto;
+  padding: 0 var(--drex-pad);
+  position: relative;
+  z-index: 1;
+}
+
+.heroEyebrow {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--drex-accent);
+  margin-bottom: 1.25rem;
+}
+
+.heroHeading {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--drex-text);
+  max-width: 800px;
+  text-wrap: balance;
+  margin-bottom: 1.5rem;
+}
+
+.heroHeadingAccent {
+  color: var(--drex-accent);
+}
+
+.heroSub {
+  font-size: 1.125rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.65;
+  max-width: 60ch;
+  margin-bottom: 2.5rem;
+}
+
+.heroCtas {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* ── QuoteHeader ──────────────────────────────────────────────────────────── */
+.quoteHeader {
+  padding: 1.5rem;
+  border: 1px solid var(--drex-border);
+  border-radius: var(--mda-radius);
+  background: var(--drex-surface);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.quoteHeaderBrand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.quoteHeaderType {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--drex-text-muted);
+}
+
+.quoteHeaderMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  text-align: right;
+}
+
+.quoteHeaderRef {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--drex-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.quoteHeaderDate {
+  font-size: 0.8125rem;
+  color: var(--drex-text-secondary);
+}

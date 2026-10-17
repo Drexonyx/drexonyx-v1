@@ -27,6 +27,30 @@
   /* Legacy compat */
   --background: var(--drex-bg);
   --foreground: var(--drex-text);
+
+  /* ── MDA Design System — Phase 2 Tokens ───────────────────────────────── */
+  /* Service category accents */
+  --mda-digital:        #1d8cf8;
+  --mda-digital-alt:    #00e5ff;
+  --mda-creative:       #C8980A;
+  --mda-media:          #7c3aed;
+  --mda-media-alt:      #60a5fa;
+  --mda-solutions:      #16a34a;
+
+  /* Category glow/surface overlays */
+  --mda-glow-gold:      rgba(200, 152, 10, 0.14);
+  --mda-glow-blue:      rgba(29, 140, 248, 0.12);
+  --mda-glow-purple:    rgba(124, 58, 237, 0.12);
+  --mda-glow-green:     rgba(22, 163, 74, 0.12);
+
+  /* MDA borders */
+  --mda-border-gold:    rgba(200, 152, 10, 0.28);
+  --mda-border-subtle:  rgba(255, 255, 255, 0.06);
+
+  /* MDA radius scale */
+  --mda-radius-sm:      4px;
+  --mda-radius:         8px;
+  --mda-radius-lg:      12px;
 }
 
 *,

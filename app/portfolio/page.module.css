@@ -73,6 +73,16 @@
   max-width: 640px;
 }
 
+.heroLogo {
+  display: block;
+  height: auto;
+  width: clamp(120px, 16vw, 180px);
+  object-fit: contain;
+  object-position: left center;
+  opacity: 0.92;
+  margin-bottom: 0.25rem;
+}
+
 .heroBadge {
   display: inline-flex;
   align-items: center;

@@ -1,0 +1,9 @@
+build/
+gen/
+obj/
+*.keystore
+*.jks
+*.apk
+*.aab
+*.idsig
+*.ks

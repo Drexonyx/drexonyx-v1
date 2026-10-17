@@ -1,0 +1,815 @@
+/* MDA Public Landing Page */
+
+.container {
+  max-width: var(--drex-container);
+  margin: 0 auto;
+  padding: 0 var(--drex-pad);
+}
+
+/* ── 1: MDA Brand Header ────────────────────────────────────────────────── */
+.mdaHeader {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--drex-border);
+  background: var(--drex-bg);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.mdaHeaderInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.mdaCatNav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-shrink: 0;
+}
+
+.mdaCatList {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.mdaCatLink {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--drex-text-secondary);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--drex-duration) var(--drex-ease);
+}
+
+.mdaCatLink:hover {
+  color: var(--drex-text);
+}
+
+/* ── 2: Hero ────────────────────────────────────────────────────────────── */
+.hero {
+  padding: 5.5rem 0 5rem;
+  position: relative;
+  overflow: hidden;
+  background: var(--drex-bg);
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -100px;
+  right: -180px;
+  width: 580px;
+  height: 580px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(10, 132, 255, 0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -80px;
+  left: -120px;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(200, 152, 10, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.heroEyebrow {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--drex-text-muted);
+  margin-bottom: 1.25rem;
+  position: relative;
+}
+
+.heroHeading {
+  font-size: clamp(2.5rem, 7vw, 5.5rem);
+  font-weight: 900;
+  letter-spacing: -0.035em;
+  line-height: 1.0;
+  color: var(--drex-text);
+  max-width: 900px;
+  text-wrap: balance;
+  margin-bottom: 1.75rem;
+  position: relative;
+}
+
+.heroBreak {
+  display: block;
+}
+
+.heroLineDigital   { color: var(--mda-digital); }
+.heroLineCreative  { color: var(--drex-accent); }
+.heroLineMedia     { color: var(--mda-media); }
+.heroLineSolutions { color: var(--mda-solutions); }
+
+.heroSub {
+  font-size: 1.125rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.65;
+  max-width: 56ch;
+  margin-bottom: 2.5rem;
+  position: relative;
+}
+
+.heroCtas {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.heroEndorsement {
+  position: relative;
+}
+
+/* ── 3: Four Service Pillars ────────────────────────────────────────────── */
+.pillars {
+  padding: 5rem 0;
+  background: var(--drex-surface);
+  border-top: 1px solid var(--drex-border);
+}
+
+.pillarsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+
+.pillarCard {
+  background: var(--drex-bg);
+  border: 1px solid var(--drex-border);
+  border-radius: var(--mda-radius-lg);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
+  transition:
+    border-color var(--drex-duration) var(--drex-ease),
+    box-shadow var(--drex-duration) var(--drex-ease);
+}
+
+.pillarCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--_pillar-accent, var(--drex-accent));
+  border-radius: var(--mda-radius-lg) var(--mda-radius-lg) 0 0;
+}
+
+.pillarCard:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 6px 32px rgba(0, 0, 0, 0.5);
+}
+
+.pillarCardDigital   { --_pillar-accent: var(--mda-digital);   }
+.pillarCardCreative  { --_pillar-accent: var(--mda-creative);  }
+.pillarCardMedia     { --_pillar-accent: var(--mda-media);     }
+.pillarCardSolutions { --_pillar-accent: var(--mda-solutions); }
+
+.pillarCardTop {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pillarTagline {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--drex-text-muted);
+}
+
+.pillarTitle {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--drex-text);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.pillarDesc {
+  font-size: 0.9375rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.65;
+  flex: 1;
+}
+
+.pillarFeatures {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-top: 1px solid var(--drex-border);
+  padding-top: 1rem;
+}
+
+.pillarFeatureItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  font-size: 0.875rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.5;
+}
+
+.pillarCheck {
+  color: var(--_pillar-accent, var(--drex-accent));
+  font-size: 0.8125rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 0.1em;
+}
+
+.pillarFooter {
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+
+/* ── 4: Portfolio ───────────────────────────────────────────────────────── */
+.portfolio {
+  padding: 5rem 0;
+  background: var(--drex-bg);
+  border-top: 1px solid var(--drex-border);
+}
+
+.portfolioGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+}
+
+.portfolioCard {
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: var(--mda-radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition:
+    border-color var(--drex-duration) var(--drex-ease),
+    box-shadow var(--drex-duration) var(--drex-ease);
+}
+
+.portfolioCard:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+.portfolioThumb {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #0a0a0a;
+}
+
+.portfolioImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.portfolioMeta {
+  padding: 1.25rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.portfolioMetaTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.portfolioCat {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--drex-accent);
+}
+
+.portfolioSample {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--drex-text-muted);
+}
+
+.portfolioTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--drex-text);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.portfolioDesc {
+  font-size: 0.875rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.6;
+}
+
+/* ── 5: Packages ────────────────────────────────────────────────────────── */
+.packages {
+  padding: 5rem 0;
+  background: var(--drex-surface);
+  border-top: 1px solid var(--drex-border);
+}
+
+.packagesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-top: 2.5rem;
+  align-items: start;
+}
+
+.packageCard {
+  background: var(--drex-bg);
+  border: 1px solid var(--drex-border);
+  border-radius: var(--mda-radius-lg);
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: relative;
+  transition:
+    border-color var(--drex-duration) var(--drex-ease),
+    box-shadow var(--drex-duration) var(--drex-ease);
+}
+
+.packageCardFeatured {
+  border-color: var(--mda-border-gold);
+  box-shadow: 0 0 0 1px var(--mda-border-gold), 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.packageBadge {
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--drex-accent);
+  color: #0a0a0a;
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.25em 0.85em;
+  border-radius: 0 0 6px 6px;
+  white-space: nowrap;
+}
+
+.packageTop {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.packageTier {
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--drex-text-muted);
+}
+
+.packagePrice {
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--drex-text);
+  line-height: 1;
+}
+
+.packageTagline {
+  font-size: 0.875rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.4;
+}
+
+.packageItems {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  flex: 1;
+}
+
+.packageItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  font-size: 0.875rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.5;
+}
+
+.packageCheck {
+  color: var(--drex-accent);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 0.05em;
+}
+
+.packageFooter {
+  margin-top: auto;
+}
+
+/* Featured Digital Example — compact, contextual, clearly subordinate */
+.featuredOffer {
+  display: grid;
+  grid-template-columns: 1fr 160px;
+  gap: 2.5rem;
+  align-items: center;
+  margin-top: 2.5rem;
+  padding: 1.75rem 2rem;
+  background: var(--drex-bg);
+  border: 1px solid var(--drex-border);
+  border-radius: var(--mda-radius-lg);
+}
+
+.featuredOfferContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.featuredOfferEyebrow {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mda-digital);
+}
+
+.featuredOfferHeading {
+  font-size: clamp(1.25rem, 2.5vw, 1.625rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--drex-text);
+}
+
+.featuredOfferAccent {
+  color: var(--drex-accent);
+}
+
+.featuredOfferDesc {
+  font-size: 0.875rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.65;
+  max-width: none;
+}
+
+.featuredOfferPoster {
+  border-radius: var(--mda-radius);
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+.featuredOfferImg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ── Digital Examples Showcase ──────────────────────────────────────────── */
+.examplesShowcase {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  margin-top: 2.5rem;
+}
+
+.examplesTier {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.examplesTierHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.examplesTierBadge {
+  display: inline-block;
+  background: var(--drex-accent);
+  color: var(--drex-bg);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+}
+
+.examplesTierLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--drex-text-muted);
+}
+
+.examplesGrid5 {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.625rem;
+}
+
+.examplesGrid3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.625rem;
+}
+
+.examplesGrid1 {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.exampleCard {
+  border-radius: var(--mda-radius);
+  overflow: hidden;
+  border: 1px solid var(--drex-border);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.exampleCard:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+.exampleCardFeatured {
+  border-radius: var(--mda-radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--drex-border);
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.35);
+  max-width: 900px;
+}
+
+.exampleImg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.examplesCta {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 900px) {
+  .examplesGrid5 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .examplesGrid5 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .examplesGrid3 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ── 6: Process ─────────────────────────────────────────────────────────── */
+.process {
+  padding: 5rem 0;
+  background: var(--drex-bg);
+  border-top: 1px solid var(--drex-border);
+}
+
+.processSteps {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 2rem;
+  margin-top: 2.5rem;
+  list-style: none;
+  padding: 0;
+}
+
+.processStep {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.processNum {
+  font-size: 2rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  color: var(--mda-digital);
+  line-height: 1;
+  flex-shrink: 0;
+  opacity: 0.5;
+}
+
+.processBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.processLabel {
+  font-size: 0.875rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--drex-text);
+}
+
+.processDesc {
+  font-size: 0.875rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.65;
+}
+
+/* ── 7: CTA ─────────────────────────────────────────────────────────────── */
+.cta {
+  padding: 6rem 0;
+  background: var(--drex-surface);
+  border-top: 1px solid var(--drex-border);
+  text-align: center;
+}
+
+.ctaInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.ctaHeading {
+  font-size: clamp(2rem, 5vw, 3.75rem);
+  font-weight: 900;
+  letter-spacing: -0.035em;
+  line-height: 1.0;
+  color: var(--drex-text);
+  text-wrap: balance;
+}
+
+.ctaAccent {
+  color: var(--drex-accent);
+}
+
+.ctaSub {
+  font-size: 1.0625rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.6;
+  max-width: 48ch;
+}
+
+.ctaPillars {
+  font-size: 0.8125rem;
+  color: var(--drex-text-muted);
+  letter-spacing: 0.08em;
+  max-width: none;
+}
+
+.ctaEndorsement {
+  margin-top: 0.25rem;
+}
+
+/* ── 8: MDA Brand Footer ────────────────────────────────────────────────── */
+.mdaFooter {
+  padding: 2.5rem 0;
+  border-top: 1px solid var(--drex-border);
+  background: var(--drex-bg);
+}
+
+.mdaFooterInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.mdaFooterLinks {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.mdaFooterLink {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--drex-text-secondary);
+  text-decoration: none;
+  transition: color var(--drex-duration) var(--drex-ease);
+}
+
+.mdaFooterLink:hover {
+  color: var(--drex-text);
+}
+
+.mdaFooterLegal {
+  font-size: 0.75rem;
+  color: var(--drex-text-muted);
+  border-top: 1px solid var(--drex-border);
+  padding-top: 1.25rem;
+  max-width: none;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .packagesGrid {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  /* Header: hide category links, keep logo + CTA */
+  .mdaCatList {
+    display: none;
+  }
+
+  .mdaCatNav {
+    gap: 0;
+  }
+
+  .pillarsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .portfolioGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .featuredOffer {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .featuredOfferPoster {
+    max-width: 140px;
+  }
+
+  .mdaFooterInner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .heroHeading {
+    font-size: clamp(2rem, 11vw, 3rem);
+  }
+
+  .packagesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .pillarCard {
+    padding: 1.5rem;
+  }
+}

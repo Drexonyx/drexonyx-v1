@@ -1,7 +1,7 @@
 // DR 0072 §2.2: Skill interface, SkillContext, SkillResult.
 // DR 0074 §2.1: version follows semver; all V1 skills start at 1.0.0.
 
-export type SkillFamily = 'BRIEF' | 'SCRIPT' | 'HOOK' | 'STRATEGY' | 'QC' | 'UTILITY' | 'COMMUNICATION' | 'SOCIAL';
+export type SkillFamily = 'BRIEF' | 'SCRIPT' | 'HOOK' | 'STRATEGY' | 'QC' | 'UTILITY' | 'COMMUNICATION' | 'SOCIAL' | 'SALES';
 
 export type SkillId =
   | 'brief.analyze'
@@ -24,7 +24,13 @@ export type SkillId =
   | 'facebook.page.publish'
   | 'utility.prompt.optimize'
   | 'utility.output.format'
-  | 'utility.batch.coordinate';
+  | 'utility.batch.coordinate'
+  // DR 0128: Sales Operating System skills
+  | 'sales.lead.discover'
+  | 'sales.lead.verify'
+  | 'sales.lead.score'
+  | 'sales.lead.qualify'
+  | 'sales.outreach.draft';
 
 // DR 0072 §2.2: Provided by the route handler; consumed by skill.execute().
 // actorRole is for audit/provenance only — skills MUST NOT use it for authorization (DR 0075 §2.6).

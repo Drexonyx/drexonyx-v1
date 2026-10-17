@@ -7,6 +7,7 @@ import { useState, useCallback } from "react";
 import styles from "./Navigation.module.css";
 
 const NAV_LINKS = [
+  { href: "/mda", label: "MDA" },
   { href: "/services", label: "Services" },
   { href: "/portfolio", label: "Portfolio" },
   { href: "/pricing", label: "Pricing" },

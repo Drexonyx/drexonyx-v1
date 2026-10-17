@@ -3,6 +3,26 @@
     {
       "path": "/api/internal/poll-generations",
       "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/internal/sales-discovery",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/internal/sales-followups",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/internal/sales-daily-report",
+      "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/internal/sales-outreach-send",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/internal/sales-reply-poll",
+      "schedule": "0 12 * * *"
     }
   ]
 }

@@ -85,7 +85,7 @@ export async function submitBrief(
     console.error('[submitBrief] db insert failed:', error);
     return {
       status: 'error',
-      error: 'Submission failed. Please try again or contact us directly at drexonyx.studio@gmail.com.',
+      error: 'Submission failed. Please try again or contact us directly at info@drexonyx.com.',
     };
   }
 }

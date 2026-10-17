@@ -26,5 +26,21 @@ export { delegateDirectFacebookPublish } from './direct-facebook-publish';
 export type { DirectFacebookPublishParams, DirectFacebookPublishResult } from './direct-facebook-publish';
 export { delegateWhatsAppInquiry } from './whatsapp-inquiry-specialist';
 export type { WhatsAppInquiryDelegationParams, WhatsAppInquiryDelegationResult } from './whatsapp-inquiry-specialist';
+export {
+  delegateLeadDiscovery,
+  delegateLeadQualification,
+  delegateOutreachDrafting,
+  delegateFollowUpScheduling,
+} from './sales-discovery-specialist';
+export type {
+  LeadDiscoveryParams,
+  LeadDiscoveryResult,
+  LeadQualificationParams,
+  LeadQualificationResult,
+  OutreachDraftingParams,
+  OutreachDraftingResult,
+  FollowUpSchedulingParams,
+  FollowUpSchedulingResult,
+} from './sales-discovery-specialist';
 export { SPECIALIST_AGENT_REGISTRY } from './registry';
 export type { SpecialistAgentEntry } from './registry';

@@ -131,6 +131,25 @@
   font-style: italic;
 }
 
+/* MDA endorsement strip */
+.mdaStrip {
+  border-top: 1px solid var(--drex-border-subtle);
+  max-width: var(--drex-container);
+  margin: 0 auto;
+  padding: 0.625rem var(--drex-pad);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mdaEndorsement {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--drex-text-muted);
+}
+
 @media (max-width: 900px) {
   .inner {
     grid-template-columns: 1fr 1fr;

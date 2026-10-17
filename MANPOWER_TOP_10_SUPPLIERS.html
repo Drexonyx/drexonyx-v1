@@ -1,0 +1,277 @@
+<title>UAE Top 10 Manpower Suppliers</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#0a0a0f;--bg2:#111118;--bg3:#1a1a24;--border:#2a2a3a;
+  --fg:#e8e8f0;--fg2:#a0a0b8;--fg3:#606078;
+  --accent:#ff5a1f;--accent2:#ff7a45;
+  --p1:#22c55e;--p2:#3b82f6;--p3:#6b7280;--rej:#ef4444;
+  --yes:#22c55e;--partial:#f59e0b;--no:#6b7280;--nc:#3b82f6;
+  color-scheme:dark;
+}
+@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  --bg:#f4f4f8;--bg2:#ffffff;--bg3:#e8e8f0;--border:#d0d0e0;
+  --fg:#1a1a2e;--fg2:#444460;--fg3:#888899;
+  color-scheme:light;
+}}
+:root[data-theme="light"]{--bg:#f4f4f8;--bg2:#ffffff;--bg3:#e8e8f0;--border:#d0d0e0;--fg:#1a1a2e;--fg2:#444460;--fg3:#888899;color-scheme:light;}
+:root[data-theme="dark"]{color-scheme:dark;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:'Inter',sans-serif;font-size:14px;line-height:1.5}
+.hdr{background:var(--bg2);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.hdr-logo{font-weight:700;font-size:16px;color:var(--accent);letter-spacing:.05em;font-family:'JetBrains Mono',monospace}
+.hdr-title{font-size:15px;font-weight:600;flex:1}
+.hdr-sub{font-size:11px;color:var(--fg3);font-family:'JetBrains Mono',monospace}
+.hdr-btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--fg2);cursor:pointer;font-size:12px;font-family:'Inter',sans-serif;transition:.15s}
+.btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.recommendation-box{margin:16px 24px;border-radius:10px;border:2px solid var(--accent);background:rgba(255,90,31,.06);padding:20px 24px}
+.rec-title{font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px}
+.rec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rec-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px}
+.rec-num{font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--accent);margin-bottom:4px}
+.rec-name{font-size:14px;font-weight:700;margin-bottom:6px}
+.rec-why{font-size:11px;color:var(--fg2);line-height:1.5}
+.rec-contact{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--p1);margin-top:8px}
+.disclaimer{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:12px 16px;margin:0 24px 12px;font-size:11px;color:var(--fg2);line-height:1.6}
+.disclaimer strong{color:#ef4444}
+.tbl-wrap{overflow-x:auto;padding:0 24px 24px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:var(--bg3);padding:8px 10px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--fg3);border-bottom:2px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none}
+th:hover{color:var(--accent)}
+td{padding:10px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.4}
+tr:hover td{background:rgba(255,90,31,.04)}
+.p1{color:var(--p1);font-weight:700} .p2{color:var(--p2);font-weight:600}
+.p3{color:var(--p3)} .rej{color:var(--rej);font-weight:600}
+.cap-yes{color:var(--yes)} .cap-partial{color:var(--partial)} .cap-no{color:var(--no)} .cap-nc{color:var(--nc)}
+.conf-high{color:var(--p1);font-weight:700} .conf-mid{color:var(--partial);font-weight:600} .conf-low{color:var(--p3)}
+.rec-cf{color:var(--p1);font-weight:700} .rec-cd{color:#86efac} .rec-cv{color:#6ee7b7}
+.rec-ev{color:var(--p2)} .rec-dny{color:var(--partial)} .rec-dn{color:var(--rej)}
+.contact-cell{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--fg2)}
+.flag-mini{color:#ef4444;font-size:10px}
+.strength-mini{color:#86efac;font-size:10px}
+.tbl-section{margin:0 24px 8px;font-size:11px;color:var(--fg3);text-transform:uppercase;letter-spacing:.1em;padding-top:4px}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;align-items:flex-start;justify-content:center;padding:24px;overflow-y:auto}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:12px;max-width:720px;width:100%;padding:24px;margin:auto}
+.modal-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;gap:12px}
+.modal-name{font-size:20px;font-weight:700}
+.modal-close{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:4px 12px;cursor:pointer;color:var(--fg2);font-size:16px}
+.modal-close:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.modal-conf{text-align:center}
+.modal-conf-num{font-size:36px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.modal-conf-lbl{font-size:10px;color:var(--fg3);text-transform:uppercase}
+.section{margin-bottom:18px}
+.section-title{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--fg3);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+.cap-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.cap-item{background:var(--bg3);border-radius:6px;padding:8px;text-align:center}
+.cap-item-lbl{font-size:9px;color:var(--fg3);text-transform:uppercase;margin-bottom:3px}
+.cap-item-val{font-size:12px;font-weight:600}
+.field-grid{display:grid;grid-template-columns:160px 1fr;gap:4px 12px}
+.field-key{font-size:11px;color:var(--fg3);padding:3px 0;font-family:'JetBrains Mono',monospace}
+.field-val{font-size:12px;color:var(--fg);padding:3px 0;word-break:break-word}
+.flag-block{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:6px;padding:10px 14px;font-size:11px;color:#ef4444;line-height:1.6;margin-bottom:10px}
+.strength-block{background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.15);border-radius:6px;padding:10px 14px;font-size:11px;color:#86efac;line-height:1.6;margin-bottom:10px}
+.notes-block{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-size:12px;color:var(--fg2);line-height:1.6}
+.rec-block{border-radius:6px;padding:10px 14px;font-size:12px;font-weight:600;margin-bottom:12px;text-align:center}
+.rec-block.CF{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#86efac}
+.rec-block.CD{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);color:#6ee7b7}
+.rec-block.EV{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3);color:#93c5fd}
+.rec-block.DN{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#fca5a5}
+@media(max-width:700px){
+  .rec-grid{grid-template-columns:1fr}
+  .tbl-wrap{padding:0 12px 16px}
+  .recommendation-box{margin:12px 16px}
+  .disclaimer{margin:0 16px 10px}
+  .cap-grid{grid-template-columns:repeat(2,1fr)}
+  .field-grid{grid-template-columns:1fr}
+}
+</style>
+<div class="hdr">
+  <div>
+    <div class="hdr-logo">DREXONYX</div>
+    <div class="hdr-sub">RESEARCH ONLY — NO OUTREACH SENT</div>
+  </div>
+  <div class="hdr-title">UAE Manpower Suppliers — Top 10 Second-Pass Verification</div>
+  <div class="hdr-btns">
+    <button class="btn" onclick="exportCSV()">Export CSV</button>
+    <button class="btn" onclick="exportJSON()">Export JSON</button>
+    <button class="btn" id="themeBtn" onclick="toggleTheme()">Light Mode</button>
+  </div>
+</div>
+<div class="recommendation-box">
+  <div class="rec-title">First 3 Companies to Contact — When Owner Approves</div>
+  <div class="rec-grid">
+    <div class="rec-card">
+      <div class="rec-num">#1 — CONTACT FIRST</div>
+      <div class="rec-name">Dulsco Group</div>
+      <div class="rec-why">Strongest verified operator. Own labour villages, medical clinics, fleet. AGR Energy Recruitment (O&G, 70 countries). Overseas sourcing India/Nepal/Bangladesh confirmed. 14,000–16,000 workforce. Full benefits stack internal. Dubai Municipality Bunyan partner.</div>
+      <div class="rec-contact">800 DULSCO (800 385726) · dulsco.com/contact<br>Ask for: Dulsco People / AGR Energy Recruitment</div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-num">#2 — CONTACT FIRST</div>
+      <div class="rec-name">Sawaeed Employment LLC</div>
+      <div class="rec-why">Founded for this exact service type. Employer-of-record model: visa, accommodation, meals, transport, medical, EOSB all covered. Mussafah Abu Dhabi = O&G industrial zone. Construction trades training center. Parent ESG: ADX-listed, AED 1.77bn revenue +39% (2025).</div>
+      <div class="rec-contact">+971 2 559 4444 · sawaeed.ae (verify first)<br>Verify BHRRC allegation before engaging</div>
+    </div>
+    <div class="rec-card">
+      <div class="rec-num">#3 — CONTACT FIRST</div>
+      <div class="rec-name">PACT Employment Services</div>
+      <div class="rec-why">HIGHEST DIRECT MATCH: July 2026 walk-in for construction helpers at O&G site. Sep 2026 bulk overseas sourcing India/Nepal for civil/MEP/O&G unskilled workers. Most recently active. Verify trade licence and resolve domain inconsistency before contacting.</div>
+      <div class="rec-contact">umme@pactemployment.ae · +971 588327856<br>Verify: pactemployment.ae · UAE DED licence</div>
+    </div>
+  </div>
+</div>
+<div class="disclaimer">
+  <strong>⚠ NO OUTREACH HAS BEEN SENT.</strong> This document is for internal research and planning only.
+  DO NOT contact any company without explicit written approval from Drexonyx Studio owner.
+  DO NOT send emails, WhatsApp messages, calls, or any form of communication to any company listed.
+  The source employer identity is protected and does not appear in this document.
+</div>
+<div class="tbl-wrap">
+<table id="mainTable">
+<thead>
+<tr>
+  <th onclick="sortTable(0)">Rank</th>
+  <th onclick="sortTable(1)">Company</th>
+  <th onclick="sortTable(2)">Location</th>
+  <th onclick="sortTable(3)">Priority</th>
+  <th onclick="sortTable(4)">MDA</th>
+  <th onclick="sortTable(5)">Conf.</th>
+  <th>100W</th>
+  <th>Const</th>
+  <th>O&amp;G</th>
+  <th>Overseas</th>
+  <th>Visa</th>
+  <th>Accomm</th>
+  <th>Transport</th>
+  <th>Medical</th>
+  <th>Contact</th>
+  <th>Active 2026</th>
+  <th onclick="sortTable(16)">Recommendation</th>
+</tr>
+</thead>
+<tbody id="tableBody"></tbody>
+</table>
+</div>
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modalContent"></div>
+</div>
+<script>
+const COMPANIES=[{"rank": 1, "companyName": "Dulsco Group", "legalName": "Dulsco LLC", "location": "Dubai (Al Quoz)", "emirate": "Dubai", "priority": "P1", "mdaScore": 88, "confidenceScore": 8, "websiteStatus": "CONFIRMED", "website": "dulsco.com", "email": "Web form only — dulsco.com/contact", "phone": "800 DULSCO (800 385726)", "whatsapp": "Not found", "capacity100Workers": "YES", "construction": "YES", "oilGas": "YES", "overseasRecruitment": "YES", "visaHandling": "YES", "accommodation": "YES", "transport": "YES", "medicalInsurance": "YES", "agencyFee": "Not publicly stated", "replacementPolicy": "Not publicly stated", "mobilizationTimeline": "Not stated (market norm 4–8 weeks for O&G)", "zeroFeePolicy": "Not explicitly published (direct overseas recruitment confirmed 2012; no worker-fee evidence found)", "verifiedActive2026": "YES", "contactConfirmation": "PARTIAL (phone confirmed; email requires web form)", "redFlags": "Minor: salary deduction reviews on Indeed (2025-2026, unverified); hiring postings down 71% in 2026 vs 2025 (may reflect outsourced model, not decline); CEO transition overlap (Stockton/Marke) in press releases — likely handover", "strengths": "Strongest verified company in database. Own labour villages (42,000+ worker capacity, Dubai Industrial Park clinic confirmed). Large commercial fleet with 24/7 monitoring. AGR Energy Recruitment division (acquired March 2023) covering oil/gas/renewables in 70 countries. Confirmed overseas sourcing India/Nepal/Bangladesh/Myanmar. ADNOC-linked job postings (July 2026). Dubai Municipality Bunyan Programme official partner. 2024–2026 operational activity very strongly evidenced (new CEO, new CFO, new CTO, major contracts). 14,000–16,000 total workforce.", "recommendation": "CONTACT FIRST", "notes": "Ask for 'Dulsco People' or 'AGR Energy Recruitment' division. Dulsco handles the full benefits stack internally (accommodation in own labour villages, medical clinics, fleet transport, overseas visa management). Best single-source for 100-worker oil & gas site deployment with full package.", "sourcesUsed": "dulsco.com, zawya.com, abmagazine.accaglobal.com, tradearabia.com, recruiter.co.uk, reveliolabs.com, dmc-education.com", "lastVerified": "October 2026"}, {"rank": 2, "companyName": "Sawaeed Employment LLC", "legalName": "Sawaeed Employment LLC (Emirates Stallions Group)", "location": "ICAD III, Mussafah South, Abu Dhabi", "emirate": "Abu Dhabi", "priority": "P1", "mdaScore": 67, "confidenceScore": 6, "websiteStatus": "PARTIAL", "website": "sawaeed.ae", "email": "Not confirmed (try info@sawaeed.ae)", "phone": "+971 2 559 4444", "whatsapp": "Not found", "capacity100Workers": "PARTIAL", "construction": "YES", "oilGas": "PARTIAL", "overseasRecruitment": "PARTIAL", "visaHandling": "YES", "accommodation": "YES", "transport": "YES", "medicalInsurance": "YES", "agencyFee": "Not publicly stated", "replacementPolicy": "Not publicly stated", "mobilizationTimeline": "Not stated", "zeroFeePolicy": "PARTIAL (visa costs explicitly employer-covered; BHRRC unpaid salary allegation on record — unresolved)", "verifiedActive2026": "YES", "contactConfirmation": "PARTIAL (phone from directory; email unconfirmed)", "redFlags": "BHRRC unpaid salary allegation against Sawaeed Holding (undated, unanswered). Website sawaeed.ae not confirmed as active. May 2024 ESG acquisition — verify service model unchanged. Benefits package (accommodation, transport, medical) is from 2012 launch article; not recently independently confirmed.", "strengths": "FOUNDED SPECIFICALLY FOR THIS CONTRACT TYPE. Employer-of-record model: Sawaeed takes full responsibility for visa, accommodation, meals, transport, medical insurance, EOSB, annual leave — employer only pays the deployment rate. Mussafah Industrial Area base = Abu Dhabi O&G industrial zone. Own construction trades training center (carpentry, steel, electrical, plumbing). Abu Dhabi Chamber reg. 223215. Parent ESG listed on Abu Dhabi Securities Exchange. ESG revenue AED 1.77bn (+39% in 2025). 120,000+ recruitments claimed. 450+ corporate clients.", "recommendation": "CONTACT FIRST", "notes": "The employer-of-record model makes Sawaeed the cleanest structural fit: you pay one deployment fee, Sawaeed handles all worker administration. Mussafah location is directly adjacent to Abu Dhabi's primary O&G industrial zone. Verify the BHRRC allegation directly. Confirm post-ESG acquisition that service terms are unchanged. Confirm website and direct email before first contact.", "sourcesUsed": "arounddeal.com, gulfnews.com, decypha.com, enterpriseam.com, wam.ae, business-humanrights.org, a-leads.co, reveliolabs.com", "lastVerified": "October 2026"}, {"rank": 3, "companyName": "Transguard Group", "legalName": "Transguard Group LLC", "location": "Dubai Airport Free Zone (DAFZA)", "emirate": "Dubai", "priority": "P1", "mdaScore": 80, "confidenceScore": 7, "websiteStatus": "CONFIRMED", "website": "transguardgroup.com", "email": "info@transguardgroup.com", "phone": "+971 4 703 0500 / 800 1800 / +971 2 446 3711 (AUH)", "whatsapp": "Not found", "capacity100Workers": "YES", "construction": "YES", "oilGas": "NOT_CONFIRMED", "overseasRecruitment": "YES", "visaHandling": "YES", "accommodation": "YES", "transport": "PARTIAL", "medicalInsurance": "YES", "agencyFee": "Not publicly stated", "replacementPolicy": "Not publicly stated", "mobilizationTimeline": "Not stated", "zeroFeePolicy": "CONCERN — 2020-2021 NGO reports (Migrant-Rights.org, Equidem) documented Nepali workers paying NPR 78,000 (vs legal ceiling NPR 10,000). Company denied responsibility, attributed to overseas agents. No post-2021 corrective verification found.", "verifiedActive2026": "YES", "contactConfirmation": "CONFIRMED (email + phone from official website)", "redFlags": "MATERIAL: 2020-2021 worker welfare allegations documented by NGOs: recruitment fee overcharging, passport withholding, unpaid wages, substandard accommodation (Migrant-Rights.org, Equidem, Business & Human Rights Resource Centre). Not cleared — absence of new reports is not a clearance. Recommend enhanced due diligence before engagement. Also: oil & gas not confirmed as a served sector (only construction/infrastructure confirmed in FY25/26).", "strengths": "Largest verified operator in database: 78,500 employees (FY26), AED 4.15bn revenue (FY26). Own accommodation complexes (Jebel Ali ~10,000 capacity, Dubai South 2,708 capacity, Tijara Town 5,000). On-site medical clinics. FY25/26 explicit construction and infrastructure growth. Overseas sourcing confirmed (Nepal, Bangladesh, Philippines, India). Emirates Group subsidiary — highest regulatory compliance standards. Category A MOHRE licence. 3,000+ construction workers deployed for Expo 2020 alone.", "recommendation": "CONTACT — WITH DUE DILIGENCE", "notes": "Transguard is the highest-capacity operator in this database and the safest bet for 100-worker deployment from a SCALE perspective. However, the 2020-2021 welfare allegations must be raised directly in the engagement process. Request: (1) current ILO/UNGP compliance policy; (2) overseas recruitment agency list (India/Nepal); (3) confirmation of zero worker-fee policy with independent audit report. Do not proceed without a satisfactory written response on worker welfare. Oil & gas capability also needs explicit confirmation.", "sourcesUsed": "transguardgroup.com, gulfnews.com, tradearabia.com, arabianbusiness.com, gulfconstructiononline.com, migrant-rights.org, business-humanrights.org, bhrrc.org", "lastVerified": "October 2026"}, {"rank": 4, "companyName": "PACT Employment Services", "legalName": "PACT Employment Services LLC", "location": "Karama, Dubai", "emirate": "Dubai", "priority": "P2", "mdaScore": 56, "confidenceScore": 5, "websiteStatus": "PARTIAL", "website": "pactemployment.ae", "email": "umme@pactemployment.ae / niha@pactemployment.ae", "phone": "+971 588327856", "whatsapp": "Not confirmed (mobile may serve as WhatsApp)", "capacity100Workers": "PARTIAL", "construction": "YES", "oilGas": "YES", "overseasRecruitment": "YES", "visaHandling": "PARTIAL", "accommodation": "NOT_CONFIRMED", "transport": "NOT_CONFIRMED", "medicalInsurance": "NOT_CONFIRMED", "agencyFee": "Not publicly stated", "replacementPolicy": "Not publicly stated", "mobilizationTimeline": "Not stated", "zeroFeePolicy": "NOT_STATED (India/Nepal agency channels confirmed = elevated worker-fee risk at source country level)", "verifiedActive2026": "YES", "contactConfirmation": "PARTIAL (email from website; phone from single third-party source)", "redFlags": "Identity inconsistencies: appears under 3+ names (PACT Employment Services, PACT Manpower Services, Pact Recruitment Services). Email domain mismatch (naveen@derbygroup.ae in some postings). Two address descriptions in 2026 (Carrera Building vs Reem Residence, Karama). All primary 2026 evidence from single third-party blog (dmc-education.com). Anonymous Indeed review (March 2025) reports unexplained pay deductions.", "strengths": "HIGHEST DIRECT RELEVANCE: July 2026 walk-in ad specifically for construction site helpers at oil & gas site location — directly matches this requirement. September 2026 bulk overseas recruitment post explicitly names India, Nepal, Africa as supply channels for civil, MEP, oil & gas, unskilled/semi-skilled workers. Very recently active. Two confirmed contact emails on website.", "recommendation": "CONTACT — VERIFY IDENTITY FIRST", "notes": "Before contacting, verify: (1) pactemployment.ae is live; (2) trade licence on UAE DED portal; (3) resolve derbygroup.ae email domain issue. PACT is the only company in this database actively advertising construction helpers at an oil & gas site in 2026 while simultaneously building an overseas recruitment partner network in India/Nepal. This directly matches the demand letter. However, the full benefits package (accommodation, transport, medical) has not been confirmed — these may be provided by the end employer, not PACT.", "sourcesUsed": "dmc-education.com, pactemployment.ae (indirect), ae.indeed.com", "lastVerified": "October 2026"}, {"rank": 5, "companyName": "Ontime Manpower Supply", "legalName": "Ontime Manpower Supply LLC", "location": "Garhoud, Dubai", "emirate": "Dubai", "priority": "P2", "mdaScore": 60, "confidenceScore": 5, "websiteStatus": "PARTIAL", "website": "ontimeuae.com", "email": "Not found", "phone": "+971 4 256 6333", "whatsapp": "Not found", "capacity100Workers": "PARTIAL", "construction": "YES", "oilGas": "YES", "overseasRecruitment": "NOT_CONFIRMED", "visaHandling": "PARTIAL", "accommodation": "PARTIAL", "transport": "NOT_CONFIRMED", "medicalInsurance": "PARTIAL", "agencyFee": "Not publicly stated", "replacementPolicy": "Not publicly stated", "mobilizationTimeline": "Not stated", "zeroFeePolicy": "Not stated", "verifiedActive2026": "YES", "contactConfirmation": "PARTIAL (phone confirmed across 2 independent sources; email not found)", "redFlags": "Anonymous Glassdoor reviews (2024–2026) filed under 'Ontime Group' — 2.6/5, salary delays and deductions (attribution to this entity uncertain). Company identity overlap with 'Mahad Manpower UAE' phrasing in some directories. Website not confirmed as live.", "strengths": "Established 2001 (23+ years). MOHRE-authorised and JAFZA-registered. Construction and oil & gas sectors listed. Camp Operations Supervisor posting implies involvement in camp management. Great Place to Work certified (2025). GoodFirms states capability for large headcounts at short notice. Company size 2,401 (GPTW). Phone confirmed across two independent sources.", "recommendation": "EVALUATE", "notes": "Strong operational track record. Key unresolved questions: (1) overseas recruitment capability — must be confirmed before engaging for this requirement; (2) whether the camp management function extends to client-site accommodation; (3) whether the Glassdoor reviews apply to this entity. Contact via +971 4 256 6333 to clarify scope.", "sourcesUsed": "goodfirms.co, greatplacetowork.me, naukrigulf.com, getprospect.com, glassdoor.com, ae.indeed.com", "lastVerified": "October 2026"}, {"rank": 6, "companyName": "G4S / First Select Employment", "legalName": "G4S Secure Solutions (UAE) LLC", "location": "Abu Dhabi", "emirate": "Abu Dhabi", "priority": "P2", "mdaScore": 68, "confidenceScore": 5, "websiteStatus": "CONFIRMED", "website": "g4s.com/en-ae", "email": "info@uae.g4s.com", "phone": "+971 2 305 8600", "whatsapp": "Not found", "capacity100Workers": "NOT_CONFIRMED", "construction": "NOT_CONFIRMED", "oilGas": "NOT_CONFIRMED", "overseasRecruitment": "PARTIAL", "visaHandling": "NOT_CONFIRMED", "accommodation": "NOT_CONFIRMED", "transport": "NOT_CONFIRMED", "medicalInsurance": "NOT_CONFIRMED", "agencyFee": "Not publicly stated", "replacementPolicy": "Not publicly stated", "mobilizationTimeline": "Not stated", "zeroFeePolicy": "Not stated", "verifiedActive2026": "PARTIAL", "contactConfirmation": "CONFIRMED (email + phone from official website)", "redFlags": "MATERIAL: No evidence that First Select supplies construction site helpers or oil & gas workers at any scale. Its described offering is white-collar HR outsourcing. Emirati ownership requirement for MOHRE recruitment licence may conflict with Allied Universal (UK/US) ownership structure. 2020 G4S UAE welfare crisis (1,000+ workers unpaid). Outdated certifications on website (ISO 9001:2000, OHSAS 18001:1999 — both superseded). FY26 First Select activity not confirmed.", "strengths": "Confirmed website and contacts. Established UAE brand (2002). ODLS licences claimed. Abu Dhabi base. Part of Allied Universal group (global presence). 9,000+ UAE staff (group level).", "recommendation": "EVALUATE", "notes": "Ranked P2 due to confirmed website/contacts and established brand, but the absence of any construction/O&G helper evidence makes First Select unlikely to be the right fit without direct confirmation. Before investing time, confirm: (1) First Select actively supplies unskilled construction workers (not just HR outsourcing); (2) UAE trade licence is fully compliant given Allied Universal ownership.", "sourcesUsed": "g4s.com, migrant-rights.org, business-humanrights.org, kompass.com, naukrigulf.com", "lastVerified": "October 2026"}, {"rank": 7, "companyName": "Five Continents Technical (5CE)", "legalName": "Five Continents Technical and Industrial Services Establishment", "location": "Abu Dhabi", "emirate": "Abu Dhabi", "priority": "P3", "mdaScore": 64, "confidenceScore": 4, "websiteStatus": "NOT_CONFIRMED", "website": "No official URL identified", "email": "Not found", "phone": "+971 2 643 1313 (potentially stale, pre-2019)", "whatsapp": "Not found", "capacity100Workers": "PARTIAL", "construction": "YES", "oilGas": "YES", "overseasRecruitment": "NOT_CONFIRMED", "visaHandling": "NOT_CONFIRMED", "accommodation": "PARTIAL", "transport": "PARTIAL", "medicalInsurance": "PARTIAL", "agencyFee": "Not publicly stated", "replacementPolicy": "Not publicly stated", "mobilizationTimeline": "Not stated", "zeroFeePolicy": "Not stated", "verifiedActive2026": "PARTIAL", "contactConfirmation": "NOT_CONFIRMED (phone may be stale)", "redFlags": "No confirmed official website. Most prominent online profile (recruiter.com) has not been updated since before April 2019 (contains Google+ links). ADNOC client claim is self-reported and unconfirmed by independent sources. Licence CN1019406 cannot be independently verified. Naukrigulf shows '1901' as founding year — clearly erroneous data. No press releases or contracts found in 2024–2026 period.", "strengths": "Oil & gas and EPC sector focus since 1989 (35+ years). ADNOC Group and ADAC UAE Airports named as clients (self-reported). 'General helpers to senior executives' stated scope. Camp management and catering listed. Abu Dhabi base in correct location for O&G projects. Ministry of Labour licence CN1019406 claimed.", "recommendation": "DO_NOT_CONTACT_YET", "notes": "5CE has the right sector focus (O&G/EPC construction) but cannot be verified as currently active. Before considering, first attempt: (1) call +971 2 643 1313 to confirm current operations; (2) verify trade licence CN1019406 via UAE Ministry of Human Resources portal; (3) obtain an independent reference from ADNOC supply chain if possible. Do not engage without these verifications.", "sourcesUsed": "naukrigulf.com, recruiter.com, freshgulfjob.com", "lastVerified": "October 2026"}, {"rank": 8, "companyName": "World Star Manpower Solutions", "legalName": "World Star Manpower Solutions LLC (World Star Holding)", "location": "Sharjah (HQ); also Dubai, Abu Dhabi", "emirate": "Sharjah", "priority": "P3", "mdaScore": 62, "confidenceScore": 4, "websiteStatus": "NOT_CONFIRMED", "website": "worldstarmanpower.ae (not confirmed active)", "email": "inquiry@worldstarmanpower.ae (from earlier research; not recently confirmed)", "phone": "Partial: 06 76..., 050 7... (Yellow Pages, truncated)", "whatsapp": "+971 50 777 8779 (from earlier research)", "capacity100Workers": "PARTIAL", "construction": "YES", "oilGas": "NOT_CONFIRMED", "overseasRecruitment": "NOT_CONFIRMED", "visaHandling": "NOT_CONFIRMED", "accommodation": "PARTIAL", "transport": "YES", "medicalInsurance": "NOT_CONFIRMED", "agencyFee": "Not publicly stated", "replacementPolicy": "Not publicly stated", "mobilizationTimeline": "Not stated", "zeroFeePolicy": "Not stated", "verifiedActive2026": "PARTIAL", "contactConfirmation": "NOT_CONFIRMED (website unconfirmed; phone numbers truncated in directories)", "redFlags": "Website worldstarmanpower.ae could not be confirmed as active. No dated 2024–2026 operations evidence. Most recent datable coverage is 2022. Headcount conflicts sharply across sources (201–500 vs 1,001–5,000). Address conflicts (Dubai vs Sharjah vs Abu Dhabi). No overseas recruitment documented. One 2023 Indeed review raises management concern (small sample, unverified).", "strengths": "Parent group established 1974 (construction heritage). Approximately 200 buses confirmed for worker transport (2022). 5,000 group headcount stated (2022). Multi-emirate presence. Dedicated helpers page (helpers, formwork, masonry). Sister brand manpowersupply.ae (World Star Holding).", "recommendation": "DO_NOT_CONTACT_YET", "notes": "The 2022 Gulf News evidence is credible but dated. Before considering: (1) confirm worldstarmanpower.ae is live; (2) obtain a 2024–2026 client reference; (3) confirm overseas recruitment capability (critical for this requirement). The transport infrastructure is useful but accommodation, medical, and overseas sourcing are all unconfirmed.", "sourcesUsed": "gulfnews.com, gulftoday.ae, yellowpages-uae.com, ae.indeed.com, prospeo.io", "lastVerified": "October 2026"}, {"rank": 9, "companyName": "Flexitalent (Farnek Group)", "legalName": "Flexitalent Manpower Supply (Farnek Group)", "location": "Al Quoz, Dubai", "emirate": "Dubai", "priority": "REJECT", "mdaScore": 59, "confidenceScore": 3, "websiteStatus": "PARTIAL", "website": "flexitalent.com", "email": "recruitment@farnek.com (Farnek group; Flexitalent-specific email not found)", "phone": "+971 4 3824400 (Farnek group; Flexitalent-specific line not confirmed)", "whatsapp": "Not found", "capacity100Workers": "NOT_CONFIRMED", "construction": "NOT_CONFIRMED", "oilGas": "NOT_CONFIRMED", "overseasRecruitment": "NOT_CONFIRMED", "visaHandling": "NOT_CONFIRMED", "accommodation": "NOT_CONFIRMED", "transport": "NOT_CONFIRMED", "medicalInsurance": "NOT_CONFIRMED", "agencyFee": "Not publicly stated", "replacementPolicy": "Not publicly stated", "mobilizationTimeline": "Not stated", "zeroFeePolicy": "Not stated", "verifiedActive2026": "YES", "contactConfirmation": "NOT_CONFIRMED (only parent Farnek contacts available)", "redFlags": "Launched March 2025 — only 18 months old as of October 2026. Core positioning is tech-forward corporate outsourcing (logistics, hospitality, manufacturing, marketing) — NOT construction or O&G site labour. No overseas recruitment documented. No accommodation/transport/medical package confirmed. Construction is frequently omitted from sector listings. Farnek's 2024 sector growth: energy, healthcare, aviation, hospitality, retail, residential — construction not featured.", "strengths": "Strong parent (Farnek Group, AED 690m contracts 2024, 9,000+ staff). 3,000+ placements claimed since March 2025. UAE-focused with digital hiring tools.", "recommendation": "DO_NOT_CONTACT", "notes": "Not suitable for this requirement. Too new, wrong sector focus, no overseas recruitment capability, and no construction/O&G site helper track record. Farnek's core business is facilities management, not O&G industrial labour supply.", "sourcesUsed": "farnek.com, zawya.com, cbnme.com, intelligentcio.com", "lastVerified": "October 2026"}, {"rank": 10, "companyName": "UDEEL", "legalName": "UDEEL LLC", "location": "Abu Dhabi", "emirate": "Abu Dhabi", "priority": "REJECT", "mdaScore": 55, "confidenceScore": 3, "websiteStatus": "NOT_CONFIRMED", "website": "udeel.com (referenced but not confirmed active)", "email": "Not found", "phone": "Not found", "whatsapp": "Not found", "capacity100Workers": "NOT_CONFIRMED", "construction": "PARTIAL", "oilGas": "PARTIAL", "overseasRecruitment": "PARTIAL", "visaHandling": "NOT_CONFIRMED", "accommodation": "NOT_CONFIRMED", "transport": "NOT_CONFIRMED", "medicalInsurance": "NOT_CONFIRMED", "agencyFee": "Not publicly stated", "replacementPolicy": "Not publicly stated", "mobilizationTimeline": "Not stated", "zeroFeePolicy": "Not stated", "verifiedActive2026": "NO", "contactConfirmation": "NOT_CONFIRMED", "redFlags": "No confirmed website. No confirmed phone. No confirmed email. No 2024-2026 operational evidence. Headcount conflicts irreconcilably (38 vs 201–500). If small estimate is correct (38 employees), deploying 100 workers to one site is beyond capacity. Profile focus is specialist/technical staff (geosciences, reservoir engineering) — NOT unskilled construction helpers. ADNOC client claim is unconfirmed by any independent source.", "strengths": "ADNOC relationship since 1993 claimed. Serves 14 ADNOC subsidiaries stated. O&G and construction both listed. Abu Dhabi base.", "recommendation": "DO_NOT_CONTACT", "notes": "Cannot be recommended without: a confirmed website, confirmed contact details, independent verification of ADNOC relationship, and confirmation that unskilled construction helpers (not technical specialists) are within scope. Contact only via a verified ADNOC supply chain introduction.", "sourcesUsed": "naukrigulf.com, village.ai, bouncewatch.com", "lastVerified": "October 2026"}];
+const CAP_CLASS={"YES":"cap-yes","PARTIAL":"cap-partial","NOT_CONFIRMED":"cap-nc","NO":"cap-no","CONCERN":"cap-partial"};
+const PRIO_CLASS={"P1":"p1","P2":"p2","P3":"p3","REJECT":"rej"};
+const REC_SHORT={"CONTACT FIRST":"CF","CONTACT — WITH DUE DILIGENCE":"CD","CONTACT — VERIFY IDENTITY FIRST":"CV","EVALUATE":"EV","DO_NOT_CONTACT_YET":"DNY","DO_NOT_CONTACT":"DN"};
+const REC_CLASS={"CONTACT FIRST":"rec-cf","CONTACT — WITH DUE DILIGENCE":"rec-cd","CONTACT — VERIFY IDENTITY FIRST":"rec-cv","EVALUATE":"rec-ev","DO_NOT_CONTACT_YET":"rec-dny","DO_NOT_CONTACT":"rec-dn"};
+const CONF_CLASS=(n)=>n>=7?"conf-high":n>=5?"conf-mid":"conf-low";
+function cap(v){return`<span class="${CAP_CLASS[v]||'cap-no'}">${v}</span>`;}
+function renderTable(){
+  const tbody=document.getElementById('tableBody');
+  tbody.innerHTML=COMPANIES.map(c=>{
+    const contact=c.email&&c.email.includes('@')?c.email.split('/')[0].trim():c.phone;
+    return`<tr onclick="openModal(${c.rank-1})" style="cursor:pointer">
+      <td style="font-family:'JetBrains Mono',monospace">${c.rank}</td>
+      <td><strong>${c.companyName}</strong><br><span style="font-size:10px;color:var(--fg3)">${c.legalName}</span></td>
+      <td style="font-size:11px">${c.emirate}</td>
+      <td class="${PRIO_CLASS[c.priority]}">${c.priority}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-weight:700">${c.mdaScore}</td>
+      <td class="${CONF_CLASS(c.confidenceScore)}" style="font-family:'JetBrains Mono',monospace">${c.confidenceScore}/10</td>
+      <td>${cap(c.capacity100Workers)}</td>
+      <td>${cap(c.construction)}</td>
+      <td>${cap(c.oilGas)}</td>
+      <td>${cap(c.overseasRecruitment)}</td>
+      <td>${cap(c.visaHandling)}</td>
+      <td>${cap(c.accommodation)}</td>
+      <td>${cap(c.transport)}</td>
+      <td>${cap(c.medicalInsurance)}</td>
+      <td class="contact-cell">${contact.length>30?contact.slice(0,30)+'…':contact}</td>
+      <td class="${c.verifiedActive2026==='YES'?'cap-yes':c.verifiedActive2026==='PARTIAL'?'cap-partial':'cap-no'}">${c.verifiedActive2026}</td>
+      <td class="${REC_CLASS[c.recommendation]||''}" style="font-size:10px;font-weight:600">${c.recommendation}</td>
+    </tr>`;
+  }).join('');
+}
+function openModal(idx){
+  const c=COMPANIES[idx];
+  const conf_color=c.confidenceScore>=7?'var(--p1)':c.confidenceScore>=5?'var(--partial)':'var(--p3)';
+  const rec_cls=Object.keys({CF:'CONTACT FIRST',CD:'CONTACT — WITH DUE DILIGENCE',CV:'CONTACT — VERIFY IDENTITY FIRST',EV:'EVALUATE',DN:'DO_NOT_CONTACT',DNY:'DO_NOT_CONTACT_YET'}).find(k=>c.recommendation.startsWith(k[0].replace(/CF|CD|CV/,'C').replace('EV','E').replace('DN','D').replace('Y','')));
+  const recBlockCls=c.recommendation.startsWith('CONTACT FIRST')?'CF':c.recommendation.startsWith('CONTACT')?'CD':c.recommendation==='EVALUATE'?'EV':'DN';
+  let html=`<div class="modal-hdr">
+    <div>
+      <div class="modal-name">${c.companyName}</div>
+      <div style="color:var(--fg2);font-size:12px">${c.legalName}</div>
+      <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+        <span class="${PRIO_CLASS[c.priority]}" style="font-weight:700">${c.priority}</span>
+        <span style="color:var(--fg3);font-size:12px">MDA ${c.mdaScore}/100</span>
+        <span style="color:var(--fg3);font-size:12px">${c.emirate}</span>
+      </div>
+    </div>
+    <div class="modal-conf">
+      <div class="modal-conf-num" style="color:${conf_color}">${c.confidenceScore}<span style="font-size:20px">/10</span></div>
+      <div class="modal-conf-lbl">Confidence</div>
+    </div>
+    <button class="modal-close" onclick="document.getElementById('modalOverlay').classList.remove('open')">✕</button>
+  </div>
+  <div class="rec-block ${recBlockCls}">${c.recommendation}</div>`;
+
+  html+=`<div class="section"><div class="section-title">Capabilities</div><div class="cap-grid">
+    <div class="cap-item"><div class="cap-item-lbl">100 Workers</div><div class="cap-item-val ${CAP_CLASS[c.capacity100Workers]||''}">${c.capacity100Workers}</div></div>
+    <div class="cap-item"><div class="cap-item-lbl">Construction</div><div class="cap-item-val ${CAP_CLASS[c.construction]||''}">${c.construction}</div></div>
+    <div class="cap-item"><div class="cap-item-lbl">Oil & Gas</div><div class="cap-item-val ${CAP_CLASS[c.oilGas]||''}">${c.oilGas}</div></div>
+    <div class="cap-item"><div class="cap-item-lbl">Overseas Recruit.</div><div class="cap-item-val ${CAP_CLASS[c.overseasRecruitment]||''}">${c.overseasRecruitment}</div></div>
+    <div class="cap-item"><div class="cap-item-lbl">Visa Handling</div><div class="cap-item-val ${CAP_CLASS[c.visaHandling]||''}">${c.visaHandling}</div></div>
+    <div class="cap-item"><div class="cap-item-lbl">Accommodation</div><div class="cap-item-val ${CAP_CLASS[c.accommodation]||''}">${c.accommodation}</div></div>
+    <div class="cap-item"><div class="cap-item-lbl">Transport</div><div class="cap-item-val ${CAP_CLASS[c.transport]||''}">${c.transport}</div></div>
+    <div class="cap-item"><div class="cap-item-lbl">Medical Insure</div><div class="cap-item-val ${CAP_CLASS[c.medicalInsurance]||''}">${c.medicalInsurance}</div></div>
+  </div></div>`;
+
+  html+=`<div class="section"><div class="section-title">Contact Information</div><div class="field-grid">
+    <span class="field-key">Website</span><span class="field-val" style="color:var(--accent)">${c.website} — ${c.websiteStatus}</span>
+    <span class="field-key">Phone</span><span class="field-val" style="font-family:'JetBrains Mono',monospace">${c.phone}</span>
+    <span class="field-key">Email</span><span class="field-val" style="font-family:'JetBrains Mono',monospace;font-size:11px">${c.email}</span>
+    <span class="field-key">WhatsApp</span><span class="field-val" style="font-family:'JetBrains Mono',monospace">${c.whatsapp}</span>
+    <span class="field-key">Contact Conf.</span><span class="field-val">${c.contactConfirmation}</span>
+  </div></div>`;
+
+  html+=`<div class="section"><div class="section-title">Verification</div><div class="field-grid">
+    <span class="field-key">Active 2026</span><span class="field-val">${c.verifiedActive2026}</span>
+    <span class="field-key">Agency Fee</span><span class="field-val">${c.agencyFee}</span>
+    <span class="field-key">Replacement</span><span class="field-val">${c.replacementPolicy}</span>
+    <span class="field-key">Mobilization</span><span class="field-val">${c.mobilizationTimeline}</span>
+    <span class="field-key">Zero-Fee Policy</span><span class="field-val">${c.zeroFeePolicy}</span>
+  </div></div>`;
+
+  if(c.redFlags&&c.redFlags.length>3)
+    html+=`<div class="section"><div class="section-title">Red Flags</div><div class="flag-block">${c.redFlags}</div></div>`;
+  html+=`<div class="section"><div class="section-title">Strengths</div><div class="strength-block">${c.strengths}</div></div>`;
+  html+=`<div class="section"><div class="section-title">Action Notes</div><div class="notes-block">${c.notes}</div></div>`;
+  html+=`<div class="section"><div class="section-title">Sources</div><div class="notes-block" style="font-size:11px;color:var(--fg3)">${c.sourcesUsed}</div></div>`;
+  document.getElementById('modalContent').innerHTML=html;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal(e){if(e.target===document.getElementById('modalOverlay'))document.getElementById('modalOverlay').classList.remove('open');}
+let sortDir=1,sortCol=-1;
+function sortTable(col){
+  if(sortCol===col)sortDir*=-1;else sortDir=1;sortCol=col;
+  const keys=["rank","companyName","emirate","priority","mdaScore","confidenceScore",null,null,null,null,null,null,null,null,null,null,"recommendation"];
+  const k=keys[col];if(!k)return;
+  COMPANIES.sort((a,b)=>{const av=a[k],bv=b[k];return(typeof av==='number'?av-bv:String(av).localeCompare(String(bv)))*sortDir;});
+  renderTable();
+}
+function exportCSV(){
+  const hdr=["rank","companyName","legalName","location","emirate","priority","mdaScore","confidenceScore","websiteStatus","website","email","phone","whatsapp","capacity100Workers","construction","oilGas","overseasRecruitment","visaHandling","accommodation","transport","medicalInsurance","verifiedActive2026","contactConfirmation","recommendation","redFlags","strengths","notes"];
+  const rows=[hdr.join(','),...COMPANIES.map(c=>hdr.map(k=>`"${String(c[k]||'').replace(/"/g,'""')}"`).join(','))];
+  const blob=new Blob([rows.join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='MANPOWER_TOP_10_SUPPLIERS.csv';a.click();
+}
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(COMPANIES,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='MANPOWER_TOP_10_SUPPLIERS.json';a.click();
+}
+function toggleTheme(){
+  const r=document.documentElement;
+  const isDark=r.getAttribute('data-theme')==='light';
+  r.setAttribute('data-theme',isDark?'dark':'light');
+  document.getElementById('themeBtn').textContent=isDark?'Light Mode':'Dark Mode';
+}
+renderTable();
+</script>

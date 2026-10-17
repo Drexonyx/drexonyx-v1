@@ -19,6 +19,11 @@ const VALID_INTENT_TYPES: ReadonlySet<string> = new Set<IntentType>([
   'COORDINATE_WEBSITE_PRODUCTION',
   'AUDIT_WEBSITE_CONTENT',
   'COORDINATE_MARKETING_CAMPAIGN',  // DR 0124 — campaign + Facebook publish pipeline
+  // DR 0128: Sales Operating System intents
+  'DISCOVER_SALES_LEAD',
+  'QUALIFY_SALES_LEAD',
+  'DRAFT_SALES_OUTREACH',
+  'SCHEDULE_SALES_FOLLOWUP',
 ]);
 
 export function isValidIntentType(raw: string): raw is IntentType {
