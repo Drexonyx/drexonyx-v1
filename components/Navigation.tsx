@@ -38,10 +38,14 @@ export default function Navigation() {
               />
             </div>
             <div className={styles.logoDivider} aria-hidden="true" />
-            <div className={styles.logoMda}>
-              <span className={styles.mdaName}>MD<span className={styles.mdaA}>A</span></span>
-              <span className={styles.mdaSub}>MASTER DIGITAL AGENCY</span>
-              <span className={styles.mdaBrand}>A DREXONYX Brand</span>
+            <div className={styles.logoMda} aria-hidden="true">
+              <Image
+                src="/brand/mda-logo-transparent.png"
+                alt=""
+                width={456}
+                height={240}
+                className={styles.mdaLogoImg}
+              />
             </div>
           </Link>
 

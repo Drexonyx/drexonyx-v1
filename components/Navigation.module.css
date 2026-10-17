@@ -54,42 +54,14 @@
 
 .logoMda {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
   flex-shrink: 0;
 }
 
-.mdaName {
-  font-size: 1.0625rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  color: #e2e2e4;
-  line-height: 1;
-  white-space: nowrap;
-}
-
-.mdaA {
-  color: #2563EB;
-}
-
-.mdaSub {
-  font-size: 0.4375rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--drex-text-muted);
-  line-height: 1;
-  white-space: nowrap;
-}
-
-.mdaBrand {
-  font-size: 0.4375rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--drex-accent);
-  line-height: 1;
-  white-space: nowrap;
+.mdaLogoImg {
+  height: 44px;
+  width: auto;
+  display: block;
 }
 
 /* Desktop nav links */
