@@ -30,8 +30,8 @@ export default function Navigation() {
               <Image
                 src="/brand/drexonyx-dx-mark.png"
                 alt=""
-                width={892}
-                height={951}
+                width={1764}
+                height={675}
                 className={styles.logoDxImg}
                 priority
               />
