@@ -31,16 +31,17 @@
   text-decoration: none;
 }
 
-.logoDx {
-  font-family: var(--font-bebas), 'Bebas Neue', sans-serif;
-  font-size: 2.5rem;
-  line-height: 1;
-  background: linear-gradient(150deg, #f0d060 0%, #C8980A 45%, #e8c030 75%, #8a6408 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: 0.06em;
+.logoDxMark {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  height: 44px;
+}
+
+.logoDxImg {
+  height: 44px;
+  width: auto;
+  display: block;
 }
 
 .logoDivider {
