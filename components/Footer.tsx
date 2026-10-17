@@ -27,10 +27,10 @@ export default function Footer() {
         <div className={styles.brand}>
           <Link href="/" className={styles.logo} aria-label="DREXONYX home">
             <Image
-              src="/brand/drexonyx-horizontal-lockup.png"
+              src="/brand/drexonyx-circular-emblem.png"
               alt="DREXONYX"
-              width={3198}
-              height={540}
+              width={1254}
+              height={1254}
               className={styles.logoImg}
             />
           </Link>

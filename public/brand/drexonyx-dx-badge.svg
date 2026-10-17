@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" role="img" aria-label="DREXONYX">
+  <defs>
+    <!-- Silver gradient: top-white → bottom-silver, userSpace so rotation doesn't skew it -->
+    <linearGradient id="dxSilver" x1="0" y1="5" x2="0" y2="95" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#FFFFFF"/>
+      <stop offset="45%"  stop-color="#E0E0E0"/>
+      <stop offset="100%" stop-color="#A6A6A6"/>
+    </linearGradient>
+    <!-- Gold gradient for the accent diamond -->
+    <linearGradient id="dxGold" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0%"   stop-color="#E2B820"/>
+      <stop offset="100%" stop-color="#9A6C08"/>
+    </linearGradient>
+    <!-- Clip the X bars to their exact bounding box so tips are sharp diagonal cuts -->
+    <clipPath id="dxXClip">
+      <rect x="108" y="5" width="87" height="90"/>
+    </clipPath>
+  </defs>
+
+  <!--
+    D letterform
+    Outer bowl: M5,5 → right to 52 → two Q-bezier arcs forming the right curve → back to 5,95
+    Inner counter: same shape scaled inward, offset 15 units from each edge
+    fill-rule="evenodd" punches the counter out of the outer shape
+  -->
+  <path fill="url(#dxSilver)" fill-rule="evenodd"
+    d="M5,5 L52,5 Q88,5 88,50 Q88,95 52,95 L5,95 Z
+       M20,20 L20,80 L46,80 Q70,80 70,50 Q70,20 46,20 Z"/>
+
+  <!--
+    X letterform
+    Two rectangles (w=16) centred on the X's centre (151.5, 50),
+    rotated ±46° to follow the diagonals of the 87×90 bounding box.
+    The clipPath trims the rectangular ends to sharp diagonal tips.
+  -->
+  <g clip-path="url(#dxXClip)">
+    <rect x="143.5" y="-15" width="16" height="130"
+          fill="url(#dxSilver)"
+          transform="rotate(46, 151.5, 50)"/>
+    <rect x="143.5" y="-15" width="16" height="130"
+          fill="url(#dxSilver)"
+          transform="rotate(-46, 151.5, 50)"/>
+  </g>
+
+  <!-- Gold accent: vertical tick + diamond, centred in the gap between D and X -->
+  <line x1="98.5" y1="54" x2="98.5" y2="68"
+        stroke="url(#dxGold)" stroke-width="1.5" stroke-linecap="round"/>
+  <polygon points="98.5,70 102.8,76.5 98.5,83 94.2,76.5"
+           fill="url(#dxGold)"/>
+</svg>

@@ -27,10 +27,10 @@
 }
 
 .logoImg {
-  height: 24px;
-  width: auto;
-  max-width: 180px;
+  height: 40px;
+  width: 40px;
   display: block;
+  object-fit: contain;
 }
 
 .tagline {
