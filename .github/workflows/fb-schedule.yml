@@ -71,6 +71,16 @@ jobs:
           META_PAGE_ID_1: ${{ secrets.META_PAGE_ID_1 }}
         run: node scripts/fb-publish.mjs --validate
 
+      # Publish text post.
+      - name: Publish text post
+        if: ${{ steps.resolve.outputs.SKIP == 'false' && steps.resolve.outputs.MEDIA_TYPE == 'text' && !inputs.dry_run }}
+        env:
+          META_PAGE_ACCESS_TOKEN: ${{ secrets.META_PAGE_ACCESS_TOKEN }}
+          META_PAGE_ID_1: ${{ secrets.META_PAGE_ID_1 }}
+          LOG_PATH: assets/facebook/publish-log.json
+          POST_KEY: ${{ steps.resolve.outputs.POST_KEY }}
+        run: node scripts/fb-publish.mjs "$(cat /tmp/post-message.txt)"
+
       # Publish image post.
       - name: Publish image post
         if: ${{ steps.resolve.outputs.SKIP == 'false' && steps.resolve.outputs.MEDIA_TYPE == 'image' && !inputs.dry_run }}

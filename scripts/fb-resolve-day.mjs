@@ -36,6 +36,7 @@ function skip(reason) {
   setOutput('MEDIA_TYPE', '');
   setOutput('IMAGE_PATH', '');
   setOutput('VIDEO_PATH', '');
+  setOutput('POST_KEY', '');
   process.exit(0);
 }
 
@@ -64,15 +65,20 @@ if (!entry) skip(`No post scheduled for ${targetDate} [${slot}]`);
 // Skip if already published in schedule
 if (entry.status === 'published') skip(`Day ${entry.day} already marked published`);
 
-// Guard against double-post: check publish log by imagePath
+// Compute a stable dedup key for this post
+const postKey = entry.mediaType === 'text'
+  ? `${entry.date}-${entry.slot}`
+  : (entry.imagePath ?? entry.videoPath ?? `${entry.date}-${entry.slot}`);
+
+// Guard against double-post: check publish log
 if (existsSync(logFile)) {
   const log = JSON.parse(readFileSync(logFile, 'utf-8'));
-  if (log.some(l => l.imagePath === entry.imagePath)) {
-    skip(`${entry.imagePath} already in publish log`);
+  if (log.some(l => l.postKey === postKey || (entry.imagePath && l.imagePath === entry.imagePath))) {
+    skip(`${postKey} already in publish log`);
   }
 }
 
-console.log(`Resolved Day ${entry.day}: ${entry.imagePath ?? entry.videoPath ?? '(no media)'}`);
+console.log(`Resolved Day ${entry.day}: ${entry.mediaType} (key: ${postKey})`);
 
 // Write caption to temp file
 writeFileSync(messageFile, entry.caption, 'utf-8');
@@ -83,3 +89,4 @@ setOutput('DAY',         String(entry.day));
 setOutput('MEDIA_TYPE',  entry.mediaType ?? 'image');
 setOutput('IMAGE_PATH',  entry.imagePath ?? '');
 setOutput('VIDEO_PATH',  entry.videoPath ?? '');
+setOutput('POST_KEY',    postKey);

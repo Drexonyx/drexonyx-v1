@@ -729,6 +729,14 @@ async function main() {
     process.exit(1);
   }
 
+  appendToLog(process.env.LOG_PATH, {
+    postKey: process.env.POST_KEY || `${new Date().toISOString().slice(0, 10)}-text`,
+    postId: result.postId,
+    date: new Date().toISOString(),
+    mediaType: 'text',
+    captionPreview: message.trim().slice(0, 80),
+  });
+
   console.log(JSON.stringify({ ok: true, postId: result.postId }));
 }
 
