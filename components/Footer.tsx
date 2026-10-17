@@ -1,5 +1,5 @@
+import Image from "next/image";
 import Link from "next/link";
-import { DrexonyxHorizontalLogo } from "./DrexonyxHorizontalLogo";
 import styles from "./Footer.module.css";
 
 const QUICK_LINKS = [
@@ -26,7 +26,13 @@ export default function Footer() {
         {/* Col 1: Brand */}
         <div className={styles.brand}>
           <Link href="/" className={styles.logo} aria-label="DREXONYX home">
-            <DrexonyxHorizontalLogo className={styles.logoImg} />
+            <Image
+              src="/brand/drexonyx-circular-emblem.png"
+              alt="DREXONYX"
+              width={1254}
+              height={1254}
+              className={styles.logoImg}
+            />
           </Link>
           <p className={styles.tagline}>Global Creative Production</p>
           <p className={styles.location}>Dubai, UAE · Global</p>

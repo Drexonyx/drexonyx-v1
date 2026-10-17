@@ -27,10 +27,10 @@ export default function Navigation() {
         <div className={styles.inner}>
           <Link href="/" className={styles.logo} onClick={closeMenu} aria-label="DREXONYX home">
             <Image
-              src="/brand/drexonyx-dx-badge.svg"
+              src="/brand/drexonyx-circular-emblem.png"
               alt=""
-              width={200}
-              height={100}
+              width={1254}
+              height={1254}
               className={styles.logoImg}
               priority
             />

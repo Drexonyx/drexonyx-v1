@@ -32,9 +32,9 @@
 
 .logoImg {
   height: 46px;
-  width: auto;
-  max-width: 110px;
+  width: 46px;
   display: block;
+  object-fit: contain;
 }
 
 /* Desktop nav links */
