@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useCallback } from "react";
@@ -26,15 +25,12 @@ export default function Navigation() {
       <nav className={styles.nav} aria-label="Main navigation">
         <div className={styles.inner}>
           <Link href="/" className={styles.logo} onClick={closeMenu} aria-label="DREXONYX home">
-            <Image
-              src="/brand/drexonyx-circular-emblem.png"
-              alt=""
-              width={1254}
-              height={1254}
-              className={styles.logoImg}
-              priority
-            />
-            <span className={styles.logoName}>DREXONYX</span>
+            <span className={styles.logoDx} aria-hidden="true">DX</span>
+            <div className={styles.logoDivider} aria-hidden="true" />
+            <div className={styles.logoText}>
+              <span className={styles.logoName}>DREXONYX</span>
+              <span className={styles.logoTagline}>Creative · Digital · Technology</span>
+            </div>
           </Link>
 
           {/* Desktop links */}
