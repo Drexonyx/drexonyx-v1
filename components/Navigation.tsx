@@ -34,6 +34,7 @@ export default function Navigation() {
               className={styles.logoImg}
               priority
             />
+            <span className={styles.logoName}>DREXONYX</span>
           </Link>
 
           {/* Desktop links */}

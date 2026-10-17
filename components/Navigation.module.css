@@ -27,14 +27,25 @@
   flex-shrink: 0;
   display: flex;
   align-items: center;
+  gap: 0.625rem;
   overflow: hidden;
 }
 
 .logoImg {
-  height: 46px;
-  width: 46px;
+  height: 36px;
+  width: 36px;
   display: block;
   object-fit: contain;
+  flex-shrink: 0;
+}
+
+.logoName {
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--drex-text);
+  white-space: nowrap;
 }
 
 /* Desktop nav links */
