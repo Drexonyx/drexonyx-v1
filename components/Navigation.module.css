@@ -41,10 +41,10 @@
 
 .logoName {
   font-size: 1rem;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--drex-text);
+  color: #C8980A;
   white-space: nowrap;
 }
 
