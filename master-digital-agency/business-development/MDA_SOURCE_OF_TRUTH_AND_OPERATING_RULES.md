@@ -1,7 +1,7 @@
 # MDA — Source of Truth & Operating Rules
 
 **Document type:** Operating baseline / conversation record  
-**Last updated:** 2026-10-16  
+**Last updated:** 2026-10-20  
 **Status:** Baseline compiled from explicit user statements and the conversation summary. It is not a legal guarantee, and unverified commercial research is deliberately marked as unverified.
 
 ## 1. Purpose
@@ -20,24 +20,36 @@ These details were supplied in the conversation context. Before placing them in 
 
 ## 3. MDA service scope
 
-Services identified for the MDA catalog:
+**Updated 2026-10-20 — CONFIRMED—USER:** User explicitly instructed to add all in-demand Dubai market services to MDA. Prior exclusion list partially superseded (see notes below).
+
+### Core Design & Digital Services
 1. Website Design
 2. Company Profile Design
-3. Branding Package
-4. Digital Launch Kit
-5. Posters & Social Media Creatives
-6. Corporate Promotional Video
-7. UGC Video Shorts
+3. Logo Design (standalone)
+4. Branding Package (logo + colors + fonts + brand guide)
+5. Business Card & Stationery Design
+6. Flyer, Poster & Banner Design
+7. Social Media Creatives (posts, stories, covers)
+8. Presentation / Pitch Deck Design
+9. Digital Launch Kit (bundled: brand + profile + social setup)
 
-Explicitly excluded from MDA's service list in this project:
-- Business setup itself
-- Lead-generation setup as a standalone service
-- Social account management
-- Account automation
-- Menu design
-- Ongoing management/follow-up as a standalone service
+### Video & Content Production
+10. Corporate Promotional Video
+11. UGC Video Shorts
 
-Do not add excluded services back into the catalog without the user's explicit instruction.
+### Digital Setup Services
+12. Google Business Profile Setup & Optimization
+13. Social Media Page Setup (cover, bio, highlights, profile photo)
+14. WhatsApp Business Profile Setup
+
+### Ongoing Services (added per user instruction 2026-10-20)
+15. Social Media Content Management (monthly packages)
+
+**Notes on previously excluded items:**
+- Social account management / ongoing management: **RE-ADDED** per user's 2026-10-20 instruction to include all market-demanded services. Scope and pricing for monthly packages to be defined.
+- Business setup, lead-generation setup as standalone, account automation, menu design: remain excluded unless user explicitly approves.
+
+Do not add any remaining excluded services without explicit user instruction.
 
 ## 4. Authority and execution
 
