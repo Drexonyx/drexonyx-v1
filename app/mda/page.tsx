@@ -9,6 +9,7 @@ import {
   EndorsementFooter,
   ExamplesTier,
 } from '@/components/mda';
+import { MDA_SERVICES, type ServiceEntry } from '@/lib/catalog/mda-services';
 import styles from './page.module.css';
 
 export const metadata: Metadata = {
@@ -239,7 +240,133 @@ const PROCESS_STEPS = [
   },
 ];
 
-const MDA_NAV_CATS = ['Digital', 'Creative', 'Media', 'Business Solutions'] as const;
+const MDA_NAV_CATS = ['Digital', 'Creative', 'Media', 'Business Solutions', 'Pricing'] as const;
+
+// ─── Service Pricing Section ──────────────────────────────────────────────────
+
+const PRICING_GROUPS: Array<{
+  title: string;
+  icon: string;
+  note?: string;
+  ids: string[];
+  showDeliverables?: boolean;
+}> = [
+  {
+    title: 'Branding & Identity',
+    icon: '◈',
+    ids: ['mda-logo-basic', 'mda-logo-brand', 'mda-visual-identity'],
+  },
+  {
+    title: 'Company Profiles',
+    icon: '◻',
+    note: 'Client supplies all text and images — MDA designs and layouts.',
+    ids: ['mda-profile-4p', 'mda-profile-8p', 'mda-profile-12p'],
+  },
+  {
+    title: 'Graphic Design',
+    icon: '◱',
+    ids: ['mda-poster-flyer', 'mda-brochure', 'mda-catalogue'],
+  },
+  {
+    title: 'Advertising Campaigns',
+    icon: '◎',
+    ids: ['mda-ads-setup', 'mda-ads-management'],
+  },
+  {
+    title: 'Social Media Management',
+    icon: '◉',
+    ids: ['mda-social-1p', 'mda-social-2p'],
+  },
+  {
+    title: 'Research Services',
+    icon: '◷',
+    ids: ['mda-research-product', 'mda-research-market'],
+  },
+  {
+    title: 'Digital Launch Kit',
+    icon: '◈',
+    ids: ['mda-launch-kit'],
+    showDeliverables: true,
+  },
+];
+
+const serviceById = new Map(MDA_SERVICES.map((s) => [s.id, s]));
+
+function ServicePricingRow({ service }: { service: ServiceEntry }) {
+  const isAds = service.id === 'mda-ads-setup' || service.id === 'mda-ads-management';
+  const isLaunch = service.id === 'mda-launch-kit';
+
+  return (
+    <div className={styles.serviceRow}>
+      <div className={styles.serviceRowMain}>
+        <span className={styles.serviceRowName}>{service.name}</span>
+        <span className={styles.serviceRowDesc}>{service.description}</span>
+        {isLaunch && (
+          <ul className={styles.serviceRowDeliverables}>
+            {service.deliverables.map((d) => (
+              <li key={d} className={styles.serviceRowDeliverable}>{d}</li>
+            ))}
+          </ul>
+        )}
+      </div>
+      <div className={styles.serviceRowPrice}>
+        <span className={styles.serviceRowPriceAmount}>{service.priceDisplay}</span>
+        {service.pricingModel === 'monthly' && (
+          <div className={styles.serviceRowPricePer}>per month</div>
+        )}
+        {service.pricingModel === 'starting-from' && (
+          <div className={styles.serviceRowPricePer}>starting from</div>
+        )}
+      </div>
+      {isAds && (
+        <div className={styles.serviceRowNote}>
+          <strong>Advertising spend is separate.</strong> MDA charges the service fee above. The client pays advertising spend directly to Meta or Google — this is not included in MDA pricing and has no mandatory minimum.
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ServicePricingSection() {
+  return (
+    <section id="service-pricing" className={styles.servicePricing} aria-labelledby="service-pricing-heading">
+      <div className={styles.container}>
+        <SectionHeading
+          eyebrow="Services & Pricing"
+          title="Transparent pricing. Clear scope."
+          description="Fixed prices for every service. No hidden costs, no invented commitments — what you see is what you get."
+        />
+        <div className={styles.servicePricingGroups}>
+          {PRICING_GROUPS.map((group) => {
+            const services = group.ids.map((id) => serviceById.get(id)).filter(Boolean) as ServiceEntry[];
+            if (services.length === 0) return null;
+            return (
+              <div key={group.title} className={styles.serviceGroup}>
+                <div className={styles.serviceGroupHeader}>
+                  <span className={styles.serviceGroupIcon} aria-hidden="true">{group.icon}</span>
+                  <h3 className={styles.serviceGroupTitle}>{group.title}</h3>
+                  {group.note && (
+                    <span className={styles.serviceGroupNote}>{group.note}</span>
+                  )}
+                </div>
+                <div className={styles.serviceRows}>
+                  {services.map((s) => (
+                    <ServicePricingRow key={s.id} service={s} />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className={styles.serviceGroupCta} style={{ marginTop: '2rem' }}>
+          <CTAButton href="/start-project" variant="primary" size="md">
+            START YOUR PROJECT →
+          </CTAButton>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function MDAPage() {
   return (
@@ -253,7 +380,10 @@ export default function MDAPage() {
               <ul className={styles.mdaCatList} role="list">
                 {MDA_NAV_CATS.map((cat) => (
                   <li key={cat}>
-                    <Link href="/start-project" className={styles.mdaCatLink}>
+                    <Link
+                      href={cat === 'Pricing' ? '#service-pricing' : '/start-project'}
+                      className={styles.mdaCatLink}
+                    >
                       {cat}
                     </Link>
                   </li>
@@ -467,6 +597,9 @@ export default function MDAPage() {
         </div>
       </section>
 
+      {/* ── 5b: Services & Pricing ───────────────────────────────────────────── */}
+      <ServicePricingSection />
+
       {/* ── 6: How We Work ──────────────────────────────────────────────────── */}
       <section className={styles.process} aria-labelledby="process-heading">
         <div className={styles.container}>
@@ -540,6 +673,11 @@ export default function MDAPage() {
                 <li>
                   <Link href="#packages" className={styles.mdaFooterLink}>
                     Packages
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#service-pricing" className={styles.mdaFooterLink}>
+                    Pricing
                   </Link>
                 </li>
                 <li>

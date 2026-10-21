@@ -74,6 +74,44 @@ These prices are live on the MDA page (`/mda`) and were explicitly approved by t
 
 ---
 
+**CONFIRMED—USER (2026-10-21): Full MDA service price list — all prices below are owner-approved:**
+
+Branding & Identity:
+- Basic Logo Design: **AED 99**
+- Logo + Brand Colours & Fonts: **AED 249**
+- Basic Visual Identity: **AED 349**
+
+Company Profiles (client supplies all text/images — design only):
+- 4 pages: **AED 60**
+- 8 pages: **AED 160**
+- 12 pages: **AED 249**
+
+Graphic Design:
+- Poster or Flyer: **AED 49**
+- Simple Brochure: **AED 99**
+- Product Catalogue (10 pages): **AED 249**
+
+Advertising Campaigns (MDA service fee only — ad spend is separate, paid by client to platform):
+- Campaign Setup: **AED 149 per campaign**
+- Campaign Management: **AED 299 per month** (1 campaign)
+
+Social Media Management:
+- 1 Platform: **AED 549 per month**
+- 2 Platforms: **AED 899 per month**
+
+Research Services:
+- Product or Supplier Research: **AED 99** (one category, initial task)
+- Market & Competitor Research: **AED 199** (one industry, initial report)
+
+Digital Launch Kit:
+- Starting from **AED 699** (Basic Logo + Company Profile 4p + 3 Social Posters + profile images)
+
+NOTE: Individual social media post-design packages (8 posts, 12 posts) are NOT offered as standalone products. Social media design is only available through the monthly management packages above.
+
+Canonical service data is maintained in `lib/catalog/mda-services.ts`.
+
+---
+
 **AED 650 is NOT an approved MDA price.** It was suggested earlier as a possible introductory price for a proposed “Company Profile Express” offer, but the user rejected it as too high and challenged the underlying evidence. Treat AED 650 as withdrawn/unapproved unless the user explicitly approves it again.
 
 The earlier competitive pricing notes are **unverified preliminary research**, not a reliable market benchmark. The researcher could not access the original provider websites and relied on search snippets for several figures. Some listed offers had different page counts or inclusions and were not directly comparable. Therefore:
