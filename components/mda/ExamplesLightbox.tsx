@@ -7,6 +7,7 @@ import styles from './ExamplesLightbox.module.css';
 interface Example {
   src: string;
   alt: string;
+  href?: string;
 }
 
 interface TierProps {
@@ -30,27 +31,39 @@ function ExampleCard({
   onOpen: (src: string, alt: string) => void;
 }) {
   return (
-    <button
-      type="button"
-      className={`${styles.card} ${cardClass ?? ''}`}
-      onClick={() => onOpen(example.src, example.alt)}
-      aria-label={`View full size: ${example.alt}`}
-    >
-      <Image
-        src={example.src}
-        alt={example.alt}
-        width={1440}
-        height={900}
-        className={styles.cardImg}
-        quality={80}
-        priority={priority}
-      />
-      <span className={styles.zoomHint} aria-hidden="true">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M10 1h5v5M6 10l9-9M1 6V1h5M6 6L1 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      </span>
-    </button>
+    <div className={`${styles.cardWrap} ${cardClass ?? ''}`}>
+      <button
+        type="button"
+        className={styles.card}
+        onClick={() => onOpen(example.src, example.alt)}
+        aria-label={`View full size: ${example.alt}`}
+      >
+        <Image
+          src={example.src}
+          alt={example.alt}
+          width={1440}
+          height={900}
+          className={styles.cardImg}
+          quality={80}
+          priority={priority}
+        />
+        <span className={styles.zoomHint} aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M10 1h5v5M6 10l9-9M1 6V1h5M6 6L1 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </span>
+      </button>
+      {example.href && (
+        <a
+          href={example.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.liveLink}
+        >
+          View Live →
+        </a>
+      )}
+    </div>
   );
 }
 

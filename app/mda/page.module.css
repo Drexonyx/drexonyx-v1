@@ -760,6 +760,203 @@
   max-width: none;
 }
 
+/* ── 5b: Services & Pricing ──────────────────────────────────────────────── */
+.servicePricing {
+  padding: 5rem 0 4rem;
+  background: var(--drex-bg);
+  border-top: 1px solid var(--drex-border);
+}
+
+.servicePricingGroups {
+  display: flex;
+  flex-direction: column;
+  gap: 3.5rem;
+  margin-top: 3rem;
+}
+
+.serviceGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.serviceGroupHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--drex-border);
+}
+
+.serviceGroupIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: var(--drex-accent-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.serviceGroupTitle {
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--drex-text-secondary);
+}
+
+.serviceGroupNote {
+  font-size: 0.8125rem;
+  color: var(--drex-text-muted);
+  margin-left: auto;
+}
+
+.serviceRows {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--drex-border);
+  border-radius: var(--mda-radius);
+  overflow: hidden;
+}
+
+.serviceRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  align-items: start;
+  padding: 1rem 1.25rem;
+  background: var(--drex-surface);
+  border-bottom: 1px solid var(--drex-border-subtle);
+  transition: background var(--drex-duration) var(--drex-ease);
+}
+
+.serviceRow:last-child {
+  border-bottom: none;
+}
+
+.serviceRow:hover {
+  background: var(--drex-elevated);
+}
+
+.serviceRowMain {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.serviceRowName {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--drex-text);
+  line-height: 1.4;
+}
+
+.serviceRowDesc {
+  font-size: 0.8125rem;
+  color: var(--drex-text-secondary);
+  line-height: 1.5;
+}
+
+.serviceRowDeliverables {
+  margin-top: 0.375rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.serviceRowDeliverable {
+  font-size: 0.75rem;
+  color: var(--drex-text-muted);
+  display: flex;
+  align-items: baseline;
+  gap: 0.375rem;
+}
+
+.serviceRowDeliverable::before {
+  content: '·';
+  color: var(--drex-accent);
+  flex-shrink: 0;
+}
+
+.serviceRowPrice {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.serviceRowPriceAmount {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--drex-accent);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.serviceRowPricePer {
+  font-size: 0.75rem;
+  color: var(--drex-text-muted);
+  margin-top: 0.125rem;
+  white-space: nowrap;
+}
+
+.serviceRowNote {
+  grid-column: 1 / -1;
+  font-size: 0.75rem;
+  color: var(--drex-text-muted);
+  background: rgba(200, 152, 10, 0.06);
+  border: 1px solid rgba(200, 152, 10, 0.15);
+  border-radius: 4px;
+  padding: 0.625rem 0.875rem;
+  line-height: 1.5;
+  margin-top: 0.25rem;
+}
+
+.serviceRowNote strong {
+  color: var(--drex-text-secondary);
+  font-weight: 600;
+}
+
+.adsBreakdown {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-top: 0.375rem;
+}
+
+.adsBreakdownItem {
+  background: var(--drex-elevated);
+  border: 1px solid var(--drex-border);
+  border-radius: 4px;
+  padding: 0.625rem 0.75rem;
+}
+
+.adsBreakdownLabel {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--drex-text-muted);
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.adsBreakdownValue {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--drex-text-secondary);
+}
+
+.serviceGroupCta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-top: 0.5rem;
+}
+
 /* ── Responsive ─────────────────────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .packagesGrid {
@@ -768,6 +965,18 @@
 }
 
 @media (max-width: 768px) {
+  .adsBreakdown {
+    grid-template-columns: 1fr;
+  }
+
+  .serviceRow {
+    grid-template-columns: 1fr;
+  }
+
+  .serviceRowPrice {
+    text-align: left;
+  }
+
   /* Header: hide category links, keep logo + CTA */
   .mdaCatList {
     display: none;

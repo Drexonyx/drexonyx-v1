@@ -13,7 +13,7 @@ const CTX: SkillContext = {
 describe('communication.whatsapp.classify', () => {
   it('has correct id, version, family', () => {
     expect(whatsappClassifySkill.id).toBe('communication.whatsapp.classify');
-    expect(whatsappClassifySkill.version).toBe('1.0.0');
+    expect(whatsappClassifySkill.version).toBe('1.1.0');
     expect(whatsappClassifySkill.family).toBe('COMMUNICATION');
   });
 

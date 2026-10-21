@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blades & Co. — Premium Men's Barbershop, Dubai</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500;600;700&display=swap">
+<style>
+:root {
+  --black: #080808;
+  --black2: #111111;
+  --black3: #1a1a1a;
+  --white: #ffffff;
+  --cream: #f5f0e8;
+  --gold: #c9a227;
+  --gold2: #a8851c;
+  --gray: #888;
+  --border: rgba(255,255,255,.1);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', system-ui, sans-serif; background: var(--black); color: var(--white); line-height: 1.6; overflow-x: hidden; }
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 56px; height: 72px;
+  background: rgba(8,8,8,.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.35rem; letter-spacing: .5px;
+}
+.nav-logo span { color: var(--gold); }
+.nav-links { display: flex; gap: 36px; font-size: .83rem; letter-spacing: .8px; text-transform: uppercase; color: rgba(255,255,255,.65); }
+.nav-links a:hover { color: var(--white); }
+.nav-book {
+  background: var(--gold); color: var(--black);
+  padding: 10px 24px; border-radius: 4px;
+  font-size: .8rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+}
+.nav-book:hover { background: var(--gold2); }
+
+/* ── HERO ── */
+.hero {
+  position: relative; height: 100vh; min-height: 640px;
+  display: flex; align-items: center;
+  overflow: hidden;
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background-image: url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1920&q=90&fit=crop');
+  background-size: cover; background-position: center 30%;
+}
+.hero-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(105deg, rgba(8,8,8,.92) 0%, rgba(8,8,8,.7) 55%, rgba(8,8,8,.3) 100%);
+}
+.hero-content {
+  position: relative; z-index: 2;
+  padding: 0 56px; max-width: 720px;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: .72rem; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 24px;
+}
+.hero-eyebrow::before { content: ""; width: 32px; height: 1px; background: var(--gold); }
+.hero h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(3rem, 6vw, 5.5rem);
+  line-height: 1.0; font-weight: 400;
+  margin-bottom: 24px;
+}
+.hero h1 em { color: var(--gold); font-style: normal; }
+.hero p {
+  font-size: 1rem; color: rgba(255,255,255,.6);
+  line-height: 1.8; margin-bottom: 44px; max-width: 460px;
+}
+.hero-btns { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.btn-gold-hero {
+  background: var(--gold); color: var(--black);
+  padding: 15px 36px; font-weight: 700;
+  font-size: .85rem; letter-spacing: 1px; text-transform: uppercase;
+  border-radius: 4px;
+}
+.btn-ghost-hero {
+  color: rgba(255,255,255,.7); font-size: .85rem; letter-spacing: .5px;
+  display: flex; align-items: center; gap: 8px;
+}
+.hero-scroll-hint {
+  position: absolute; bottom: 36px; left: 56px; z-index: 2;
+  display: flex; align-items: center; gap: 12px;
+  font-size: .72rem; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,.35);
+}
+.hero-scroll-hint::after { content: ""; width: 40px; height: 1px; background: rgba(255,255,255,.25); }
+
+/* ── STRIP ── */
+.strip {
+  background: var(--gold);
+  padding: 0; overflow: hidden;
+}
+.strip-inner {
+  display: flex; align-items: center; gap: 0;
+}
+.strip-item {
+  padding: 14px 32px; font-size: .78rem; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; color: var(--black);
+  border-right: 1px solid rgba(0,0,0,.15); white-space: nowrap;
+  flex: 1; text-align: center;
+}
+
+/* ── SERVICES ── */
+.services { padding: 100px 56px; background: var(--black2); }
+.section-eyebrow {
+  font-size: .7rem; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.section-eyebrow::before { content: ""; width: 24px; height: 1px; background: var(--gold); }
+.section-h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 400; margin-bottom: 60px;
+  max-width: 600px;
+}
+.services-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1px; background: var(--border);
+  border: 1px solid var(--border);
+}
+.svc {
+  background: var(--black2); padding: 44px 36px;
+  transition: background .25s;
+}
+.svc:hover { background: var(--black3); }
+.svc-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 3rem; color: rgba(201,162,39,.2);
+  line-height: 1; margin-bottom: 20px;
+}
+.svc h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 10px; }
+.svc p { font-size: .86rem; color: var(--gray); line-height: 1.75; margin-bottom: 20px; }
+.svc-price { font-size: .9rem; color: var(--gold); font-weight: 700; }
+
+/* ── ABOUT ── */
+.about {
+  display: grid; grid-template-columns: 1fr 1fr;
+  min-height: 600px;
+}
+.about-img {
+  position: relative; overflow: hidden;
+}
+.about-img img {
+  width: 100%; height: 100%; object-fit: cover;
+  filter: brightness(.85);
+}
+.about-body {
+  background: var(--black3);
+  padding: 80px 60px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.about-body .section-h2 { margin-bottom: 24px; }
+.about-body p {
+  font-size: .95rem; color: rgba(255,255,255,.6);
+  line-height: 1.9; margin-bottom: 32px;
+}
+.about-stats { display: flex; gap: 40px; margin-top: 40px; }
+.astat-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2.2rem; color: var(--gold); display: block;
+}
+.astat-label { font-size: .78rem; color: var(--gray); text-transform: uppercase; letter-spacing: .8px; }
+
+/* ── GALLERY ── */
+.gallery { padding: 100px 56px; background: var(--black); }
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto auto;
+  gap: 12px; margin-top: 56px;
+}
+.gallery-item { overflow: hidden; border-radius: 2px; }
+.gallery-item img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform .6s ease, filter .4s;
+  filter: brightness(.8) saturate(.9);
+}
+.gallery-item:hover img { transform: scale(1.04); filter: brightness(.9) saturate(1.1); }
+.gallery-item:nth-child(1) { grid-column: 1 / 3; aspect-ratio: 16/9; }
+.gallery-item:nth-child(2) { aspect-ratio: 3/4; }
+.gallery-item:nth-child(3) { aspect-ratio: 3/4; }
+.gallery-item:nth-child(4) { aspect-ratio: 3/4; }
+.gallery-item:nth-child(5) { grid-column: 2 / 4; aspect-ratio: 16/9; }
+
+/* ── TESTIMONIALS ── */
+.testimonials { background: var(--black2); padding: 100px 56px; }
+.testi-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px; margin-top: 56px;
+}
+.testi-card {
+  background: var(--black3); border: 1px solid var(--border);
+  padding: 36px; border-radius: 2px;
+}
+.testi-quote {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2rem; color: var(--gold); line-height: 1;
+  margin-bottom: 16px;
+}
+.testi-text {
+  font-size: .9rem; color: rgba(255,255,255,.65);
+  line-height: 1.8; margin-bottom: 28px; font-style: italic;
+}
+.testi-author { display: flex; align-items: center; gap: 14px; }
+.testi-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; color: var(--black); font-size: .9rem; flex-shrink: 0;
+}
+.testi-name { font-weight: 700; font-size: .9rem; }
+.testi-role { font-size: .78rem; color: var(--gray); }
+
+/* ── BOOKING CTA ── */
+.booking-cta {
+  position: relative; overflow: hidden;
+  padding: 120px 56px; text-align: center;
+}
+.booking-cta-bg {
+  position: absolute; inset: 0;
+  background-image: url('https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=1800&q=80&fit=crop');
+  background-size: cover; background-position: center;
+}
+.booking-cta-overlay {
+  position: absolute; inset: 0;
+  background: rgba(8,8,8,.88);
+}
+.booking-cta-content { position: relative; z-index: 2; max-width: 640px; margin: 0 auto; }
+.booking-cta h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2.2rem, 4vw, 3.5rem); font-weight: 400;
+  margin-bottom: 18px; line-height: 1.1;
+}
+.booking-cta h2 em { color: var(--gold); font-style: normal; }
+.booking-cta p { color: rgba(255,255,255,.55); font-size: .98rem; margin-bottom: 44px; }
+.booking-cta .btn-gold-hero { display: inline-block; }
+.booking-tel {
+  margin-top: 24px; font-size: .88rem; color: rgba(255,255,255,.4);
+}
+.booking-tel a { color: var(--gold); }
+
+/* ── FOOTER ── */
+footer {
+  background: #050505; padding: 64px 56px 28px;
+  border-top: 1px solid var(--border);
+}
+.footer-top {
+  display: grid; grid-template-columns: 1.8fr 1fr 1fr 1fr;
+  gap: 48px; padding-bottom: 48px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 28px;
+}
+.footer-brand-logo {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.4rem; margin-bottom: 14px;
+}
+.footer-brand-logo span { color: var(--gold); }
+.footer-brand p { font-size: .85rem; color: var(--gray); line-height: 1.75; margin-bottom: 24px; }
+.footer-social { display: flex; gap: 12px; }
+.footer-social a {
+  width: 36px; height: 36px; border: 1px solid var(--border);
+  border-radius: 4px; display: flex; align-items: center;
+  justify-content: center; font-size: .85rem;
+  color: var(--gray); transition: border-color .2s, color .2s;
+}
+.footer-social a:hover { border-color: var(--gold); color: var(--gold); }
+.footer-col h5 {
+  font-size: .7rem; text-transform: uppercase; letter-spacing: 2px;
+  color: rgba(255,255,255,.5); margin-bottom: 20px; font-weight: 600;
+}
+.footer-col a { display: block; font-size: .85rem; color: var(--gray); margin-bottom: 10px; }
+.footer-col a:hover { color: var(--white); }
+.footer-bottom {
+  font-size: .78rem; color: rgba(255,255,255,.25);
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  nav { padding: 0 20px; }
+  .nav-links { display: none; }
+  .hero-content { padding: 0 20px; }
+  .hero-scroll-hint { left: 20px; }
+  .services { padding: 64px 20px; }
+  .gallery { padding: 64px 20px; }
+  .gallery-grid { grid-template-columns: 1fr 1fr; }
+  .gallery-item:nth-child(1) { grid-column: 1 / 3; }
+  .gallery-item:nth-child(5) { grid-column: 1 / 3; }
+  .testimonials { padding: 64px 20px; }
+  .about { grid-template-columns: 1fr; }
+  .about-img { min-height: 300px; }
+  .about-body { padding: 48px 20px; }
+  .booking-cta { padding: 80px 20px; }
+  footer { padding: 48px 20px 20px; }
+  .footer-top { grid-template-columns: 1fr 1fr; gap: 28px; }
+  .strip-inner { flex-wrap: wrap; }
+  .strip-item { flex: 0 0 50%; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Blades<span> & Co.</span></div>
+  <div class="nav-links">
+    <a href="#services">Services</a>
+    <a href="#about">About</a>
+    <a href="#gallery">Gallery</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <a class="nav-book" href="#booking">Book Now</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Premium Men's Grooming · Dubai</div>
+    <h1>Where <em>Precision</em><br>Meets Craft</h1>
+    <p>Dubai's destination for the discerning gentleman. Classic cuts, hot towel shaves, and grooming rituals crafted to perfection.</p>
+    <div class="hero-btns">
+      <a class="btn-gold-hero" href="#booking">Book Your Visit</a>
+      <a class="btn-ghost-hero" href="#services">View Services →</a>
+    </div>
+  </div>
+  <div class="hero-scroll-hint">Scroll to explore</div>
+</section>
+
+<!-- STRIP -->
+<div class="strip">
+  <div class="strip-inner">
+    <div class="strip-item">✦ Open 7 Days</div>
+    <div class="strip-item">✦ JBR Walk, Dubai</div>
+    <div class="strip-item">✦ Walk-ins Welcome</div>
+    <div class="strip-item">✦ Book Online</div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section id="services" class="services">
+  <div class="section-eyebrow">Our Services</div>
+  <h2 class="section-h2">Every Visit, <br>A Ritual</h2>
+  <div class="services-grid">
+    <div class="svc">
+      <div class="svc-num">01</div>
+      <h3>Signature Haircut</h3>
+      <p>Precision cut tailored to your face shape and lifestyle. Includes hot towel, scalp massage, and styling.</p>
+      <div class="svc-price">From AED 120</div>
+    </div>
+    <div class="svc">
+      <div class="svc-num">02</div>
+      <h3>Royal Shave</h3>
+      <p>Traditional straight razor shave with pre-shave oil, hot lather, and three-step post-shave treatment.</p>
+      <div class="svc-price">From AED 90</div>
+    </div>
+    <div class="svc">
+      <div class="svc-num">03</div>
+      <h3>Beard Sculpt</h3>
+      <p>Expert beard shaping, trimming, and conditioning. Finished with premium beard oil and styling wax.</p>
+      <div class="svc-price">From AED 75</div>
+    </div>
+    <div class="svc">
+      <div class="svc-num">04</div>
+      <h3>The Full Package</h3>
+      <p>Haircut + shave + beard + scalp treatment. Our flagship 90-minute grooming experience.</p>
+      <div class="svc-price">From AED 250</div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="about">
+  <div class="about-img">
+    <img src="https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=900&q=85&fit=crop" alt="Master barber at work" loading="lazy">
+  </div>
+  <div class="about-body">
+    <div class="section-eyebrow">Our Story</div>
+    <h2 class="section-h2">Crafted for the Modern Gentleman</h2>
+    <p>Founded in 2016, Blades & Co. was built on a single belief — that a great haircut is more than a service; it's an experience. We brought together Dubai's finest barbers and created a space where quality, craft, and conversation come together.</p>
+    <p>Every detail — from the vintage chairs to the hand-selected grooming products — is chosen to give our clients the best 60 minutes of their week.</p>
+    <div class="about-stats">
+      <div>
+        <span class="astat-num">8+</span>
+        <span class="astat-label">Years Open</span>
+      </div>
+      <div>
+        <span class="astat-num">12K+</span>
+        <span class="astat-label">Happy Clients</span>
+      </div>
+      <div>
+        <span class="astat-num">4.9 ★</span>
+        <span class="astat-label">Google Rating</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery" class="gallery">
+  <div class="section-eyebrow">Gallery</div>
+  <h2 class="section-h2">Inside the Shop</h2>
+  <div class="gallery-grid">
+    <div class="gallery-item">
+      <img src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=1200&q=80&fit=crop" alt="Barbershop interior" loading="lazy">
+    </div>
+    <div class="gallery-item">
+      <img src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?w=600&q=80&fit=crop" alt="Barber tools" loading="lazy">
+    </div>
+    <div class="gallery-item">
+      <img src="https://images.unsplash.com/photo-1560869713-bf207f237ece?w=600&q=80&fit=crop&crop=top" alt="Haircut in progress" loading="lazy">
+    </div>
+    <div class="gallery-item">
+      <img src="https://images.unsplash.com/photo-1493256338651-d82f7acb2b38?w=600&q=80&fit=crop" alt="Grooming product" loading="lazy">
+    </div>
+    <div class="gallery-item">
+      <img src="https://images.unsplash.com/photo-1517832207067-4db24a2ae47c?w=1200&q=80&fit=crop" alt="Barber shop atmosphere" loading="lazy">
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+  <div class="section-eyebrow">Client Reviews</div>
+  <h2 class="section-h2">What Our Clients Say</h2>
+  <div class="testi-grid">
+    <div class="testi-card">
+      <div class="testi-quote">"</div>
+      <p class="testi-text">Best barbershop in Dubai, no question. I've been going every two weeks for three years. The haircut is always perfect, the service is always warm. This place genuinely makes my week better.</p>
+      <div class="testi-author">
+        <div class="testi-avatar">KA</div>
+        <div>
+          <div class="testi-name">Khalid Al Hamad</div>
+          <div class="testi-role">Business Executive, DIFC</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-quote">"</div>
+      <p class="testi-text">I brought my whole team here before our client presentation. Every single person walked out looking sharp. The Full Package is worth every dirham — it's a proper ritual.</p>
+      <div class="testi-author">
+        <div class="testi-avatar">MR</div>
+        <div>
+          <div class="testi-name">Marc Renaud</div>
+          <div class="testi-role">Finance Director, Business Bay</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-quote">"</div>
+      <p class="testi-text">The Royal Shave is a completely different level to anything else in Dubai. Hot towels, the leather chair, the precision — it's like stepping back into a golden era. Incredible experience.</p>
+      <div class="testi-author">
+        <div class="testi-avatar">RA</div>
+        <div>
+          <div class="testi-name">Rayan Al Sayed</div>
+          <div class="testi-role">Entrepreneur, Dubai Hills</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BOOKING CTA -->
+<section id="booking" class="booking-cta">
+  <div class="booking-cta-bg"></div>
+  <div class="booking-cta-overlay"></div>
+  <div class="booking-cta-content">
+    <h2>Ready for <em>Your Best Look?</em></h2>
+    <p>Book your appointment online or walk in any day of the week. Our barbers are ready for you.</p>
+    <a class="btn-gold-hero" href="tel:+97143001234">Book by Phone →</a>
+    <p class="booking-tel">Or call us: <a href="tel:+97143001234">+971 4 300 1234</a> — Available 10am to 10pm daily</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="contact">
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div class="footer-brand-logo">Blades<span> & Co.</span></div>
+      <p>Dubai's destination for premium men's grooming. Precision, craft, and an experience you'll come back for — every time.</p>
+      <div class="footer-social">
+        <a href="#">📸</a>
+        <a href="#">💬</a>
+        <a href="#">🗺</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h5>Services</h5>
+      <a href="#">Signature Haircut</a>
+      <a href="#">Royal Shave</a>
+      <a href="#">Beard Sculpt</a>
+      <a href="#">Full Package</a>
+      <a href="#">Kids Cuts</a>
+    </div>
+    <div class="footer-col">
+      <h5>Visit Us</h5>
+      <a href="#">JBR Walk, Dubai Marina</a>
+      <a href="#">Open 7 days a week</a>
+      <a href="#">10:00 AM – 10:00 PM</a>
+      <a href="#">Walk-ins welcome</a>
+    </div>
+    <div class="footer-col">
+      <h5>Contact</h5>
+      <a href="tel:+97143001234">+971 4 300 1234</a>
+      <a href="#">hello@bladesandco.ae</a>
+      <a href="#">Book Online</a>
+      <a href="#">Gift Vouchers</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Blades & Co. — Dubai, UAE. All rights reserved.</span>
+    <span>Privacy Policy · Terms</span>
+  </div>
+</footer>
+
+</body>
+</html>
