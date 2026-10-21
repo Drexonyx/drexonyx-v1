@@ -31,6 +31,30 @@
   color: var(--drex-text-muted);
 }
 
+/* Card wrapper (holds image button + live link) */
+.cardWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Live demo link */
+.liveLink {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--drex-accent, #c9a96e);
+  text-decoration: none;
+  text-align: center;
+  padding: 4px 0;
+  transition: opacity 0.15s ease;
+}
+
+.liveLink:hover {
+  opacity: 0.75;
+}
+
 /* Clickable card */
 .card {
   position: relative;

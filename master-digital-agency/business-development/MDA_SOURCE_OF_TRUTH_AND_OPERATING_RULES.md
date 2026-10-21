@@ -65,6 +65,15 @@ Operational rules for Claude Code:
 
 ## 5. Pricing: strict status
 
+**CONFIRMED—USER (2026-10-21): MDA website-build pricing tiers:**
+- **AED 599** — Starter tier (5-page business website, standard design, 7-day delivery)
+- **AED 899** — Professional tier (expanded scope, custom design)
+- **AED 1,899** — Premium tier (ultra-professional, full custom)
+
+These prices are live on the MDA page (`/mda`) and were explicitly approved by the user. AED 599 is the entry-level portfolio price, demonstrated by 5 live demo sites: Blades & Co (barber), Vitalis Clinic (medical), Lumière Studio (salon), Zafran & Oud (restaurant), Pinnacle Properties (real estate) — all hosted on Vercel production.
+
+---
+
 **AED 650 is NOT an approved MDA price.** It was suggested earlier as a possible introductory price for a proposed “Company Profile Express” offer, but the user rejected it as too high and challenged the underlying evidence. Treat AED 650 as withdrawn/unapproved unless the user explicitly approves it again.
 
 The earlier competitive pricing notes are **unverified preliminary research**, not a reliable market benchmark. The researcher could not access the original provider websites and relied on search snippets for several figures. Some listed offers had different page counts or inclusions and were not directly comparable. Therefore:

@@ -425,14 +425,14 @@ export default function MDAPage() {
           <div className={styles.examplesShowcase}>
             <ExamplesTier
               badge="AED 599"
-              label="Starter — 5 example sites"
+              label="Starter — 5 live demo sites"
               gridClass={styles.examplesGrid5}
               examples={[
-                { src: '/mda/examples/restaurant-599.jpg', alt: 'Restaurant website example' },
-                { src: '/mda/examples/gym-599.jpg', alt: 'Gym website example' },
-                { src: '/mda/examples/cleaning-599.jpg', alt: 'Cleaning company website example' },
-                { src: '/mda/examples/cars-599.jpg', alt: 'Car dealership website example' },
-                { src: '/mda/examples/pool-599.jpg', alt: 'Pool services website example' },
+                { src: '/mda/examples/restaurant-599.jpg', alt: 'Zafran & Oud — Restaurant website demo', href: 'https://zafran-oud-demo-m5k07rloa-drexonyxstudio-7806.vercel.app' },
+                { src: '/mda/examples/gym-599.jpg', alt: 'Blades & Co — Barbershop website demo', href: 'https://blades-and-co-demo-g6dguvwlp-drexonyxstudio-7806.vercel.app' },
+                { src: '/mda/examples/cleaning-599.jpg', alt: 'Vitalis Clinic — Medical website demo', href: 'https://vitalis-clinic-demo-82j52szqz-drexonyxstudio-7806.vercel.app' },
+                { src: '/mda/examples/cars-599.jpg', alt: 'Lumière Studio — Salon website demo', href: 'https://lumiere-studio-demo-7n7qxb36g-drexonyxstudio-7806.vercel.app' },
+                { src: '/mda/examples/pool-599.jpg', alt: 'Pinnacle Properties — Real estate website demo', href: 'https://pinnacle-properties-demo-6da7qa68s-drexonyxstudio-7806.vercel.app' },
               ]}
             />
 
