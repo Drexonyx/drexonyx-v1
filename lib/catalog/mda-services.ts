@@ -114,7 +114,7 @@ const BRANDING: ServiceEntry[] = [
     scopeNotes: 'Client must supply business name, tagline (if any), and any existing brand assets.',
     whatsappKeywords: [
       'visual identity', 'هوية بصرية', 'brand identity', 'complete branding', 'brand package',
-      'identity design', 'identity package', 'full brand',
+      'identity design', 'identity package', 'full brand package',
     ],
     approvalStatus: 'confirmed',
   },
