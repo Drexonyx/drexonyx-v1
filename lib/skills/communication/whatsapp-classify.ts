@@ -107,13 +107,17 @@ function matchServiceKeywords(text: string): {
   // Deduplicate service IDs
   const serviceIds = [...new Set(matched.map((m) => m.serviceId))];
 
-  // Determine brand: MDA wins if any MDA service matched; DREXONYX only if all matches are DREXONYX
-  const brands = new Set(matched.map((m) => m.brand));
-  const brand: ServiceBrand | null = brands.has('MDA')
-    ? 'MDA'
-    : brands.has('DREXONYX')
-    ? 'DREXONYX'
-    : null;
+  // Determine brand by majority vote: the brand with more keyword matches wins.
+  // Ties go to MDA (default). This ensures DREXONYX wins when cinematic/video
+  // keywords dominate even if a generic word like "brand" also triggers an MDA entry.
+  const mdaCount = matched.filter((m) => m.brand === 'MDA').length;
+  const drexCount = matched.filter((m) => m.brand === 'DREXONYX').length;
+  const brand: ServiceBrand | null =
+    mdaCount === 0 && drexCount === 0
+      ? null
+      : drexCount > mdaCount
+      ? 'DREXONYX'
+      : 'MDA';
 
   return { serviceIds, brand };
 }
@@ -163,7 +167,7 @@ function classify(text: string): WhatsAppClassifyOutput {
 
 export const whatsappClassifySkill: Skill<WhatsAppClassifyInput, WhatsAppClassifyOutput> = {
   id: 'communication.whatsapp.classify',
-  version: '1.1.0',
+  version: '1.2.0',
   family: 'COMMUNICATION',
 
   async execute(input: WhatsAppClassifyInput, _context: SkillContext): Promise<SkillResult<WhatsAppClassifyOutput>> {
