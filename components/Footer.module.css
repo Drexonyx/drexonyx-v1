@@ -131,29 +131,60 @@
   font-style: italic;
 }
 
-/* MDA endorsement strip */
-.mdaStrip {
+/* Brand showcase strip */
+.brandStrip {
   border-top: 1px solid var(--drex-border-subtle);
+  background: linear-gradient(135deg, rgba(200,152,10,0.07) 0%, rgba(37,99,235,0.07) 100%);
+  padding: 3rem var(--drex-pad);
+}
+
+.brandStripInner {
   max-width: var(--drex-container);
   margin: 0 auto;
-  padding: 1.25rem var(--drex-pad);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+}
+
+.brandStripLogo {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.mdaLogo {
-  height: 64px;
+.brandStripDxLogo {
+  height: 88px;
   width: auto;
-  max-width: 320px;
-  object-fit: contain;
   display: block;
+  object-fit: contain;
+}
+
+.brandStripMdaLogo {
+  height: 88px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
+
+.brandStripDivider {
+  width: 1px;
+  height: 80px;
+  background: linear-gradient(to bottom, #C8980A 0%, #2563EB 100%);
+  flex-shrink: 0;
+  opacity: 0.5;
 }
 
 @media (max-width: 540px) {
-  .mdaLogo {
-    height: 48px;
-    max-width: 240px;
+  .brandStripDxLogo,
+  .brandStripMdaLogo {
+    height: 56px;
+  }
+  .brandStripDivider {
+    height: 50px;
+  }
+  .brandStripInner {
+    gap: 1.5rem;
   }
 }
 
