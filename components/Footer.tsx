@@ -90,9 +90,13 @@ export default function Footer() {
       </div>
 
       <div className={styles.mdaStrip}>
-        <p className={styles.mdaEndorsement}>
-          MDA — MASTER DIGITAL AGENCY · A DREXONYX Brand
-        </p>
+        <Image
+          src="/brand/mda-brand-identity.png"
+          alt="MDA — Master Digital Agency, a DREXONYX brand"
+          width={1588}
+          height={640}
+          className={styles.mdaLogo}
+        />
       </div>
     </footer>
   );

@@ -136,18 +136,25 @@
   border-top: 1px solid var(--drex-border-subtle);
   max-width: var(--drex-container);
   margin: 0 auto;
-  padding: 0.625rem var(--drex-pad);
+  padding: 1.25rem var(--drex-pad);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.mdaEndorsement {
-  font-size: 0.625rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--drex-text-muted);
+.mdaLogo {
+  height: 64px;
+  width: auto;
+  max-width: 320px;
+  object-fit: contain;
+  display: block;
+}
+
+@media (max-width: 540px) {
+  .mdaLogo {
+    height: 48px;
+    max-width: 240px;
+  }
 }
 
 @media (max-width: 900px) {
