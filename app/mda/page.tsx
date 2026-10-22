@@ -405,14 +405,27 @@ export default function MDAPage() {
       {/* ── 2: Hero ─────────────────────────────────────────────────────────── */}
       <section className={styles.hero} aria-labelledby="mda-hero-heading">
         <div className={styles.container}>
+          <div className={styles.mdaBrandBlock}>
+            <Image
+              src="/brand/mda-logo-transparent.png"
+              alt="MDA — Master Digital Agency"
+              width={1820}
+              height={864}
+              className={styles.mdaBrandLogo}
+              priority
+            />
+            <h1 id="mda-hero-heading" className={styles.mdaBrandTitle}>
+              Master Digital Agency
+            </h1>
+          </div>
           <p className={styles.heroEyebrow}>Full-Service Commercial Agency · Dubai &amp; UAE</p>
-          <h1 id="mda-hero-heading" className={styles.heroHeading}>
+          <h2 className={styles.heroHeading}>
             <span className={styles.heroLineDigital}>DIGITAL.</span>{' '}
             <span className={styles.heroLineCreative}>CREATIVE.</span>
             <br className={styles.heroBreak} />
             <span className={styles.heroLineMedia}>MEDIA.</span>{' '}
             <span className={styles.heroLineSolutions}>SOLUTIONS.</span>
-          </h1>
+          </h2>
           <p className={styles.heroSub}>
             One agency. Every dimension of your business.
             <br />
