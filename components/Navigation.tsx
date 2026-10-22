@@ -42,8 +42,8 @@ export default function Navigation() {
               <Image
                 src="/brand/mda-logo-transparent.png"
                 alt=""
-                width={456}
-                height={240}
+                width={1820}
+                height={864}
                 className={styles.mdaLogoImg}
               />
             </div>
