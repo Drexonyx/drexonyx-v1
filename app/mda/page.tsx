@@ -375,7 +375,6 @@ export default function MDAPage() {
       <section className={styles.mdaHeader} aria-label="MDA brand identity">
         <div className={styles.container}>
           <div className={styles.mdaHeaderInner}>
-            <MDALogo size="lg" assetSrc="/mda/mda-logo.png" />
             <nav className={styles.mdaCatNav} aria-label="MDA service categories">
               <ul className={styles.mdaCatList} role="list">
                 {MDA_NAV_CATS.map((cat) => (
