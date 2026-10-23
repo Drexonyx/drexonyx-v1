@@ -1,0 +1,68 @@
+name: EAS Build — Fleet Tracker
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to build'
+        required: true
+        default: 'android'
+        type: choice
+        options:
+          - android
+          - ios
+          - all
+      profile:
+        description: 'Build profile'
+        required: true
+        default: 'preview'
+        type: choice
+        options:
+          - preview
+          - production
+
+jobs:
+  build:
+    name: EAS Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/fleet-tracker
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: apps/fleet-tracker/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Initialize EAS project (first time only)
+        run: |
+          if ! grep -q '"projectId"' app.config.js 2>/dev/null || grep -q '""' app.config.js; then
+            eas init --id ${{ secrets.EAS_PROJECT_ID }} --non-interactive || true
+          fi
+
+      - name: Set EAS Secrets
+        run: |
+          eas secret:create --scope project --name WIALON_TOKEN --value "${{ secrets.WIALON_TOKEN }}" --force || true
+          eas secret:create --scope project --name LICENSE_SECRET --value "${{ secrets.LICENSE_SECRET }}" --force || true
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build app
+        run: eas build --platform ${{ inputs.platform }} --profile ${{ inputs.profile }} --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
