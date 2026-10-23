@@ -1,12 +1,16 @@
 /**
  * Wialon API service.
- * In mock mode (no token set) it returns realistic fake data.
- * With a real token it calls the Wialon Hosting SaaS API.
+ *
+ * The Wialon token is injected at EAS build time via the WIALON_TOKEN secret
+ * (app.config.js → extra.wialonToken). The client never sees or enters it.
+ *
+ * When no token is baked in (dev/demo builds) the service returns mock data.
  *
  * Docs: https://sdk.wialon.com/wiki/en/kit/remoteapi/apiref/apiref
  */
 
 import * as SecureStore from 'expo-secure-store';
+import Constants from 'expo-constants';
 import { Vehicle, Trip, MileageReport } from '../types';
 import {
   getMockVehicles,
@@ -16,35 +20,16 @@ import {
 } from './mock-data';
 
 const WIALON_BASE = 'https://hst-api.wialon.com/wialon/ajax.do';
-const TOKEN_KEY = 'wialon_api_token';
 const SESSION_KEY = 'wialon_session_id';
+
+function getBakedToken(): string {
+  return (Constants.expoConfig?.extra?.wialonToken as string) ?? '';
+}
 
 let _sessionId: string | null = null;
 let _useMock = true;
 
-// ─── Token management ──────────────────────────────────────
-
-export async function saveToken(token: string): Promise<void> {
-  await SecureStore.setItemAsync(TOKEN_KEY, token);
-  _useMock = false;
-  _sessionId = null;
-}
-
-export async function getToken(): Promise<string | null> {
-  return SecureStore.getItemAsync(TOKEN_KEY);
-}
-
-export async function clearToken(): Promise<void> {
-  await SecureStore.deleteItemAsync(TOKEN_KEY);
-  await SecureStore.deleteItemAsync(SESSION_KEY);
-  _sessionId = null;
-  _useMock = true;
-}
-
-export async function hasToken(): Promise<boolean> {
-  const t = await getToken();
-  return !!t;
-}
+// ─── Token management (internal — not exposed to client UI) ───
 
 // ─── Wialon session ────────────────────────────────────────
 
@@ -72,8 +57,8 @@ async function ensureSession(): Promise<string> {
     return _sessionId;
   }
 
-  const token = await getToken();
-  if (!token) throw new Error('No Wialon token set');
+  const token = getBakedToken();
+  if (!token) throw new Error('No Wialon token configured in this build');
 
   const resp = await wialonRequest<{ eid: string }>({
     svc: 'token/login',
@@ -87,9 +72,8 @@ async function ensureSession(): Promise<string> {
 
 // ─── Public API ────────────────────────────────────────────
 
-export async function initService(): Promise<void> {
-  const token = await getToken();
-  _useMock = !token;
+export function initService(): void {
+  _useMock = !getBakedToken();
 }
 
 export async function fetchVehicles(): Promise<Vehicle[]> {
