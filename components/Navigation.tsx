@@ -29,10 +29,10 @@ export default function Navigation() {
           <Link href="/" className={styles.logo} onClick={closeMenu} aria-label="DREXONYX home">
             <div className={styles.logoDxMark} aria-hidden="true">
               <Image
-                src="/brand/drexonyx-dx-mark.png"
+                src="/brand/drexonyx-dx-full-logo.png"
                 alt=""
-                width={1764}
-                height={675}
+                width={1752}
+                height={886}
                 className={styles.logoDxImg}
                 priority
               />
@@ -40,10 +40,10 @@ export default function Navigation() {
             <div className={styles.logoDivider} aria-hidden="true" />
             <div className={styles.logoMda} aria-hidden="true">
               <Image
-                src="/brand/mda-logo-transparent.png"
+                src="/brand/mda-full-logo.png"
                 alt=""
-                width={456}
-                height={240}
+                width={1820}
+                height={864}
                 className={styles.mdaLogoImg}
               />
             </div>

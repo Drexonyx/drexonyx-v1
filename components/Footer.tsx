@@ -71,10 +71,10 @@ export default function Footer() {
           <div className={styles.colLabel}>Contact</div>
           <p className={styles.contactLocation}>Dubai, UAE · Global</p>
           <a
-            href="mailto:drexonyx.studio@gmail.com"
+            href="mailto:info@drexonyx.com"
             className={styles.contactEmail}
           >
-            drexonyx.studio@gmail.com
+            info@drexonyx.com
           </a>
           <Link href="/portal/login" className={styles.portalLink}>
             Client Portal →
@@ -89,10 +89,28 @@ export default function Footer() {
         <p className={styles.copyTagline}>Creativity Today. A Bolder Tomorrow.</p>
       </div>
 
-      <div className={styles.mdaStrip}>
-        <p className={styles.mdaEndorsement}>
-          MDA — MASTER DIGITAL AGENCY · A DREXONYX Brand
-        </p>
+      <div className={styles.brandStrip}>
+        <div className={styles.brandStripInner}>
+          <div className={styles.brandStripLogo}>
+            <Image
+              src="/brand/drexonyx-dx-full-logo.png"
+              alt="DREXONYX — Creative Digital Technology"
+              width={1752}
+              height={886}
+              className={styles.brandStripDxLogo}
+            />
+          </div>
+          <div className={styles.brandStripDivider} aria-hidden="true" />
+          <div className={styles.brandStripLogo}>
+            <Image
+              src="/brand/mda-full-logo.png"
+              alt="MDA — Master Digital Agency, a DREXONYX Brand"
+              width={1820}
+              height={864}
+              className={styles.brandStripMdaLogo}
+            />
+          </div>
+        </div>
       </div>
     </footer>
   );
