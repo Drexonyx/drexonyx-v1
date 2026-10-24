@@ -37,6 +37,14 @@ export default function RootLayout() {
             options={{ title: 'Vehicle Details', presentation: 'card' }}
           />
           <Stack.Screen
+            name="vehicle/add"
+            options={{ title: 'Add Vehicle', presentation: 'modal' }}
+          />
+          <Stack.Screen
+            name="vehicle/edit/[id]"
+            options={{ title: 'Edit Vehicle', presentation: 'modal' }}
+          />
+          <Stack.Screen
             name="history/[id]"
             options={{ title: 'Trip History', presentation: 'card' }}
           />

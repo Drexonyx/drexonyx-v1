@@ -17,6 +17,9 @@ import {
   getMockVehicle,
   getMockTrips,
   getMockMileageReports,
+  addMockVehicle,
+  updateMockVehicle,
+  deleteMockVehicle,
 } from './mock-data';
 
 const WIALON_BASE = 'https://hst-api.wialon.com/wialon/ajax.do';
@@ -191,6 +194,29 @@ export async function fetchMileageReports(): Promise<MileageReport[]> {
     thisWeek: 0,
     thisMonth: 0,
   }));
+}
+
+export type VehicleFormData = {
+  name: string;
+  plateNumber: string;
+  model?: string;
+  driver?: string;
+  status: Vehicle['status'];
+};
+
+export async function addVehicle(data: VehicleFormData): Promise<Vehicle> {
+  if (_useMock) return addMockVehicle(data);
+  throw new Error('Live vehicle management not yet supported in this build.');
+}
+
+export async function updateVehicle(id: string, data: Partial<VehicleFormData>): Promise<Vehicle | undefined> {
+  if (_useMock) return updateMockVehicle(id, data);
+  throw new Error('Live vehicle management not yet supported in this build.');
+}
+
+export async function deleteVehicle(id: string): Promise<void> {
+  if (_useMock) return deleteMockVehicle(id);
+  throw new Error('Live vehicle management not yet supported in this build.');
 }
 
 // ─── Utils ─────────────────────────────────────────────────

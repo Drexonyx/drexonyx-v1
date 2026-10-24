@@ -1,9 +1,9 @@
 import React from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator,
+  View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator, Alert,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useVehicle } from '../../src/hooks/useFleet';
+import { useVehicle, useDeleteVehicle } from '../../src/hooks/useFleet';
 import StatusBadge from '../../src/components/StatusBadge';
 import { formatDistanceToNow, format } from 'date-fns';
 
@@ -11,6 +11,24 @@ export default function VehicleDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { data: vehicle, isLoading } = useVehicle(id);
+  const { mutateAsync: deleteVehicle, isPending: isDeleting } = useDeleteVehicle();
+
+  function handleDelete() {
+    Alert.alert(
+      'Delete Vehicle',
+      `Remove "${vehicle?.name}" from the fleet? This cannot be undone.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete', style: 'destructive',
+          onPress: async () => {
+            await deleteVehicle(id);
+            router.back();
+          },
+        },
+      ],
+    );
+  }
 
   if (isLoading) {
     return (
@@ -103,6 +121,30 @@ export default function VehicleDetail() {
           onPress={() => router.push(`/history/${vehicle.id}`)}
           accent
         />
+      </View>
+
+      {/* Management */}
+      <Text style={styles.sectionLabel}>Manage</Text>
+      <View style={styles.actions}>
+        <ActionBtn
+          icon="✏️"
+          label="Edit"
+          onPress={() => router.push(`/vehicle/edit/${vehicle.id}`)}
+        />
+        <Pressable
+          style={[styles.actionBtn, styles.actionBtnDanger]}
+          onPress={handleDelete}
+          disabled={isDeleting}
+        >
+          {isDeleting ? (
+            <ActivityIndicator size="small" color="#ef4444" />
+          ) : (
+            <>
+              <Text style={styles.actionIcon}>🗑️</Text>
+              <Text style={[styles.actionLabel, styles.actionLabelDanger]}>Delete</Text>
+            </>
+          )}
+        </Pressable>
       </View>
     </ScrollView>
   );
@@ -206,7 +248,9 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
   },
   actionBtnAccent: { backgroundColor: '#C8980A', borderColor: '#C8980A' },
+  actionBtnDanger: { borderColor: 'rgba(239,68,68,0.25)', backgroundColor: 'rgba(239,68,68,0.06)' },
   actionIcon: { fontSize: 16 },
   actionLabel: { fontSize: 13, fontWeight: '700', color: '#a0a0b0' },
   actionLabelAccent: { color: '#000' },
+  actionLabelDanger: { color: '#ef4444' },
 });

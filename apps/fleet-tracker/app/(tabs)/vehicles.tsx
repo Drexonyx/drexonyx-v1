@@ -45,6 +45,9 @@ export default function VehiclesScreen() {
             clearButtonMode="while-editing"
           />
         </View>
+        <Pressable style={styles.addBtn} onPress={() => router.push('/vehicle/add')}>
+          <Text style={styles.addBtnText}>+</Text>
+        </Pressable>
       </View>
 
       <View style={styles.filterRow}>
@@ -108,13 +111,21 @@ export default function VehiclesScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0a0a0c' },
-  searchRow: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8 },
+  searchRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8 },
   searchInput: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
+    flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8,
     backgroundColor: '#111116',
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
     borderRadius: 10, paddingHorizontal: 12, paddingVertical: 9,
   },
+  addBtn: {
+    width: 40, height: 40, borderRadius: 12,
+    backgroundColor: '#C8980A',
+    alignItems: 'center', justifyContent: 'center',
+    shadowColor: '#C8980A', shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.4, shadowRadius: 6, elevation: 6,
+  },
+  addBtnText: { fontSize: 22, fontWeight: '700', color: '#000', lineHeight: 26 },
   searchIcon: { fontSize: 14 },
   input: { flex: 1, fontSize: 14, color: '#f0f0f4' },
   filterRow: {
