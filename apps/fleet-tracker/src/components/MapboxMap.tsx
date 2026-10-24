@@ -108,6 +108,13 @@ export default function MapboxMap({ vehicles, selectedId, onVehicleSelect }: Pro
     heading: v.heading,
   }));
 
+  // Memoize by vehicle IDs only — prevents WebView reload on position updates
+  const source = React.useMemo(
+    () => ({ html: buildHtml(pins) }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [pins.map(p => p.id).join(',')],
+  );
+
   const handleMessage = (e: WebViewMessageEvent) => {
     try {
       const data = JSON.parse(e.nativeEvent.data);
@@ -118,7 +125,7 @@ export default function MapboxMap({ vehicles, selectedId, onVehicleSelect }: Pro
 
   return (
     <WebView
-      source={{ html: buildHtml(pins) }}
+      source={source}
       style={StyleSheet.absoluteFill}
       onMessage={handleMessage}
       javaScriptEnabled
