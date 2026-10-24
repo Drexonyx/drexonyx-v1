@@ -62,7 +62,7 @@ export default async function PricingPage() {
                     <div className={styles.creditCreditsLabel}>Credits</div>
                   </div>
                   <div className={styles.packagePrice}>{formatAed(pkg.price_aed)}</div>
-                  <Link href="/portal/credits/buy" className={styles.ctaSecondary}>
+                  <Link href={`/portal/credits/buy?pkg=${pkg.id}`} className={styles.ctaSecondary}>
                     Buy Credits
                   </Link>
                 </article>
