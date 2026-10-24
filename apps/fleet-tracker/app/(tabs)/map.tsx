@@ -1,36 +1,14 @@
-import React, { useState, useRef } from 'react';
-import {
-  View, Text, StyleSheet, Pressable, ActivityIndicator, ScrollView,
-} from 'react-native';
-import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
+import React from 'react';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useVehicles } from '../../src/hooks/useFleet';
-import VehicleMarker from '../../src/components/VehicleMarker';
 import StatusBadge from '../../src/components/StatusBadge';
 import { Vehicle } from '../../src/types';
 
-const DUBAI_REGION = {
-  latitude: 25.2048,
-  longitude: 55.2708,
-  latitudeDelta: 0.12,
-  longitudeDelta: 0.12,
-};
-
 export default function MapScreen() {
   const router = useRouter();
-  const { data: vehicles, isLoading, error } = useVehicles();
-  const [selected, setSelected] = useState<Vehicle | null>(null);
-  const mapRef = useRef<MapView>(null);
-
-  function focusVehicle(v: Vehicle) {
-    setSelected(v);
-    mapRef.current?.animateToRegion({
-      latitude: v.lat,
-      longitude: v.lng,
-      latitudeDelta: 0.02,
-      longitudeDelta: 0.02,
-    }, 600);
-  }
+  const { data: vehicles, isLoading } = useVehicles();
+  const [selected, setSelected] = React.useState<Vehicle | null>(null);
 
   const moving = vehicles?.filter(v => v.status === 'moving').length ?? 0;
   const parked = vehicles?.filter(v => v.status === 'parked').length ?? 0;
@@ -50,38 +28,33 @@ export default function MapScreen() {
         </Pressable>
       </View>
 
-      {/* Map */}
-      <MapView
-        ref={mapRef}
-        style={StyleSheet.absoluteFill}
-        provider={PROVIDER_GOOGLE}
-        initialRegion={DUBAI_REGION}
-        customMapStyle={darkMapStyle}
-        showsUserLocation={false}
-        showsCompass={false}
-        showsTraffic={false}
-        toolbarEnabled={false}
-      >
-        {vehicles?.map(v => (
-          <VehicleMarker
-            key={v.id}
-            vehicle={v}
-            selected={selected?.id === v.id}
-            onPress={() => focusVehicle(v)}
-          />
-        ))}
-      </MapView>
+      {/* Map placeholder */}
+      <View style={styles.mapPlaceholder}>
+        <Text style={styles.mapIcon}>🗺️</Text>
+        <Text style={styles.mapTitle}>Live Map</Text>
+        <Text style={styles.mapSub}>Google Maps API key required</Text>
+        {isLoading && (
+          <ActivityIndicator color="#C8980A" size="small" style={{ marginTop: 12 }} />
+        )}
+      </View>
 
-      {isLoading && (
-        <View style={styles.loader}>
-          <ActivityIndicator color="#C8980A" size="small" />
-        </View>
-      )}
-
-      {error && (
-        <View style={styles.errorBanner}>
-          <Text style={styles.errorText}>⚠️ Could not load fleet data</Text>
-        </View>
+      {/* Vehicle list */}
+      {!selected && vehicles && vehicles.length > 0 && (
+        <ScrollView
+          horizontal
+          style={styles.quickList}
+          contentContainerStyle={styles.quickListContent}
+          showsHorizontalScrollIndicator={false}
+        >
+          {vehicles.map(v => (
+            <Pressable key={v.id} style={styles.quickChip} onPress={() => setSelected(v)}>
+              <View style={[styles.quickDot, {
+                backgroundColor: v.status === 'moving' ? '#10b981' : v.status === 'parked' ? '#f59e0b' : '#6b7280'
+              }]} />
+              <Text style={styles.quickName} numberOfLines={1}>{v.name.split(' #')[0]}</Text>
+            </Pressable>
+          ))}
+        </ScrollView>
       )}
 
       {/* Selected vehicle panel */}
@@ -116,25 +89,6 @@ export default function MapScreen() {
             <Text style={styles.panelCloseText}>✕</Text>
           </Pressable>
         </View>
-      )}
-
-      {/* Bottom quick list */}
-      {!selected && vehicles && vehicles.length > 0 && (
-        <ScrollView
-          horizontal
-          style={styles.quickList}
-          contentContainerStyle={styles.quickListContent}
-          showsHorizontalScrollIndicator={false}
-        >
-          {vehicles.map(v => (
-            <Pressable key={v.id} style={styles.quickChip} onPress={() => focusVehicle(v)}>
-              <View style={[styles.quickDot, {
-                backgroundColor: v.status === 'moving' ? '#10b981' : v.status === 'parked' ? '#f59e0b' : '#6b7280'
-              }]} />
-              <Text style={styles.quickName} numberOfLines={1}>{v.name.split(' #')[0]}</Text>
-            </Pressable>
-          ))}
-        </ScrollView>
       )}
     </View>
   );
@@ -182,19 +136,16 @@ const styles = StyleSheet.create({
   statLabel: { fontSize: 12, color: '#606070' },
   settingsBtn: { padding: 4 },
   settingsIcon: { fontSize: 18 },
-  loader: {
-    position: 'absolute',
-    top: 52, right: 16, zIndex: 5,
-    backgroundColor: 'rgba(10,10,12,0.8)',
-    borderRadius: 8, padding: 8,
+  mapPlaceholder: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 44,
+    gap: 8,
   },
-  errorBanner: {
-    position: 'absolute',
-    top: 52, left: 16, right: 16, zIndex: 5,
-    backgroundColor: 'rgba(239,68,68,0.15)',
-    borderRadius: 8, padding: 10, alignItems: 'center',
-  },
-  errorText: { color: '#ef4444', fontSize: 13 },
+  mapIcon: { fontSize: 64 },
+  mapTitle: { fontSize: 20, fontWeight: '800', color: '#f0f0f4' },
+  mapSub: { fontSize: 13, color: '#505060' },
   panel: {
     position: 'absolute',
     bottom: 16, left: 16, right: 16,
@@ -221,9 +172,7 @@ const styles = StyleSheet.create({
   panelBtnTextSecondary: { fontSize: 13, fontWeight: '700', color: '#a0a0b0' },
   panelClose: { position: 'absolute', top: 12, right: 12, padding: 4 },
   panelCloseText: { fontSize: 14, color: '#505060' },
-  quickList: {
-    position: 'absolute', bottom: 16, left: 0, right: 0,
-  },
+  quickList: { position: 'absolute', bottom: 16, left: 0, right: 0 },
   quickListContent: { paddingHorizontal: 16, gap: 8 },
   quickChip: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
@@ -234,20 +183,3 @@ const styles = StyleSheet.create({
   quickDot: { width: 7, height: 7, borderRadius: 3.5 },
   quickName: { fontSize: 12, fontWeight: '600', color: '#a0a0b0', maxWidth: 90 },
 });
-
-const darkMapStyle = [
-  { elementType: 'geometry', stylers: [{ color: '#1a1a2e' }] },
-  { elementType: 'labels.text.stroke', stylers: [{ color: '#1a1a2e' }] },
-  { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] },
-  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#2d2d3d' }] },
-  { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#212121' }] },
-  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#3d3d55' }] },
-  { featureType: 'road.highway', elementType: 'labels.text.fill', stylers: [{ color: '#f3d19c' }] },
-  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#0a1628' }] },
-  { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#515c6d' }] },
-  { featureType: 'poi', stylers: [{ visibility: 'off' }] },
-  { featureType: 'transit', stylers: [{ visibility: 'off' }] },
-  { featureType: 'administrative', elementType: 'geometry', stylers: [{ color: '#757575' }] },
-  { featureType: 'administrative.country', elementType: 'labels.text.fill', stylers: [{ color: '#9e9e9e' }] },
-  { featureType: 'administrative.locality', elementType: 'labels.text.fill', stylers: [{ color: '#bdbdbd' }] },
-];
