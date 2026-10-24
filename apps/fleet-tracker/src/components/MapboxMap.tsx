@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
+import Constants from 'expo-constants';
 import { Vehicle } from '../types';
 
-const MAPBOX_TOKEN =
-  'pk.eyJ1IjoiZHJleG9ueXgiLCJhIjoiY212bHh4aWE1MDBlMjM1czlveWJkczRrMyJ9.MXOF41mKcWd3W5U3A5tn9Q';
+const MAPBOX_TOKEN: string = (Constants.expoConfig?.extra?.mapboxToken as string) ?? '';
 
 interface VehiclePin {
   id: string;

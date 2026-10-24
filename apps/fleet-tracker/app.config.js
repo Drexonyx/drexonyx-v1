@@ -49,6 +49,7 @@ export default {
       // Injected at EAS build time via secrets — empty string = demo/dev mode
       wialonToken: process.env.WIALON_TOKEN ?? '',
       licenseSecret: process.env.LICENSE_SECRET ?? 'dev-mode-no-secret',
+      mapboxToken: process.env.MAPBOX_TOKEN ?? '',
       eas: { projectId: process.env.EAS_PROJECT_ID ?? '49194fb7-a5e6-4997-aaca-daed56a10215' },
     },
   },
