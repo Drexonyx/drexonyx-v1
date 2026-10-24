@@ -110,7 +110,7 @@ function MileageRow({
       <View style={styles.rowRight}>
         <Text style={styles.rowValue}>{value.toFixed(1)} km</Text>
         <View style={styles.bar}>
-          <View style={[styles.barFill, { width: `${pct * 100}%` as any }]} />
+          <View style={[styles.barFill, { width: `${pct * 100}%` as unknown as number }]} />
         </View>
       </View>
     </View>

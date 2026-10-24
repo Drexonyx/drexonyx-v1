@@ -105,7 +105,7 @@ export default function ActivateScreen() {
         {/* Footer */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            Don't have a key?{' '}
+            {"Don't have a key?"}{' '}
           </Text>
           <Text style={styles.footerContact}>Contact info@drexonyx.com</Text>
         </View>
