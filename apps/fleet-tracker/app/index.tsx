@@ -8,10 +8,16 @@ export default function Index() {
   const [activated, setActivated] = useState(false);
 
   useEffect(() => {
-    isActivated().then(result => {
-      setActivated(result);
-      setReady(true);
-    });
+    isActivated()
+      .then(result => {
+        setActivated(result);
+        setReady(true);
+      })
+      .catch(() => {
+        // crypto error or SecureStore error — default to not activated
+        setActivated(false);
+        setReady(true);
+      });
   }, []);
 
   if (!ready) {
