@@ -106,7 +106,11 @@ export async function saveKey(key: string): Promise<void> {
 }
 
 export async function getStoredKey(): Promise<string | null> {
-  return SecureStore.getItemAsync(STORE_KEY);
+  // Some MIUI devices hang on KeyStore — bail after 3 s
+  return Promise.race([
+    SecureStore.getItemAsync(STORE_KEY),
+    new Promise<null>(resolve => setTimeout(() => resolve(null), 3000)),
+  ]);
 }
 
 export async function isActivated(): Promise<boolean> {

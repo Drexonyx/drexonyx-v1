@@ -1,32 +1,34 @@
-import { Redirect } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useEffect } from 'react';
+import { ActivityIndicator, Text, View } from 'react-native';
 import { isActivated } from '../src/services/license';
 
 export default function Index() {
-  const [ready, setReady] = useState(false);
-  const [activated, setActivated] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
+    // Timeout fallback: if SecureStore hangs on MIUI, default to activate screen after 5s
+    const fallback = setTimeout(() => {
+      router.replace('/activate');
+    }, 5000);
+
     isActivated()
       .then(result => {
-        setActivated(result);
-        setReady(true);
+        clearTimeout(fallback);
+        router.replace(result ? '/(tabs)/map' : '/activate');
       })
       .catch(() => {
-        // crypto error or SecureStore error — default to not activated
-        setActivated(false);
-        setReady(true);
+        clearTimeout(fallback);
+        router.replace('/activate');
       });
+
+    return () => clearTimeout(fallback);
   }, []);
 
-  if (!ready) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0a0a0c' }}>
-        <ActivityIndicator color="#C8980A" size="large" />
-      </View>
-    );
-  }
-
-  return <Redirect href={activated ? '/(tabs)/map' : '/activate'} />;
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0a0a0c' }}>
+      <ActivityIndicator color="#C8980A" size="large" />
+      <Text style={{ color: '#606070', marginTop: 16, fontSize: 13 }}>Fleet Tracker</Text>
+    </View>
+  );
 }
