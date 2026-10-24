@@ -43,17 +43,6 @@ export default {
     plugins: [
       'expo-router',
       'expo-secure-store',
-      [
-        'expo-notifications',
-        { icon: './assets/notification-icon.png', color: '#C8980A' },
-      ],
-      [
-        'expo-location',
-        {
-          locationAlwaysAndWhenInUsePermission:
-            'Fleet Tracker needs location access to show nearby vehicles.',
-        },
-      ],
     ],
     scheme: 'fleet-tracker',
     extra: {
