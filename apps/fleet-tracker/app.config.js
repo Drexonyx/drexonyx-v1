@@ -25,9 +25,9 @@ export default {
     ios: {
       supportsTablet: false,
       bundleIdentifier: 'com.drexonyx.fleettracker',
-      config: {
-        googleMapsApiKey: process.env.GOOGLE_MAPS_IOS_KEY ?? '',
-      },
+      ...(process.env.GOOGLE_MAPS_IOS_KEY ? {
+        config: { googleMapsApiKey: process.env.GOOGLE_MAPS_IOS_KEY },
+      } : {}),
     },
     android: {
       adaptiveIcon: {
@@ -35,11 +35,9 @@ export default {
         backgroundColor: '#0a0a0c',
       },
       package: 'com.drexonyx.fleettracker',
-      config: {
-        googleMaps: {
-          apiKey: process.env.GOOGLE_MAPS_ANDROID_KEY ?? '',
-        },
-      },
+      ...(process.env.GOOGLE_MAPS_ANDROID_KEY ? {
+        config: { googleMaps: { apiKey: process.env.GOOGLE_MAPS_ANDROID_KEY } },
+      } : {}),
     },
     web: { bundler: 'metro', favicon: './assets/favicon.png' },
     plugins: [
