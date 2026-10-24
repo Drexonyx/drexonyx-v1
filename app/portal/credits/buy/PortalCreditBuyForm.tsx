@@ -38,13 +38,7 @@ export default function PortalCreditBuyForm({ packages, defaultPkgId }: Props) {
 
     startTransition(async () => {
       const result = await actionPortalBuyCredits(selectedId);
-      if (!result.ok) {
-        setErrorMsg(result.reason);
-        return;
-      }
-      // Open in new tab to bypass Android App Links intercepting the Ziina URL
-      const w = window.open(result.url, '_blank', 'noopener,noreferrer');
-      if (!w) window.location.href = result.url;
+      if (result && !result.ok) setErrorMsg(result.reason);
     });
   }
 

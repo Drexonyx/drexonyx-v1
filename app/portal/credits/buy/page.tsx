@@ -8,7 +8,6 @@ import { getActiveCreditPackages } from '@/lib/credits/packages';
 import { getCreditBalance } from '@/lib/credits/balance';
 import { createCreditPurchaseCheckout } from '@/lib/credits/create-credit-purchase';
 import PortalCreditBuyForm from './PortalCreditBuyForm';
-import PayRedirectClient from './PayRedirectClient';
 import s from '../../portal.module.css';
 
 export const metadata = { title: 'Buy Credits — Client Portal' };
@@ -48,27 +47,7 @@ export default async function PortalBuyCreditsPage({
       });
 
       if (result.ok) {
-        const priceFormatted =
-          'AED ' +
-          parseFloat(pkg.price_aed).toLocaleString('en-US', {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-          });
-        return (
-          <>
-            <div className={s.pageHeader}>
-              <h1 className={s.pageTitle}>Complete Payment</h1>
-              <p className={s.pageSubtitle}>
-                Current balance: <strong>{balance.toLocaleString('en-US')} credits</strong>
-              </p>
-            </div>
-            <PayRedirectClient
-              url={result.redirectUrl}
-              packageName={pkg.name}
-              priceAed={priceFormatted}
-            />
-          </>
-        );
+        redirect(result.redirectUrl);
       }
     }
   }

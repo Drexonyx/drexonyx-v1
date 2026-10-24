@@ -5,13 +5,14 @@
 // Amount is from financial.credit_packages (DB) — never from client request.
 // DR 0120.
 
+import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { auth } from '@/auth';
 import { createCreditPurchaseCheckout } from '@/lib/credits/create-credit-purchase';
 
 export async function actionPortalBuyCredits(
   creditPackageId: string,
-): Promise<{ ok: true; url: string } | { ok: false; reason: string }> {
+): Promise<{ ok: false; reason: string } | never> {
   const session = await auth();
   if (!session) return { ok: false, reason: 'Not authenticated' };
   if (session.user.role !== 'CLIENT') return { ok: false, reason: 'Unauthorized' };
@@ -34,5 +35,5 @@ export async function actionPortalBuyCredits(
 
   if (!result.ok) return { ok: false, reason: result.reason };
 
-  return { ok: true, url: result.redirectUrl };
+  redirect(result.redirectUrl);
 }
