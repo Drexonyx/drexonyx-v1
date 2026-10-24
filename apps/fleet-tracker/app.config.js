@@ -11,7 +11,8 @@
 export default {
   expo: {
     name: 'Fleet Tracker',
-    slug: 'fleet-tracker',
+    slug: 'fleet-tracker-',
+    owner: 'drexonyx.studio',
     version: '1.0.0',
     orientation: 'portrait',
     icon: './assets/icon.png',
