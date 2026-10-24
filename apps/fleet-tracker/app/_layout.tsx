@@ -29,8 +29,9 @@ export default function RootLayout() {
             contentStyle: { backgroundColor: '#0a0a0c' },
           }}
         >
+          <Stack.Screen name="login"    options={{ headerShown: false }} />
           <Stack.Screen name="activate" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)"  options={{ headerShown: false }} />
           <Stack.Screen
             name="vehicle/[id]"
             options={{ title: 'Vehicle Details', presentation: 'card' }}
