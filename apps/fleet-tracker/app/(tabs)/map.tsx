@@ -1,44 +1,44 @@
-import React, { useState, useRef } from 'react';
-import {
-  View, Text, StyleSheet, Pressable, ActivityIndicator, ScrollView,
-} from 'react-native';
-import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
+import React from 'react';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useVehicles } from '../../src/hooks/useFleet';
-import VehicleMarker from '../../src/components/VehicleMarker';
 import StatusBadge from '../../src/components/StatusBadge';
+import MapboxMap from '../../src/components/MapboxMap';
 import { Vehicle } from '../../src/types';
-
-const DUBAI_REGION = {
-  latitude: 25.2048,
-  longitude: 55.2708,
-  latitudeDelta: 0.12,
-  longitudeDelta: 0.12,
-};
 
 export default function MapScreen() {
   const router = useRouter();
-  const { data: vehicles, isLoading, error } = useVehicles();
-  const [selected, setSelected] = useState<Vehicle | null>(null);
-  const mapRef = useRef<MapView>(null);
-
-  function focusVehicle(v: Vehicle) {
-    setSelected(v);
-    mapRef.current?.animateToRegion({
-      latitude: v.lat,
-      longitude: v.lng,
-      latitudeDelta: 0.02,
-      longitudeDelta: 0.02,
-    }, 600);
-  }
+  const { data: vehicles, isLoading } = useVehicles();
+  const [selected, setSelected] = React.useState<Vehicle | null>(null);
 
   const moving = vehicles?.filter(v => v.status === 'moving').length ?? 0;
   const parked = vehicles?.filter(v => v.status === 'parked').length ?? 0;
   const offline = vehicles?.filter(v => v.status === 'offline').length ?? 0;
 
+  const handleVehicleSelect = (id: string | null) => {
+    if (!id) { setSelected(null); return; }
+    const v = vehicles?.find(v => v.id === id);
+    setSelected(v ?? null);
+  };
+
   return (
     <View style={styles.container}>
-      {/* Status bar */}
+      {/* Mapbox map fills entire screen */}
+      {vehicles && vehicles.length > 0 && (
+        <MapboxMap
+          vehicles={vehicles}
+          selectedId={selected?.id ?? null}
+          onVehicleSelect={handleVehicleSelect}
+        />
+      )}
+
+      {isLoading && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator color="#C8980A" size="large" />
+        </View>
+      )}
+
+      {/* Status bar — floats above map */}
       <View style={styles.statusBar}>
         <View style={styles.statusGroup}>
           <StatChip color="#10b981" count={moving} label="Moving" />
@@ -50,38 +50,23 @@ export default function MapScreen() {
         </Pressable>
       </View>
 
-      {/* Map */}
-      <MapView
-        ref={mapRef}
-        style={StyleSheet.absoluteFill}
-        provider={PROVIDER_GOOGLE}
-        initialRegion={DUBAI_REGION}
-        customMapStyle={darkMapStyle}
-        showsUserLocation={false}
-        showsCompass={false}
-        showsTraffic={false}
-        toolbarEnabled={false}
-      >
-        {vehicles?.map(v => (
-          <VehicleMarker
-            key={v.id}
-            vehicle={v}
-            selected={selected?.id === v.id}
-            onPress={() => focusVehicle(v)}
-          />
-        ))}
-      </MapView>
-
-      {isLoading && (
-        <View style={styles.loader}>
-          <ActivityIndicator color="#C8980A" size="small" />
-        </View>
-      )}
-
-      {error && (
-        <View style={styles.errorBanner}>
-          <Text style={styles.errorText}>⚠️ Could not load fleet data</Text>
-        </View>
+      {/* Vehicle chips — float at bottom when nothing is selected */}
+      {!selected && vehicles && vehicles.length > 0 && (
+        <ScrollView
+          horizontal
+          style={styles.quickList}
+          contentContainerStyle={styles.quickListContent}
+          showsHorizontalScrollIndicator={false}
+        >
+          {vehicles.map(v => (
+            <Pressable key={v.id} style={styles.quickChip} onPress={() => handleVehicleSelect(v.id)}>
+              <View style={[styles.quickDot, {
+                backgroundColor: v.status === 'moving' ? '#10b981' : v.status === 'parked' ? '#f59e0b' : '#6b7280',
+              }]} />
+              <Text style={styles.quickName} numberOfLines={1}>{v.name.split(' #')[0]}</Text>
+            </Pressable>
+          ))}
+        </ScrollView>
       )}
 
       {/* Selected vehicle panel */}
@@ -97,6 +82,7 @@ export default function MapScreen() {
           <View style={styles.panelStats}>
             <PanelStat label="Speed" value={selected.status === 'moving' ? `${selected.speed} km/h` : '—'} />
             <PanelStat label="Odometer" value={`${Math.round(selected.odometer).toLocaleString()} km`} />
+            {selected.driver && <PanelStat label="Driver" value={selected.driver} />}
           </View>
           <View style={styles.panelActions}>
             <Pressable
@@ -112,29 +98,10 @@ export default function MapScreen() {
               <Text style={styles.panelBtnText}>View Details</Text>
             </Pressable>
           </View>
-          <Pressable style={styles.panelClose} onPress={() => setSelected(null)}>
+          <Pressable style={styles.panelClose} onPress={() => handleVehicleSelect(null)}>
             <Text style={styles.panelCloseText}>✕</Text>
           </Pressable>
         </View>
-      )}
-
-      {/* Bottom quick list */}
-      {!selected && vehicles && vehicles.length > 0 && (
-        <ScrollView
-          horizontal
-          style={styles.quickList}
-          contentContainerStyle={styles.quickListContent}
-          showsHorizontalScrollIndicator={false}
-        >
-          {vehicles.map(v => (
-            <Pressable key={v.id} style={styles.quickChip} onPress={() => focusVehicle(v)}>
-              <View style={[styles.quickDot, {
-                backgroundColor: v.status === 'moving' ? '#10b981' : v.status === 'parked' ? '#f59e0b' : '#6b7280'
-              }]} />
-              <Text style={styles.quickName} numberOfLines={1}>{v.name.split(' #')[0]}</Text>
-            </Pressable>
-          ))}
-        </ScrollView>
       )}
     </View>
   );
@@ -161,6 +128,12 @@ function PanelStat({ label, value }: { label: string; value: string }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0a0a0c' },
+  loadingOverlay: {
+    position: 'absolute', inset: 0,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(10,10,12,0.6)',
+    zIndex: 5,
+  },
   statusBar: {
     position: 'absolute',
     top: 0, left: 0, right: 0,
@@ -171,7 +144,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 8,
-    backgroundColor: 'rgba(10,10,12,0.9)',
+    backgroundColor: 'rgba(10,10,12,0.88)',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255,255,255,0.06)',
   },
@@ -182,29 +155,17 @@ const styles = StyleSheet.create({
   statLabel: { fontSize: 12, color: '#606070' },
   settingsBtn: { padding: 4 },
   settingsIcon: { fontSize: 18 },
-  loader: {
-    position: 'absolute',
-    top: 52, right: 16, zIndex: 5,
-    backgroundColor: 'rgba(10,10,12,0.8)',
-    borderRadius: 8, padding: 8,
-  },
-  errorBanner: {
-    position: 'absolute',
-    top: 52, left: 16, right: 16, zIndex: 5,
-    backgroundColor: 'rgba(239,68,68,0.15)',
-    borderRadius: 8, padding: 10, alignItems: 'center',
-  },
-  errorText: { color: '#ef4444', fontSize: 13 },
   panel: {
     position: 'absolute',
     bottom: 16, left: 16, right: 16,
+    zIndex: 10,
     backgroundColor: '#111116',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.1)',
     gap: 12,
-    shadowColor: '#000', shadowOpacity: 0.5, shadowRadius: 20, elevation: 10,
+    shadowColor: '#000', shadowOpacity: 0.6, shadowRadius: 20, elevation: 12,
   },
   panelTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   panelName: { fontSize: 15, fontWeight: '700', color: '#f0f0f4' },
@@ -212,7 +173,7 @@ const styles = StyleSheet.create({
   panelStats: { flexDirection: 'row', gap: 16 },
   panelStat: { gap: 2 },
   panelStatLabel: { fontSize: 10, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase', color: '#505060' },
-  panelStatValue: { fontSize: 14, fontWeight: '600', color: '#a0a0b0' },
+  panelStatValue: { fontSize: 13, fontWeight: '600', color: '#a0a0b0' },
   panelActions: { flexDirection: 'row', gap: 10 },
   panelBtn: { flex: 1, paddingVertical: 10, borderRadius: 8, alignItems: 'center' },
   panelBtnPrimary: { backgroundColor: '#C8980A' },
@@ -221,9 +182,7 @@ const styles = StyleSheet.create({
   panelBtnTextSecondary: { fontSize: 13, fontWeight: '700', color: '#a0a0b0' },
   panelClose: { position: 'absolute', top: 12, right: 12, padding: 4 },
   panelCloseText: { fontSize: 14, color: '#505060' },
-  quickList: {
-    position: 'absolute', bottom: 16, left: 0, right: 0,
-  },
+  quickList: { position: 'absolute', bottom: 16, left: 0, right: 0, zIndex: 10 },
   quickListContent: { paddingHorizontal: 16, gap: 8 },
   quickChip: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
@@ -234,20 +193,3 @@ const styles = StyleSheet.create({
   quickDot: { width: 7, height: 7, borderRadius: 3.5 },
   quickName: { fontSize: 12, fontWeight: '600', color: '#a0a0b0', maxWidth: 90 },
 });
-
-const darkMapStyle = [
-  { elementType: 'geometry', stylers: [{ color: '#1a1a2e' }] },
-  { elementType: 'labels.text.stroke', stylers: [{ color: '#1a1a2e' }] },
-  { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] },
-  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#2d2d3d' }] },
-  { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#212121' }] },
-  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#3d3d55' }] },
-  { featureType: 'road.highway', elementType: 'labels.text.fill', stylers: [{ color: '#f3d19c' }] },
-  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#0a1628' }] },
-  { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#515c6d' }] },
-  { featureType: 'poi', stylers: [{ visibility: 'off' }] },
-  { featureType: 'transit', stylers: [{ visibility: 'off' }] },
-  { featureType: 'administrative', elementType: 'geometry', stylers: [{ color: '#757575' }] },
-  { featureType: 'administrative.country', elementType: 'labels.text.fill', stylers: [{ color: '#9e9e9e' }] },
-  { featureType: 'administrative.locality', elementType: 'labels.text.fill', stylers: [{ color: '#bdbdbd' }] },
-];

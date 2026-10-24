@@ -1,32 +1,25 @@
 import { Redirect } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
-import { isActivated } from '../src/services/license';
+import { View, ActivityIndicator } from 'react-native';
+import { getSession } from '../src/services/auth';
 
 export default function Index() {
-  const [ready, setReady] = useState(false);
-  const [activated, setActivated] = useState(false);
+  const [checking, setChecking] = useState(true);
+  const [authed, setAuthed]     = useState(false);
 
   useEffect(() => {
-    isActivated()
-      .then(result => {
-        setActivated(result);
-        setReady(true);
-      })
-      .catch(() => {
-        // crypto error or SecureStore error — default to not activated
-        setActivated(false);
-        setReady(true);
-      });
+    getSession()
+      .then(s => setAuthed(!!s))
+      .finally(() => setChecking(false));
   }, []);
 
-  if (!ready) {
+  if (checking) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0a0a0c' }}>
+      <View style={{ flex: 1, backgroundColor: '#05050a', alignItems: 'center', justifyContent: 'center' }}>
         <ActivityIndicator color="#C8980A" size="large" />
       </View>
     );
   }
 
-  return <Redirect href={activated ? '/(tabs)/map' : '/activate'} />;
+  return <Redirect href={authed ? '/(tabs)/map' : '/login'} />;
 }

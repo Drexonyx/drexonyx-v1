@@ -10,9 +10,16 @@ import s from '../../portal.module.css';
 
 export const metadata = { title: 'Buy Credits — Client Portal' };
 
-export default async function PortalBuyCreditsPage() {
+export default async function PortalBuyCreditsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ pkg?: string }>;
+}) {
   const session = await auth();
   if (!session) redirect('/portal/login');
+
+  const params = await searchParams;
+  const defaultPkgId = params.pkg;
 
   const [packages, balance] = await Promise.all([
     getActiveCreditPackages(),
@@ -33,7 +40,7 @@ export default async function PortalBuyCreditsPage() {
           <p>No credit packages are currently available. Please contact us.</p>
         </div>
       ) : (
-        <PortalCreditBuyForm packages={packages} organizationId={session.user.organizationId} />
+        <PortalCreditBuyForm packages={packages} organizationId={session.user.organizationId} defaultPkgId={defaultPkgId} />
       )}
     </>
   );

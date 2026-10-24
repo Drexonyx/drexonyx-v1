@@ -4,13 +4,19 @@ import {
   ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { validateKey, saveKey } from '../src/services/license';
+import { isActivated, validateKey, saveKey } from '../src/services/license';
 
 export default function ActivateScreen() {
   const router = useRouter();
   const [key, setKey] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  React.useEffect(() => {
+    isActivated()
+      .then(ok => { if (ok) router.replace('/(tabs)/map'); })
+      .catch(() => {});
+  }, []);
 
   async function handleActivate() {
     const normalized = key.trim().toUpperCase();
@@ -99,7 +105,7 @@ export default function ActivateScreen() {
         {/* Footer */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            Don't have a key?{' '}
+            {"Don't have a key?"}{' '}
           </Text>
           <Text style={styles.footerContact}>Contact info@drexonyx.com</Text>
         </View>

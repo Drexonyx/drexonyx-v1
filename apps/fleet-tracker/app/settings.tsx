@@ -7,12 +7,19 @@ import { useQueryClient } from '@tanstack/react-query';
 import Constants from 'expo-constants';
 import { isDevMode } from '../src/services/license';
 import { revoke } from '../src/services/license';
+import { signOut, getSession } from '../src/services/auth';
+import type { AuthSession } from '../src/services/auth';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const qc = useQueryClient();
   const [devMode] = useState(() => isDevMode());
   const hasBakedToken = !!(Constants.expoConfig?.extra?.wialonToken as string);
+  const [session, setSession] = useState<AuthSession | null>(null);
+
+  useEffect(() => {
+    getSession().then(setSession).catch(() => {});
+  }, []);
 
   async function handleRevokeLicense() {
     Alert.alert(
@@ -64,6 +71,36 @@ export default function SettingsScreen() {
           <InfoRow label="Support" value="info@drexonyx.com" />
         </View>
       </View>
+
+      {/* Account */}
+      {session && (
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>Account</Text>
+          <View style={styles.aboutCard}>
+            <InfoRow label="Name"    value={session.name} />
+            <InfoRow label="Email"   value={session.email} />
+            <InfoRow label="Company" value={session.company} />
+          </View>
+          <Pressable
+            style={styles.btnSignOut}
+            onPress={() =>
+              Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                  text: 'Sign Out', style: 'destructive',
+                  onPress: async () => {
+                    await signOut();
+                    qc.clear();
+                    router.replace('/login');
+                  },
+                },
+              ])
+            }
+          >
+            <Text style={styles.btnSignOutText}>Sign Out</Text>
+          </Pressable>
+        </View>
+      )}
 
       {/* License */}
       <View style={styles.section}>
@@ -128,4 +165,11 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: 'rgba(239,68,68,0.2)',
   },
   btnDangerText: { fontSize: 14, fontWeight: '700', color: '#ef4444' },
+  btnSignOut: {
+    backgroundColor: 'rgba(200,152,10,0.08)',
+    borderRadius: 10, paddingVertical: 13,
+    alignItems: 'center',
+    borderWidth: 1, borderColor: 'rgba(200,152,10,0.2)',
+  },
+  btnSignOutText: { fontSize: 14, fontWeight: '700', color: '#C8980A' },
 });

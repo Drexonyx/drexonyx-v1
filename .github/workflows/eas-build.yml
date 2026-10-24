@@ -57,6 +57,7 @@ jobs:
         run: |
           eas secret:create --scope project --name WIALON_TOKEN --value "${{ secrets.WIALON_TOKEN }}" --force || true
           eas secret:create --scope project --name LICENSE_SECRET --value "${{ secrets.LICENSE_SECRET }}" --force || true
+          eas secret:create --scope project --name MAPBOX_TOKEN --value "${{ secrets.MAPBOX_TOKEN }}" --force || true
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 

@@ -3,7 +3,10 @@ import { StatusBar } from 'expo-status-bar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useEffect } from 'react';
+import * as SplashScreen from 'expo-splash-screen';
 import { initService } from '../src/services/wialon';
+
+SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -15,6 +18,8 @@ export default function RootLayout() {
 
   useEffect(() => {
     initService();
+    const timer = setTimeout(() => SplashScreen.hideAsync(), 2500);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -29,11 +34,20 @@ export default function RootLayout() {
             contentStyle: { backgroundColor: '#0a0a0c' },
           }}
         >
+          <Stack.Screen name="login"    options={{ headerShown: false }} />
           <Stack.Screen name="activate" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)"  options={{ headerShown: false }} />
           <Stack.Screen
             name="vehicle/[id]"
             options={{ title: 'Vehicle Details', presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="vehicle/add"
+            options={{ title: 'Add Vehicle', presentation: 'modal' }}
+          />
+          <Stack.Screen
+            name="vehicle/edit/[id]"
+            options={{ title: 'Edit Vehicle', presentation: 'modal' }}
           />
           <Stack.Screen
             name="history/[id]"

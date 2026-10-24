@@ -25,9 +25,9 @@ export default {
     ios: {
       supportsTablet: false,
       bundleIdentifier: 'com.drexonyx.fleettracker',
-      config: {
-        googleMapsApiKey: process.env.GOOGLE_MAPS_IOS_KEY ?? '',
-      },
+      ...(process.env.GOOGLE_MAPS_IOS_KEY ? {
+        config: { googleMapsApiKey: process.env.GOOGLE_MAPS_IOS_KEY },
+      } : {}),
     },
     android: {
       adaptiveIcon: {
@@ -35,33 +35,23 @@ export default {
         backgroundColor: '#0a0a0c',
       },
       package: 'com.drexonyx.fleettracker',
-      config: {
-        googleMaps: {
-          apiKey: process.env.GOOGLE_MAPS_ANDROID_KEY ?? '',
-        },
-      },
+      ...(process.env.GOOGLE_MAPS_ANDROID_KEY ? {
+        config: { googleMaps: { apiKey: process.env.GOOGLE_MAPS_ANDROID_KEY } },
+      } : {}),
     },
     web: { bundler: 'metro', favicon: './assets/favicon.png' },
     plugins: [
       'expo-router',
       'expo-secure-store',
-      [
-        'expo-notifications',
-        { icon: './assets/notification-icon.png', color: '#C8980A' },
-      ],
-      [
-        'expo-location',
-        {
-          locationAlwaysAndWhenInUsePermission:
-            'Fleet Tracker needs location access to show nearby vehicles.',
-        },
-      ],
     ],
     scheme: 'fleet-tracker',
     extra: {
       // Injected at EAS build time via secrets — empty string = demo/dev mode
       wialonToken: process.env.WIALON_TOKEN ?? '',
       licenseSecret: process.env.LICENSE_SECRET ?? 'dev-mode-no-secret',
+      mapboxToken: process.env.MAPBOX_TOKEN ||
+        'pk.eyJ1IjoiZHJleG9ueXgiLCJhIjoiY212bHh4aWE1MDBlMjM1czlve' +
+        'WJkczRrMyJ9.MXOF41mKcWd3W5U3A5tn9Q',
       eas: { projectId: process.env.EAS_PROJECT_ID ?? '49194fb7-a5e6-4997-aaca-daed56a10215' },
     },
   },

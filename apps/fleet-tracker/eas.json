@@ -7,6 +7,9 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "cache": {
+        "key": "v3-no-maps"
       }
     },
     "production": {

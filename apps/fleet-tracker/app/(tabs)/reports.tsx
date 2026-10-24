@@ -7,20 +7,28 @@ import { MileageReport } from '../../src/types';
 
 type Period = 'today' | 'week' | 'month';
 
+const PERIOD_FIELD: Record<Period, 'today' | 'thisWeek' | 'thisMonth'> = {
+  today: 'today',
+  week: 'thisWeek',
+  month: 'thisMonth',
+};
+
 export default function ReportsScreen() {
   const { data: reports, isLoading, error, refetch } = useMileageReports();
   const [period, setPeriod] = useState<Period>('today');
   const [sortAsc, setSortAsc] = useState(false);
 
+  const field = PERIOD_FIELD[period];
+
   const sorted = reports
     ? [...reports].sort((a, b) => {
-        const va = a[period];
-        const vb = b[period];
+        const va = a[field];
+        const vb = b[field];
         return sortAsc ? va - vb : vb - va;
       })
     : [];
 
-  const total = sorted.reduce((sum, r) => sum + r[period], 0);
+  const total = sorted.reduce((sum, r) => sum + r[field], 0);
 
   return (
     <View style={styles.container}>
@@ -94,7 +102,7 @@ function MileageRow({
   period: Period;
   rank: number;
 }) {
-  const value = report[period];
+  const value = report[PERIOD_FIELD[period]];
   const max = 300;
   const pct = Math.min(1, value / max);
 
@@ -110,7 +118,7 @@ function MileageRow({
       <View style={styles.rowRight}>
         <Text style={styles.rowValue}>{value.toFixed(1)} km</Text>
         <View style={styles.bar}>
-          <View style={[styles.barFill, { width: `${pct * 100}%` as any }]} />
+          <View style={[styles.barFill, { width: `${pct * 100}%` as unknown as number }]} />
         </View>
       </View>
     </View>

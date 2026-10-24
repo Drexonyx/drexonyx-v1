@@ -132,6 +132,57 @@ export function getMockVehicle(id: string): Vehicle | undefined {
   return _vehicles.find(v => v.id === id);
 }
 
+export function addMockVehicle(data: {
+  name: string;
+  plateNumber: string;
+  model?: string;
+  driver?: string;
+  status: Vehicle['status'];
+}): Vehicle {
+  const newVehicle: Vehicle = {
+    id: `v${Date.now()}`,
+    name: data.name.trim(),
+    plateNumber: data.plateNumber.trim(),
+    model: data.model?.trim() || undefined,
+    driver: data.driver?.trim() || undefined,
+    status: data.status,
+    speed: 0,
+    odometer: 0,
+    lat: 25.2048 + (Math.random() - 0.5) * 0.06,
+    lng: 55.2708 + (Math.random() - 0.5) * 0.06,
+    heading: Math.floor(Math.random() * 360),
+    lastUpdate: new Date(),
+  };
+  _vehicles = [..._vehicles, newVehicle];
+  return newVehicle;
+}
+
+export function updateMockVehicle(id: string, data: {
+  name?: string;
+  plateNumber?: string;
+  model?: string;
+  driver?: string;
+  status?: Vehicle['status'];
+}): Vehicle | undefined {
+  _vehicles = _vehicles.map(v => {
+    if (v.id !== id) return v;
+    return {
+      ...v,
+      ...(data.name        !== undefined ? { name: data.name.trim() }               : {}),
+      ...(data.plateNumber !== undefined ? { plateNumber: data.plateNumber.trim() } : {}),
+      ...(data.model       !== undefined ? { model: data.model.trim() || undefined } : {}),
+      ...(data.driver      !== undefined ? { driver: data.driver.trim() || undefined } : {}),
+      ...(data.status      !== undefined ? { status: data.status }                  : {}),
+      lastUpdate: new Date(),
+    };
+  });
+  return _vehicles.find(v => v.id === id);
+}
+
+export function deleteMockVehicle(id: string): void {
+  _vehicles = _vehicles.filter(v => v.id !== id);
+}
+
 function generateTripPoints(startLat: number, startLng: number, count: number): {
   lat: number; lng: number; speed: number; timestamp: Date;
 }[] {

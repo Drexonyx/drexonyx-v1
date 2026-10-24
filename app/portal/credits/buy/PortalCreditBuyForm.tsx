@@ -8,6 +8,7 @@ import s from '../../portal.module.css';
 interface Props {
   packages: CreditPackageRow[];
   organizationId: string;
+  defaultPkgId?: string;
 }
 
 function formatCredits(n: number): string {
@@ -19,8 +20,12 @@ function formatAed(aed: string): string {
   return `AED ${n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 }
 
-export default function PortalCreditBuyForm({ packages }: Props) {
-  const [selectedId, setSelectedId] = useState<string>(packages[0]?.id ?? '');
+export default function PortalCreditBuyForm({ packages, defaultPkgId }: Props) {
+  const [selectedId, setSelectedId] = useState<string>(
+    defaultPkgId && packages.some((p) => p.id === defaultPkgId)
+      ? defaultPkgId
+      : (packages[0]?.id ?? ''),
+  );
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -33,7 +38,13 @@ export default function PortalCreditBuyForm({ packages }: Props) {
 
     startTransition(async () => {
       const result = await actionPortalBuyCredits(selectedId);
-      if (result && !result.ok) setErrorMsg(result.reason);
+      if (!result.ok) {
+        setErrorMsg(result.reason);
+        return;
+      }
+      // Open in new tab to bypass Android App Links intercepting the Ziina URL
+      const w = window.open(result.url, '_blank', 'noopener,noreferrer');
+      if (!w) window.location.href = result.url;
     });
   }
 
