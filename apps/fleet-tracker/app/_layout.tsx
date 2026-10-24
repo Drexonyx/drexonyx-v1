@@ -3,7 +3,10 @@ import { StatusBar } from 'expo-status-bar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useEffect } from 'react';
+import * as SplashScreen from 'expo-splash-screen';
 import { initService } from '../src/services/wialon';
+
+SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -15,6 +18,8 @@ export default function RootLayout() {
 
   useEffect(() => {
     initService();
+    const timer = setTimeout(() => SplashScreen.hideAsync(), 2500);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
