@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, FlatList, Pressable, ActivityIndicator,
 } from 'react-native';
-import MapView, { PROVIDER_GOOGLE, Polyline, Marker } from 'react-native-maps';
 import { useLocalSearchParams } from 'expo-router';
 import { useTrips } from '../../src/hooks/useFleet';
 import { Trip } from '../../src/types';
@@ -45,39 +44,15 @@ export default function HistoryScreen() {
       {/* Map for selected trip */}
       {selectedTrip && selectedTrip.points.length > 1 && (
         <View style={styles.mapContainer}>
-          <MapView
-            style={StyleSheet.absoluteFill}
-            provider={PROVIDER_GOOGLE}
-            customMapStyle={darkMap}
-            initialRegion={{
-              latitude: selectedTrip.points[0].lat,
-              longitude: selectedTrip.points[0].lng,
-              latitudeDelta: 0.04,
-              longitudeDelta: 0.04,
-            }}
-            scrollEnabled={false}
-          >
-            <Polyline
-              coordinates={selectedTrip.points.map(p => ({ latitude: p.lat, longitude: p.lng }))}
-              strokeColor="#C8980A"
-              strokeWidth={3}
-            />
-            <Marker
-              coordinate={{ latitude: selectedTrip.points[0].lat, longitude: selectedTrip.points[0].lng }}
-              pinColor="green"
-              title="Start"
-            />
-            <Marker
-              coordinate={{
-                latitude: selectedTrip.points[selectedTrip.points.length - 1].lat,
-                longitude: selectedTrip.points[selectedTrip.points.length - 1].lng,
-              }}
-              pinColor="red"
-              title="End"
-            />
-          </MapView>
+          <View style={styles.mapPlaceholder}>
+            <Text style={styles.mapPlaceholderIcon}>🗺️</Text>
+            <Text style={styles.mapPlaceholderText}>
+              {selectedTrip.points.length} route points
+            </Text>
+            <Text style={styles.mapPlaceholderSub}>Google Maps API key required to show route</Text>
+          </View>
           <Pressable style={styles.mapCloseBtn} onPress={() => setSelectedTrip(null)}>
-            <Text style={styles.mapCloseText}>✕ Close map</Text>
+            <Text style={styles.mapCloseText}>✕ Close</Text>
           </Pressable>
         </View>
       )}
@@ -190,6 +165,13 @@ const styles = StyleSheet.create({
   dayDate: { fontSize: 11, color: '#404050', marginTop: 1 },
   dayDateActive: { color: '#a07808' },
   mapContainer: { height: 220, position: 'relative' },
+  mapPlaceholder: {
+    flex: 1, alignItems: 'center', justifyContent: 'center', gap: 4,
+    backgroundColor: '#0d0d14',
+  },
+  mapPlaceholderIcon: { fontSize: 32 },
+  mapPlaceholderText: { fontSize: 13, fontWeight: '700', color: '#f0f0f4' },
+  mapPlaceholderSub: { fontSize: 11, color: '#505060', textAlign: 'center', paddingHorizontal: 20 },
   mapCloseBtn: {
     position: 'absolute', top: 10, right: 10,
     backgroundColor: 'rgba(10,10,12,0.85)',
@@ -227,11 +209,3 @@ const styles = StyleSheet.create({
   tripChevron: { fontSize: 11, color: '#505060' },
 });
 
-const darkMap = [
-  { elementType: 'geometry', stylers: [{ color: '#1a1a2e' }] },
-  { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] },
-  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#2d2d3d' }] },
-  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#3d3d55' }] },
-  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#0a1628' }] },
-  { featureType: 'poi', stylers: [{ visibility: 'off' }] },
-];
