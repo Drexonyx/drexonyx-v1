@@ -3,11 +3,10 @@
 
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
-import { headers } from 'next/headers';
 import { getActiveCreditPackages } from '@/lib/credits/packages';
 import { getCreditBalance } from '@/lib/credits/balance';
-import { createCreditPurchaseCheckout } from '@/lib/credits/create-credit-purchase';
 import PortalCreditBuyForm from './PortalCreditBuyForm';
+import PayConfirmForm from './PayConfirmForm';
 import s from '../../portal.module.css';
 
 export const metadata = { title: 'Buy Credits — Client Portal' };
@@ -28,27 +27,23 @@ export default async function PortalBuyCreditsPage({
     getCreditBalance(session.user.organizationId),
   ]);
 
-  // Direct checkout — skip the package list when coming from pricing
+  // Show confirmation card when coming from pricing — checkout created on button click
   if (pkgId) {
     const pkg = packages.find((p) => p.id === pkgId);
     if (pkg) {
-      const headersList = await headers();
-      const host = headersList.get('host') ?? 'localhost:3000';
-      const proto = headersList.get('x-forwarded-proto') ?? 'http';
-      const baseUrl = `${proto}://${host}`;
-
-      const result = await createCreditPurchaseCheckout({
-        creditPackageId: pkgId,
-        organizationId: session.user.organizationId,
-        actorId: session.user.id ?? null,
-        baseUrl,
-        successPath: '/portal/credits/buy/success',
-        cancelPath: '/portal/credits/buy',
-      });
-
-      if (result.ok) {
-        redirect(result.redirectUrl);
-      }
+      return (
+        <>
+          <div className={s.pageHeader}>
+            <h1 className={s.pageTitle}>Complete Payment</h1>
+            <p className={s.pageSubtitle}>
+              Current balance: <strong>{balance.toLocaleString('en-US')} credits</strong>
+            </p>
+          </div>
+          <div className={s.payRedirectWrap}>
+            <PayConfirmForm pkg={pkg} />
+          </div>
+        </>
+      );
     }
   }
 
