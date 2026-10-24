@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Pressable, ActivityIndicator, ScrollView } from
 import { useRouter } from 'expo-router';
 import { useVehicles } from '../../src/hooks/useFleet';
 import StatusBadge from '../../src/components/StatusBadge';
+import MapboxMap from '../../src/components/MapboxMap';
 import { Vehicle } from '../../src/types';
 
 export default function MapScreen() {
@@ -14,9 +15,30 @@ export default function MapScreen() {
   const parked = vehicles?.filter(v => v.status === 'parked').length ?? 0;
   const offline = vehicles?.filter(v => v.status === 'offline').length ?? 0;
 
+  const handleVehicleSelect = (id: string | null) => {
+    if (!id) { setSelected(null); return; }
+    const v = vehicles?.find(v => v.id === id);
+    setSelected(v ?? null);
+  };
+
   return (
     <View style={styles.container}>
-      {/* Status bar */}
+      {/* Mapbox map fills entire screen */}
+      {vehicles && vehicles.length > 0 && (
+        <MapboxMap
+          vehicles={vehicles}
+          selectedId={selected?.id ?? null}
+          onVehicleSelect={handleVehicleSelect}
+        />
+      )}
+
+      {isLoading && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator color="#C8980A" size="large" />
+        </View>
+      )}
+
+      {/* Status bar — floats above map */}
       <View style={styles.statusBar}>
         <View style={styles.statusGroup}>
           <StatChip color="#10b981" count={moving} label="Moving" />
@@ -28,17 +50,7 @@ export default function MapScreen() {
         </Pressable>
       </View>
 
-      {/* Map placeholder */}
-      <View style={styles.mapPlaceholder}>
-        <Text style={styles.mapIcon}>🗺️</Text>
-        <Text style={styles.mapTitle}>Live Map</Text>
-        <Text style={styles.mapSub}>Google Maps API key required</Text>
-        {isLoading && (
-          <ActivityIndicator color="#C8980A" size="small" style={{ marginTop: 12 }} />
-        )}
-      </View>
-
-      {/* Vehicle list */}
+      {/* Vehicle chips — float at bottom when nothing is selected */}
       {!selected && vehicles && vehicles.length > 0 && (
         <ScrollView
           horizontal
@@ -47,9 +59,9 @@ export default function MapScreen() {
           showsHorizontalScrollIndicator={false}
         >
           {vehicles.map(v => (
-            <Pressable key={v.id} style={styles.quickChip} onPress={() => setSelected(v)}>
+            <Pressable key={v.id} style={styles.quickChip} onPress={() => handleVehicleSelect(v.id)}>
               <View style={[styles.quickDot, {
-                backgroundColor: v.status === 'moving' ? '#10b981' : v.status === 'parked' ? '#f59e0b' : '#6b7280'
+                backgroundColor: v.status === 'moving' ? '#10b981' : v.status === 'parked' ? '#f59e0b' : '#6b7280',
               }]} />
               <Text style={styles.quickName} numberOfLines={1}>{v.name.split(' #')[0]}</Text>
             </Pressable>
@@ -70,6 +82,7 @@ export default function MapScreen() {
           <View style={styles.panelStats}>
             <PanelStat label="Speed" value={selected.status === 'moving' ? `${selected.speed} km/h` : '—'} />
             <PanelStat label="Odometer" value={`${Math.round(selected.odometer).toLocaleString()} km`} />
+            {selected.driver && <PanelStat label="Driver" value={selected.driver} />}
           </View>
           <View style={styles.panelActions}>
             <Pressable
@@ -85,7 +98,7 @@ export default function MapScreen() {
               <Text style={styles.panelBtnText}>View Details</Text>
             </Pressable>
           </View>
-          <Pressable style={styles.panelClose} onPress={() => setSelected(null)}>
+          <Pressable style={styles.panelClose} onPress={() => handleVehicleSelect(null)}>
             <Text style={styles.panelCloseText}>✕</Text>
           </Pressable>
         </View>
@@ -115,6 +128,12 @@ function PanelStat({ label, value }: { label: string; value: string }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0a0a0c' },
+  loadingOverlay: {
+    position: 'absolute', inset: 0,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(10,10,12,0.6)',
+    zIndex: 5,
+  },
   statusBar: {
     position: 'absolute',
     top: 0, left: 0, right: 0,
@@ -125,7 +144,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 8,
-    backgroundColor: 'rgba(10,10,12,0.9)',
+    backgroundColor: 'rgba(10,10,12,0.88)',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255,255,255,0.06)',
   },
@@ -136,26 +155,17 @@ const styles = StyleSheet.create({
   statLabel: { fontSize: 12, color: '#606070' },
   settingsBtn: { padding: 4 },
   settingsIcon: { fontSize: 18 },
-  mapPlaceholder: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 44,
-    gap: 8,
-  },
-  mapIcon: { fontSize: 64 },
-  mapTitle: { fontSize: 20, fontWeight: '800', color: '#f0f0f4' },
-  mapSub: { fontSize: 13, color: '#505060' },
   panel: {
     position: 'absolute',
     bottom: 16, left: 16, right: 16,
+    zIndex: 10,
     backgroundColor: '#111116',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.1)',
     gap: 12,
-    shadowColor: '#000', shadowOpacity: 0.5, shadowRadius: 20, elevation: 10,
+    shadowColor: '#000', shadowOpacity: 0.6, shadowRadius: 20, elevation: 12,
   },
   panelTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   panelName: { fontSize: 15, fontWeight: '700', color: '#f0f0f4' },
@@ -163,7 +173,7 @@ const styles = StyleSheet.create({
   panelStats: { flexDirection: 'row', gap: 16 },
   panelStat: { gap: 2 },
   panelStatLabel: { fontSize: 10, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase', color: '#505060' },
-  panelStatValue: { fontSize: 14, fontWeight: '600', color: '#a0a0b0' },
+  panelStatValue: { fontSize: 13, fontWeight: '600', color: '#a0a0b0' },
   panelActions: { flexDirection: 'row', gap: 10 },
   panelBtn: { flex: 1, paddingVertical: 10, borderRadius: 8, alignItems: 'center' },
   panelBtnPrimary: { backgroundColor: '#C8980A' },
@@ -172,7 +182,7 @@ const styles = StyleSheet.create({
   panelBtnTextSecondary: { fontSize: 13, fontWeight: '700', color: '#a0a0b0' },
   panelClose: { position: 'absolute', top: 12, right: 12, padding: 4 },
   panelCloseText: { fontSize: 14, color: '#505060' },
-  quickList: { position: 'absolute', bottom: 16, left: 0, right: 0 },
+  quickList: { position: 'absolute', bottom: 16, left: 0, right: 0, zIndex: 10 },
   quickListContent: { paddingHorizontal: 16, gap: 8 },
   quickChip: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
