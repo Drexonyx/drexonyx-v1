@@ -1,8 +1,10 @@
-// DR 0120: Payment iframe intermediary — reads httpOnly cookie set by server action,
-// validates the URL is from Ziina, then serves an iframe page.
-// iframe embedding does NOT trigger Android App Links (only top-level navigations do),
-// so the Ziina web checkout renders inside the browser instead of opening the Ziina app.
-// JavaScript polls for same-origin navigation to detect success/cancel redirects.
+// DR 0120: Payment page intermediary — reads httpOnly cookie set by server action,
+// validates the URL is from Ziina, then serves either:
+//   (a) an iframe page — if Ziina allows framing (App Links not triggered by iframes)
+//   (b) a copy-link fallback — if Ziina blocks framing via X-Frame-Options
+//
+// Both paths keep the browser URL on drexonyx.com, so Android App Links
+// (which only intercept top-level navigations to pay.ziina.com) are bypassed.
 
 import { type NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
@@ -11,6 +13,23 @@ import { auth } from '@/auth';
 export const dynamic = 'force-dynamic';
 
 const ALLOWED_HOSTS = ['pay.ziina.com', 'pay-test.ziina.com'];
+
+async function ziinaPolicyAllowsIframe(url: string): Promise<boolean> {
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), 3000);
+  try {
+    const resp = await fetch(url, { method: 'HEAD', signal: controller.signal });
+    clearTimeout(t);
+    const xfo = (resp.headers.get('x-frame-options') ?? '').toUpperCase().trim();
+    const csp = resp.headers.get('content-security-policy') ?? '';
+    if (xfo === 'DENY' || xfo === 'SAMEORIGIN') return false;
+    if (/frame-ancestors\s+['"]?none['"]?/i.test(csp)) return false;
+    return true;
+  } catch {
+    clearTimeout(t);
+    return false;
+  }
+}
 
 export async function GET(request: NextRequest) {
   const origin = new URL(request.url).origin;
@@ -42,11 +61,26 @@ export async function GET(request: NextRequest) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 
-  // Escape for JS string literal (single-quoted)
+  // Escape for JS single-quoted string literal
   const jsUrl = payUrl.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
   const jsOrigin = origin.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 
-  const html = `<!DOCTYPE html>
+  const allowIframe = await ziinaPolicyAllowsIframe(payUrl);
+
+  const html = allowIframe
+    ? buildIframePage(safeUrl, jsUrl, jsOrigin)
+    : buildFallbackPage(safeUrl, jsUrl, origin);
+
+  return new NextResponse(html, {
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Cache-Control': 'no-store',
+    },
+  });
+}
+
+function buildIframePage(safeUrl: string, jsUrl: string, jsOrigin: string): string {
+  return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -63,93 +97,97 @@ export async function GET(request: NextRequest) {
     .spinner{width:32px;height:32px;border:3px solid #e5e5e5;border-top-color:#7c5cfc;
     border-radius:50%;animation:spin .7s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
-    #blocked{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;
-    justify-content:center;gap:16px;font-family:-apple-system,system-ui,sans-serif;
-    color:#ccc;background:#0a0a0a;text-align:center;padding:1.5rem}
-    #blocked.visible{display:flex}
-    #blocked p{font-size:15px;max-width:320px}
-    #blocked small{font-size:12px;color:#666;word-break:break-all;max-width:320px}
-    #copy-btn{background:#7c5cfc;color:#fff;border:none;padding:12px 24px;
-    border-radius:10px;font-size:15px;cursor:pointer;min-width:180px}
-    #back-btn{background:transparent;color:#888;border:1px solid #333;padding:10px 20px;
-    border-radius:10px;font-size:14px;cursor:pointer}
   </style>
 </head>
 <body>
   <div id="loading"><div class="spinner"></div><span>Loading payment…</span></div>
   <iframe id="pay-frame" src="${safeUrl}" allow="payment *" title="Secure Payment"></iframe>
-  <div id="blocked">
-    <p>The payment page could not be embedded.</p>
-    <p>Copy the link below and paste it in your browser address bar:</p>
-    <small id="url-text">${safeUrl}</small>
-    <button id="copy-btn" onclick="copyUrl()">Copy Payment Link</button>
-    <button id="back-btn" onclick="window.location.href='${origin}/portal/credits/buy'">← Go Back</button>
-  </div>
   <script>
     var frame = document.getElementById('pay-frame');
     var loading = document.getElementById('loading');
-    var blocked = document.getElementById('blocked');
     var base = '${jsOrigin}';
-    var frameLoaded = false;
-
     frame.addEventListener('load', function() {
-      frameLoaded = true;
       loading.classList.add('hidden');
       check();
     });
-
-    // If iframe never fires load (blocked before load), show fallback after 8s
-    setTimeout(function() {
-      if (!frameLoaded) {
-        loading.classList.add('hidden');
-        blocked.classList.add('visible');
-        frame.style.display = 'none';
-      }
-    }, 8000);
-
     function check() {
       try {
         var href = frame.contentWindow.location.href;
         if (href && href !== 'about:blank' && href.startsWith(base)) {
           window.location.replace(href);
         }
-      } catch(e) {
-        // Cross-origin — still on Ziina, expected
-      }
+      } catch(e) {}
     }
-
-    // Poll for same-origin redirect (Ziina success/cancel redirects to our domain)
     setInterval(check, 400);
+  </script>
+</body>
+</html>`;
+}
 
-    function copyUrl() {
+function buildFallbackPage(safeUrl: string, jsUrl: string, origin: string): string {
+  return `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>اكمال الدفع — Drexonyx</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    html,body{min-height:100%;font-family:-apple-system,system-ui,sans-serif;
+    background:#0a0a0a;color:#e0e0e0;display:flex;align-items:center;
+    justify-content:center;padding:1.5rem}
+    .card{background:#161616;border:1px solid #2a2a2a;border-radius:16px;
+    padding:2rem 1.5rem;max-width:360px;width:100%;text-align:center;
+    display:flex;flex-direction:column;gap:1.25rem}
+    .icon{font-size:2.5rem;line-height:1}
+    h1{font-size:1.15rem;font-weight:600;color:#fff}
+    p{font-size:0.88rem;color:#999;line-height:1.65}
+    .url-box{background:#0f0f0f;border:1px solid #2a2a2a;border-radius:8px;
+    padding:10px 12px;font-size:0.68rem;color:#666;word-break:break-all;
+    text-align:left;direction:ltr;user-select:all;cursor:text}
+    .copy-btn{background:#7c5cfc;color:#fff;border:none;padding:14px 24px;
+    border-radius:10px;font-size:1rem;cursor:pointer;width:100%;font-weight:500;
+    transition:background .15s}
+    .copy-btn:active{background:#6a4de0}
+    .copy-btn.ok{background:#22c55e}
+    .back-btn{background:transparent;color:#555;border:none;
+    font-size:0.82rem;cursor:pointer;text-decoration:underline;padding:4px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">🔒</div>
+    <h1>رابط الدفع جاهز</h1>
+    <p>
+      اضغط على <strong>نسخ الرابط</strong>، ثم الصقه في شريط العنوان بالمتصفح
+      لإتمام عملية الدفع.
+    </p>
+    <div class="url-box" id="url-box">${safeUrl}</div>
+    <button class="copy-btn" id="copy-btn" onclick="doCopy()">نسخ رابط الدفع</button>
+    <button class="back-btn" onclick="history.back()">← رجوع</button>
+  </div>
+  <script>
+    function doCopy() {
       var url = '${jsUrl}';
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(url).then(function() {
-          document.getElementById('copy-btn').textContent = 'Copied!';
-        }).catch(fallbackCopy);
-      } else {
-        fallbackCopy();
+      var btn = document.getElementById('copy-btn');
+      function ok() {
+        btn.textContent = 'تم النسخ ✓';
+        btn.classList.add('ok');
+        setTimeout(function(){ btn.textContent = 'نسخ رابط الدفع'; btn.classList.remove('ok'); }, 3000);
       }
-    }
-
-    function fallbackCopy() {
-      var ta = document.createElement('textarea');
-      ta.value = '${jsUrl}';
-      ta.style.position = 'fixed';
-      ta.style.opacity = '0';
-      document.body.appendChild(ta);
-      ta.select();
-      try { document.execCommand('copy'); document.getElementById('copy-btn').textContent = 'Copied!'; } catch(e) {}
-      document.body.removeChild(ta);
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(ok).catch(legacy);
+      } else { legacy(); }
+      function legacy() {
+        var ta = document.createElement('textarea');
+        ta.value = url;
+        ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); ok(); } catch(e) {}
+        document.body.removeChild(ta);
+      }
     }
   </script>
 </body>
 </html>`;
-
-  return new NextResponse(html, {
-    headers: {
-      'Content-Type': 'text/html; charset=utf-8',
-      'Cache-Control': 'no-store',
-    },
-  });
 }
