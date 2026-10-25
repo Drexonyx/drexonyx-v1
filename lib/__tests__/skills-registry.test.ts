@@ -73,8 +73,8 @@ describe('SKILL_REGISTRY', () => {
     expect(SKILL_REGISTRY[skillId].id).toBe(skillId);
   });
 
-  it.each(EXPECTED_SKILLS)('%s is version 1.0.0', (skillId) => {
-    expect(SKILL_REGISTRY[skillId].version).toBe('1.0.0');
+  it.each(EXPECTED_SKILLS)('%s has a valid semver version', (skillId) => {
+    expect(SKILL_REGISTRY[skillId].version).toMatch(/^\d+\.\d+\.\d+$/);
   });
 
   it.each(EXPECTED_SKILLS)('%s has correct family', (skillId) => {

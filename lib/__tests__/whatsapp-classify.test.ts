@@ -13,7 +13,7 @@ const CTX: SkillContext = {
 describe('communication.whatsapp.classify', () => {
   it('has correct id, version, family', () => {
     expect(whatsappClassifySkill.id).toBe('communication.whatsapp.classify');
-    expect(whatsappClassifySkill.version).toBe('1.0.0');
+    expect(whatsappClassifySkill.version).toBe('1.2.0');
     expect(whatsappClassifySkill.family).toBe('COMMUNICATION');
   });
 
@@ -254,5 +254,117 @@ describe('communication.whatsapp.classify', () => {
       CTX,
     );
     expect(result.ok).toBe(true);
+  });
+
+  // ─── Brand routing ────────────────────────────────────────────────────────
+
+  it('routes cinematic video inquiry to DREXONYX', async () => {
+    const result = await whatsappClassifySkill.execute(
+      { text: 'I need a cinematic video production for my brand' },
+      CTX,
+    );
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.output.suggestedBrand).toBe('DREXONYX');
+    }
+  });
+
+  it('routes UGC video inquiry to DREXONYX', async () => {
+    const result = await whatsappClassifySkill.execute(
+      { text: 'Can you make a UGC video for my product?' },
+      CTX,
+    );
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.output.suggestedBrand).toBe('DREXONYX');
+    }
+  });
+
+  it('routes commercial video inquiry to DREXONYX', async () => {
+    const result = await whatsappClassifySkill.execute(
+      { text: 'I need a commercial video production for my launch' },
+      CTX,
+    );
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.output.suggestedBrand).toBe('DREXONYX');
+    }
+  });
+
+  it('routes product film inquiry to DREXONYX', async () => {
+    const result = await whatsappClassifySkill.execute(
+      { text: 'I want a product film for my new collection' },
+      CTX,
+    );
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.output.suggestedBrand).toBe('DREXONYX');
+    }
+  });
+
+  it('routes Arabic cinematic inquiry to DREXONYX', async () => {
+    const result = await whatsappClassifySkill.execute(
+      { text: 'أريد إنتاج سينمائي لعلامتي التجارية' },
+      CTX,
+    );
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.output.suggestedBrand).toBe('DREXONYX');
+    }
+  });
+
+  it('routes brand film inquiry to DREXONYX', async () => {
+    const result = await whatsappClassifySkill.execute(
+      { text: 'I need a full brand film production for our campaign' },
+      CTX,
+    );
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.output.suggestedBrand).toBe('DREXONYX');
+    }
+  });
+
+  it('routes logo/branding inquiry to MDA', async () => {
+    const result = await whatsappClassifySkill.execute(
+      { text: 'I want a logo and brand identity for my business' },
+      CTX,
+    );
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.output.suggestedBrand).toBe('MDA');
+    }
+  });
+
+  it('routes website inquiry to MDA', async () => {
+    const result = await whatsappClassifySkill.execute(
+      { text: 'I need a website for my restaurant, how much does it cost?' },
+      CTX,
+    );
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.output.suggestedBrand).toBe('MDA');
+    }
+  });
+
+  it('routes advertising management inquiry to MDA', async () => {
+    const result = await whatsappClassifySkill.execute(
+      { text: 'Can you manage my Google and Meta advertising campaigns?' },
+      CTX,
+    );
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.output.suggestedBrand).toBe('MDA');
+    }
+  });
+
+  it('routes market research inquiry to MDA', async () => {
+    const result = await whatsappClassifySkill.execute(
+      { text: 'I need a market research report for my product launch' },
+      CTX,
+    );
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.output.suggestedBrand).toBe('MDA');
+    }
   });
 });

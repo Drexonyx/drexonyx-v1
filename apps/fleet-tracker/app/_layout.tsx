@@ -1,0 +1,64 @@
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useEffect } from 'react';
+import * as SplashScreen from 'expo-splash-screen';
+import { initService } from '../src/services/wialon';
+
+SplashScreen.preventAutoHideAsync();
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: 1, staleTime: 5_000 },
+  },
+});
+
+export default function RootLayout() {
+
+  useEffect(() => {
+    initService();
+    const timer = setTimeout(() => SplashScreen.hideAsync(), 2500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <QueryClientProvider client={queryClient}>
+        <StatusBar style="light" />
+        <Stack
+          screenOptions={{
+            headerStyle: { backgroundColor: '#0a0a0c' },
+            headerTintColor: '#f0f0f4',
+            headerTitleStyle: { fontWeight: '700' },
+            contentStyle: { backgroundColor: '#0a0a0c' },
+          }}
+        >
+          <Stack.Screen name="login"    options={{ headerShown: false }} />
+          <Stack.Screen name="activate" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)"  options={{ headerShown: false }} />
+          <Stack.Screen
+            name="vehicle/[id]"
+            options={{ title: 'Vehicle Details', presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="vehicle/add"
+            options={{ title: 'Add Vehicle', presentation: 'modal' }}
+          />
+          <Stack.Screen
+            name="vehicle/edit/[id]"
+            options={{ title: 'Edit Vehicle', presentation: 'modal' }}
+          />
+          <Stack.Screen
+            name="history/[id]"
+            options={{ title: 'Trip History', presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="settings"
+            options={{ title: 'Settings', presentation: 'modal' }}
+          />
+        </Stack>
+      </QueryClientProvider>
+    </GestureHandlerRootView>
+  );
+}

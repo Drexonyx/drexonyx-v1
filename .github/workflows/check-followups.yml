@@ -1,0 +1,39 @@
+name: Check & Fix Follow-ups (one-shot)
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'dry_run=true to only report, false to insert missing follow-ups'
+        required: true
+        default: 'true'
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  check-followups:
+    name: Check follow-ups for DXB Market & Creative Shelf LLC
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.2'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run follow-up check/fix script
+        run: node .github/scripts/check-followups.mjs
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DRY_RUN: ${{ github.event.inputs.dry_run }}

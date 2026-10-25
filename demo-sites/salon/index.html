@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lumière Beauty Studio — Dubai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0c0a0b;
+    --black2: #171215;
+    --black3: #221b1e;
+    --rose: #c9956b;
+    --rose2: #a8784f;
+    --rose3: #e8b898;
+    --white: #faf7f5;
+    --grey: #8c7e7a;
+    --light: #f0e8e4;
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--black); color: var(--white); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 20px 60px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(12,10,11,0.75); backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(201,149,107,0.12);
+  }
+  .nav-logo { font-family: 'DM Serif Display', serif; font-size: 1.5rem; letter-spacing: 0.04em; color: var(--white); }
+  .nav-logo span { color: var(--rose); }
+  .nav-links { display: flex; gap: 40px; list-style: none; }
+  .nav-links a { color: rgba(250,247,245,0.72); text-decoration: none; font-size: 0.82rem; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--rose); }
+  .nav-cta {
+    background: var(--rose); color: var(--black); border: none;
+    padding: 11px 26px; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
+    font-family: 'Inter', sans-serif; font-weight: 600; cursor: pointer;
+    transition: background 0.25s;
+  }
+  .nav-cta:hover { background: var(--rose2); }
+
+  /* HERO */
+  .hero {
+    height: 100vh; position: relative;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: url('https://images.unsplash.com/photo-1562322140-8baeececf3df?w=1920&q=90&fit=crop') center/cover no-repeat;
+  }
+  .hero-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(160deg, rgba(12,10,11,0.82) 0%, rgba(12,10,11,0.55) 50%, rgba(12,10,11,0.88) 100%);
+  }
+  .hero-content { position: relative; z-index: 2; max-width: 780px; padding: 0 24px; }
+  .hero-eyebrow {
+    display: inline-block; color: var(--rose); font-size: 0.72rem; letter-spacing: 0.22em;
+    text-transform: uppercase; margin-bottom: 24px; border-bottom: 1px solid var(--rose); padding-bottom: 8px;
+  }
+  .hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2.8rem, 6vw, 5.2rem); line-height: 1.1; font-weight: 400; margin-bottom: 24px; }
+  .hero h1 em { font-style: italic; color: var(--rose3); }
+  .hero p { font-size: 1.08rem; color: rgba(250,247,245,0.75); line-height: 1.75; max-width: 520px; margin: 0 auto 40px; }
+  .hero-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--rose); color: var(--black); padding: 16px 38px;
+    font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600;
+    font-family: 'Inter', sans-serif; border: none; cursor: pointer; transition: background 0.25s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-primary:hover { background: var(--rose2); }
+  .btn-secondary {
+    border: 1px solid rgba(250,247,245,0.35); color: var(--white); padding: 16px 38px;
+    font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 500;
+    font-family: 'Inter', sans-serif; background: transparent; cursor: pointer; transition: all 0.25s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-secondary:hover { border-color: var(--rose); color: var(--rose); }
+
+  /* ACCENT STRIP */
+  .strip {
+    background: var(--rose); padding: 22px 60px;
+    display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 20px;
+  }
+  .strip-item { text-align: center; }
+  .strip-num { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--black); }
+  .strip-lbl { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(12,10,11,0.72); margin-top: 2px; }
+
+  /* SERVICES */
+  .services { padding: 100px 60px; background: var(--black2); }
+  .section-header { text-align: center; margin-bottom: 64px; }
+  .section-tag { font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--rose); margin-bottom: 14px; }
+  .section-tag::before, .section-tag::after { content: '—'; margin: 0 10px; }
+  .section-title { font-family: 'DM Serif Display', serif; font-size: clamp(2rem, 4vw, 3rem); font-weight: 400; }
+  .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 2px; max-width: 1200px; margin: 0 auto; }
+  .service-card {
+    background: var(--black3); padding: 44px 36px;
+    border-top: 2px solid transparent; transition: all 0.3s; cursor: default;
+    position: relative; overflow: hidden;
+  }
+  .service-card::after {
+    content: ''; position: absolute; bottom: 0; left: 0;
+    width: 0; height: 1px; background: var(--rose); transition: width 0.4s;
+  }
+  .service-card:hover { border-top-color: var(--rose); }
+  .service-card:hover::after { width: 100%; }
+  .service-icon { font-size: 1.8rem; margin-bottom: 20px; }
+  .service-name { font-family: 'DM Serif Display', serif; font-size: 1.35rem; margin-bottom: 12px; }
+  .service-desc { font-size: 0.85rem; color: var(--grey); line-height: 1.7; margin-bottom: 24px; }
+  .service-price { color: var(--rose); font-size: 0.82rem; letter-spacing: 0.1em; font-weight: 500; }
+
+  /* ABOUT */
+  .about { padding: 0; display: grid; grid-template-columns: 1fr 1fr; min-height: 680px; }
+  .about-image { position: relative; }
+  .about-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .about-content {
+    background: var(--black3); padding: 80px 70px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .about-content .section-tag { text-align: left; }
+  .about-content .section-tag::before { display: none; }
+  .about-title { font-family: 'DM Serif Display', serif; font-size: clamp(1.8rem, 3vw, 2.6rem); font-weight: 400; margin-bottom: 24px; line-height: 1.2; }
+  .about-text { color: var(--grey); line-height: 1.85; font-size: 0.92rem; margin-bottom: 18px; }
+  .about-sign { font-family: 'DM Serif Display', serif; font-style: italic; font-size: 1.2rem; color: var(--rose3); margin-top: 28px; }
+
+  /* GALLERY */
+  .gallery { padding: 100px 60px; background: var(--black); }
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto auto;
+    gap: 8px; max-width: 1200px; margin: 0 auto;
+  }
+  .gallery-item { overflow: hidden; cursor: pointer; position: relative; }
+  .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s ease; }
+  .gallery-item:hover img { transform: scale(1.05); }
+  .gallery-item:nth-child(1) { grid-column: 1/3; aspect-ratio: 16/9; }
+  .gallery-item:nth-child(2) { aspect-ratio: 9/12; }
+  .gallery-item:nth-child(3) { aspect-ratio: 9/12; }
+  .gallery-item:nth-child(4) { aspect-ratio: 9/12; }
+  .gallery-item:nth-child(5) { grid-column: 2/4; aspect-ratio: 16/9; }
+
+  /* TESTIMONIALS */
+  .testimonials { padding: 100px 60px; background: var(--black2); }
+  .test-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1100px; margin: 0 auto; }
+  .test-card { background: var(--black3); padding: 40px 36px; position: relative; }
+  .test-card::before { content: '"'; position: absolute; top: 20px; right: 30px; font-family: 'DM Serif Display', serif; font-size: 5rem; color: var(--rose); opacity: 0.18; line-height: 1; }
+  .test-text { font-size: 0.9rem; color: rgba(250,247,245,0.78); line-height: 1.8; margin-bottom: 28px; font-style: italic; }
+  .test-stars { color: var(--rose); font-size: 0.8rem; margin-bottom: 14px; letter-spacing: 3px; }
+  .test-author { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+  .test-role { font-size: 0.75rem; color: var(--grey); margin-top: 4px; }
+
+  /* CTA */
+  .cta { position: relative; padding: 120px 60px; text-align: center; overflow: hidden; }
+  .cta-bg {
+    position: absolute; inset: 0;
+    background: url('https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=1920&q=90&fit=crop') center/cover no-repeat;
+  }
+  .cta-overlay { position: absolute; inset: 0; background: rgba(12,10,11,0.82); }
+  .cta-content { position: relative; z-index: 2; max-width: 640px; margin: 0 auto; }
+  .cta h2 { font-family: 'DM Serif Display', serif; font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 400; margin-bottom: 18px; }
+  .cta p { color: rgba(250,247,245,0.72); font-size: 0.95rem; line-height: 1.75; margin-bottom: 40px; }
+  .cta-phone { font-size: 1.5rem; font-family: 'DM Serif Display', serif; color: var(--rose3); margin-bottom: 32px; display: block; }
+
+  /* FOOTER */
+  footer {
+    background: #07050606; border-top: 1px solid rgba(201,149,107,0.12);
+    padding: 70px 60px 36px;
+  }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+  .footer-brand .nav-logo { font-size: 1.6rem; display: block; margin-bottom: 16px; }
+  .footer-brand p { font-size: 0.84rem; color: var(--grey); line-height: 1.75; max-width: 280px; }
+  .footer-col h4 { font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--rose); margin-bottom: 20px; }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .footer-col a { color: var(--grey); text-decoration: none; font-size: 0.84rem; transition: color 0.2s; }
+  .footer-col a:hover { color: var(--rose); }
+  .footer-bottom { border-top: 1px solid rgba(201,149,107,0.1); padding-top: 28px; display: flex; justify-content: space-between; align-items: center; }
+  .footer-bottom p { font-size: 0.78rem; color: var(--grey); }
+  .footer-bottom span { color: var(--rose); }
+
+  @media (max-width: 900px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    .strip { padding: 20px 24px; }
+    .services { padding: 70px 24px; }
+    .about { grid-template-columns: 1fr; }
+    .about-image { height: 360px; }
+    .about-content { padding: 50px 30px; }
+    .gallery { padding: 70px 24px; }
+    .gallery-grid { grid-template-columns: 1fr 1fr; }
+    .gallery-item:nth-child(1) { grid-column: 1/3; }
+    .gallery-item:nth-child(5) { grid-column: 1/3; }
+    .testimonials { padding: 70px 24px; }
+    .test-grid { grid-template-columns: 1fr; }
+    .cta { padding: 80px 24px; }
+    footer { padding: 50px 24px 28px; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Lumière<span>.</span></div>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#about">Our Story</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <button class="nav-cta">Book Appointment</button>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <span class="hero-eyebrow">Premium Beauty Studio — Dubai</span>
+    <h1>Where Beauty<br>Becomes <em>Art</em></h1>
+    <p>Indulge in the finest beauty treatments curated for the modern woman. From bespoke facials to transformative styling — your sanctuary of elegance awaits.</p>
+    <div class="hero-btns">
+      <a href="#services" class="btn-primary">Explore Services</a>
+      <a href="#contact" class="btn-secondary">Book a Consultation</a>
+    </div>
+  </div>
+</section>
+
+<div class="strip">
+  <div class="strip-item"><div class="strip-num">12+</div><div class="strip-lbl">Years of Mastery</div></div>
+  <div class="strip-item"><div class="strip-num">8,000+</div><div class="strip-lbl">Clients Transformed</div></div>
+  <div class="strip-item"><div class="strip-num">18</div><div class="strip-lbl">Expert Specialists</div></div>
+  <div class="strip-item"><div class="strip-num">4.9 ★</div><div class="strip-lbl">Client Satisfaction</div></div>
+</div>
+
+<section class="services" id="services">
+  <div class="section-header">
+    <div class="section-tag">Our Offerings</div>
+    <h2 class="section-title">Curated Treatments</h2>
+  </div>
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-icon">✦</div>
+      <div class="service-name">Signature Hair Styling</div>
+      <div class="service-desc">A bespoke cut and style tailored to your unique features. Includes scalp treatment, blow-dry, and finishing serum application.</div>
+      <div class="service-price">FROM AED 350</div>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">◈</div>
+      <div class="service-name">Radiance Facial</div>
+      <div class="service-desc">Deep-cleanse, exfoliation, and targeted serums by La Mer. 90-minute ritual leaving your complexion luminous and renewed.</div>
+      <div class="service-price">FROM AED 450</div>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">◇</div>
+      <div class="service-name">Bridal Experience</div>
+      <div class="service-desc">A full-day bridal package including hair, makeup, skincare prep, and a trial session — ensuring perfection on your most special day.</div>
+      <div class="service-price">FROM AED 2,800</div>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">❋</div>
+      <div class="service-name">Body Ritual</div>
+      <div class="service-desc">A pampering full-body treatment combining exfoliation, hydrating wrap, and pressure-point massage. Pure indulgence from head to toe.</div>
+      <div class="service-price">FROM AED 380</div>
+    </div>
+  </div>
+</section>
+
+<section class="about" id="about">
+  <div class="about-image">
+    <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=900&q=85&fit=crop" alt="Beauty treatment at Lumière">
+  </div>
+  <div class="about-content">
+    <div class="section-tag">Our Philosophy</div>
+    <h2 class="about-title">Crafted With<br>Intention & Care</h2>
+    <p class="about-text">At Lumière, we believe beauty is not a standard to be met — it is a unique expression to be celebrated. Our team of international specialists brings together decades of expertise from Paris, London, and Milan.</p>
+    <p class="about-text">Every treatment is tailored to your skin, your structure, and your story. We use only the most refined products: La Mer, Sisley, and Augustinus Bader among our trusted partners.</p>
+    <div class="about-sign">— Sophia Laurent, Founder & Creative Director</div>
+  </div>
+</section>
+
+<section class="gallery" id="gallery">
+  <div class="section-header">
+    <div class="section-tag">Our Studio</div>
+    <h2 class="section-title">The Lumière Experience</h2>
+  </div>
+  <div class="gallery-grid">
+    <div class="gallery-item">
+      <img src="https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=1400&q=85&fit=crop" alt="Beauty salon interior">
+    </div>
+    <div class="gallery-item">
+      <img src="https://images.unsplash.com/photo-1629454686091-ee2fd3d1db12?w=700&q=85&fit=crop" alt="Hair styling">
+    </div>
+    <div class="gallery-item">
+      <img src="https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=700&q=85&fit=crop" alt="Nail treatment">
+    </div>
+    <div class="gallery-item">
+      <img src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=700&q=85&fit=crop" alt="Facial treatment">
+    </div>
+    <div class="gallery-item">
+      <img src="https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=1400&q=85&fit=crop" alt="Luxury skincare products">
+    </div>
+  </div>
+</section>
+
+<section class="testimonials">
+  <div class="section-header">
+    <div class="section-tag">Client Stories</div>
+    <h2 class="section-title">Voices of Lumière</h2>
+  </div>
+  <div class="test-grid">
+    <div class="test-card">
+      <div class="test-stars">★★★★★</div>
+      <p class="test-text">"My bridal experience at Lumière was absolute magic. Sophia and her team made me feel like the most beautiful version of myself. Every detail was perfect."</p>
+      <div class="test-author">Noor Al Rashidi</div>
+      <div class="test-role">Bride, Dubai</div>
+    </div>
+    <div class="test-card">
+      <div class="test-stars">★★★★★</div>
+      <p class="test-text">"I've visited salons all over the world and Lumière stands in a league of its own. The radiance facial alone is worth the trip to Dubai. My skin has never looked better."</p>
+      <div class="test-author">Isabelle Moreau</div>
+      <div class="test-role">CEO, Paris</div>
+    </div>
+    <div class="test-card">
+      <div class="test-stars">★★★★★</div>
+      <p class="test-text">"Walking into Lumière feels like stepping into a Parisian atelier. The attention to detail is extraordinary — from the ambiance to the treatment itself. Pure luxury."</p>
+      <div class="test-author">Aisha Al Mansouri</div>
+      <div class="test-role">Fashion Designer, Abu Dhabi</div>
+    </div>
+  </div>
+</section>
+
+<section class="cta" id="contact">
+  <div class="cta-bg"></div>
+  <div class="cta-overlay"></div>
+  <div class="cta-content">
+    <div class="section-tag">Reserve Your Moment</div>
+    <h2>Begin Your<br>Transformation</h2>
+    <p>Step into a world of bespoke beauty at Lumière Beauty Studio. Our specialists are ready to craft a personalised ritual just for you.</p>
+    <span class="cta-phone">+971 4 XXX XXXX</span>
+    <div class="hero-btns">
+      <a href="#" class="btn-primary">Book Appointment</a>
+      <a href="#" class="btn-secondary">WhatsApp Us</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="nav-logo">Lumière<span style="color:var(--rose)">.</span></span>
+      <p>Dubai's premier women's beauty studio — where artistry meets luxury. DIFC, Dubai, UAE.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <ul>
+        <li><a href="#">Hair Styling</a></li>
+        <li><a href="#">Skin & Facials</a></li>
+        <li><a href="#">Bridal Package</a></li>
+        <li><a href="#">Body Rituals</a></li>
+        <li><a href="#">Nail Artistry</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Studio</h4>
+      <ul>
+        <li><a href="#">Our Story</a></li>
+        <li><a href="#">Our Team</a></li>
+        <li><a href="#">Gallery</a></li>
+        <li><a href="#">Press</a></li>
+        <li><a href="#">Gift Cards</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Visit Us</h4>
+      <ul>
+        <li><a href="#">DIFC, Dubai, UAE</a></li>
+        <li><a href="#">+971 4 XXX XXXX</a></li>
+        <li><a href="#">hello@lumiere.ae</a></li>
+        <li><a href="#">Mon–Sat: 9am – 9pm</a></li>
+        <li><a href="#">Sun: 11am – 7pm</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2024 Lumière Beauty Studio. All rights reserved.</p>
+    <p>Crafted by <span>DREXONYX</span></p>
+  </div>
+</footer>
+
+</body>
+</html>

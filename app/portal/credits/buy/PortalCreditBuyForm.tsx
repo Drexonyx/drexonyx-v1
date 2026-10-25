@@ -8,6 +8,7 @@ import s from '../../portal.module.css';
 interface Props {
   packages: CreditPackageRow[];
   organizationId: string;
+  defaultPkgId?: string;
 }
 
 function formatCredits(n: number): string {
@@ -19,8 +20,12 @@ function formatAed(aed: string): string {
   return `AED ${n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 }
 
-export default function PortalCreditBuyForm({ packages }: Props) {
-  const [selectedId, setSelectedId] = useState<string>(packages[0]?.id ?? '');
+export default function PortalCreditBuyForm({ packages, defaultPkgId }: Props) {
+  const [selectedId, setSelectedId] = useState<string>(
+    defaultPkgId && packages.some((p) => p.id === defaultPkgId)
+      ? defaultPkgId
+      : (packages[0]?.id ?? ''),
+  );
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 

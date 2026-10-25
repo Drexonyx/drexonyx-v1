@@ -29,19 +29,23 @@ export default function Navigation() {
           <Link href="/" className={styles.logo} onClick={closeMenu} aria-label="DREXONYX home">
             <div className={styles.logoDxMark} aria-hidden="true">
               <Image
-                src="/brand/drexonyx-dx-mark.png"
+                src="/brand/drexonyx-dx-full-logo.png"
                 alt=""
-                width={1764}
-                height={675}
+                width={1752}
+                height={886}
                 className={styles.logoDxImg}
                 priority
               />
             </div>
             <div className={styles.logoDivider} aria-hidden="true" />
-            <div className={styles.logoMda}>
-              <span className={styles.mdaName}>MD<span className={styles.mdaA}>A</span></span>
-              <span className={styles.mdaSub}>MASTER DIGITAL AGENCY</span>
-              <span className={styles.mdaBrand}>A DREXONYX Brand</span>
+            <div className={styles.logoMda} aria-hidden="true">
+              <Image
+                src="/brand/mda-full-logo.png"
+                alt=""
+                width={1820}
+                height={864}
+                className={styles.mdaLogoImg}
+              />
             </div>
           </Link>
 

@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zafran & Oud — Fine Dining, Dubai</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap">
+<style>
+:root {
+  --black: #080704;
+  --black2: #110e09;
+  --black3: #1c1710;
+  --white: #faf8f3;
+  --cream: #f0e9d6;
+  --gold: #c8963b;
+  --gold2: #a8781e;
+  --gold-light: #e8b86a;
+  --gray: #7a7060;
+  --border: rgba(200,150,59,.2);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', system-ui, sans-serif; background: var(--black); color: var(--white); line-height: 1.6; overflow-x: hidden; }
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 56px; height: 76px;
+  background: rgba(8,7,4,.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  transition: background .3s;
+}
+.nav-logo { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.35rem; font-weight: 600; letter-spacing: .5px; }
+.nav-logo span { color: var(--gold); }
+.nav-links { display: flex; gap: 36px; font-size: .82rem; letter-spacing: 1.2px; text-transform: uppercase; color: rgba(250,248,243,.6); }
+.nav-links a:hover { color: var(--gold-light); }
+.nav-reserve { background: var(--gold); color: var(--black); padding: 10px 24px; font-size: .78rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; border-radius: 2px; transition: background .2s; }
+.nav-reserve:hover { background: var(--gold-light); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh; display: flex; align-items: center;
+  position: relative; overflow: hidden;
+  background: var(--black);
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, #1a1208 0%, #0a0804 40%, #150e05 70%, #0a0804 100%);
+}
+.hero-pattern {
+  position: absolute; inset: 0; opacity: .06;
+  background-image: repeating-linear-gradient(45deg, var(--gold) 0, var(--gold) 1px, transparent 0, transparent 50%);
+  background-size: 12px 12px;
+}
+.hero-glow {
+  position: absolute; top: 20%; right: 15%; width: 480px; height: 480px;
+  background: radial-gradient(circle, rgba(200,150,59,.18) 0%, transparent 65%);
+  pointer-events: none;
+}
+.hero-glow-2 {
+  position: absolute; bottom: 10%; left: 10%; width: 360px; height: 360px;
+  background: radial-gradient(circle, rgba(200,150,59,.1) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-content {
+  position: relative; z-index: 10; max-width: 1200px;
+  margin: 0 auto; padding: 0 56px; padding-top: 76px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+}
+.hero-tag { font-size: .7rem; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
+.hero-title { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(3rem, 5vw, 5.2rem); font-weight: 500; line-height: 1.05; margin-bottom: 28px; }
+.hero-title em { font-style: italic; color: var(--gold-light); }
+.hero-desc { font-size: .95rem; color: rgba(250,248,243,.6); line-height: 1.8; margin-bottom: 40px; max-width: 420px; }
+.hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
+.btn-gold { background: var(--gold); color: var(--black); padding: 14px 32px; font-size: .82rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; border-radius: 2px; transition: all .2s; }
+.btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); }
+.btn-outline { border: 1px solid var(--border); color: var(--cream); padding: 14px 32px; font-size: .82rem; font-weight: 500; letter-spacing: 1.2px; text-transform: uppercase; border-radius: 2px; transition: all .2s; }
+.btn-outline:hover { border-color: var(--gold); color: var(--gold-light); }
+.hero-visual {
+  display: flex; flex-direction: column; gap: 20px;
+}
+.hero-img-main {
+  height: 380px; border-radius: 4px; overflow: hidden;
+  background: linear-gradient(160deg, #2a1f08 0%, #3d2b0d 40%, #1e1508 100%);
+  position: relative;
+}
+.hero-img-main::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(200,150,59,.15) 0%, transparent 60%);
+}
+.food-icon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+.food-icon svg { width: 100px; height: 100px; opacity: .3; }
+.hero-img-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.hero-img-sm {
+  height: 160px; border-radius: 4px;
+  background: linear-gradient(135deg, #2e2008 0%, #3a2710 100%);
+  position: relative; overflow: hidden;
+}
+.hero-img-sm::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(8,7,4,.6) 0%, transparent 60%);
+}
+
+/* ── DIVIDER ── */
+.divider { display: flex; align-items: center; gap: 20px; padding: 0 56px; margin: 0; }
+.divider-line { flex: 1; height: 1px; background: var(--border); }
+.divider-icon { color: var(--gold); font-size: 1.2rem; opacity: .8; }
+
+/* ── SECTION BASE ── */
+section { padding: 100px 0; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 56px; }
+.section-tag { font-size: .7rem; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+.section-title { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 500; line-height: 1.15; margin-bottom: 16px; }
+.section-sub { font-size: .95rem; color: rgba(250,248,243,.55); line-height: 1.8; max-width: 520px; }
+
+/* ── EXPERIENCE STRIP ── */
+.exp-strip { background: var(--black2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.exp-strip .container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; padding: 0 56px; }
+.exp-item { padding: 40px 32px; display: flex; flex-direction: column; align-items: center; text-align: center; border-right: 1px solid var(--border); }
+.exp-item:last-child { border-right: none; }
+.exp-num { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 2.8rem; font-weight: 600; color: var(--gold); line-height: 1; margin-bottom: 6px; }
+.exp-label { font-size: .72rem; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(250,248,243,.5); }
+
+/* ── MENU ── */
+.menu { background: var(--black); }
+.menu-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 56px; }
+.menu-tabs { display: flex; gap: 0; border: 1px solid var(--border); border-radius: 3px; overflow: hidden; }
+.menu-tab { padding: 10px 24px; font-size: .78rem; letter-spacing: 1.2px; text-transform: uppercase; color: rgba(250,248,243,.5); cursor: pointer; transition: all .2s; }
+.menu-tab.active { background: var(--gold); color: var(--black); }
+.menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+.menu-card {
+  background: var(--black2); padding: 32px; position: relative;
+  border: 1px solid transparent; transition: all .3s;
+}
+.menu-card:hover { border-color: var(--border); background: var(--black3); }
+.menu-card-tag { font-size: .65rem; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.menu-card-tag::after { content: ''; flex: 1; height: 1px; background: var(--border); max-width: 40px; }
+.menu-card h3 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.3rem; font-weight: 500; margin-bottom: 8px; }
+.menu-card-desc { font-size: .82rem; color: rgba(250,248,243,.5); line-height: 1.7; margin-bottom: 20px; }
+.menu-card-price { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.5rem; color: var(--gold); }
+.menu-card-price span { font-family: 'Inter', sans-serif; font-size: .75rem; color: var(--gray); margin-left: 4px; }
+
+/* ── SIGNATURE DISH ── */
+.signature { background: var(--black3); }
+.signature-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+.signature-visual {
+  height: 520px; border-radius: 4px; position: relative;
+  background: linear-gradient(135deg, #2a1f08 0%, #4a350e 50%, #2a1f08 100%);
+  overflow: hidden;
+}
+.signature-visual::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 40%, rgba(200,150,59,.25) 0%, transparent 60%);
+}
+.signature-badge {
+  position: absolute; top: 24px; right: 24px; z-index: 10;
+  background: var(--gold); color: var(--black); padding: 8px 16px;
+  font-size: .7rem; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; border-radius: 2px;
+}
+.signature-content .section-title { margin-bottom: 20px; }
+.signature-quote {
+  font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic;
+  font-size: 1.15rem; color: rgba(250,248,243,.7); line-height: 1.7;
+  border-left: 2px solid var(--gold); padding-left: 20px; margin: 28px 0;
+}
+.signature-chef { display: flex; align-items: center; gap: 16px; margin-top: 32px; }
+.chef-avatar {
+  width: 52px; height: 52px; border-radius: 50%;
+  background: linear-gradient(135deg, #3a2a0d, #5a4218);
+  border: 2px solid var(--border); flex-shrink: 0;
+}
+.chef-info .name { font-size: .9rem; font-weight: 600; }
+.chef-info .role { font-size: .75rem; color: var(--gold); letter-spacing: 1px; text-transform: uppercase; }
+
+/* ── PRIVATE DINING ── */
+.private { background: var(--black); }
+.private-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 56px; }
+.private-card {
+  border: 1px solid var(--border); border-radius: 4px; overflow: hidden;
+  transition: all .3s;
+}
+.private-card:hover { border-color: var(--gold); transform: translateY(-4px); }
+.private-card-img {
+  height: 220px; position: relative;
+  background: linear-gradient(135deg, #2a1f08 0%, #3a2910 100%);
+}
+.private-card-img::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(8,7,4,.8) 0%, transparent 50%);
+}
+.private-card-body { padding: 28px; }
+.private-card-body h3 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.25rem; margin-bottom: 8px; }
+.private-card-body p { font-size: .82rem; color: rgba(250,248,243,.5); line-height: 1.7; margin-bottom: 20px; }
+.private-card-body .capacity { font-size: .72rem; letter-spacing: 1.2px; text-transform: uppercase; color: var(--gold); }
+
+/* ── REVIEWS ── */
+.reviews { background: var(--black2); }
+.reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 56px; }
+.review-card { background: var(--black3); padding: 32px; border-radius: 4px; border: 1px solid var(--border); }
+.review-stars { color: var(--gold); font-size: .9rem; letter-spacing: 3px; margin-bottom: 16px; }
+.review-text { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 1.05rem; line-height: 1.7; color: rgba(250,248,243,.8); margin-bottom: 20px; }
+.reviewer { display: flex; align-items: center; gap: 12px; }
+.reviewer-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: linear-gradient(135deg, #3a2a0d, #5a4218); flex-shrink: 0;
+}
+.reviewer-name { font-size: .85rem; font-weight: 600; }
+.reviewer-detail { font-size: .72rem; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
+
+/* ── HOURS & LOCATION ── */
+.info-section { background: var(--black3); }
+.info-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 48px; margin-top: 56px; }
+.info-block h3 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.3rem; margin-bottom: 20px; color: var(--gold-light); }
+.info-block ul { list-style: none; }
+.info-block ul li { padding: 10px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-size: .88rem; }
+.info-block ul li:last-child { border-bottom: none; }
+.info-block ul li span { color: rgba(250,248,243,.5); }
+.map-placeholder {
+  height: 200px; border-radius: 4px; margin-top: 20px;
+  background: linear-gradient(135deg, #1a1710 0%, #252018 100%);
+  border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+  font-size: .78rem; color: rgba(250,248,243,.3); letter-spacing: 1px; text-transform: uppercase;
+}
+
+/* ── RESERVATION CTA ── */
+.reservation { background: var(--black); border-top: 1px solid var(--border); }
+.reservation-inner {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+  align-items: center; padding: 80px 56px;
+  max-width: 1200px; margin: 0 auto;
+}
+.res-title { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 2.8rem; font-weight: 500; margin-bottom: 16px; line-height: 1.1; }
+.res-title em { color: var(--gold-light); font-style: italic; }
+.res-sub { font-size: .92rem; color: rgba(250,248,243,.55); line-height: 1.8; margin-bottom: 32px; }
+.res-form { display: flex; flex-direction: column; gap: 16px; }
+.res-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.res-input {
+  background: var(--black2); border: 1px solid var(--border); border-radius: 2px;
+  padding: 14px 18px; font-size: .88rem; color: var(--white); font-family: inherit;
+  transition: border-color .2s; width: 100%;
+}
+.res-input:focus { outline: none; border-color: var(--gold); }
+.res-input::placeholder { color: var(--gray); }
+.res-select {
+  background: var(--black2); border: 1px solid var(--border); border-radius: 2px;
+  padding: 14px 18px; font-size: .88rem; color: var(--white); font-family: inherit;
+  width: 100%; cursor: pointer; appearance: none;
+}
+.res-select:focus { outline: none; border-color: var(--gold); }
+.res-btn { background: var(--gold); color: var(--black); padding: 16px; font-size: .85rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; border: none; border-radius: 2px; cursor: pointer; transition: all .2s; font-family: inherit; }
+.res-btn:hover { background: var(--gold-light); }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--black2); border-top: 1px solid var(--border);
+  padding: 56px 0 32px;
+}
+.footer-inner { max-width: 1200px; margin: 0 auto; padding: 0 56px; }
+.footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+.footer-brand .logo { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.4rem; font-weight: 600; margin-bottom: 12px; }
+.footer-brand .logo span { color: var(--gold); }
+.footer-brand p { font-size: .82rem; color: rgba(250,248,243,.45); line-height: 1.8; max-width: 260px; }
+.footer-col h4 { font-size: .7rem; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+.footer-col ul { list-style: none; }
+.footer-col ul li { margin-bottom: 10px; }
+.footer-col ul li a { font-size: .83rem; color: rgba(250,248,243,.45); transition: color .2s; }
+.footer-col ul li a:hover { color: var(--gold-light); }
+.footer-bottom { border-top: 1px solid var(--border); padding-top: 24px; display: flex; align-items: center; justify-content: space-between; }
+.footer-bottom p { font-size: .75rem; color: rgba(250,248,243,.3); }
+.footer-social { display: flex; gap: 16px; }
+.footer-social a { width: 36px; height: 36px; border: 1px solid var(--border); border-radius: 2px; display: flex; align-items: center; justify-content: center; font-size: .75rem; color: var(--gray); transition: all .2s; }
+.footer-social a:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ── WHATSAPP BUTTON ── */
+.wa-btn {
+  position: fixed; bottom: 28px; right: 28px; z-index: 500;
+  width: 54px; height: 54px; border-radius: 50%; background: #25D366;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 24px rgba(37,211,102,.4); transition: transform .2s;
+}
+.wa-btn:hover { transform: scale(1.08); }
+.wa-btn svg { width: 28px; height: 28px; fill: white; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  nav { padding: 0 24px; }
+  .nav-links { display: none; }
+  .hero-content { grid-template-columns: 1fr; gap: 48px; padding: 0 24px; padding-top: 76px; }
+  .hero-visual { display: none; }
+  .container { padding: 0 24px; }
+  .exp-strip .container { grid-template-columns: repeat(2, 1fr); padding: 0 24px; }
+  .exp-item { border-right: none; border-bottom: 1px solid var(--border); }
+  .exp-item:nth-child(odd) { border-right: 1px solid var(--border); }
+  .menu-grid { grid-template-columns: 1fr; }
+  .signature-inner { grid-template-columns: 1fr; gap: 40px; }
+  .private-grid { grid-template-columns: 1fr; }
+  .reviews-grid { grid-template-columns: 1fr; }
+  .info-grid { grid-template-columns: 1fr; gap: 32px; }
+  .reservation-inner { grid-template-columns: 1fr; gap: 40px; padding: 60px 24px; }
+  .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Zafran <span>&</span> Oud</div>
+  <div class="nav-links">
+    <a href="#menu">Menu</a>
+    <a href="#dining">Private Dining</a>
+    <a href="#story">Our Story</a>
+    <a href="#location">Location</a>
+  </div>
+  <a href="#reserve" class="nav-reserve">Reserve a Table</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-pattern"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-glow-2"></div>
+  <div class="hero-content">
+    <div>
+      <div class="hero-tag">Fine Dining · DIFC, Dubai</div>
+      <h1 class="hero-title">
+        Where Tradition<br>Meets <em>Modern</em><br>Elegance
+      </h1>
+      <p class="hero-desc">
+        An intimate culinary journey through the flavours of the Levant and the Gulf,
+        crafted with imported heritage spices and the finest seasonal ingredients.
+      </p>
+      <div class="hero-actions">
+        <a href="#reserve" class="btn-gold">Reserve Your Table</a>
+        <a href="#menu" class="btn-outline">Explore Menu</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-img-main">
+        <div class="food-icon">
+          <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="40" stroke="#c8963b" stroke-width="1.5"/>
+            <circle cx="50" cy="50" r="28" stroke="#c8963b" stroke-width="1" stroke-dasharray="4 3"/>
+            <path d="M30 50 Q50 30 70 50 Q50 70 30 50Z" fill="#c8963b" opacity=".4"/>
+            <circle cx="50" cy="50" r="8" fill="#c8963b" opacity=".6"/>
+          </svg>
+        </div>
+      </div>
+      <div class="hero-img-row">
+        <div class="hero-img-sm"></div>
+        <div class="hero-img-sm"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE STRIP -->
+<div class="exp-strip">
+  <div class="container">
+    <div class="exp-item">
+      <div class="exp-num">12+</div>
+      <div class="exp-label">Years of Excellence</div>
+    </div>
+    <div class="exp-item">
+      <div class="exp-num">47</div>
+      <div class="exp-label">Signature Dishes</div>
+    </div>
+    <div class="exp-item">
+      <div class="exp-num">4.9</div>
+      <div class="exp-label">Google Rating</div>
+    </div>
+    <div class="exp-item">
+      <div class="exp-num">300+</div>
+      <div class="exp-label">Guests per Evening</div>
+    </div>
+  </div>
+</div>
+
+<!-- MENU -->
+<section class="menu" id="menu">
+  <div class="container">
+    <div class="menu-header">
+      <div>
+        <div class="section-tag">Curated Selections</div>
+        <h2 class="section-title">A Feast for the Senses</h2>
+      </div>
+      <div class="menu-tabs">
+        <div class="menu-tab active">Starters</div>
+        <div class="menu-tab">Mains</div>
+        <div class="menu-tab">Desserts</div>
+      </div>
+    </div>
+    <div class="menu-grid">
+      <div class="menu-card">
+        <div class="menu-card-tag">Cold Mezze</div>
+        <h3>Truffle Hummus & Gold Leaf</h3>
+        <p class="menu-card-desc">Hand-blended Levantine chickpeas with black truffle oil, draped with edible 24k gold flakes and served with house-baked markook.</p>
+        <div class="menu-card-price">AED 68 <span>per serving</span></div>
+      </div>
+      <div class="menu-card">
+        <div class="menu-card-tag">Seafood</div>
+        <h3>Saffron Grilled Hammour</h3>
+        <p class="menu-card-desc">Wild-caught Gulf hammour marinated in Emirati spices, flame-grilled and served over saffron-infused freekeh with pomegranate glaze.</p>
+        <div class="menu-card-price">AED 185 <span>per person</span></div>
+      </div>
+      <div class="menu-card">
+        <div class="menu-card-tag">Heritage</div>
+        <h3>Ouzi Royale</h3>
+        <p class="menu-card-desc">Slow-roasted lamb shoulder on a bed of spiced rice with pine nuts and raisins — our most celebrated dish, prepared over 14 hours.</p>
+        <div class="menu-card-price">AED 210 <span>per person</span></div>
+      </div>
+      <div class="menu-card">
+        <div class="menu-card-tag">Signature Starter</div>
+        <h3>Labneh en Croûte</h3>
+        <p class="menu-card-desc">Strained yoghurt wrapped in crisp filo pastry, served warm with wild thyme honey and a dusting of sumac and za'atar.</p>
+        <div class="menu-card-price">AED 55 <span>per serving</span></div>
+      </div>
+      <div class="menu-card">
+        <div class="menu-card-tag">Grill</div>
+        <h3>Mixed Premium Mashawi</h3>
+        <p class="menu-card-desc">A curated selection of Wagyu kofta, shish tawook with Lebanese marinade, and lamb chops over a live charcoal flame.</p>
+        <div class="menu-card-price">AED 240 <span>per person</span></div>
+      </div>
+      <div class="menu-card">
+        <div class="menu-card-tag">Vegetarian</div>
+        <h3>Stuffed Vine Leaves Royale</h3>
+        <p class="menu-card-desc">Twelve delicate vine leaves filled with herb-scented rice, pinenuts and lemon zest, finished with a warm tomato and cinnamon broth.</p>
+        <div class="menu-card-price">AED 72 <span>per serving</span></div>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top:40px;">
+      <a href="#reserve" class="btn-gold">View Full Menu</a>
+    </div>
+  </div>
+</section>
+
+<!-- SIGNATURE DISH -->
+<section class="signature" id="story">
+  <div class="container">
+    <div class="signature-inner">
+      <div class="signature-visual">
+        <div class="signature-badge">Chef's Selection</div>
+        <div class="food-icon">
+          <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="60" cy="60" r="50" stroke="#c8963b" stroke-width="1.5" opacity=".4"/>
+            <path d="M40 60 Q60 35 80 60 Q60 85 40 60Z" fill="#c8963b" opacity=".25"/>
+            <circle cx="60" cy="60" r="15" fill="#c8963b" opacity=".4"/>
+            <path d="M45 45 Q60 30 75 45" stroke="#c8963b" stroke-width="1.5" stroke-linecap="round" opacity=".5"/>
+            <path d="M45 75 Q60 90 75 75" stroke="#c8963b" stroke-width="1.5" stroke-linecap="round" opacity=".5"/>
+          </svg>
+        </div>
+      </div>
+      <div class="signature-content">
+        <div class="section-tag">The Story Behind the Dish</div>
+        <h2 class="section-title">Fourteen Hours of Patience</h2>
+        <p class="section-sub">Our signature Ouzi Royale is prepared using a recipe passed down through three generations of our founding family from the Levant — a whole young lamb, slow-roasted overnight in a sealed underground pit over fragrant hardwood and desert herbs.</p>
+        <blockquote class="signature-quote">
+          "Food is not fuel — it is memory, ceremony, and love made edible. We serve all three, every evening."
+        </blockquote>
+        <div class="signature-chef">
+          <div class="chef-avatar"></div>
+          <div class="chef-info">
+            <div class="name">Chef Mahmoud Al-Rashid</div>
+            <div class="role">Executive Chef & Co-Founder</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRIVATE DINING -->
+<section class="private" id="dining">
+  <div class="container">
+    <div class="section-tag">Exclusive Spaces</div>
+    <h2 class="section-title">Private Dining Rooms</h2>
+    <p class="section-sub">Host your most important gatherings in one of our curated private rooms — from intimate celebrations to corporate dinners for 80.</p>
+    <div class="private-grid">
+      <div class="private-card">
+        <div class="private-card-img"></div>
+        <div class="private-card-body">
+          <h3>The Amber Room</h3>
+          <p>An intimate candlelit setting with hand-painted arabesque walls and a dedicated sommelier. Perfect for proposals and anniversaries.</p>
+          <div class="capacity">Capacity: 8 – 12 guests</div>
+        </div>
+      </div>
+      <div class="private-card">
+        <div class="private-card-img"></div>
+        <div class="private-card-body">
+          <h3>The Pearl Terrace</h3>
+          <p>A semi-open terrace overlooking the DIFC skyline, adorned with draped silks and brass lanterns. Available evenings only.</p>
+          <div class="capacity">Capacity: 20 – 35 guests</div>
+        </div>
+      </div>
+      <div class="private-card">
+        <div class="private-card-img"></div>
+        <div class="private-card-body">
+          <h3>The Sultan Hall</h3>
+          <p>Our grand private dining hall with a customisable stage, AV system, and full banquet service for gala events and corporate functions.</p>
+          <div class="capacity">Capacity: 50 – 80 guests</div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top:40px;">
+      <a href="#reserve" class="btn-outline">Enquire About Private Events</a>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="reviews">
+  <div class="container">
+    <div class="section-tag">Guest Voices</div>
+    <h2 class="section-title">What Our Guests Say</h2>
+    <div class="reviews-grid">
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"The Ouzi Royale is, without question, the finest lamb dish I have tasted anywhere in the Gulf. Zafran & Oud sets a standard I have not seen matched."</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar"></div>
+          <div>
+            <div class="reviewer-name">Khalid Al-Mansoori</div>
+            <div class="reviewer-detail">Google Review · 2 weeks ago</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"We hosted our board dinner in the Sultan Hall — seamless service, extraordinary food, and an atmosphere that left every single guest impressed. Will return."</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar"></div>
+          <div>
+            <div class="reviewer-name">Sarah Mitchell</div>
+            <div class="reviewer-detail">TripAdvisor · 1 month ago</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"I have dined in Levantine restaurants across three continents. Zafran & Oud belongs in that rare group where the memory of the meal follows you home."</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar"></div>
+          <div>
+            <div class="reviewer-name">Nawal Hassan</div>
+            <div class="reviewer-detail">Google Review · 3 weeks ago</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOURS & LOCATION -->
+<section class="info-section" id="location">
+  <div class="container">
+    <div class="section-tag">Find Us</div>
+    <h2 class="section-title">Hours & Location</h2>
+    <div class="info-grid">
+      <div class="info-block">
+        <h3>Opening Hours</h3>
+        <ul>
+          <li>Saturday – Wednesday <span>12:30 – 00:00</span></li>
+          <li>Thursday <span>12:30 – 01:00</span></li>
+          <li>Friday <span>13:00 – 01:00</span></li>
+          <li>Private Events <span>By appointment</span></li>
+        </ul>
+      </div>
+      <div class="info-block">
+        <h3>Contact</h3>
+        <ul>
+          <li>Phone <span>+971 4 555 1234</span></li>
+          <li>WhatsApp <span>+971 55 123 4567</span></li>
+          <li>Email <span>reserve@zafranoud.ae</span></li>
+          <li>Instagram <span>@zafranoud</span></li>
+        </ul>
+      </div>
+      <div class="info-block">
+        <h3>Location</h3>
+        <p style="font-size:.83rem; color:rgba(250,248,243,.5); margin-bottom:16px;">Gate District, DIFC, Dubai — Level 3, Gate Village Building 10</p>
+        <div class="map-placeholder">Interactive Map</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESERVATION CTA -->
+<section class="reservation" id="reserve">
+  <div class="reservation-inner">
+    <div>
+      <div class="section-tag">Make a Reservation</div>
+      <h2 class="res-title">Reserve Your <em>Evening</em></h2>
+      <p class="res-sub">Secure your table online in under 60 seconds. For groups of 10 or more, or private dining enquiries, our team will confirm within two hours.</p>
+      <div style="margin-top:24px;">
+        <p style="font-size:.82rem; color:var(--gold); letter-spacing:1px;">✦ &nbsp; WhatsApp: +971 55 123 4567</p>
+        <p style="font-size:.82rem; color:rgba(250,248,243,.45); margin-top:8px;">Available 10:00 – 23:00, seven days a week</p>
+      </div>
+    </div>
+    <div>
+      <form class="res-form">
+        <div class="res-row">
+          <input class="res-input" type="text" placeholder="Full Name">
+          <input class="res-input" type="tel" placeholder="Phone Number">
+        </div>
+        <div class="res-row">
+          <input class="res-input" type="date" placeholder="Date">
+          <select class="res-select">
+            <option value="">Time</option>
+            <option>12:30</option><option>13:00</option><option>13:30</option>
+            <option>19:00</option><option>19:30</option><option>20:00</option>
+            <option>20:30</option><option>21:00</option><option>21:30</option>
+          </select>
+        </div>
+        <div class="res-row">
+          <select class="res-select">
+            <option value="">Guests</option>
+            <option>1 – 2</option><option>3 – 4</option>
+            <option>5 – 6</option><option>7 – 10</option>
+            <option>10+</option>
+          </select>
+          <select class="res-select">
+            <option value="">Occasion</option>
+            <option>Business Dinner</option>
+            <option>Anniversary</option>
+            <option>Birthday</option>
+            <option>Private Event</option>
+            <option>Just Dining</option>
+          </select>
+        </div>
+        <textarea class="res-input" rows="3" placeholder="Special requests or dietary requirements…" style="resize:none;"></textarea>
+        <button type="submit" class="res-btn">Confirm Reservation</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo">Zafran <span>&</span> Oud</div>
+        <p>Fine Levantine & Gulf dining in the heart of DIFC, Dubai. Every meal is a ceremony; every guest, our honoured companion.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Discover</h4>
+        <ul>
+          <li><a href="#menu">Menu</a></li>
+          <li><a href="#dining">Private Dining</a></li>
+          <li><a href="#story">Our Story</a></li>
+          <li><a href="#">Wine List</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Visit</h4>
+        <ul>
+          <li><a href="#location">Location</a></li>
+          <li><a href="#">Parking</a></li>
+          <li><a href="#">Dress Code</a></li>
+          <li><a href="#">Gift Vouchers</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Connect</h4>
+        <ul>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">Facebook</a></li>
+          <li><a href="#">TikTok</a></li>
+          <li><a href="#">Press</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Zafran & Oud. All rights reserved. Designed by Master Digital Agency.</p>
+      <div class="footer-social">
+        <a href="#">ig</a>
+        <a href="#">fb</a>
+        <a href="#">wa</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- WHATSAPP FLOAT -->
+<a href="https://wa.me/971551234567" class="wa-btn" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+  </svg>
+</a>
+
+<script>
+// Menu tab switching
+document.querySelectorAll('.menu-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.menu-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+  });
+});
+
+// Sticky nav opacity
+window.addEventListener('scroll', () => {
+  const nav = document.querySelector('nav');
+  if (window.scrollY > 50) {
+    nav.style.background = 'rgba(8,7,4,.97)';
+  } else {
+    nav.style.background = 'rgba(8,7,4,.92)';
+  }
+});
+</script>
+</body>
+</html>
