@@ -4,15 +4,19 @@
 // organizationId is from server-side session — never from client input.
 // Amount is from financial.credit_packages (DB) — never from client request.
 // DR 0120.
+//
+// Payment URL stored in httpOnly cookie, never returned to client.
+// Client navigates to /portal/credits/buy/pay which serves a meta-refresh
+// page — bypasses Android App Links interception of pay.ziina.com.
 
-import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
 import { headers } from 'next/headers';
 import { auth } from '@/auth';
 import { createCreditPurchaseCheckout } from '@/lib/credits/create-credit-purchase';
 
 export async function actionPortalBuyCredits(
   creditPackageId: string,
-): Promise<{ ok: false; reason: string } | never> {
+): Promise<{ ok: false; reason: string } | { ok: true }> {
   const session = await auth();
   if (!session) return { ok: false, reason: 'Not authenticated' };
   if (session.user.role !== 'CLIENT') return { ok: false, reason: 'Unauthorized' };
@@ -35,5 +39,15 @@ export async function actionPortalBuyCredits(
 
   if (!result.ok) return { ok: false, reason: result.reason };
 
-  redirect(result.redirectUrl);
+  // Store URL in httpOnly cookie — client only sees the /pay path on our domain
+  const cookieStore = await cookies();
+  cookieStore.set('_drex_pay', result.redirectUrl, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'lax',
+    maxAge: 300,
+    path: '/',
+  });
+
+  return { ok: true };
 }
