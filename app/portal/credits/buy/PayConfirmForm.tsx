@@ -23,7 +23,13 @@ export default function PayConfirmForm({ pkg }: Props) {
     setErrorMsg(null);
     startTransition(async () => {
       const result = await actionPortalBuyCredits(pkg.id);
-      if (result && !result.ok) setErrorMsg(result.reason);
+      if (result && !result.ok) {
+        setErrorMsg(result.reason);
+        return;
+      }
+      // Navigate to our own domain first — route handler serves meta-refresh
+      // to pay.ziina.com, bypassing Android App Links interception
+      window.location.href = '/portal/credits/buy/pay';
     });
   }
 
