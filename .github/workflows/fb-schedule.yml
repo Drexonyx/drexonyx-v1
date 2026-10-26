@@ -89,6 +89,7 @@ jobs:
           META_PAGE_ID_1: ${{ secrets.META_PAGE_ID_1 }}
           IMAGE_PATH: ${{ steps.resolve.outputs.IMAGE_PATH }}
           LOG_PATH: assets/facebook/publish-log.json
+          POST_KEY: ${{ steps.resolve.outputs.POST_KEY }}
         run: node scripts/fb-publish.mjs --image-post "$(cat /tmp/post-message.txt)"
 
       # Publish video post.

@@ -65,15 +65,13 @@ if (!entry) skip(`No post scheduled for ${targetDate} [${slot}]`);
 // Skip if already published in schedule
 if (entry.status === 'published') skip(`Day ${entry.day} already marked published`);
 
-// Compute a stable dedup key for this post
-const postKey = entry.mediaType === 'text'
-  ? `${entry.date}-${entry.slot}`
-  : (entry.imagePath ?? entry.videoPath ?? `${entry.date}-${entry.slot}`);
+// Compute a stable dedup key — always date+slot so shared signature images don't collide
+const postKey = `${entry.date}-${entry.slot}`;
 
 // Guard against double-post: check publish log
 if (existsSync(logFile)) {
   const log = JSON.parse(readFileSync(logFile, 'utf-8'));
-  if (log.some(l => l.postKey === postKey || (entry.imagePath && l.imagePath === entry.imagePath))) {
+  if (log.some(l => l.postKey === postKey)) {
     skip(`${postKey} already in publish log`);
   }
 }
