@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { getClient } from '@/lib/chatbot/clients';
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,16 +17,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unknown client' }, { status: 404 });
     }
 
-    const response = await anthropic.messages.create({
-      model: 'claude-haiku-4-5',
-      max_tokens: 500,
-      system: client.systemPrompt,
-      messages: messages.slice(-10),
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-3.8-flash',
+      systemInstruction: client.systemPrompt,
     });
 
-    const text = response.content[0].type === 'text' ? response.content[0].text : '';
+    const history = messages.slice(0, -1).map((m: { role: string; content: string }) => ({
+      role: m.role === 'user' ? 'user' : 'model',
+      parts: [{ text: m.content }],
+    }));
 
-    return NextResponse.json({ reply: text });
+    const chat = model.startChat({ history });
+    const lastMsg = messages[messages.length - 1].content;
+    const result = await chat.sendMessage(lastMsg);
+    const reply = result.response.text();
+
+    return NextResponse.json({ reply });
   } catch (err) {
     console.error('[chatbot]', err);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
