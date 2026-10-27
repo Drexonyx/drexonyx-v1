@@ -17,21 +17,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unknown client' }, { status: 404 });
     }
 
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-3.8-flash',
-      systemInstruction: client.systemPrompt,
+    const model = genAI.getGenerativeModel({ model: 'gemini-flash-lite-latest' });
+
+    const history = messages
+      .slice(-8)
+      .map((m: { role: string; content: string }) =>
+        `${m.role === 'user' ? 'العميل' : 'المساعد'}: ${m.content}`
+      )
+      .join('\n');
+
+    const prompt = `${client.systemPrompt}\n\n${history}\nالمساعد:`;
+
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: { maxOutputTokens: 350 },
     });
 
-    const history = messages.slice(0, -1).map((m: { role: string; content: string }) => ({
-      role: m.role === 'user' ? 'user' : 'model',
-      parts: [{ text: m.content }],
-    }));
-
-    const chat = model.startChat({ history });
-    const lastMsg = messages[messages.length - 1].content;
-    const result = await chat.sendMessage(lastMsg);
-    const reply = result.response.text();
-
+    const reply = result.response.text().trim();
     return NextResponse.json({ reply });
   } catch (err) {
     console.error('[chatbot]', err);
