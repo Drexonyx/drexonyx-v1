@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DREXONYX Chatbot Demo</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: system-ui, sans-serif;
+    background: #0c0c14;
+    color: #eee;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+  }
+  .logo { color: #D4AF37; font-size: 28px; font-weight: 800; letter-spacing: 2px; margin-bottom: 12px; }
+  .sub { color: #888; font-size: 15px; margin-bottom: 40px; }
+  .arrow {
+    position: fixed;
+    bottom: 90px;
+    right: 90px;
+    font-size: 36px;
+    animation: bounce 1s infinite alternate;
+  }
+  @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+  .hint {
+    position: fixed;
+    bottom: 155px;
+    right: 80px;
+    background: #D4AF37;
+    color: #0c0c14;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+  <div class="logo">DREXONYX</div>
+  <div class="sub">اضغط على الزر في الزاوية اليمنى السفلية لتجربة البوت</div>
+
+  <div class="hint">اضغط هنا! 👇</div>
+  <div class="arrow">↘️</div>
+
+  <script src="/chatbot.js?client=demo&api=https://drexonyx.com"></script>
+</body>
+</html>
