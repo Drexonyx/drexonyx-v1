@@ -18,8 +18,8 @@
     }
     #drx-chat-btn:hover { transform: scale(1.1); }
     #drx-chat-box {
-      position: fixed; bottom: 90px; right: 24px; z-index: 99999;
-      width: 320px; max-height: 420px;
+      position: fixed; bottom: 90px; right: 16px; z-index: 99999;
+      width: min(380px, calc(100vw - 32px)); max-height: min(560px, 70vh);
       background: ${DARK}; border: 1px solid ${GOLD};
       border-radius: 16px; display: none; flex-direction: column;
       font-family: system-ui, sans-serif; overflow: hidden;
@@ -32,12 +32,12 @@
       align-items: center; justify-content: space-between;
     }
     #drx-chat-messages {
-      flex: 1; overflow-y: auto; padding: 12px; display: flex;
-      flex-direction: column; gap: 8px;
+      flex: 1; overflow-y: auto; padding: 14px; display: flex;
+      flex-direction: column; gap: 10px;
     }
     .drx-msg {
-      max-width: 85%; padding: 8px 12px; border-radius: 12px;
-      font-size: 13px; line-height: 1.5; word-break: break-word;
+      max-width: 85%; padding: 10px 14px; border-radius: 12px;
+      font-size: 14px; line-height: 1.6; word-break: break-word;
     }
     .drx-msg.bot {
       background: #1e1e2e; color: #eee; align-self: flex-start;
