@@ -1,7 +1,7 @@
 (function () {
   const params = new URLSearchParams(document.currentScript?.src.split('?')[1] || '');
   const clientId = params.get('client') || 'demo';
-  const apiBase = params.get('api') || 'https://drexonyx.com';
+  const apiBase = (params.get('api') || 'https://www.drexonyx.com').replace(/\/$/, '');
 
   const GOLD = '#D4AF37';
   const DARK = '#0c0c14';
@@ -122,7 +122,11 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages, clientId }),
+        redirect: 'error',
       });
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
       const data = await res.json();
       const reply = data.reply || 'Sorry, something went wrong.';
       messages.push({ role: 'assistant', content: reply });
