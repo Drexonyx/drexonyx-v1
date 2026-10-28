@@ -175,23 +175,43 @@ nav {
 .biz-item .label { font-size: 13px; font-weight: 600; color: var(--muted); }
 
 /* ── PRICING ── */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px; margin-top: 60px;
+}
 .price-card {
   background: var(--dark2);
-  border: 2px solid var(--gold);
-  border-radius: 24px; padding: 48px;
-  max-width: 480px; margin: 60px auto 0;
+  border: 1px solid rgba(212,175,55,0.2);
+  border-radius: 24px; padding: 40px 32px;
   text-align: center;
+  transition: border-color .3s, transform .3s;
+  position: relative;
 }
-.price-amount { font-size: 64px; font-weight: 900; color: var(--gold); line-height: 1; }
-.price-period { color: var(--muted); font-size: 16px; margin-bottom: 32px; }
-.price-features { list-style: none; margin-bottom: 40px; }
+.price-card:hover { border-color: rgba(212,175,55,0.5); transform: translateY(-4px); }
+.price-card.featured {
+  border: 2px solid var(--gold);
+  background: linear-gradient(135deg, rgba(212,175,55,0.07) 0%, var(--dark2) 60%);
+}
+.price-badge {
+  position: absolute; top: -14px; right: 50%; transform: translateX(50%);
+  background: var(--gold); color: var(--dark);
+  font-size: 12px; font-weight: 800;
+  padding: 4px 16px; border-radius: 50px;
+  white-space: nowrap;
+}
+.price-name { font-size: 16px; font-weight: 700; color: var(--muted); margin-bottom: 16px; }
+.price-amount { font-size: 52px; font-weight: 900; color: var(--gold); line-height: 1; }
+.price-cur { font-size: 18px; font-weight: 700; vertical-align: super; }
+.price-period { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+.price-features { list-style: none; margin-bottom: 32px; text-align: right; }
 .price-features li {
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  font-size: 15px;
-  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 14px;
+  display: flex; align-items: center; gap: 10px;
 }
-.price-features li::before { content: '✓'; color: var(--gold); font-weight: 900; }
+.price-features li::before { content: '✓'; color: var(--gold); font-weight: 900; flex-shrink: 0; }
 
 /* ── CTA SECTION ── */
 .cta-section {
@@ -247,7 +267,7 @@ footer span { color: var(--gold); }
     <div style="padding:14px;display:flex;flex-direction:column;gap:10px;min-height:200px;">
       <div style="background:#1e1e2e;color:#eee;padding:10px 14px;border-radius:12px 12px 12px 4px;font-size:13px;line-height:1.6;max-width:85%;text-align:right;">مرحباً! 👋 كيف أقدر أساعدك اليوم؟</div>
       <div style="background:#D4AF37;color:#0c0c14;padding:10px 14px;border-radius:12px 12px 4px 12px;font-size:13px;line-height:1.6;max-width:85%;align-self:flex-end;font-weight:600;text-align:right;">عندي مطعم وأبي أعرف الأسعار</div>
-      <div style="background:#1e1e2e;color:#eee;padding:10px 14px;border-radius:12px 12px 12px 4px;font-size:13px;line-height:1.6;max-width:90%;text-align:right;">ممتاز! 🍽️ نقدر نجهز لك بوت مخصص للمطعم يرد على الزبائن ٢٤/٧ — الأسعار تبدأ من AED 99/شهر. تبي تعرف أكثر؟</div>
+      <div style="background:#1e1e2e;color:#eee;padding:10px 14px;border-radius:12px 12px 12px 4px;font-size:13px;line-height:1.6;max-width:90%;text-align:right;">ممتاز! 🍽️ نقدر نجهز لك بوت مخصص للمطعم يرد على الزبائن ٢٤/٧ — الأسعار تبدأ من AED 299/شهر. تبي تعرف أكثر؟</div>
     </div>
     <div style="border-top:1px solid #333;padding:8px;display:flex;gap:8px;">
       <div style="flex:1;background:#1e1e2e;border-radius:8px;padding:8px 12px;font-size:12px;color:#555;">اكتب رسالتك…</div>
@@ -347,21 +367,59 @@ footer span { color: var(--gold); }
 
 <!-- PRICING -->
 <div style="max-width:1100px;margin:0 auto;padding:100px 24px 0;text-align:center">
-  <div class="section-label">الباقة</div>
-  <h2 class="section-title">كل ما تحتاجه في باقة واحدة</h2>
-  <div class="price-card">
-    <div style="font-size:42px;margin-bottom:8px">🎁</div>
-    <div style="font-size:22px;font-weight:900;color:var(--gold);margin-bottom:8px">احصل على عرض سعر خاص لنشاطك</div>
-    <div class="price-period">بدون التزام — تواصل معنا وخلّنا نصمم لك البوت المناسب</div>
-    <ul class="price-features">
-      <li>بوت مخصص لنشاطك</li>
-      <li>عربي وإنجليزي</li>
-      <li>تركيب مجاني على موقعك</li>
-      <li>ردود غير محدودة</li>
-      <li>دعم فني على الواتساب</li>
-    </ul>
-    <a href="https://wa.me/971521770988" target="_blank" class="btn-primary" style="display:inline-block;text-decoration:none">احصل على عرض سعرك الآن ←</a>
+  <div class="section-label">الأسعار</div>
+  <h2 class="section-title">باقات تناسب كل نشاط</h2>
+  <p class="section-sub" style="margin:0 auto">تبدأ من <strong style="color:var(--gold)">AED 299</strong> شهرياً — بدون عقود طويلة</p>
+  <div class="pricing-grid">
+
+    <!-- Basic -->
+    <div class="price-card">
+      <div class="price-name">أساسي</div>
+      <div class="price-amount"><span class="price-cur">AED </span>299</div>
+      <div class="price-period">/ شهر</div>
+      <ul class="price-features">
+        <li>بوت مخصص لنشاطك</li>
+        <li>عربي وإنجليزي</li>
+        <li>تركيب مجاني على موقعك</li>
+        <li>ردود غير محدودة</li>
+        <li>دعم على الواتساب</li>
+      </ul>
+      <a href="https://wa.me/971521770988" target="_blank" class="btn-secondary" style="display:inline-block;text-decoration:none;font-size:14px">ابدأ الآن</a>
+    </div>
+
+    <!-- Advanced (Featured) -->
+    <div class="price-card featured">
+      <div class="price-badge">الأكثر طلباً</div>
+      <div class="price-name">متقدم</div>
+      <div class="price-amount"><span class="price-cur">AED </span>499</div>
+      <div class="price-period">/ شهر</div>
+      <ul class="price-features">
+        <li>كل مميزات الأساسي</li>
+        <li>تخصيص متقدم للردود</li>
+        <li>تقرير شهري للمحادثات</li>
+        <li>أولوية في الدعم الفني</li>
+        <li>تحديث المحتوى شهرياً</li>
+      </ul>
+      <a href="https://wa.me/971521770988" target="_blank" class="btn-primary" style="display:inline-block;text-decoration:none;font-size:14px">ابدأ الآن ←</a>
+    </div>
+
+    <!-- Pro -->
+    <div class="price-card">
+      <div class="price-name">احترافي</div>
+      <div class="price-amount"><span class="price-cur">AED </span>799</div>
+      <div class="price-period">/ شهر</div>
+      <ul class="price-features">
+        <li>كل مميزات المتقدم</li>
+        <li>بوت لأكثر من موقع</li>
+        <li>مدير حساب مخصص</li>
+        <li>تقارير أسبوعية</li>
+        <li>دعم أولوية قصوى</li>
+      </ul>
+      <a href="https://wa.me/971521770988" target="_blank" class="btn-secondary" style="display:inline-block;text-decoration:none;font-size:14px">تواصل معنا</a>
+    </div>
+
   </div>
+  <p style="margin-top:32px;color:var(--muted);font-size:14px">جميع الباقات تشمل تركيب مجاني على موقعك ودعم فني مستمر</p>
 </div>
 
 <!-- CTA -->
