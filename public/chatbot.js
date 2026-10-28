@@ -18,12 +18,12 @@
     }
     #drx-chat-btn:hover { transform: scale(1.1); }
     #drx-chat-box {
-      position: fixed; bottom: 90px; right: 16px; z-index: 99999;
-      width: min(380px, calc(100vw - 32px)); max-height: min(560px, 70vh);
+      position: fixed; bottom: 90px; right: 12px; z-index: 99999;
+      width: min(420px, calc(100vw - 24px)); height: min(600px, 78vh);
       background: ${DARK}; border: 1px solid ${GOLD};
-      border-radius: 16px; display: none; flex-direction: column;
+      border-radius: 20px; display: none; flex-direction: column;
       font-family: system-ui, sans-serif; overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.6);
     }
     #drx-chat-box.open { display: flex; }
     #drx-chat-header {
