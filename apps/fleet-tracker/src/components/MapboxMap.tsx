@@ -109,10 +109,11 @@ export default function MapboxMap({ vehicles, selectedId, onVehicleSelect }: Pro
   }));
 
   // Memoize by vehicle IDs only — prevents WebView reload on position updates
+  const pinIds = pins.map(p => p.id).join(',');
   const source = React.useMemo(
     () => ({ html: buildHtml(pins) }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [pins.map(p => p.id).join(',')],
+    [pinIds],
   );
 
   const handleMessage = (e: WebViewMessageEvent) => {

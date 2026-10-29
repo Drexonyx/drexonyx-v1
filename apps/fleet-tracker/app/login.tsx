@@ -6,6 +6,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { signIn } from '../src/services/auth';
+import appIcon from '../assets/icon.png';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -52,7 +53,7 @@ export default function LoginScreen() {
         <View style={styles.logoArea}>
           <View style={styles.iconWrapper}>
             <Image
-              source={require('../assets/icon.png')}
+              source={appIcon}
               style={styles.iconImg}
               resizeMode="contain"
             />
