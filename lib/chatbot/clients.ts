@@ -1,18 +1,62 @@
+export interface ChatCategory {
+  icon: 'monitor' | 'brush' | 'chart';
+  title: string;
+  desc: string;
+  prompt: string;
+}
+
 export interface ChatbotClient {
   name: string;
+  headerName?: string;
   language: 'ar' | 'en' | 'both';
   systemPrompt: string;
   logoUrl?: string;
   theme?: 'dark' | 'light';
+  welcomeMessage?: string;
+  heroBg?: string;
+  heroTagline?: string;
+  heroTitle?: string;
+  heroHighlight?: string;
+  heroSubtitle?: string;
+  categories?: ChatCategory[];
+  inputPlaceholder?: string;
 }
 
 const clients: Record<string, ChatbotClient> = {
   // ── MDA — Master Digital Agency ───────────────────────────────────────────
   mda: {
     name: 'MDA — Master Digital Agency',
+    headerName: 'MDA Business Assistant',
     language: 'both',
     logoUrl: '/brand/mda-full-logo.png',
-    theme: 'light',
+    theme: 'dark',
+    welcomeMessage: 'Welcome to MDA — how can we help your business today?',
+    heroBg: 'https://images.unsplash.com/flagged/photo-1559717201-fbb671ff56b7?q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=800',
+    heroTagline: 'YOUR DIGITAL GROWTH PARTNER',
+    heroTitle: 'How can we help your',
+    heroHighlight: 'business?',
+    heroSubtitle: 'From branding to campaigns — we handle your digital presence.',
+    categories: [
+      {
+        icon: 'monitor' as const,
+        title: 'Website & Digital',
+        desc: 'Professional websites, landing pages & online stores',
+        prompt: "I'm interested in website design or digital services.",
+      },
+      {
+        icon: 'brush' as const,
+        title: 'Branding & Creative',
+        desc: 'Logo design, brand identity & visual assets',
+        prompt: 'Tell me about your branding and creative services.',
+      },
+      {
+        icon: 'chart' as const,
+        title: 'Social Media & Ads',
+        desc: 'Social management, campaigns & paid advertising',
+        prompt: 'What social media and advertising services do you offer?',
+      },
+    ],
+    inputPlaceholder: 'Message MDA...',
     systemPrompt: `أنت مساعد ذكي لـ MDA — Master Digital Agency، وكالة التصميم والتسويق الرقمي التابعة لـ DREXONYX في دبي.
 مهمتك: مساعدة الزبائن في معرفة الخدمات والأسعار والبدء في التعاون.
 

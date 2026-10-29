@@ -22,5 +22,21 @@ export default async function Page({ params }: Props) {
 
   if (!client) notFound();
 
-  return <ChatPage clientId={slug} businessName={client.name} logoUrl={client.logoUrl} theme={client.theme} />;
+  return (
+    <ChatPage
+      clientId={slug}
+      businessName={client.name}
+      headerName={client.headerName}
+      logoUrl={client.logoUrl}
+      theme={client.theme}
+      welcomeMessage={client.welcomeMessage}
+      heroBg={client.heroBg}
+      heroTagline={client.heroTagline}
+      heroTitle={client.heroTitle}
+      heroHighlight={client.heroHighlight}
+      heroSubtitle={client.heroSubtitle}
+      categories={client.categories}
+      inputPlaceholder={client.inputPlaceholder}
+    />
+  );
 }
