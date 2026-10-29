@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DREXONYX — AI Chatbot for Your Business</title>
+  <meta name="description" content="Custom AI chatbot for your business website — responds in Arabic & English, 24/7. Starts at AED 299/month. Free setup within 24 hours.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --card: #161616;
+      --gold: #C9A227;
+      --gold-light: #E8BF4A;
+      --gold-dim: rgba(201,162,39,0.12);
+      --gold-border: rgba(201,162,39,0.22);
+      --white: #F2EDE4;
+      --muted: #6b6355;
+      --muted2: #4a4438;
+      color-scheme: dark;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--gold-border);
+      padding: 14px max(20px, env(safe-area-inset-left, 0px)) 14px max(20px, env(safe-area-inset-right, 0px));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: var(--gold);
+      text-transform: uppercase;
+      text-decoration: none;
+    }
+
+    .nav-ar {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid var(--gold-border);
+      padding: 5px 14px;
+      border-radius: 20px;
+      transition: color .2s, border-color .2s;
+    }
+    .nav-ar:hover { color: var(--gold-light); border-color: var(--gold); }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 80px max(20px, env(safe-area-inset-left, 0px)) 60px max(20px, env(safe-area-inset-right, 0px));
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -100px; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 500px;
+      background: radial-gradient(ellipse, rgba(201,162,39,0.08) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--gold-dim);
+      border: 1px solid var(--gold-border);
+      color: var(--gold-light);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      font-size: clamp(30px, 7vw, 52px);
+      font-weight: 900;
+      line-height: 1.15;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+
+    .hero h1 .gold { color: var(--gold-light); }
+
+    .hero-sub {
+      font-size: clamp(15px, 3vw, 17px);
+      color: var(--muted);
+      font-weight: 500;
+      max-width: 500px;
+      margin: 0 auto 36px;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--gold) 0%, #9e7c10 100%);
+      color: #0a0a0a;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      padding: 14px 30px;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: opacity .2s, transform .2s;
+    }
+    .hero-cta:hover { opacity: .9; transform: translateY(-1px); }
+
+    /* ── FEATURES ── */
+    .section {
+      padding: 64px max(20px, env(safe-area-inset-left, 0px)) 64px max(20px, env(safe-area-inset-right, 0px));
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: clamp(22px, 5vw, 30px);
+      font-weight: 800;
+      margin-bottom: 40px;
+      letter-spacing: -0.3px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .feat-card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 24px 20px;
+      transition: border-color .2s;
+    }
+    .feat-card:hover { border-color: var(--gold-border); }
+
+    .feat-icon { font-size: 28px; margin-bottom: 12px; }
+    .feat-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .feat-desc { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+    /* ── DEMO BOT ── */
+    .demo-section {
+      background: var(--surface);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      padding: 64px max(20px, env(safe-area-inset-left, 0px));
+    }
+
+    .demo-inner {
+      max-width: 700px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .demo-inner p {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    .demo-box {
+      background: var(--card);
+      border: 1px solid var(--gold-border);
+      border-radius: 20px;
+      overflow: hidden;
+      min-height: 420px;
+      position: relative;
+    }
+
+    /* ── PRICING ── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .plan {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      padding: 28px 22px;
+      position: relative;
+      transition: border-color .2s, transform .2s;
+    }
+    .plan:hover { border-color: var(--gold-border); transform: translateY(-2px); }
+
+    .plan.popular {
+      border-color: var(--gold);
+      background: linear-gradient(160deg, #1a1608 0%, var(--card) 100%);
+    }
+
+    .popular-badge {
+      position: absolute;
+      top: -12px;
+      left: 22px;
+      background: var(--gold);
+      color: #0a0a0a;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 14px;
+      border-radius: 20px;
+    }
+
+    .plan-name { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+    .plan-price {
+      font-size: 34px;
+      font-weight: 900;
+      color: var(--gold-light);
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+    .plan-price span { font-size: 14px; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+
+    .plan-features {
+      list-style: none;
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .plan-features li {
+      font-size: 13px;
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .plan-features li::before {
+      content: '✓';
+      color: var(--gold);
+      font-weight: 900;
+      flex-shrink: 0;
+    }
+
+    .plan-cta {
+      display: block;
+      margin-top: 24px;
+      text-align: center;
+      padding: 11px;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: opacity .2s;
+      border: 1px solid var(--gold-border);
+      color: var(--gold-light);
+    }
+    .plan.popular .plan-cta {
+      background: linear-gradient(135deg, var(--gold) 0%, #9e7c10 100%);
+      color: #0a0a0a;
+      border-color: transparent;
+      font-weight: 800;
+    }
+    .plan-cta:hover { opacity: .85; }
+
+    /* ── PROCESS ── */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+
+    .step {
+      text-align: center;
+      padding: 20px 16px;
+    }
+
+    .step-num {
+      width: 44px; height: 44px;
+      background: var(--gold-dim);
+      border: 1px solid var(--gold-border);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--gold-light);
+      margin: 0 auto 14px;
+    }
+
+    .step-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .step-desc { font-size: 12px; color: var(--muted); }
+
+    /* ── CTA BANNER ── */
+    .cta-banner {
+      background: linear-gradient(135deg, #1a1200 0%, #0d0d0d 100%);
+      border-top: 1px solid var(--gold-border);
+      border-bottom: 1px solid var(--gold-border);
+      padding: 64px max(20px, env(safe-area-inset-left, 0px));
+      text-align: center;
+    }
+
+    .cta-banner h2 {
+      font-size: clamp(22px, 5vw, 32px);
+      font-weight: 900;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+
+    .cta-banner p { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
+
+    .cta-group {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--gold) 0%, #9e7c10 100%);
+      color: #0a0a0a;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      padding: 13px 28px;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: opacity .2s;
+    }
+    .btn-primary:hover { opacity: .9; }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--gold-light);
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 13px 28px;
+      border-radius: 10px;
+      text-decoration: none;
+      border: 1px solid var(--gold-border);
+      transition: border-color .2s;
+    }
+    .btn-secondary:hover { border-color: var(--gold); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 28px max(20px, env(safe-area-inset-left, 0px)) 28px max(20px, env(safe-area-inset-right, 0px));
+      text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      font-size: 12px;
+      color: var(--muted2);
+    }
+
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--gold-light); }
+
+    .divider {
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(to right, transparent, var(--gold), transparent);
+      margin: 0 auto 32px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">DREXONYX</a>
+  <a href="/promo.html" class="nav-ar">عربي</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">🤖 AI Chatbot Service</div>
+  <h1>A <span class="gold">Smart Bot</span> for Your Business Website</h1>
+  <p class="hero-sub">We build a custom AI chatbot for your business and install it on your website within 24 hours — in Arabic & English.</p>
+  <a href="#demo" class="hero-cta">🚀 Try the Bot Free Now</a>
+</section>
+
+<!-- FEATURES -->
+<section class="section">
+  <p class="section-label">Why DREXONYX</p>
+  <h2 class="section-title">Everything Your Business Needs</h2>
+  <div class="divider"></div>
+  <div class="features-grid">
+    <div class="feat-card">
+      <div class="feat-icon">🌐</div>
+      <div class="feat-title">Arabic & English</div>
+      <div class="feat-desc">The bot replies in the customer's own language — automatically Arabic or English</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">⏰</div>
+      <div class="feat-title">24/7 Always On</div>
+      <div class="feat-desc">No holidays, no downtime — your customers get instant answers any time</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">⚡</div>
+      <div class="feat-title">Setup in 24 Hours</div>
+      <div class="feat-desc">One line of code on your site — we handle everything else</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🎯</div>
+      <div class="feat-title">100% Customized</div>
+      <div class="feat-desc">It knows your products, services, and prices — not a generic chatbot</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🏢</div>
+      <div class="feat-title">Any Business Type</div>
+      <div class="feat-desc">Restaurants, salons, clinics, real estate, retail shops, and more</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">💬</div>
+      <div class="feat-title">Unlimited Replies</div>
+      <div class="feat-desc">No conversation limits — all plans include unlimited responses</div>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE DEMO -->
+<section class="demo-section" id="demo">
+  <div class="demo-inner">
+    <p class="section-label">Try It Live</p>
+    <h2 class="section-title" style="margin-bottom:12px">Talk to the Bot Right Now</h2>
+    <p>This is a real example — ask about pricing, services, or say you're interested</p>
+    <div class="demo-box">
+      <script src="/chatbot.js?client=demo&api=https://www.drexonyx.com"></script>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section">
+  <p class="section-label">Monthly Pricing</p>
+  <h2 class="section-title">A Plan for Every Business</h2>
+  <div class="divider"></div>
+  <div class="pricing-grid">
+
+    <div class="plan">
+      <div class="plan-name">Basic</div>
+      <div class="plan-price">AED 299<span>/mo</span></div>
+      <ul class="plan-features">
+        <li>Custom bot for your business</li>
+        <li>Arabic & English</li>
+        <li>Free installation</li>
+        <li>Unlimited replies</li>
+        <li>WhatsApp support</li>
+      </ul>
+      <a href="https://wa.me/971521770988?text=Hello, I'm interested in the Basic plan AED 299" target="_blank" class="plan-cta">Get Started</a>
+    </div>
+
+    <div class="plan popular">
+      <div class="popular-badge">⭐ Most Popular</div>
+      <div class="plan-name">Advanced</div>
+      <div class="plan-price">AED 499<span>/mo</span></div>
+      <ul class="plan-features">
+        <li>Everything in Basic</li>
+        <li>Advanced bot customization</li>
+        <li>Monthly conversation report</li>
+        <li>Priority support</li>
+        <li>Monthly content update</li>
+      </ul>
+      <a href="https://wa.me/971521770988?text=Hello, I'm interested in the Advanced plan AED 499" target="_blank" class="plan-cta">Get Started</a>
+    </div>
+
+    <div class="plan">
+      <div class="plan-name">Professional</div>
+      <div class="plan-price">AED 799<span>/mo</span></div>
+      <ul class="plan-features">
+        <li>Everything in Advanced</li>
+        <li>Bot for multiple websites</li>
+        <li>Dedicated account manager</li>
+        <li>Weekly reports</li>
+        <li>Top-priority support</li>
+      </ul>
+      <a href="https://wa.me/971521770988?text=Hello, I'm interested in the Professional plan AED 799" target="_blank" class="plan-cta">Get Started</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" style="padding-top:0">
+  <p class="section-label">How It Works</p>
+  <h2 class="section-title">3 Simple Steps</h2>
+  <div class="divider"></div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-title">Contact Us</div>
+      <div class="step-desc">Send us your business details via WhatsApp</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-title">We Build the Bot</div>
+      <div class="step-desc">Your custom bot is ready within 24 hours</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-title">Live on Your Site</div>
+      <div class="step-desc">One line of code and your bot is live for customers</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section class="cta-banner">
+  <h2>Ready to Get Started?</h2>
+  <p>Contact us now and your bot will be ready within 24 hours</p>
+  <div class="cta-group">
+    <a href="https://wa.me/971521770988?text=Hello, I want an AI chatbot for my website" target="_blank" class="btn-primary">💬 Chat on WhatsApp</a>
+    <a href="#demo" class="btn-secondary">Try the Demo First</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p style="margin-bottom:8px">
+    <a href="/promo.html">عربي</a> &nbsp;|&nbsp;
+    <a href="https://wa.me/971521770988" target="_blank">WhatsApp</a>
+  </p>
+  <p>© 2025 DREXONYX — Dubai, UAE</p>
+</footer>
+
+</body>
+</html>
