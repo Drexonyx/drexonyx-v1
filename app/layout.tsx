@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Bebas_Neue } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { headers } from "next/headers";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -60,18 +61,28 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const h = await headers();
+  const pathname = h.get('x-pathname') ?? '';
+  const isChat = pathname.startsWith('/chat/');
+
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${bebasNeue.variable}`}>
       <body>
-        <a href="#main-content" className="skip-link">
-          Skip to main content
-        </a>
-        <Navigation />
-        <main id="main-content" tabIndex={-1}>
-          {children}
-        </main>
-        <Footer />
+        {!isChat && (
+          <a href="#main-content" className="skip-link">
+            Skip to main content
+          </a>
+        )}
+        {!isChat && <Navigation />}
+        {isChat ? (
+          children
+        ) : (
+          <main id="main-content" tabIndex={-1}>
+            {children}
+          </main>
+        )}
+        {!isChat && <Footer />}
         <Analytics />
       </body>
     </html>
