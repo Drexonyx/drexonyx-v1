@@ -198,14 +198,29 @@
       margin-bottom: 28px;
     }
 
-    .demo-box {
-      background: var(--card);
-      border: 1px solid var(--gold-border);
+    .demo-trigger {
+      border: 2px dashed var(--gold-border);
       border-radius: 20px;
-      padding: 0;
-      overflow: hidden;
-      min-height: 420px;
-      position: relative;
+      padding: 40px 20px;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      background: var(--gold-dim);
+      text-align: center;
+    }
+    .demo-trigger:hover { border-color: var(--gold); background: rgba(201,162,39,0.18); }
+
+    .demo-trigger-icon { font-size: 48px; margin-bottom: 12px; }
+    .demo-trigger-text { font-size: 18px; font-weight: 900; color: var(--white); margin-bottom: 6px; }
+    .demo-trigger-sub { font-size: 13px; color: var(--muted); }
+    .demo-arrow {
+      font-size: 28px;
+      margin-top: 12px;
+      animation: bounce 1.2s infinite;
+      display: inline-block;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(8px); }
     }
 
     /* ── PRICING ── */
@@ -458,9 +473,13 @@
     <p class="section-label">جرّب بنفسك</p>
     <h2 class="section-title" style="margin-bottom:12px">تحدّث مع البوت الآن</h2>
     <p>هذا مثال حقيقي — اسأله عن الأسعار أو الخدمات أو قل إنك مهتم</p>
-    <div class="demo-box">
-      <script src="/chatbot.js?client=demo&api=https://www.drexonyx.com"></script>
+    <div class="demo-trigger" onclick="document.getElementById('drx-chat-btn')?.click()">
+      <div class="demo-trigger-icon">🤖</div>
+      <div class="demo-trigger-text">اضغط هنا لبدء المحادثة</div>
+      <div class="demo-trigger-sub">البوت جاهز — ابدأ باي سؤال</div>
+      <div class="demo-arrow">👇</div>
     </div>
+    <script src="/chatbot.js?client=demo&api=https://www.drexonyx.com"></script>
   </div>
 </section>
 
