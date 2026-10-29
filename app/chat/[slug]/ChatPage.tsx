@@ -14,6 +14,14 @@ interface Message {
   content: string;
 }
 
+function BotAvatar({ logoUrl, initials }: { logoUrl?: string; initials: string }) {
+  return logoUrl ? (
+    <div className="msg-mini-logo"><img src={logoUrl} alt="" /></div>
+  ) : (
+    <div className="msg-mini-circle">{initials}</div>
+  );
+}
+
 interface Props {
   clientId: string;
   businessName: string;
@@ -416,12 +424,6 @@ export default function ChatPage({
   const displayName = headerName || businessName;
   const isDark = theme !== 'light';
 
-  const BotAvatar = () => logoUrl ? (
-    <div className="msg-mini-logo"><img src={logoUrl} alt="" /></div>
-  ) : (
-    <div className="msg-mini-circle">{initials}</div>
-  );
-
   return (
     <div className={`chat-root ${isDark ? 'dark' : 'light'}`}>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -476,7 +478,7 @@ export default function ChatPage({
             {/* Welcome bot message */}
             {welcomeMessage && (
               <div className="welcome-msg-row">
-                <BotAvatar />
+                <BotAvatar logoUrl={logoUrl} initials={initials} />
                 <div className="welcome-bubble">{renderWelcome(welcomeMessage)}</div>
               </div>
             )}
@@ -522,7 +524,7 @@ export default function ChatPage({
           <div className="messages-list">
             {messages.map((msg, i) => (
               <div key={i} className={`msg-row ${msg.role}`}>
-                {msg.role === 'assistant' && <BotAvatar />}
+                {msg.role === 'assistant' && <BotAvatar logoUrl={logoUrl} initials={initials} />}
                 <div className={`bubble ${msg.role === 'assistant' ? 'bot' : 'user'}`}>
                   {msg.role === 'assistant' && !msg.content && loading ? (
                     <div className="typing"><span /><span /><span /></div>
