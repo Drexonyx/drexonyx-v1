@@ -203,7 +203,7 @@ html, body { height: 100%; }
   border: 1px solid var(--gold-dim);
   border-radius: 14px; padding: 14px 12px;
   cursor: pointer; text-align: left;
-  display: flex; flex-direction: column; gap: 6px;
+  display: flex; flex-direction: row; align-items: center; gap: 12px;
   transition: border-color .15s, background .15s;
   font-family: 'Inter', sans-serif;
 }
@@ -211,15 +211,15 @@ html, body { height: 100%; }
   border-color: var(--gold); background: rgba(201,168,76,.06); outline: none;
 }
 .category-card.full-width { grid-column: 1 / -1; }
-.card-top { display: flex; align-items: center; justify-content: space-between; }
 .card-icon {
-  width: 32px; height: 32px; border-radius: 8px;
+  width: 38px; height: 38px; border-radius: 10px;
   background: rgba(201,168,76,.12);
   display: flex; align-items: center; justify-content: center;
   color: var(--gold); flex-shrink: 0;
 }
-.card-arrow { font-size: 20px; color: var(--gold); opacity: .5; line-height: 1; }
-.card-title { font-size: 12.5px; font-weight: 700; color: var(--text); line-height: 1.2; }
+.card-text { flex: 1; min-width: 0; }
+.card-arrow { font-size: 18px; color: var(--gold); opacity: .5; line-height: 1; flex-shrink: 0; }
+.card-title { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.2; margin-bottom: 3px; }
 .card-desc { font-size: 11px; color: var(--text-soft); line-height: 1.4; }
 
 /* ── SECURITY FOOTER ── */
@@ -229,10 +229,14 @@ html, body { height: 100%; }
 }
 .sec-line { flex: 1; height: 1px; background: var(--gold-dim); }
 .sec-content {
-  display: flex; align-items: center; gap: 5px;
-  font-size: 10px; color: var(--text-muted);
-  white-space: nowrap; flex-shrink: 0;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  flex-shrink: 0;
 }
+.sec-main {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 10px; color: var(--text-muted); white-space: nowrap;
+}
+.sec-sub { font-size: 9.5px; color: var(--text-muted); opacity: .7; }
 
 /* ── MESSAGES LIST ── */
 .messages-list { padding: 16px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
@@ -379,6 +383,14 @@ export default function ChatPage({
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(input); }
   }
 
+  function renderWelcome(text: string) {
+    return text.split(/(\{\{GOLD:[^}]+\}\})/).map((part, i) => {
+      const m = part.match(/\{\{GOLD:([^}]+)\}\}/);
+      if (m) return <span key={i} style={{ color: 'var(--gold)', fontWeight: 700 }}>{m[1]}</span>;
+      return <span key={i}>{part}</span>;
+    });
+  }
+
   function renderContent(content: string) {
     const waMatch = content.match(/\{\{WA_LINK_TEXT:([\s\S]*?)\}\}/);
     if (waMatch) {
@@ -465,7 +477,7 @@ export default function ChatPage({
             {welcomeMessage && (
               <div className="welcome-msg-row">
                 <BotAvatar />
-                <div className="welcome-bubble">{welcomeMessage}</div>
+                <div className="welcome-bubble">{renderWelcome(welcomeMessage)}</div>
               </div>
             )}
 
@@ -479,12 +491,12 @@ export default function ChatPage({
                       className={`category-card${categories.length % 2 !== 0 && i === categories.length - 1 ? ' full-width' : ''}`}
                       onClick={() => sendMessage(cat.prompt)}
                     >
-                      <div className="card-top">
-                        <div className="card-icon"><CategoryIcon type={cat.icon} /></div>
-                        <span className="card-arrow">›</span>
+                      <div className="card-icon"><CategoryIcon type={cat.icon} /></div>
+                      <div className="card-text">
+                        <div className="card-title">{cat.title}</div>
+                        <div className="card-desc">{cat.desc}</div>
                       </div>
-                      <div className="card-title">{cat.title}</div>
-                      <div className="card-desc">{cat.desc}</div>
+                      <span className="card-arrow">›</span>
                     </button>
                   ))}
                 </div>
@@ -495,10 +507,13 @@ export default function ChatPage({
             <div className="security-footer">
               <div className="sec-line" />
               <div className="sec-content">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                </svg>
-                <span>Your information is secure and confidential.</span>
+                <div className="sec-main">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                  <span>Your information is secure and confidential.</span>
+                </div>
+                <div className="sec-sub">We support businesses of all sizes.</div>
               </div>
               <div className="sec-line" />
             </div>
