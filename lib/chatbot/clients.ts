@@ -1,3 +1,4 @@
+// DR 0121: Chatbot client registry — add new clients here to publish at /chat/<slug>
 export interface ChatCategory {
   icon: 'monitor' | 'brush' | 'chart';
   title: string;
