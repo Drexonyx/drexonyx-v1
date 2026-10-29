@@ -32,10 +32,15 @@ export function proxy(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
   }
+
+  // Expose pathname to Server Components so the root layout can detect chat routes
+  const response = NextResponse.next();
+  response.headers.set('x-pathname', pathname);
+  return response;
 }
 
 export default proxy;
 
 export const config = {
-  matcher: ['/portal/:path*', '/admin/:path*', '/api/admin/:path*'],
+  matcher: ['/portal/:path*', '/admin/:path*', '/api/admin/:path*', '/chat/:path*'],
 };
