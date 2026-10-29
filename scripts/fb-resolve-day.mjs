@@ -49,9 +49,10 @@ if (dateArg && /^\d{4}-\d{2}-\d{2}$/.test(dateArg)) {
   targetDate = new Date().toISOString().slice(0, 10);
 }
 
-// Determine slot from UTC hour
+// Determine slot from UTC hour (or from explicit override)
+const slotArg = process.argv[3];
 const utcHour = new Date().getUTCHours();
-const slot = utcHour < 12 ? 'morning' : 'evening';
+const slot = (slotArg && slotArg.trim()) ? slotArg.trim() : (utcHour < 12 ? 'morning' : 'evening');
 console.log(`Resolving: date=${targetDate}  utcHour=${utcHour}  slot=${slot}`);
 
 // Load schedule

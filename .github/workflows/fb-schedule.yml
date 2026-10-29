@@ -17,6 +17,11 @@ on:
         required: false
         default: false
         type: boolean
+      override_slot:
+        description: 'Override slot (morning/evening/promo/…) — blank = auto from time'
+        required: false
+        default: ''
+        type: string
 
 # contents: write required to commit publish log after a successful post.
 permissions:
@@ -47,7 +52,7 @@ jobs:
           if [ -z "$DATE_ARG" ]; then
             DATE_ARG=$(date -u +%Y-%m-%d)
           fi
-          node scripts/fb-resolve-day.mjs "$DATE_ARG"
+          node scripts/fb-resolve-day.mjs "$DATE_ARG" "${{ inputs.override_slot }}"
 
       # QC gate — validates media file and caption. No post is created.
       # Credential is not required for QC.
