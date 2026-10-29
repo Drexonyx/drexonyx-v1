@@ -28,13 +28,32 @@ export async function POST(req: NextRequest) {
 
     const prompt = `${client.systemPrompt}\n\n${history}\nالمساعد:`;
 
-    const result = await model.generateContent({
+    const result = await model.generateContentStream({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
       generationConfig: { maxOutputTokens: 350 },
     });
 
-    const reply = result.response.text().trim();
-    return NextResponse.json({ reply });
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const chunk of result.stream) {
+            const text = chunk.text();
+            if (text) controller.enqueue(encoder.encode(text));
+          }
+        } finally {
+          controller.close();
+        }
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control': 'no-cache',
+        'X-Accel-Buffering': 'no',
+      },
+    });
   } catch (err) {
     console.error('[chatbot]', err);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });

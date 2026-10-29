@@ -49,6 +49,7 @@
     }
     #drx-chat-input-row {
       display: flex; border-top: 1px solid #333; padding: 8px;
+      direction: ltr;
     }
     #drx-chat-input {
       flex: 1; background: #1e1e2e; color: #eee; border: none;
@@ -107,12 +108,24 @@
   function addMsg(role, text) {
     const el = document.createElement('div');
     el.className = `drx-msg ${role === 'user' ? 'user' : 'bot'}`;
+    el.style.whiteSpace = 'pre-wrap';
+    el.textContent = text;
+    msgsEl.appendChild(el);
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+  }
 
-    const waMatch = text.match(/\{\{WA_LINK_TEXT:([\s\S]*?)\}\}/);
+  function greet() {
+    addMsg('bot', 'مرحباً! 👋 كيف أقدر أساعدك اليوم؟\nHello! How can I help you today?');
+  }
+
+  function renderBotContent(el, fullText) {
+    el.textContent = '';
+    el.style.whiteSpace = '';
+    const waMatch = fullText.match(/\{\{WA_LINK_TEXT:([\s\S]*?)\}\}/);
     if (waMatch) {
       const waText = waMatch[1].trim();
-      const before = text.slice(0, waMatch.index).trim();
-      const after = text.slice(waMatch.index + waMatch[0].length).trim();
+      const before = fullText.slice(0, waMatch.index).trim();
+      const after = fullText.slice(waMatch.index + waMatch[0].length).trim();
       if (before) {
         const pre = document.createElement('span');
         pre.style.whiteSpace = 'pre-wrap';
@@ -136,15 +149,8 @@
       }
     } else {
       el.style.whiteSpace = 'pre-wrap';
-      el.textContent = text;
+      el.textContent = fullText;
     }
-
-    msgsEl.appendChild(el);
-    msgsEl.scrollTop = msgsEl.scrollHeight;
-  }
-
-  function greet() {
-    addMsg('bot', 'مرحباً! 👋 كيف أقدر أساعدك اليوم؟\nHello! How can I help you today?');
   }
 
   async function sendMessage() {
@@ -156,6 +162,10 @@
     typingEl.style.display = 'block';
     sendBtn.disabled = true;
 
+    const botEl = document.createElement('div');
+    botEl.className = 'drx-msg bot';
+    botEl.style.whiteSpace = 'pre-wrap';
+
     try {
       const res = await fetch(`${apiBase}/api/chatbot`, {
         method: 'POST',
@@ -163,15 +173,32 @@
         body: JSON.stringify({ messages, clientId }),
         redirect: 'error',
       });
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      typingEl.style.display = 'none';
+      msgsEl.appendChild(botEl);
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let fullText = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        fullText += decoder.decode(value, { stream: true });
+        const displayText = fullText.replace(/\{\{WA_LINK_TEXT:[\s\S]*?\}\}/g, '').trim();
+        botEl.textContent = displayText || fullText;
+        msgsEl.scrollTop = msgsEl.scrollHeight;
       }
-      const data = await res.json();
-      const reply = data.reply || 'Sorry, something went wrong.';
-      messages.push({ role: 'assistant', content: reply });
-      addMsg('bot', reply);
+
+      renderBotContent(botEl, fullText.trim());
+      messages.push({ role: 'assistant', content: fullText.trim() });
+      msgsEl.scrollTop = msgsEl.scrollHeight;
     } catch {
-      addMsg('bot', 'Connection error. Please try again.');
+      typingEl.style.display = 'none';
+      if (!botEl.isConnected) msgsEl.appendChild(botEl);
+      botEl.style.whiteSpace = 'pre-wrap';
+      botEl.textContent = 'Connection error. Please try again.';
     } finally {
       typingEl.style.display = 'none';
       sendBtn.disabled = false;
