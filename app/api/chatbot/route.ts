@@ -22,10 +22,12 @@ export async function POST(req: NextRequest) {
     }
 
     const recent = messages.slice(-8) as { role: string; content: string }[];
-    const history = recent.slice(0, -1).map(m => ({
+    const historyRaw = recent.slice(0, -1).map(m => ({
       role: m.role === 'user' ? 'user' : 'model',
       parts: [{ text: m.content }],
     }));
+    const firstUser = historyRaw.findIndex(m => m.role === 'user');
+    const history = firstUser >= 0 ? historyRaw.slice(firstUser) : [];
     const lastMsg = recent[recent.length - 1];
 
     const encoder = new TextEncoder();
