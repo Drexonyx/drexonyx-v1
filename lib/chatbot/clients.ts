@@ -197,7 +197,7 @@ After collecting all info, show a formatted summary then write exactly:
     headerName: 'Try Live — AI Chatbot',
     language: 'both',
     theme: 'dark',
-    logoUrl: '/brand/drexonyx-icon.png',
+    logoUrl: '/brand/drexonyx-dx-mark.png',
     welcomeMessage: "You're now chatting with a {{GOLD:live AI bot}} — powered by DREXONYX.\nAsk anything to see what your customers would experience.",
     heroBg: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=800',
     heroTagline: 'EXPERIENCE IT LIVE',
