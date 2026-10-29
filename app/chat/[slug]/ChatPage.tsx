@@ -105,7 +105,7 @@ export default function ChatPage({ clientId, businessName, logoUrl, theme = 'dar
     <div className={`chat-root ${isLight ? 'light' : 'dark'}`}>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
       <style>{`
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { height: 100%; }
@@ -123,6 +123,7 @@ export default function ChatPage({ clientId, businessName, logoUrl, theme = 'dar
           --surface: #16161e;
           --border: #2a2a38;
           --text: #f0eee8;
+          --text-soft: #aaa;
           --text-muted: #666;
           --bubble-bot-bg: #1e1e2a;
           --bubble-bot-border: #2a2a3a;
@@ -133,26 +134,35 @@ export default function ChatPage({ clientId, businessName, logoUrl, theme = 'dar
           --input-placeholder: #555;
           --scrollbar: #333;
           --avatar-bg: linear-gradient(135deg, #c9a84c, #7a5c1e);
-          --powered-color: #555;
+          --logo-bg: #1e1e2a;
+          --logo-border: #2a2a38;
+          --powered-color: #444;
+          --welcome-hero: linear-gradient(180deg, #16161e 0%, #0f0f14 100%);
+          --welcome-divider: #2a2a38;
         }
 
         /* ── Light theme ─────────────────────────────────────── */
         .chat-root.light {
-          --bg: #f4f5f8;
+          --bg: #f0f2f5;
           --surface: #ffffff;
-          --border: #e0e2e9;
+          --border: #e4e6ed;
           --text: #1a1a2e;
-          --text-muted: #999;
+          --text-soft: #555;
+          --text-muted: #aaa;
           --bubble-bot-bg: #ffffff;
-          --bubble-bot-border: #e4e6ed;
+          --bubble-bot-border: #e8eaf0;
           --bubble-bot-text: #1a1a2e;
           --input-bg: #ffffff;
           --input-border: #dcdfe8;
           --input-text: #1a1a2e;
-          --input-placeholder: #aaa;
-          --scrollbar: #ccc;
+          --input-placeholder: #bbb;
+          --scrollbar: #ddd;
           --avatar-bg: linear-gradient(135deg, #c9a84c, #7a5c1e);
-          --powered-color: #bbb;
+          --logo-bg: #ffffff;
+          --logo-border: #e4e6ed;
+          --powered-color: #ccc;
+          --welcome-hero: linear-gradient(180deg, #ffffff 0%, #f0f2f5 100%);
+          --welcome-divider: #e4e6ed;
         }
 
         .chat-root {
@@ -160,39 +170,56 @@ export default function ChatPage({ clientId, businessName, logoUrl, theme = 'dar
           color: var(--text);
         }
 
-        /* Header */
+        /* ── Header ─────────────────────────────────────────── */
         .chat-header {
           display: flex;
           align-items: center;
           gap: 12px;
-          padding: 12px 16px;
+          padding: 10px 16px;
           background: var(--surface);
           border-bottom: 1px solid var(--border);
           flex-shrink: 0;
+          box-shadow: 0 1px 4px rgba(0,0,0,.06);
         }
-        .chat-avatar {
-          width: 42px;
-          height: 42px;
+
+        /* Circle avatar — used for initials */
+        .chat-avatar-circle {
+          width: 44px;
+          height: 44px;
           border-radius: 50%;
           background: var(--avatar-bg);
           display: flex;
           align-items: center;
           justify-content: center;
-          font-weight: 700;
-          font-size: 14px;
+          font-weight: 800;
+          font-size: 15px;
           color: #fff;
           flex-shrink: 0;
+        }
+
+        /* Logo container — rounded square, not cropped circle */
+        .chat-avatar-logo {
+          width: 44px;
+          height: 44px;
+          border-radius: 10px;
+          background: var(--logo-bg);
+          border: 1px solid var(--logo-border);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
           overflow: hidden;
+          box-shadow: 0 1px 3px rgba(0,0,0,.08);
         }
-        .chat-avatar img {
-          width: 100%;
-          height: 100%;
+        .chat-avatar-logo img {
+          width: 88%;
+          height: 88%;
           object-fit: contain;
-          border-radius: 0;
         }
+
         .chat-header-info { flex: 1; min-width: 0; }
         .chat-biz-name {
-          font-size: 15px;
+          font-size: 14px;
           font-weight: 700;
           color: var(--text);
           white-space: nowrap;
@@ -200,77 +227,133 @@ export default function ChatPage({ clientId, businessName, logoUrl, theme = 'dar
           text-overflow: ellipsis;
         }
         .chat-status {
-          font-size: 12px;
-          color: #4caf8a;
+          font-size: 11.5px;
+          color: #3cb87a;
           display: flex;
           align-items: center;
           gap: 5px;
-          margin-top: 1px;
+          margin-top: 2px;
         }
         .status-dot {
-          width: 7px; height: 7px;
-          background: #4caf8a;
+          width: 6px; height: 6px;
+          background: #3cb87a;
           border-radius: 50%;
           animation: pulse 2s infinite;
         }
         @keyframes pulse {
           0%, 100% { opacity: 1; }
-          50% { opacity: 0.4; }
+          50% { opacity: 0.35; }
         }
         .chat-powered {
-          font-size: 11px;
+          font-size: 10px;
           color: var(--powered-color);
           white-space: nowrap;
+          text-align: right;
+          line-height: 1.4;
         }
-        .chat-powered span { color: #c9a84c; font-weight: 600; }
+        .chat-powered strong { color: #c9a84c; font-weight: 700; letter-spacing: .3px; }
 
-        /* Messages */
+        /* ── Messages area ───────────────────────────────────── */
         .chat-messages {
           flex: 1;
           overflow-y: auto;
-          padding: 20px 16px;
+          padding: 0;
           display: flex;
           flex-direction: column;
-          gap: 12px;
           scroll-behavior: smooth;
         }
         .chat-messages::-webkit-scrollbar { width: 4px; }
         .chat-messages::-webkit-scrollbar-track { background: transparent; }
         .chat-messages::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 2px; }
 
-        /* Welcome */
-        .welcome-wrap {
+        /* ── Welcome screen ──────────────────────────────────── */
+        .welcome-hero {
+          background: var(--welcome-hero);
+          padding: 32px 24px 28px;
           display: flex;
           flex-direction: column;
           align-items: center;
-          justify-content: center;
-          flex: 1;
-          gap: 10px;
-          padding: 40px 20px;
-          text-align: center;
-          color: var(--text-muted);
+          gap: 14px;
+          border-bottom: 1px solid var(--welcome-divider);
         }
-        .welcome-icon {
-          width: 60px; height: 60px;
-          border-radius: 50%;
-          background: #c9a84c18;
-          border: 1px solid #c9a84c44;
+        .welcome-logo-wrap {
+          width: 84px;
+          height: 84px;
+          border-radius: 20px;
+          background: var(--logo-bg);
+          border: 1px solid var(--logo-border);
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 26px;
-          margin-bottom: 4px;
+          box-shadow: 0 4px 16px rgba(0,0,0,.08);
           overflow: hidden;
         }
-        .welcome-icon img {
-          width: 80%;
-          height: 80%;
+        .welcome-logo-wrap img {
+          width: 76%;
+          height: 76%;
           object-fit: contain;
         }
-        .welcome-title { font-size: 17px; font-weight: 700; color: #c9a84c; }
-        .welcome-sub { font-size: 14px; line-height: 1.7; max-width: 280px; color: var(--text-muted); }
+        .welcome-logo-initials {
+          font-size: 28px;
+          font-weight: 800;
+          color: #fff;
+          width: 84px;
+          height: 84px;
+          border-radius: 20px;
+          background: var(--avatar-bg);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 16px rgba(201,168,76,.25);
+        }
+        .welcome-biz { font-size: 16px; font-weight: 800; color: var(--text); text-align: center; }
+        .welcome-greeting { font-size: 22px; font-weight: 800; color: #c9a84c; text-align: center; }
+        .welcome-sub {
+          font-size: 13.5px;
+          line-height: 1.7;
+          text-align: center;
+          color: var(--text-soft);
+          max-width: 260px;
+        }
 
-        /* Bubbles */
+        .welcome-suggestions {
+          padding: 18px 16px;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .suggestion-label {
+          font-size: 11px;
+          font-weight: 700;
+          color: var(--text-muted);
+          text-align: right;
+          letter-spacing: .5px;
+          margin-bottom: 2px;
+        }
+        .suggestion-chip {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 22px;
+          padding: 10px 16px;
+          font-size: 13.5px;
+          color: var(--text);
+          text-align: right;
+          direction: rtl;
+          cursor: pointer;
+          width: 100%;
+          font-family: 'Tajawal', sans-serif;
+          transition: border-color .15s, background .15s;
+        }
+        .suggestion-chip:hover { border-color: #c9a84c88; background: #c9a84c08; }
+
+        .messages-list {
+          padding: 16px 16px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        /* ── Bubbles ─────────────────────────────────────────── */
         .msg-row {
           display: flex;
           gap: 8px;
@@ -282,31 +365,44 @@ export default function ChatPage({ clientId, businessName, logoUrl, theme = 'dar
           to   { opacity: 1; transform: translateY(0); }
         }
         .msg-row.user { flex-direction: row-reverse; }
-        .msg-mini-avatar {
+
+        .msg-mini-circle {
           width: 28px; height: 28px;
           border-radius: 50%;
           background: var(--avatar-bg);
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 10px;
-          font-weight: 700;
+          font-size: 9px;
+          font-weight: 800;
           color: #fff;
+          flex-shrink: 0;
+          margin-bottom: 2px;
+        }
+        .msg-mini-logo {
+          width: 28px; height: 28px;
+          border-radius: 7px;
+          background: var(--logo-bg);
+          border: 1px solid var(--logo-border);
+          display: flex;
+          align-items: center;
+          justify-content: center;
           flex-shrink: 0;
           margin-bottom: 2px;
           overflow: hidden;
         }
-        .msg-mini-avatar img {
-          width: 100%;
-          height: 100%;
+        .msg-mini-logo img {
+          width: 90%;
+          height: 90%;
           object-fit: contain;
         }
+
         .bubble {
           max-width: 78%;
           padding: 10px 14px;
           border-radius: 18px;
           font-size: 14.5px;
-          line-height: 1.6;
+          line-height: 1.65;
           white-space: pre-wrap;
           word-break: break-word;
         }
@@ -317,7 +413,7 @@ export default function ChatPage({ clientId, businessName, logoUrl, theme = 'dar
           color: var(--bubble-bot-text);
           text-align: right;
           direction: rtl;
-          box-shadow: 0 1px 3px rgba(0,0,0,.06);
+          box-shadow: 0 1px 4px rgba(0,0,0,.05);
         }
         .bubble.user {
           background: linear-gradient(135deg, #c9a84c, #a07830);
@@ -327,7 +423,7 @@ export default function ChatPage({ clientId, businessName, logoUrl, theme = 'dar
           direction: rtl;
         }
 
-        /* WhatsApp button */
+        /* ── WhatsApp button ─────────────────────────────────── */
         .wa-btn {
           display: inline-flex;
           align-items: center;
@@ -340,11 +436,10 @@ export default function ChatPage({ clientId, businessName, logoUrl, theme = 'dar
           font-weight: 700;
           text-decoration: none;
           margin-top: 8px;
-          cursor: pointer;
           direction: rtl;
         }
 
-        /* Typing */
+        /* ── Typing indicator ────────────────────────────────── */
         .typing { display: flex; gap: 5px; align-items: center; padding: 4px 2px; }
         .typing span {
           width: 7px; height: 7px;
@@ -359,9 +454,9 @@ export default function ChatPage({ clientId, businessName, logoUrl, theme = 'dar
           40% { transform: scale(1); opacity: 1; }
         }
 
-        /* Input area */
+        /* ── Input area ──────────────────────────────────────── */
         .chat-input-area {
-          padding: 12px 14px;
+          padding: 10px 14px;
           background: var(--surface);
           border-top: 1px solid var(--border);
           display: flex;
@@ -372,7 +467,7 @@ export default function ChatPage({ clientId, businessName, logoUrl, theme = 'dar
         .chat-textarea {
           flex: 1;
           background: var(--input-bg);
-          border: 1px solid var(--input-border);
+          border: 1.5px solid var(--input-border);
           border-radius: 22px;
           padding: 10px 16px;
           color: var(--input-text);
@@ -388,7 +483,7 @@ export default function ChatPage({ clientId, businessName, logoUrl, theme = 'dar
           transition: border-color .15s;
         }
         .chat-textarea::placeholder { color: var(--input-placeholder); }
-        .chat-textarea:focus { border-color: #c9a84c66; }
+        .chat-textarea:focus { border-color: #c9a84c88; }
         .send-btn {
           width: 44px; height: 44px;
           border-radius: 50%;
@@ -401,20 +496,22 @@ export default function ChatPage({ clientId, businessName, logoUrl, theme = 'dar
           justify-content: center;
           flex-shrink: 0;
           transition: opacity .15s, transform .1s;
+          box-shadow: 0 2px 8px rgba(201,168,76,.35);
         }
         .send-btn:hover { opacity: .85; }
         .send-btn:active { transform: scale(.93); }
-        .send-btn:disabled { opacity: .4; cursor: default; }
+        .send-btn:disabled { opacity: .35; cursor: default; box-shadow: none; }
       `}</style>
 
       {/* Header */}
       <div className="chat-header">
-        <div className="chat-avatar">
-          {logoUrl
-            ? <img src={logoUrl} alt={businessName} />
-            : initials
-          }
-        </div>
+        {logoUrl ? (
+          <div className="chat-avatar-logo">
+            <img src={logoUrl} alt={businessName} />
+          </div>
+        ) : (
+          <div className="chat-avatar-circle">{initials}</div>
+        )}
         <div className="chat-header-info">
           <div className="chat-biz-name">{businessName}</div>
           <div className="chat-status">
@@ -422,48 +519,74 @@ export default function ChatPage({ clientId, businessName, logoUrl, theme = 'dar
             متاح الآن
           </div>
         </div>
-        <div className="chat-powered">powered by <span>DREXONYX</span></div>
+        <div className="chat-powered">
+          powered by<br />
+          <strong>DREXONYX</strong>
+        </div>
       </div>
 
       {/* Messages */}
       <div className="chat-messages">
         {!started && messages.length === 0 ? (
-          <div className="welcome-wrap">
-            <div className="welcome-icon">
-              {logoUrl
-                ? <img src={logoUrl} alt={businessName} />
-                : '💬'
-              }
-            </div>
-            <div className="welcome-title">أهلاً بك!</div>
-            <div className="welcome-sub">
-              كيف يمكنني مساعدتك اليوم؟<br />اكتب سؤالك وسأرد فوراً.
-            </div>
-          </div>
-        ) : (
-          messages.map((msg, i) => (
-            <div key={i} className={`msg-row ${msg.role}`}>
-              {msg.role === 'assistant' && (
-                <div className="msg-mini-avatar">
-                  {logoUrl
-                    ? <img src={logoUrl} alt="" />
-                    : initials
-                  }
+          <>
+            {/* Hero welcome */}
+            <div className="welcome-hero">
+              {logoUrl ? (
+                <div className="welcome-logo-wrap">
+                  <img src={logoUrl} alt={businessName} />
                 </div>
+              ) : (
+                <div className="welcome-logo-initials">{initials}</div>
               )}
-              <div className={`bubble ${msg.role === 'assistant' ? 'bot' : 'user'}`}>
-                {msg.role === 'assistant' && !msg.content && loading ? (
-                  <div className="typing">
-                    <span /><span /><span />
-                  </div>
-                ) : (
-                  renderContent(msg.content)
-                )}
+              <div className="welcome-greeting">أهلاً بك! 👋</div>
+              <div className="welcome-sub">
+                مرحباً في {businessName}.<br />
+                اكتب سؤالك وسأرد عليك فوراً.
               </div>
             </div>
-          ))
+
+            {/* Quick suggestions */}
+            <div className="welcome-suggestions">
+              <div className="suggestion-label">اسألني عن ↓</div>
+              {[
+                'ما هي خدماتكم؟',
+                'كم تكلفة تصميم الموقع؟',
+                'كيف أبدأ معكم؟',
+              ].map(q => (
+                <button key={q} className="suggestion-chip" onClick={() => sendMessage(q)}>
+                  {q}
+                </button>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="messages-list">
+            {messages.map((msg, i) => (
+              <div key={i} className={`msg-row ${msg.role}`}>
+                {msg.role === 'assistant' && (
+                  logoUrl ? (
+                    <div className="msg-mini-logo">
+                      <img src={logoUrl} alt="" />
+                    </div>
+                  ) : (
+                    <div className="msg-mini-circle">{initials}</div>
+                  )
+                )}
+                <div className={`bubble ${msg.role === 'assistant' ? 'bot' : 'user'}`}>
+                  {msg.role === 'assistant' && !msg.content && loading ? (
+                    <div className="typing">
+                      <span /><span /><span />
+                    </div>
+                  ) : (
+                    renderContent(msg.content)
+                  )}
+                </div>
+              </div>
+            ))}
+            <div ref={bottomRef} />
+          </div>
         )}
-        <div ref={bottomRef} />
+        {started && <div ref={bottomRef} />}
       </div>
 
       {/* Input */}
