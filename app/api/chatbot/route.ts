@@ -6,6 +6,8 @@ export const runtime = 'edge';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
+const MODELS = ['gemini-3.5-flash-lite', 'gemini-2.0-flash'];
+
 export async function POST(req: NextRequest) {
   try {
     const { messages, clientId = 'demo' } = await req.json();
@@ -19,29 +21,44 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unknown client' }, { status: 404 });
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-flash-lite-latest' });
-
-    const history = messages
-      .slice(-8)
-      .map((m: { role: string; content: string }) =>
-        `${m.role === 'user' ? 'العميل' : 'المساعد'}: ${m.content}`
-      )
-      .join('\n');
-
-    const prompt = `${client.systemPrompt}\n\n${history}\nالمساعد:`;
-
-    const result = await model.generateContentStream({
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: { maxOutputTokens: 350 },
-    });
+    const recent = messages.slice(-8) as { role: string; content: string }[];
+    const history = recent.slice(0, -1).map(m => ({
+      role: m.role === 'user' ? 'user' : 'model',
+      parts: [{ text: m.content }],
+    }));
+    const lastMsg = recent[recent.length - 1];
 
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       async start(controller) {
+        let sent = false;
         try {
-          for await (const chunk of result.stream) {
-            const text = chunk.text();
-            if (text) controller.enqueue(encoder.encode(text));
+          for (const modelName of MODELS) {
+            try {
+              const model = genAI.getGenerativeModel({
+                model: modelName,
+                systemInstruction: client.systemPrompt,
+              });
+              const chat = model.startChat({ history, generationConfig: { maxOutputTokens: 300 } });
+              const result = await chat.sendMessageStream(lastMsg.content);
+              for await (const chunk of result.stream) {
+                const text = chunk.text();
+                if (text) { controller.enqueue(encoder.encode(text)); sent = true; }
+              }
+              return;
+            } catch (err: any) {
+              const retired = err?.status === 404 || String(err?.message).includes('no longer available');
+              if (retired && modelName !== MODELS[MODELS.length - 1]) {
+                console.warn(`[chatbot] ${modelName} retired, switching to fallback`);
+                continue;
+              }
+              throw err;
+            }
+          }
+        } catch (err) {
+          console.error('[chatbot]', err);
+          if (!sent) {
+            controller.enqueue(encoder.encode('عذراً، هناك انقطاع مؤقت في الخدمة. يرجى المحاولة خلال لحظات.'));
           }
         } finally {
           controller.close();
