@@ -380,7 +380,7 @@ export default function ChatPage({
         setMessages([...newMessages, { role: 'assistant', content: full }]);
       }
     } catch {
-      setMessages([...newMessages, { role: 'assistant', content: 'عذراً، حدث خطأ. حاول مرة أخرى.' }]);
+      setMessages([...newMessages, { role: 'assistant', content: 'عذراً، هناك انقطاع مؤقت في الخدمة. يرجى المحاولة خلال لحظات.' }]);
     } finally {
       setLoading(false);
       inputRef.current?.focus();
