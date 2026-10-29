@@ -10,9 +10,11 @@ interface Message {
 interface Props {
   clientId: string;
   businessName: string;
+  logoUrl?: string;
+  theme?: 'dark' | 'light';
 }
 
-export default function ChatPage({ clientId, businessName }: Props) {
+export default function ChatPage({ clientId, businessName, logoUrl, theme = 'dark' }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -97,9 +99,13 @@ export default function ChatPage({ clientId, businessName }: Props) {
   }
 
   const initials = businessName.slice(0, 2).toUpperCase();
+  const isLight = theme === 'light';
 
   return (
-    <div className="chat-root">
+    <div className={`chat-root ${isLight ? 'light' : 'dark'}`}>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet" />
       <style>{`
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { height: 100%; }
@@ -108,9 +114,50 @@ export default function ChatPage({ clientId, businessName }: Props) {
           display: flex;
           flex-direction: column;
           height: 100dvh;
-          background: #0f0f14;
           font-family: 'Tajawal', -apple-system, sans-serif;
-          color: #f0eee8;
+        }
+
+        /* ── Dark theme ─────────────────────────────────────── */
+        .chat-root.dark {
+          --bg: #0f0f14;
+          --surface: #16161e;
+          --border: #2a2a38;
+          --text: #f0eee8;
+          --text-muted: #666;
+          --bubble-bot-bg: #1e1e2a;
+          --bubble-bot-border: #2a2a3a;
+          --bubble-bot-text: #e8e6e0;
+          --input-bg: #0f0f14;
+          --input-border: #2a2a38;
+          --input-text: #f0eee8;
+          --input-placeholder: #555;
+          --scrollbar: #333;
+          --avatar-bg: linear-gradient(135deg, #c9a84c, #7a5c1e);
+          --powered-color: #555;
+        }
+
+        /* ── Light theme ─────────────────────────────────────── */
+        .chat-root.light {
+          --bg: #f4f5f8;
+          --surface: #ffffff;
+          --border: #e0e2e9;
+          --text: #1a1a2e;
+          --text-muted: #999;
+          --bubble-bot-bg: #ffffff;
+          --bubble-bot-border: #e4e6ed;
+          --bubble-bot-text: #1a1a2e;
+          --input-bg: #ffffff;
+          --input-border: #dcdfe8;
+          --input-text: #1a1a2e;
+          --input-placeholder: #aaa;
+          --scrollbar: #ccc;
+          --avatar-bg: linear-gradient(135deg, #c9a84c, #7a5c1e);
+          --powered-color: #bbb;
+        }
+
+        .chat-root {
+          background: var(--bg);
+          color: var(--text);
         }
 
         /* Header */
@@ -118,16 +165,16 @@ export default function ChatPage({ clientId, businessName }: Props) {
           display: flex;
           align-items: center;
           gap: 12px;
-          padding: 14px 18px;
-          background: #16161e;
-          border-bottom: 1px solid #2a2a38;
+          padding: 12px 16px;
+          background: var(--surface);
+          border-bottom: 1px solid var(--border);
           flex-shrink: 0;
         }
         .chat-avatar {
           width: 42px;
           height: 42px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #c9a84c, #7a5c1e);
+          background: var(--avatar-bg);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -135,12 +182,19 @@ export default function ChatPage({ clientId, businessName }: Props) {
           font-size: 14px;
           color: #fff;
           flex-shrink: 0;
+          overflow: hidden;
+        }
+        .chat-avatar img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          border-radius: 0;
         }
         .chat-header-info { flex: 1; min-width: 0; }
         .chat-biz-name {
           font-size: 15px;
           font-weight: 700;
-          color: #f0eee8;
+          color: var(--text);
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -165,10 +219,10 @@ export default function ChatPage({ clientId, businessName }: Props) {
         }
         .chat-powered {
           font-size: 11px;
-          color: #555;
+          color: var(--powered-color);
           white-space: nowrap;
         }
-        .chat-powered span { color: #c9a84c; }
+        .chat-powered span { color: #c9a84c; font-weight: 600; }
 
         /* Messages */
         .chat-messages {
@@ -182,7 +236,7 @@ export default function ChatPage({ clientId, businessName }: Props) {
         }
         .chat-messages::-webkit-scrollbar { width: 4px; }
         .chat-messages::-webkit-scrollbar-track { background: transparent; }
-        .chat-messages::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 2px; }
 
         /* Welcome */
         .welcome-wrap {
@@ -194,21 +248,27 @@ export default function ChatPage({ clientId, businessName }: Props) {
           gap: 10px;
           padding: 40px 20px;
           text-align: center;
-          color: #888;
+          color: var(--text-muted);
         }
         .welcome-icon {
-          width: 56px; height: 56px;
+          width: 60px; height: 60px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #c9a84c22, #c9a84c44);
+          background: #c9a84c18;
           border: 1px solid #c9a84c44;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 24px;
+          font-size: 26px;
           margin-bottom: 4px;
+          overflow: hidden;
+        }
+        .welcome-icon img {
+          width: 80%;
+          height: 80%;
+          object-fit: contain;
         }
         .welcome-title { font-size: 17px; font-weight: 700; color: #c9a84c; }
-        .welcome-sub { font-size: 14px; line-height: 1.6; max-width: 280px; }
+        .welcome-sub { font-size: 14px; line-height: 1.7; max-width: 280px; color: var(--text-muted); }
 
         /* Bubbles */
         .msg-row {
@@ -225,7 +285,7 @@ export default function ChatPage({ clientId, businessName }: Props) {
         .msg-mini-avatar {
           width: 28px; height: 28px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #c9a84c, #7a5c1e);
+          background: var(--avatar-bg);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -234,6 +294,12 @@ export default function ChatPage({ clientId, businessName }: Props) {
           color: #fff;
           flex-shrink: 0;
           margin-bottom: 2px;
+          overflow: hidden;
+        }
+        .msg-mini-avatar img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
         }
         .bubble {
           max-width: 78%;
@@ -245,12 +311,13 @@ export default function ChatPage({ clientId, businessName }: Props) {
           word-break: break-word;
         }
         .bubble.bot {
-          background: #1e1e2a;
-          border: 1px solid #2a2a3a;
+          background: var(--bubble-bot-bg);
+          border: 1px solid var(--bubble-bot-border);
           border-bottom-right-radius: 4px;
-          color: #e8e6e0;
+          color: var(--bubble-bot-text);
           text-align: right;
           direction: rtl;
+          box-shadow: 0 1px 3px rgba(0,0,0,.06);
         }
         .bubble.user {
           background: linear-gradient(135deg, #c9a84c, #a07830);
@@ -295,8 +362,8 @@ export default function ChatPage({ clientId, businessName }: Props) {
         /* Input area */
         .chat-input-area {
           padding: 12px 14px;
-          background: #16161e;
-          border-top: 1px solid #2a2a38;
+          background: var(--surface);
+          border-top: 1px solid var(--border);
           display: flex;
           gap: 10px;
           align-items: flex-end;
@@ -304,11 +371,11 @@ export default function ChatPage({ clientId, businessName }: Props) {
         }
         .chat-textarea {
           flex: 1;
-          background: #0f0f14;
-          border: 1px solid #2a2a38;
+          background: var(--input-bg);
+          border: 1px solid var(--input-border);
           border-radius: 22px;
           padding: 10px 16px;
-          color: #f0eee8;
+          color: var(--input-text);
           font-family: 'Tajawal', sans-serif;
           font-size: 14.5px;
           resize: none;
@@ -320,8 +387,8 @@ export default function ChatPage({ clientId, businessName }: Props) {
           line-height: 1.5;
           transition: border-color .15s;
         }
-        .chat-textarea::placeholder { color: #555; }
-        .chat-textarea:focus { border-color: #c9a84c55; }
+        .chat-textarea::placeholder { color: var(--input-placeholder); }
+        .chat-textarea:focus { border-color: #c9a84c66; }
         .send-btn {
           width: 44px; height: 44px;
           border-radius: 50%;
@@ -342,7 +409,12 @@ export default function ChatPage({ clientId, businessName }: Props) {
 
       {/* Header */}
       <div className="chat-header">
-        <div className="chat-avatar">{initials}</div>
+        <div className="chat-avatar">
+          {logoUrl
+            ? <img src={logoUrl} alt={businessName} />
+            : initials
+          }
+        </div>
         <div className="chat-header-info">
           <div className="chat-biz-name">{businessName}</div>
           <div className="chat-status">
@@ -357,7 +429,12 @@ export default function ChatPage({ clientId, businessName }: Props) {
       <div className="chat-messages">
         {!started && messages.length === 0 ? (
           <div className="welcome-wrap">
-            <div className="welcome-icon">💬</div>
+            <div className="welcome-icon">
+              {logoUrl
+                ? <img src={logoUrl} alt={businessName} />
+                : '💬'
+              }
+            </div>
             <div className="welcome-title">أهلاً بك!</div>
             <div className="welcome-sub">
               كيف يمكنني مساعدتك اليوم؟<br />اكتب سؤالك وسأرد فوراً.
@@ -367,7 +444,12 @@ export default function ChatPage({ clientId, businessName }: Props) {
           messages.map((msg, i) => (
             <div key={i} className={`msg-row ${msg.role}`}>
               {msg.role === 'assistant' && (
-                <div className="msg-mini-avatar">{initials}</div>
+                <div className="msg-mini-avatar">
+                  {logoUrl
+                    ? <img src={logoUrl} alt="" />
+                    : initials
+                  }
+                </div>
               )}
               <div className={`bubble ${msg.role === 'assistant' ? 'bot' : 'user'}`}>
                 {msg.role === 'assistant' && !msg.content && loading ? (
