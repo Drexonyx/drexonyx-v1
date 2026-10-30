@@ -21,6 +21,12 @@ export interface ChatbotClient {
   heroSubtitle?: string;
   categories?: ChatCategory[];
   inputPlaceholder?: string;
+  // Subscription fields — omit for internal/demo clients (treated as always active)
+  active?: boolean;       // false = blocked; omitted = active
+  expiresAt?: Date;       // if set and in the past, treated as expired
+  activatedAt?: Date;     // subscription start date
+  planName?: string;      // e.g. "Basic AED 299/month"
+  ownerContact?: string;  // billing contact (WhatsApp or email)
 }
 
 const clients: Record<string, ChatbotClient> = {
