@@ -1,7 +1,7 @@
 # MDA SINGLE SESSION MASTER GUIDE
 **Project:** DREXONYX / MDA — drexonyx-v1  
 **Purpose:** Everything a new Claude Code session needs to understand and continue work on this project.  
-**Last Updated:** 2026-10-30  
+**Last Updated:** 2026-10-30 (Reconciliation Audit — Session 2)  
 **Authoritative Version:** This file + `MDA_SOURCE_OF_TRUTH_AND_OPERATING_RULES.md` + `ARCHITECTURE.md` + `CLAUDE.md`
 
 ---
@@ -12,7 +12,8 @@
 - **GitHub:** `drexonyx/drexonyx-v1` (private)
 - **Dev Branch:** `ccr-3a71ba38-pwua60` (current active session branch)
 - **Production Branch:** `main`
-- **Latest Production Commit:** `210ff06` (PR #49 — chatbot fixes)
+- **Latest Main Branch Commit:** `210ff06` (PR #49 — chatbot fixes)  
+**Current Production Deployment:** `1588e5e` — PR #49 NOT YET LIVE (ISS-016)
 
 ### Hosting
 - **Platform:** Vercel (free tier — 100 deployments/day limit)
@@ -131,14 +132,14 @@ drexonyx-v1/
 ### Digital Launch Package
 - Starting from AED 699
 
-### CHATBOT SUBSCRIPTION (⚠️ PRICING PENDING OWNER CONFIRMATION — SEE ISS-003)
-| Code Value | Status |
-|---|---|
-| Basic: AED 299/month | In code — NEEDS OWNER CONFIRMATION |
-| Advanced: AED 499/month | In code — NEEDS OWNER CONFIRMATION |
-| Professional: AED 799/month | In code — NEEDS OWNER CONFIRMATION |
+### CHATBOT SUBSCRIPTION (OWNER-CONFIRMED — 2026-10-30)
+| Tier | Price (AED) | Status |
+|---|---|---|
+| Subscription | 199/month | **OWNER-CONFIRMED** |
 
-**⚠️ WITHDRAWN:** AED 650 = SUPERSEDED/WITHDRAWN. DO NOT use.
+**⚠️ SUPERSEDED:** AED 299/499/799 tiers = IN CODE BUT NOT APPROVED. Must be updated. See ISS-003.  
+**⚠️ WITHDRAWN:** AED 650 = SUPERSEDED/WITHDRAWN. DO NOT use.  
+**ACTION REQUIRED:** Code in `lib/chatbot/clients.ts` and both promo pages still show 299/499/799 — awaiting owner confirmation of full tier structure before code fix.
 
 ---
 
@@ -157,7 +158,7 @@ drexonyx-v1/
 - **API Route:** `app/api/chatbot/route.ts`
 - **Runtime:** Edge (Vercel Edge Functions)
 - **AI Provider:** Google Gemini
-- **Models:** `['gemini-3.5-flash-lite', 'gemini-2.0-flash']` ← PRIMARY MODEL IS WRONG (ISS-001)
+- **Models:** `['gemini-3.5-flash-lite', 'gemini-2.0-flash']` ← ISS-001: `gemini-3.5-flash-lite` is invalid; falls back to `gemini-2.0-flash` on every request
 - **Fallback:** 404 → switch to next model
 - **Max History:** 8 messages (last 8 kept)
 - **History Rule:** Must start with `role: 'user'` (fixed in PR #49)
@@ -172,71 +173,83 @@ drexonyx-v1/
 ### 5.1 Database — Neon PostgreSQL
 | Item | Status |
 |---|---|
-| Connection string | `DATABASE_URL` env var (lazy init, fails closed if missing) |
+| Connection string | `DATABASE_URL` — VERIFIED SET in Vercel (sensitive) |
 | Schemas | 8: core, identity, commercial, production, financial, system, orchestration, sales |
 | ORM | Drizzle ORM with postgres-js driver |
 | Config | `prepare: false` (PgBouncer compatible) |
-| Verification | UNVERIFIED — Neon MCP requires OAuth (ISS-018) |
-| Migration | 0026_email_optouts may not be applied (ISS-012) |
+| Migration 0026 | CONFIRMED—APPLIED (email_optouts, opt-out system live) |
+| Schema verification | UNVERIFIED — Neon MCP requires OAuth (ISS-018) |
 
 ### 5.2 Email — Resend
 | Item | Status |
 |---|---|
-| API Key | `RESEND_API_KEY` env var |
-| From Address | `RESEND_FROM_ADDRESS` env var |
+| API Key | `RESEND_API_KEY` — VERIFIED SET in Vercel (sensitive) |
+| From Address | `RESEND_FROM_ADDRESS` — VERIFIED SET in Vercel (sensitive) |
 | Admin Notifications | `ADMIN_NOTIFICATION_EMAIL` (defaults to drexonyx.studio@gmail.com) |
 | Orchestration Alerts | `ORCHESTRATION_ALERT_EMAIL` env var |
-| Verification | UNVERIFIED (ISS-009) |
-| Safety Gate | `SALES_OUTREACH_TEST_MODE` — MUST be "true" (ISS-010 — CRITICAL) |
+| Domain verification | UNVERIFIED (Resend dashboard access required) |
+| Safety Gate | `SALES_OUTREACH_TEST_MODE` = "false" — **LIVE MODE** (intentional, activated 2026-10-07) |
 
 ### 5.3 Cloudflare R2 (Object Storage)
 | Item | Status |
 |---|---|
-| Account ID | `R2_ACCOUNT_ID` env var |
-| Access Key | `R2_ACCESS_KEY_ID` env var |
-| Secret Key | `R2_SECRET_ACCESS_KEY` env var |
-| Bucket Name | `R2_BUCKET_NAME` env var |
+| Account ID | `R2_ACCOUNT_ID` — VERIFIED SET in Vercel (sensitive) |
+| Access Key | `R2_ACCESS_KEY_ID` — VERIFIED SET in Vercel (sensitive) |
+| Secret Key | `R2_SECRET_ACCESS_KEY` — VERIFIED SET in Vercel (sensitive) |
+| Bucket Name | `R2_BUCKET_NAME` — VERIFIED SET in Vercel (sensitive) |
 | Endpoint | Optional `R2_ENDPOINT` (auto-derived from account ID) |
-| Status | NOT CONFIGURED (ISS-007) |
-| Impact | Blocks: Facebook IMAGE/VIDEO publishing, asset management |
+| Connectivity | UNVERIFIED (bucket existence not confirmed without live test) |
+| Note | GitHub Actions FB publishing does NOT use R2 (uses repo files) |
 
 ### 5.4 Vercel (Hosting)
 | Item | Status |
 |---|---|
 | Plan | Free tier |
-| Deployment Limit | 100/day (hit Oct 29, 2026) |
+| Deployment Limit | 100/day (hit Oct 29, 2026; resets daily) |
 | Cron Jobs | 6 active (see section 6) |
-| Admin Routes | Separate deployment required (ENABLE_ADMIN_ROUTES=true) |
+| Admin Routes | ANOMALY: `ENABLE_ADMIN_ROUTES=true` on main public project (ISS-019) |
+| Production SHA | `1588e5e` — PR #49 (`210ff06`) NOT yet deployed (ISS-016) |
 
 ### 5.5 Google Gemini (AI)
 | Item | Status |
 |---|---|
 | API Key | `GEMINI_API_KEY` — CONFIRMED SET |
-| Chatbot | WORKING ✅ |
+| Chatbot | WORKING ✅ (falling back to gemini-2.0-flash due to ISS-001) |
+| Primary model | `gemini-3.5-flash-lite` — INVALID name (ISS-001) |
+| Fallback model | `gemini-2.0-flash` — WORKING |
 | Skills AI | `SKILLS_AI_MODEL` env var (defaults to gemini-2.5-flash) |
 
-### 5.6 Facebook Graph API
-| Item | Status |
-|---|---|
-| Access Token | `META_PAGE_ACCESS_TOKEN` — NOT SET (ISS-008) |
-| Page ID 1 | `META_PAGE_ID_1` — NOT SET |
-| Page ID 2 | `META_PAGE_ID_2` — NOT SET |
-| Status | COMPLETELY BLOCKED |
+### 5.6 Facebook Publishing (TWO SYSTEMS)
+| System | Credentials | Status |
+|---|---|---|
+| GitHub Actions (fb-publish.yml, fb-schedule.yml) | GitHub Secrets: `META_PAGE_ACCESS_TOKEN`, `META_PAGE_ID_1` | UNKNOWN (GitHub Secrets not readable from this session) |
+| Vercel Skill (lib/skills/facebook/page-publish.ts) | Vercel: `META_PAGE_ACCESS_TOKEN` SET, `META_PAGE_ID_1` SET, `META_PAGE_ID_2` **MISSING** | PARTIAL |
+| R2 (for Vercel Skill IMAGE/VIDEO) | All R2 vars SET | PARTIAL (connectivity unverified) |
 
 ### 5.7 Authentication
 | Item | Status |
 |---|---|
-| NextAuth v5 | `AUTH_SECRET`, `AUTH_URL` env vars |
-| Admin Login | Custom bcrypt: `ADMIN_LOGIN_PASSWORD_HASH` + DB lookup |
-| Admin Session | HMAC-SHA256 cookie (`ADMIN_SESSION_SECRET` or falls back to `AUTH_SECRET`) |
-| Status | UNVERIFIED (ISS-011) |
+| NextAuth v5 | `AUTH_SECRET` SET, `AUTH_URL` SET |
+| Admin Login | `ADMIN_LOGIN_PASSWORD_HASH` SET (sensitive) |
+| Admin Session | HMAC-SHA256 cookie |
+| `DREXONYX_ORG_ID` | SET (sensitive) |
+| ANOMALY | `ENABLE_ADMIN_ROUTES=true` on main public project — see ISS-019 |
 
 ### 5.8 Payments (Stripe + Ziina)
 | Item | Status |
 |---|---|
-| Stripe | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` — UNVERIFIED |
-| Ziina | `ZIINA_API_KEY`, `ZIINA_BASE_URL`, `ZIINA_TEST_MODE` — UNVERIFIED |
-| Status | DEFERRED (ISS-014) |
+| Stripe | `STRIPE_SECRET_KEY` SET, `STRIPE_WEBHOOK_SECRET` SET |
+| Ziina | `ZIINA_API_KEY` SET; `ZIINA_BASE_URL` + `ZIINA_TEST_MODE` — NOT FOUND in Vercel |
+| Status | PARTIAL (ISS-014) |
+
+### 5.9 Higgsfield AI
+| Item | Status |
+|---|---|
+| API Key | `HIGGSFIELD_API_KEY` — VERIFIED SET (sensitive) |
+| Base URL | `HIGGSFIELD_API_BASE_URL` — VERIFIED SET (sensitive) |
+| Webhook URL | NOT FOUND in Vercel — inbound callbacks will not work |
+| Webhook Secret | NOT FOUND in Vercel |
+| Status | PARTIAL (ISS-013) |
 
 ---
 
@@ -257,28 +270,31 @@ All times UTC. Need `CRON_SECRET` set in Vercel as Bearer token.
 
 ---
 
-## 7. ENVIRONMENT VARIABLES CHECKLIST
+## 7. ENVIRONMENT VARIABLES STATUS (Verified 2026-10-30)
 
-### CONFIRMED WORKING
+### CONFIRMED SET in Vercel Production
 - [x] `GEMINI_API_KEY` — chatbot working
+- [x] `DATABASE_URL` — SET (sensitive)
+- [x] `RESEND_API_KEY` — SET (sensitive)
+- [x] `RESEND_FROM_ADDRESS` — SET (sensitive)
+- [x] `R2_ACCOUNT_ID` + `R2_ACCESS_KEY_ID` + `R2_SECRET_ACCESS_KEY` + `R2_BUCKET_NAME` — ALL SET (sensitive)
+- [x] `META_PAGE_ACCESS_TOKEN` + `META_PAGE_ID_1` — SET (sensitive)
+- [x] `HIGGSFIELD_API_KEY` + `HIGGSFIELD_API_BASE_URL` — SET (sensitive)
+- [x] `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET` — SET (sensitive)
+- [x] `ZIINA_API_KEY` — SET (sensitive)
+- [x] `ADMIN_LOGIN_PASSWORD_HASH` + `DREXONYX_ORG_ID` — SET (sensitive)
+- [x] `AUTH_SECRET` + `AUTH_URL` — SET
+- [x] `ENABLE_ADMIN_ROUTES` = "true" — SET (anomaly — ISS-019)
+- [x] `CRON_SECRET` — SET (sensitive)
+- [x] `WHATSAPP_WEBHOOK_VERIFY_TOKEN` — SET (sensitive)
+- [x] `SALES_OUTREACH_TEST_MODE` = "false" — **LIVE MODE** (intentional)
+- [x] `ANTHROPIC_API_KEY` — SET (undocumented — ISS-021)
 
-### MUST VERIFY (check in Vercel dashboard)
-- [ ] `DATABASE_URL` — Neon connection string
-- [ ] `SALES_OUTREACH_TEST_MODE` — CRITICAL: must be "true"
-- [ ] `CRON_SECRET` — cron auth
-- [ ] `DREXONYX_ORG_ID` — production org UUID
-- [ ] `AUTH_SECRET` — NextAuth
-- [ ] `RESEND_API_KEY` — email
-- [ ] `RESEND_FROM_ADDRESS` — email sender
-
-### NOT SET (need to configure when ready)
-- [ ] `META_PAGE_ACCESS_TOKEN` + `META_PAGE_ID_1` + `META_PAGE_ID_2` — Facebook
-- [ ] `R2_ACCOUNT_ID` + `R2_ACCESS_KEY_ID` + `R2_SECRET_ACCESS_KEY` + `R2_BUCKET_NAME` — R2
-- [ ] `HIGGSFIELD_API_KEY` + related — Higgsfield
-- [ ] `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET` — Stripe
-- [ ] `ZIINA_API_KEY` + related — Ziina
-- [ ] `WHATSAPP_*` — WhatsApp
-- [ ] `ADMIN_LOGIN_PASSWORD_HASH` — Admin
+### PARTIAL / MISSING
+- [ ] `META_PAGE_ID_2` — NOT FOUND (ISS-020)
+- [ ] `HIGGSFIELD_WEBHOOK_URL` + `HIGGSFIELD_WEBHOOK_SECRET` — NOT FOUND
+- [ ] `ZIINA_BASE_URL` + `ZIINA_TEST_MODE` — NOT FOUND
+- [ ] `WHATSAPP_APP_SECRET` + `WHATSAPP_PHONE_NUMBER_ID` — NOT FOUND
 
 ---
 
@@ -297,20 +313,30 @@ a21febc  feat(chat): MDA chatbot — premium dark design
 
 ---
 
-## 9. OPEN ISSUES SUMMARY
+## 9. OPEN ISSUES SUMMARY (Updated 2026-10-30)
 
 See `MDA_MASTER_ISSUES_REGISTER.md` for full details. Priority order:
 
-1. **ISS-010** (CRITICAL) — Verify SALES_OUTREACH_TEST_MODE=true in Vercel before crons fire
+1. **ISS-019** (HIGH) — ENABLE_ADMIN_ROUTES=true on main public project (security anomaly — needs owner decision)
 2. **ISS-002** (HIGH) — Replace Netflix logo in /chat/try background
-3. **ISS-001** (MEDIUM) — Fix chatbot primary model name
-4. **ISS-004** (MEDIUM) — Update promo.html CTA to link to /chat/try
-5. **ISS-005** (MEDIUM) — Embed MDA bot widget on /mda page
-6. **ISS-016** (MEDIUM) — Verify PR #49 production deployment is live
-7. **ISS-018** (MEDIUM) — Verify Neon DB connection and schema state
-8. **ISS-009** (MEDIUM) — Verify Resend email configuration
-9. **ISS-007** (HIGH, deferred) — Configure R2 when Facebook publishing needed
-10. **ISS-008** (HIGH, deferred) — Configure Meta credentials when publishing needed
+3. **ISS-003** (HIGH) — Update chatbot pricing to owner-confirmed 199 AED/month (code + promo pages)
+4. **ISS-016** (MEDIUM) — Deploy PR #49 to production (currently at 1588e5e, not 210ff06)
+5. **ISS-001** (MEDIUM) — Fix chatbot primary model name (gemini-3.5-flash-lite is invalid)
+6. **ISS-004** (MEDIUM) — Update promo.html/promo-en.html CTA to link to /chat/try
+7. **ISS-005** (MEDIUM) — Embed MDA bot widget on /mda page
+8. **ISS-020** (MEDIUM) — Add META_PAGE_ID_2 to Vercel for second-page FB publishing
+9. **ISS-011** (MEDIUM) — Confirm admin panel architecture (tied to ISS-019)
+10. **ISS-008** (MEDIUM) — Verify GitHub Actions Facebook secrets separately
+11. **ISS-013** (LOW) — Add Higgsfield webhook vars when video production begins
+12. **ISS-014** (LOW) — Confirm Ziina test mode before accepting payments
+13. **ISS-021** (LOW) — Document ANTHROPIC_API_KEY purpose in .env.example
+
+**RESOLVED since last session:**
+- ISS-010: Was "CRITICAL UNVERIFIED" — RESOLVED: LIVE MODE is deliberate (activated 2026-10-07)
+- ISS-009: Was "UNVERIFIED" — RESOLVED: Resend vars SET
+- ISS-007: Was "NOT CONFIGURED" — RESOLVED: R2 vars SET
+- ISS-012: Was "may not be applied" — RESOLVED: Migration APPLIED
+- ISS-018: Was "UNVERIFIED" — RESOLVED: DATABASE_URL SET
 
 ---
 
