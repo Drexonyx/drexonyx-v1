@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { getClient } from '@/lib/chatbot/clients';
+// DR 0122: Register Social Seller Bot merchants as a module-load side effect.
+import '@/lib/chatbot/social-seller';
 
 export const runtime = 'edge';
 

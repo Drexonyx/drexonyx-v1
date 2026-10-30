@@ -37,6 +37,7 @@ export default async function Page({ params }: Props) {
       heroSubtitle={client.heroSubtitle}
       categories={client.categories}
       inputPlaceholder={client.inputPlaceholder}
+      waNumber={client.waNumber}
     />
   );
 }

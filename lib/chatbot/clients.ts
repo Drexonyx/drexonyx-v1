@@ -21,6 +21,7 @@ export interface ChatbotClient {
   heroSubtitle?: string;
   categories?: ChatCategory[];
   inputPlaceholder?: string;
+  waNumber?: string;       // WhatsApp number for WA button, e.g. "971501234567"; falls back to MDA number if omitted
   // Subscription fields — omit for internal/demo clients (treated as always active)
   active?: boolean;       // false = blocked; omitted = active
   expiresAt?: Date;       // if set and in the past, treated as expired
