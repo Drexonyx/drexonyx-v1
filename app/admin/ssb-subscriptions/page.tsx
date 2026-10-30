@@ -1,9 +1,10 @@
-// DR-0130: Admin — SSB subscriptions & payment management
+// DR-0130: Admin — SSB subscriptions & payment management (Stages 5 & 6)
 import { getAdminSession } from '@/lib/admin/session';
 import { redirect } from 'next/navigation';
 import { db, ssbSchema } from '@/db';
 import { desc, eq } from 'drizzle-orm';
 import { CreatePaymentButton, CheckPaymentButton } from './PaymentButtons';
+import { ProvisionBotButton } from './ProvisionBotButton';
 import s from '../admin.module.css';
 
 export const metadata = { title: 'SSB Subscriptions — Admin' };
@@ -32,12 +33,26 @@ export default async function SsbSubscriptionsPage() {
           .orderBy(desc(ssbSchema.ssbPayments.created_at))
       : [];
 
+  const botConfigs =
+    subIds.length > 0
+      ? await db
+          .select({
+            subscription_id: ssbSchema.ssbBotConfigs.subscription_id,
+            merchant_slug: ssbSchema.ssbBotConfigs.merchant_slug,
+            qc_passed_at: ssbSchema.ssbBotConfigs.qc_passed_at,
+            delivered_at: ssbSchema.ssbBotConfigs.delivered_at,
+          })
+          .from(ssbSchema.ssbBotConfigs)
+      : [];
+
   const paymentsBySubId = new Map<string, typeof payments>();
   for (const p of payments) {
     const list = paymentsBySubId.get(p.subscription_id) ?? [];
     list.push(p);
     paymentsBySubId.set(p.subscription_id, list);
   }
+
+  const botConfigBySubId = new Map(botConfigs.map((c) => [c.subscription_id, c]));
 
   return (
     <>
@@ -62,6 +77,8 @@ export default async function SsbSubscriptionsPage() {
             const subPayments = paymentsBySubId.get(sub.id) ?? [];
             const latestPayment = subPayments[0] ?? null;
             const hasPendingPayment = subPayments.some((p) => p.status === 'PENDING');
+            const botConfig = botConfigBySubId.get(sub.id) ?? null;
+            const isProvisioned = botConfig?.delivered_at != null;
 
             return (
               <div
@@ -107,13 +124,34 @@ export default async function SsbSubscriptionsPage() {
                   {sub.activated_at && sub.active && <span>Activated: {fmtDate(sub.activated_at)}</span>}
                 </div>
 
-                {/* Payment actions */}
+                {/* Payment + provisioning actions */}
                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
                   {!hasPendingPayment && !sub.active && (
                     <CreatePaymentButton subscriptionId={sub.id} />
                   )}
                   {latestPayment && latestPayment.status === 'PENDING' && (
                     <CheckPaymentButton paymentId={latestPayment.id} />
+                  )}
+                  {sub.active && !isProvisioned && (
+                    <ProvisionBotButton subscriptionId={sub.id} />
+                  )}
+                  {isProvisioned && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                      <span className={`${s.badge} ${s.badgeSuccess}`}>Bot delivered ✓</span>
+                      <a
+                        href={`/chat/${sub.merchant_slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ fontSize: '0.75rem', color: 'var(--drex-accent)' }}
+                      >
+                        /chat/{sub.merchant_slug} ↗
+                      </a>
+                      {botConfig?.qc_passed_at && (
+                        <span style={{ fontSize: '0.7rem', color: 'var(--drex-text-secondary)' }}>
+                          QC: {fmtDate(botConfig.qc_passed_at)}
+                        </span>
+                      )}
+                    </div>
                   )}
                   {latestPayment && (
                     <div style={{ fontSize: '0.75rem', color: 'var(--drex-text-secondary)' }}>

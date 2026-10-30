@@ -1,5 +1,5 @@
 'use server';
-// DR-0130: SSB admin server actions — Stage 5 WhatsApp + Ziina payment workflow.
+// DR-0130: SSB admin server actions — Stages 5 & 6: payment + provisioning.
 // Node.js runtime required (Drizzle). Called from Client Components in the admin panel.
 
 import { getAdminSession } from '@/lib/admin/session';
@@ -7,6 +7,9 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { db, ssbSchema } from '@/db';
 import { eq } from 'drizzle-orm';
+import { registerClient } from '@/lib/chatbot/clients';
+import { buildSellerClient } from '@/lib/chatbot/social-seller/builder';
+import type { SocialSellerConfig } from '@/lib/chatbot/social-seller/types';
 import {
   createZiinaPaymentIntent,
   getZiinaPaymentIntent,
@@ -169,4 +172,89 @@ export async function actionCheckPayment(
 
   revalidatePath('/admin/ssb-subscriptions');
   return { ok: true, status: newStatus, activated };
+}
+
+// ── Provision Bot (Stage 6) ────────────────────────────────────────────────
+// Generates a SocialSellerConfig from subscription data, stores in ssb_bot_configs,
+// marks QC + delivered, registers in-memory for the current process.
+export async function actionProvisionBot(
+  subscriptionId: string,
+): Promise<{ ok: boolean; botUrl?: string; reason?: string }> {
+  const session = await getAdminSession();
+  if (!session) redirect('/admin/login');
+
+  const [sub] = await db
+    .select()
+    .from(ssbSchema.ssbSubscriptions)
+    .where(eq(ssbSchema.ssbSubscriptions.id, subscriptionId))
+    .limit(1);
+
+  if (!sub) return { ok: false, reason: 'Subscription not found' };
+  if (!sub.active) return { ok: false, reason: 'Subscription is not yet active (payment not confirmed)' };
+
+  // Check if already provisioned
+  const existing = await db
+    .select({ id: ssbSchema.ssbBotConfigs.id })
+    .from(ssbSchema.ssbBotConfigs)
+    .where(eq(ssbSchema.ssbBotConfigs.subscription_id, subscriptionId))
+    .limit(1);
+
+  if (existing.length > 0) {
+    return { ok: false, reason: 'Bot already provisioned for this subscription' };
+  }
+
+  // Build the SocialSellerConfig from subscription data
+  const waNumber = sub.contact_whatsapp.replace(/\D/g, '');
+  const config: SocialSellerConfig = {
+    slug: sub.merchant_slug,
+    name: sub.business_name,
+    headerName: sub.business_name,
+    businessType: sub.business_type ?? undefined,
+    language: 'both',
+    waNumber,
+    theme: 'dark',
+    welcomeMessage: `أهلاً بك في {{GOLD:${sub.business_name}}}.\nكيف يمكنني مساعدتك اليوم؟`,
+    heroTagline: sub.business_type ?? 'Social Seller Bot',
+    heroTitle: 'أهلاً بك في',
+    heroHighlight: sub.business_name,
+    heroSubtitle: 'اكتب رسالتك وسنساعدك على الفور.',
+    inputPlaceholder: 'اكتب رسالتك...',
+    active: true,
+    activatedAt: sub.activated_at ?? new Date(),
+    planName: sub.plan_name,
+    ownerContact: sub.contact_whatsapp,
+  };
+
+  // QC: validate minimum required fields
+  const qcErrors: string[] = [];
+  if (!config.slug) qcErrors.push('Missing slug');
+  if (!config.name) qcErrors.push('Missing business name');
+  if (!config.waNumber || config.waNumber.length < 10) qcErrors.push('Invalid WhatsApp number');
+
+  if (qcErrors.length > 0) {
+    return { ok: false, reason: `QC failed: ${qcErrors.join(', ')}` };
+  }
+
+  const now = new Date();
+  try {
+    await db.insert(ssbSchema.ssbBotConfigs).values({
+      subscription_id: subscriptionId,
+      merchant_slug: sub.merchant_slug,
+      config_json: config as unknown as Record<string, unknown>,
+      qc_passed_at: now,
+      delivered_at: now,
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return { ok: false, reason: `DB error: ${msg}` };
+  }
+
+  // Register in-memory for the current process instance
+  const client = buildSellerClient(config);
+  registerClient(sub.merchant_slug, client);
+
+  revalidatePath('/admin/ssb-subscriptions');
+
+  const base = getBaseUrl();
+  return { ok: true, botUrl: `${base}/chat/${sub.merchant_slug}` };
 }

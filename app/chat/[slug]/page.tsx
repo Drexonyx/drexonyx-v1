@@ -4,6 +4,8 @@ import { getClient } from '@/lib/chatbot/clients';
 // the Edge runtime registration in app/api/chatbot/route.ts — they have independent
 // module caches in production and cannot share registered clients).
 import '@/lib/chatbot/social-seller';
+// DR-0130 Stage 6: DB fallback for dynamically provisioned SSB bots.
+import { getOrLoadDynamicClient } from '@/lib/chatbot/social-seller/db-registry';
 import ChatPage from './ChatPage';
 
 interface Props {
@@ -12,7 +14,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const client = getClient(slug);
+  const client = getClient(slug) ?? await getOrLoadDynamicClient(slug);
   if (!client || client.active === false) return { title: 'Chat' };
   return {
     title: `${client.name} — مساعد ذكي`,
@@ -22,7 +24,7 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function Page({ params }: Props) {
   const { slug } = await params;
-  const client = getClient(slug);
+  const client = getClient(slug) ?? await getOrLoadDynamicClient(slug);
 
   if (!client) notFound();
   if (client.active === false) notFound();
