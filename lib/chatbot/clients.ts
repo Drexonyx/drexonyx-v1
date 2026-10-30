@@ -199,7 +199,7 @@ After collecting all info, show a formatted summary then write exactly:
     theme: 'dark',
     logoUrl: '/brand/drexonyx-dx-mark.png',
     welcomeMessage: "You're now chatting with a {{GOLD:live AI bot}} — powered by DREXONYX.\nAsk anything to see what your customers would experience.",
-    heroBg: 'https://images.unsplash.com/photo-1577908884587-a89c28d6c1af?q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=800',
+    heroBg: '/images/chat-hero-mda.png',
     heroTagline: 'EXPERIENCE IT LIVE',
     heroTitle: 'This is your',
     heroHighlight: 'AI Assistant.',
