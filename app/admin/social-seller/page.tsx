@@ -2,7 +2,8 @@
 import { getAdminSession } from '@/lib/admin/session';
 import { redirect } from 'next/navigation';
 import { db, ssbSchema } from '@/db';
-import { desc } from 'drizzle-orm';
+import { desc, sql } from 'drizzle-orm';
+import { ConvertLeadButton } from './ConvertLeadButton';
 import s from '../admin.module.css';
 
 export const metadata = { title: 'SSB Leads — Admin' };
@@ -25,7 +26,20 @@ export default async function SocialSellerLeadsPage() {
   if (!session) redirect('/admin/login');
 
   const leads = await db
-    .select()
+    .select({
+      id: ssbSchema.ssbLeads.id,
+      business_name: ssbSchema.ssbLeads.business_name,
+      business_type: ssbSchema.ssbLeads.business_type,
+      platform: ssbSchema.ssbLeads.platform,
+      contact_whatsapp: ssbSchema.ssbLeads.contact_whatsapp,
+      services: ssbSchema.ssbLeads.services,
+      source_bot: ssbSchema.ssbLeads.source_bot,
+      status: ssbSchema.ssbLeads.status,
+      created_at: ssbSchema.ssbLeads.created_at,
+      has_subscription: sql<boolean>`EXISTS (
+        SELECT 1 FROM ssb.ssb_subscriptions s WHERE s.lead_id = ${ssbSchema.ssbLeads.id}
+      )`,
+    })
     .from(ssbSchema.ssbLeads)
     .orderBy(desc(ssbSchema.ssbLeads.created_at))
     .limit(200);
@@ -59,6 +73,7 @@ export default async function SocialSellerLeadsPage() {
                 <th>Source</th>
                 <th>Date</th>
                 <th>Status</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -83,6 +98,19 @@ export default async function SocialSellerLeadsPage() {
                     <td>{fmt(lead.created_at)}</td>
                     <td>
                       <span className={`${s.badge} ${badge.cssClass}`}>{badge.label}</span>
+                    </td>
+                    <td>
+                      {lead.has_subscription ? (
+                        <span className={`${s.badge} ${s.badgeNeutral}`}>Subscribed</span>
+                      ) : (
+                        <ConvertLeadButton
+                          leadId={lead.id}
+                          defaultSlug={lead.business_name
+                            .toLowerCase()
+                            .replace(/[^a-z0-9]+/g, '-')
+                            .replace(/^-|-$/g, '')}
+                        />
+                      )}
                     </td>
                   </tr>
                 );

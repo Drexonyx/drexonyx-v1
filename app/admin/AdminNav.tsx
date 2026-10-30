@@ -52,6 +52,7 @@ const NAV_SECTIONS = [
     label: 'Social Seller',
     items: [
       { href: '/admin/social-seller', label: 'Leads' },
+      { href: '/admin/ssb-subscriptions', label: 'Subscriptions' },
       { href: '/admin/chatbots', label: 'Chatbots' },
     ],
   },
