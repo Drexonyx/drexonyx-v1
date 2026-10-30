@@ -48,8 +48,9 @@ export async function POST(req: NextRequest) {
                 if (text) { controller.enqueue(encoder.encode(text)); sent = true; }
               }
               return;
-            } catch (err: any) {
-              const retired = err?.status === 404 || String(err?.message).includes('no longer available');
+            } catch (err: unknown) {
+              const e = err as { status?: number; message?: string };
+              const retired = e?.status === 404 || String(e?.message).includes('no longer available');
               if (retired && modelName !== MODELS[MODELS.length - 1]) {
                 console.warn(`[chatbot] ${modelName} retired, switching to fallback`);
                 continue;
