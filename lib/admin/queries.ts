@@ -552,7 +552,7 @@ export async function getAdminProductionCreditEvents(organizationId: string, lim
 export async function getAdminCreditEconomicsSummary(organizationId: string) {
   const [
     totalEventsRows,
-    warningRows,
+    _warningRows,
     reserveRows,
     overTargetRows,
     runawyRows,

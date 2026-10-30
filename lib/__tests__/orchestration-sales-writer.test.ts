@@ -63,7 +63,7 @@ function makeUpdateChain() {
 
 // ── Task steps prior output ───────────────────────────────────────────────────
 
-function mockPriorSteps(steps: Array<{ step_index: number; skill_id: string | null; output: Record<string, unknown> }>) {
+function _mockPriorSteps(steps: Array<{ step_index: number; skill_id: string | null; output: Record<string, unknown> }>) {
   // First select call = leadSources dedup (returns [])
   // Second+ calls = taskSteps for getPriorStepOutputs
   let callCount = 0;

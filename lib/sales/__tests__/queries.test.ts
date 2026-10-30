@@ -27,7 +27,7 @@ import {
 
 // ── Chain builder helpers ─────────────────────────────────────────────────────
 
-function makeChain(result: unknown[]) {
+function _makeChain(result: unknown[]) {
   const asPromise = Promise.resolve(result);
   const terminal = {
     then: asPromise.then.bind(asPromise),
@@ -67,7 +67,7 @@ function resolve(result: unknown[]) {
     limit: vi.fn(),
     offset: vi.fn(),
   };
-  const makeTerminal = () => terminal;
+  const _makeTerminal = () => terminal;
   chain.from.mockReturnValue({ ...chain, ...terminal });
   chain.where.mockReturnValue({ ...chain, ...terminal });
   chain.orderBy.mockReturnValue({ ...chain, ...terminal });
@@ -159,7 +159,7 @@ function makeActivity(overrides: Record<string, unknown> = {}) {
   };
 }
 
-function makeOutreach(overrides: Record<string, unknown> = {}) {
+function _makeOutreach(overrides: Record<string, unknown> = {}) {
   return {
     id: 'msg-1',
     lead_id: 'lead-1',

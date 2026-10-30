@@ -16,9 +16,6 @@ import { delegateWebsiteProduction, type WebsiteProductionDelegationParams, type
 import { delegateSiteAudit, type SiteAuditDelegationParams, type SiteAuditDelegationResult } from './site-audit-specialist';
 import {
   delegateLeadDiscovery,
-  delegateLeadQualification,
-  delegateOutreachDrafting,
-  delegateFollowUpScheduling,
   type LeadDiscoveryParams,
   type LeadDiscoveryResult,
 } from './sales-discovery-specialist';

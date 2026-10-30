@@ -8,7 +8,7 @@ import { db } from '@/db/index';
 import { outreachMessages } from '@/db/schema/sales';
 import { salesLeads } from '@/db/schema/sales';
 import { auditEvents } from '@/db/schema/system';
-import { eq, and, inArray } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { getSentOutreachForReplyPoll } from '@/lib/sales/queries';
 import { detectReplies } from '@/lib/sales/reply-detector';
 

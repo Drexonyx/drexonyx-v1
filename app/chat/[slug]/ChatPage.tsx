@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 
 interface ChatCategory {
   icon: 'monitor' | 'brush' | 'chart';
@@ -16,7 +17,7 @@ interface Message {
 
 function BotAvatar({ logoUrl, initials }: { logoUrl?: string; initials: string }) {
   return logoUrl ? (
-    <div className="msg-mini-logo"><img src={logoUrl} alt="" /></div>
+    <div className="msg-mini-logo"><Image src={logoUrl} alt="" width={25} height={25} unoptimized /></div>
   ) : (
     <div className="msg-mini-circle">{initials}</div>
   );
@@ -64,7 +65,7 @@ html, body { height: 100%; }
   display: flex;
   flex-direction: column;
   height: 100dvh;
-  font-family: 'Inter', 'Tajawal', -apple-system, sans-serif;
+  font-family: var(--font-inter), var(--font-tajawal), -apple-system, sans-serif;
 }
 
 .chat-root.dark {
@@ -213,7 +214,7 @@ html, body { height: 100%; }
   cursor: pointer; text-align: left;
   display: flex; flex-direction: row; align-items: center; gap: 12px;
   transition: border-color .15s, background .15s;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-inter), sans-serif;
 }
 .category-card:hover, .category-card:focus {
   border-color: var(--gold); background: rgba(201,168,76,.06); outline: none;
@@ -304,7 +305,7 @@ html, body { height: 100%; }
   flex: 1;
   background: rgba(255,255,255,.04); border: 1.5px solid var(--border); border-radius: 22px;
   padding: 10px 16px; color: var(--text);
-  font-family: 'Tajawal', 'Inter', sans-serif;
+  font-family: var(--font-tajawal), var(--font-inter), sans-serif;
   font-size: 14px; resize: none; min-height: 44px; max-height: 120px;
   outline: none; line-height: 1.5; transition: border-color .15s;
 }
@@ -435,16 +436,13 @@ export default function ChatPage({
 
   return (
     <div className={`chat-root ${isDark ? 'dark' : 'light'}`}>
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet" />
       <style>{CSS}</style>
 
       {/* HEADER */}
       <header className="chat-header">
         <div className="header-logo-wrap">
           {logoUrl
-            ? <img src={logoUrl} alt={businessName} className="header-logo" />
+            ? <Image src={logoUrl} alt={businessName} width={96} height={26} className="header-logo" unoptimized />
             : <div className="header-initials">{initials}</div>
           }
         </div>

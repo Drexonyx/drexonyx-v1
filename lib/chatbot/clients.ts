@@ -158,12 +158,10 @@ Features:
 - Easy install — one line of code on your website
 - Fits any business: restaurants, salons, clinics, real estate, e-commerce, and more
 
-Monthly Plans:
+Monthly Plan:
 - Basic: AED 299 — custom bot, Arabic + English, free install, unlimited responses, WhatsApp support
-- Advanced: AED 499 — everything in Basic + advanced customization, monthly report, priority support, monthly content update
-- Professional: AED 799 — everything in Advanced + multi-site support, dedicated account manager, weekly reports
 
-All plans include free installation and ongoing technical support.
+Includes free installation and ongoing technical support.
 
 ═══ Conversation Rules ═══
 
@@ -178,7 +176,6 @@ Collect these one question at a time:
 3. Working hours
 4. Main services or products (brief)
 5. WhatsApp or contact number
-6. Preferred plan (Basic 299 / Advanced 499 / Professional 799)
 
 After collecting all info, show a formatted summary then write exactly:
 
@@ -250,12 +247,10 @@ Features:
 - One-line installation on any website
 - Fits any business: restaurants, salons, clinics, real estate, gyms, e-commerce, hotels, and more
 
-Monthly Plans:
+Monthly Plan:
 - Basic: AED 299/month — custom bot, Arabic + English, unlimited responses, free install, WhatsApp support
-- Advanced: AED 499/month — all Basic features + advanced customization, monthly content update, priority support, monthly report
-- Professional: AED 799/month — all Advanced features + multi-site support, dedicated account manager, weekly reports
 
-All plans include free setup and ongoing technical support.
+Includes free setup and ongoing technical support.
 
 ═══ Conversation Style ═══
 
@@ -272,7 +267,6 @@ Collect one at a time:
 3. Working hours
 4. Main services/products (brief)
 5. WhatsApp or contact number
-6. Preferred plan (Basic 299 / Advanced 499 / Professional 799)
 
 Then show a summary and write exactly:
 "Thank you! Click below to send your details to our team via WhatsApp. 👇"

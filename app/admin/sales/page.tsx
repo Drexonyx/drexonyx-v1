@@ -1,7 +1,7 @@
 import { getAdminSession } from '@/lib/admin/session';
 import { redirect } from 'next/navigation';
 import { db } from '@/db/index';
-import { salesLeads, outreachMessages, followUps } from '@/db/schema/sales';
+import { salesLeads, outreachMessages } from '@/db/schema/sales';
 import { eq, and, isNotNull, ne } from 'drizzle-orm';
 import { SendOutreachButton } from './SendOutreachButton';
 import s from '../admin.module.css';

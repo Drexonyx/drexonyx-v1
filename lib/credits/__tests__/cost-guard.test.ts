@@ -2,7 +2,7 @@
 // Covers: approved package values, runaway protection, reserve logic,
 // customer credit isolation, retry limits, and manipulation resistance.
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   evaluateCostGuard,
   resolvePackageEconomics,

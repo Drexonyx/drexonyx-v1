@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import { actionPortalBuyCredits } from './actions';
 import type { CreditPackageRow } from '@/lib/credits/packages';
 import s from '../../portal.module.css';
@@ -15,6 +16,7 @@ function formatAed(aed: string): string {
 }
 
 export default function PayConfirmForm({ pkg }: Props) {
+  const router = useRouter();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -29,7 +31,7 @@ export default function PayConfirmForm({ pkg }: Props) {
       }
       // Navigate to our own domain first — route handler serves meta-refresh
       // to pay.ziina.com, bypassing Android App Links interception
-      window.location.href = '/portal/credits/buy/pay';
+      router.push('/portal/credits/buy/pay');
     });
   }
 

@@ -5,10 +5,10 @@
 import { db } from '@/db/index';
 import { customerCreditLedger } from '@/db/schema/financial';
 import { auditEvents } from '@/db/schema/system';
-import { eq, sql, and } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { uuidv7 } from 'uuidv7';
 
-const SYSTEM_ACTOR_ID = '00000000-0000-0000-0000-000000000000';
+const _SYSTEM_ACTOR_ID = '00000000-0000-0000-0000-000000000000';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
