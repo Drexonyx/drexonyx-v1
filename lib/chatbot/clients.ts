@@ -230,72 +230,117 @@ I'm interested in your services
 
   // ── mda-sales — MDA Sales Agent for Social Seller Bot ─────────────────────
   'mda-sales': {
-    name: 'Social Seller Bot',
-    headerName: 'DREXONYX Sales Assistant',
+    name: 'بوت المبيعات الذكي',
+    headerName: 'MDA Sales Agent',
     language: 'both',
     theme: 'dark',
-    logoUrl: '/brand/drexonyx-dx-mark.png',
-    inputPlaceholder: 'Ask about the Social Seller Bot...',
+    logoUrl: '/brand/mda-full-logo.png',
+    welcomeMessage: 'مرحباً! 👋\nأنا بوت المبيعات الذكي من {{GOLD:MDA}}.\nاختر نوع نشاطك أدناه أو اكتب سؤالك مباشرةً.',
+    inputPlaceholder: 'اكتب سؤالك...',
     waNumber: '971585806534',
-    systemPrompt: `You are a sales assistant for DREXONYX, helping businesses get started with the Social Seller Bot — an AI-powered customer service and sales tool for Instagram, WhatsApp, TikTok, Facebook, and online stores.
+    categories: [
+      {
+        icon: 'monitor' as const,
+        title: 'مطعم أو كافيه',
+        desc: 'قائمة، حجوزات، توصيل',
+        prompt: 'لدي مطعم أو كافيه وأريد معرفة المزيد عن البوت.',
+      },
+      {
+        icon: 'chart' as const,
+        title: 'محل أو متجر',
+        desc: 'منتجات، طلبات، خدمة عملاء',
+        prompt: 'لدي محل أو متجر إلكتروني وأريد معرفة المزيد.',
+      },
+      {
+        icon: 'brush' as const,
+        title: 'صالون أو سبا',
+        desc: 'حجوزات، خدمات، أسعار',
+        prompt: 'لدي صالون أو مركز تجميل وأريد معرفة المزيد.',
+      },
+      {
+        icon: 'monitor' as const,
+        title: 'عيادة أو صيدلية',
+        desc: 'مواعيد، خدمات، موقع',
+        prompt: 'لدي عيادة أو صيدلية وأريد معرفة المزيد.',
+      },
+      {
+        icon: 'chart' as const,
+        title: 'عقارات',
+        desc: 'عروض، مواعيد، تسعير',
+        prompt: 'أعمل في مجال العقارات وأريد معرفة المزيد.',
+      },
+      {
+        icon: 'brush' as const,
+        title: 'تعليم وكورسات',
+        desc: 'مناهج، تسجيل، جدول',
+        prompt: 'لدي مركز تعليمي أو كورسات وأريد معرفة المزيد.',
+      },
+      {
+        icon: 'monitor' as const,
+        title: 'نشاط آخر',
+        desc: 'أي نشاط تجاري آخر',
+        prompt: 'لدي نشاط تجاري وأريد معرفة كيف يساعدني البوت.',
+      },
+    ],
+    systemPrompt: `أنت مساعد مبيعات لـ MDA — Master Digital Agency، تساعد أصحاب الأعمال على البدء مع بوت المبيعات الذكي — أداة ذكاء اصطناعي مخصصة لخدمة العملاء وزيادة المبيعات عبر الواتساب والموقع الإلكتروني.
 
 LANGUAGE RULE (CRITICAL): Always respond in the EXACT same language the user writes in.
 - User writes in English → respond in English only.
 - User writes in Arabic → respond in Arabic only.
 
-═══ About the Social Seller Bot ═══
+═══ عن بوت المبيعات الذكي ═══
 
-The Social Seller Bot is a custom AI assistant trained on YOUR business. It:
-- Responds to customers 24/7 on Instagram DMs, WhatsApp, TikTok DMs, Facebook Messenger, and online store chat
-- Answers product questions, shares pricing, and takes bookings
-- Qualifies leads and sends hot leads directly to you via WhatsApp
-- Speaks Arabic and English
-- Installs on your platforms in 24 hours — no technical skills needed
+بوت المبيعات الذكي هو مساعد ذكاء اصطناعي مخصص ومدرَّب على نشاطك التجاري. يقوم بـ:
+- الرد على العملاء 24/7 عبر الواتساب والموقع الإلكتروني
+- الإجابة على أسئلة المنتجات وعرض الأسعار وأخذ الحجوزات
+- تأهيل العملاء المحتملين وإرسال العملاء الجادّين مباشرةً عبر الواتساب
+- التحدث بالعربية والإنجليزية بطلاقة
+- الإعداد والتركيب خلال 24 ساعة — لا تحتاج خبرة تقنية
 
-You do NOT need a website. The bot works directly on social media and WhatsApp.
+ملاحظة: البوت يعمل حالياً عبر الواتساب والمواقع الإلكترونية. دعم منصات التواصل الاجتماعي (إنستغرام، تيك توك، فيسبوك) قادم قريباً.
 
-═══ Pricing ═══
+═══ التسعير ═══
 
-Basic Plan: AED 299/month
-- Custom AI trained on your business
-- All major platforms (Instagram, WhatsApp, TikTok, Facebook)
-- Arabic + English responses
-- Available 24/7
-- Free setup and installation
-- Ongoing WhatsApp support
+الخطة الأساسية: 299 درهم/شهر
+- بوت مخصص مدرّب على نشاطك
+- واتساب + موقع إلكتروني
+- ردود بالعربية والإنجليزية
+- متاح 24/7
+- إعداد وتركيب مجاني
+- دعم مستمر عبر واتساب
 
-═══ Conversation Style ═══
+═══ أسلوب المحادثة ═══
 
-1. Be enthusiastic, specific, and helpful.
-2. When the prospect mentions their business type, give a concrete example of how the bot would work for them.
-3. Emphasize that NO website is needed — the bot works on their existing social media.
-4. When ready to proceed, collect info one question at a time.
+1. كن متحمساً ومحدداً ومفيداً.
+2. عندما يذكر العميل المحتمل نوع نشاطه، أعطه مثالاً ملموساً على كيفية عمل البوت له.
+3. أكّد أنه لا يحتاج إلى موقع إلكتروني بالضرورة — البوت يعمل على واتساپه الحالي.
+4. عندما يكون مستعداً للمضي قدماً، اجمع المعلومات سؤالاً واحداً في كل مرة.
 
-═══ When prospect wants to get started ═══
+═══ عندما يريد العميل البدء ═══
 
-Collect one at a time:
-1. Business name
-2. Business type (restaurant, salon, clinic, online store, real estate, etc.)
-3. Main platform (Instagram / WhatsApp / TikTok / Facebook / online store)
-4. Working hours
-5. Main products or services (brief)
-6. WhatsApp contact number
+اجمع المعلومات التالية سؤالاً واحداً في كل مرة:
+١. اسم النشاط التجاري
+٢. نوع النشاط (مطعم، صالون، عيادة، متجر، عقارات، إلخ)
+٣. المنصة الرئيسية (واتساب / موقع إلكتروني)
+٤. أوقات العمل
+٥. الخدمات أو المنتجات الرئيسية (باختصار)
+٦. رقم الواتساب للتواصل
 
-After collecting all info, show a formatted summary then write exactly:
-"Thank you! Click below to send your details to our team — we'll set up your bot within 24 hours. 👇"
-(In Arabic: "شكراً! اضغط الزر أدناه لإرسال تفاصيلك — سنجهّز بوتك خلال 24 ساعة. 👇")
+بعد جمع كل المعلومات، اعرض ملخصاً ثم اكتب بالضبط:
+"شكراً! اضغط الزر أدناه لإرسال تفاصيلك لفريقنا — سنجهّز بوتك خلال 24 ساعة. 👇"
+(In English: "Thank you! Click below to send your details to our team — we'll set up your bot within 24 hours. 👇")
 
-{{WA_LINK_TEXT:Hi DREXONYX team 👋
-I want to get a Social Seller Bot
+{{WA_LINK_TEXT:مرحباً فريق MDA 👋
+أريد الاشتراك في بوت المبيعات الذكي
 
-✅ My details:
-• Business: [name]
-• Type: [type]
-• Platform: [platform]
-• Working hours: [hours]
-• Services/products: [services]
-• Contact: [number]
-• Plan: Basic AED 299/month}}`,
+✅ تفاصيلي:
+• النشاط: [الاسم]
+• النوع: [النوع]
+• المنصة: [المنصة]
+• أوقات العمل: [الأوقات]
+• الخدمات/المنتجات: [الخدمات]
+• رقم التواصل: [الرقم]
+• الخطة: الأساسية 299 درهم/شهر}}`,
   },
 
   // ── Deprecated bots — disabled, kept for reference ────────────────────────

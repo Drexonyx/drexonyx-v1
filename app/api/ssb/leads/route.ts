@@ -8,6 +8,23 @@ import { db, ssbSchema } from '@/db';
 
 export const runtime = 'nodejs';
 
+// In-memory rate limiter: max 5 lead submissions per IP per hour.
+const ipSubmissions = new Map<string, { count: number; windowStart: number }>();
+const RATE_LIMIT = 5;
+const WINDOW_MS = 60 * 60 * 1000;
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const rec = ipSubmissions.get(ip);
+  if (!rec || now - rec.windowStart > WINDOW_MS) {
+    ipSubmissions.set(ip, { count: 1, windowStart: now });
+    return false;
+  }
+  if (rec.count >= RATE_LIMIT) return true;
+  rec.count++;
+  return false;
+}
+
 interface LeadPayload {
   businessName: string;
   businessType?: string;
@@ -27,6 +44,11 @@ function isValidPayload(body: unknown): body is LeadPayload {
 }
 
 export async function POST(request: NextRequest) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown';
+  if (checkRateLimit(ip)) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
   let body: unknown;
   try {
     body = await request.json();

@@ -1,5 +1,5 @@
-/* Social Seller Bot landing page — clean navy/blue-purple SaaS aesthetic */
-/* DR-0130: /social-seller route */
+/* MDA Social Commerce landing page — Arabic, RTL, Cairo font, deep navy */
+/* DR-0130 Phase 5-6: /social-seller redesign */
 
 /* ── Page-level tokens ───────────────────────────────────────────────── */
 .page {
@@ -19,6 +19,7 @@
   background: var(--ssb-bg);
   color: var(--ssb-text);
   overflow-x: hidden;
+  font-family: var(--font-cairo), 'Tajawal', 'Segoe UI', Arial, sans-serif;
 }
 
 /* ── Layout helpers ──────────────────────────────────────────────────── */
@@ -26,14 +27,54 @@
   width: 100%;
   max-width: var(--ssb-max);
   margin: 0 auto;
-  padding: 0 var(--ssb-pad);
+  padding: 0 max(var(--ssb-pad), env(safe-area-inset-right, 0px));
+}
+
+/* ── MDA Header ──────────────────────────────────────────────────────── */
+.mdaHeader {
+  padding: 1.2rem 0;
+  border-bottom: 1px solid var(--ssb-border);
+  background: rgba(8, 13, 26, 0.92);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(12px);
+}
+
+.mdaLogo {
+  object-fit: contain;
+  object-position: right center;
+  height: 36px;
+  width: auto;
+}
+
+/* ── Hero two-column layout ──────────────────────────────────────────── */
+.heroLayout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+@media (max-width: 860px) {
+  .heroLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.heroText {
+  min-width: 0;
+}
+
+.heroChatWrap {
+  position: relative;
+  min-width: 0;
 }
 
 /* ── Hero ─────────────────────────────────────────────────────────────── */
 .hero {
   position: relative;
-  padding: 7rem var(--ssb-pad) 5rem;
-  text-align: center;
+  padding: 5rem var(--ssb-pad) 4rem;
   overflow: hidden;
 }
 
@@ -273,7 +314,7 @@
 
 .industriesGrid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
   margin-top: 2.5rem;
 }
@@ -503,7 +544,7 @@
   list-style: none;
   padding: 0;
   margin: 0 0 2rem;
-  text-align: left;
+  text-align: right;
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
@@ -581,6 +622,115 @@
 .waBtn:hover {
   opacity: 0.92;
   transform: translateY(-1px);
+}
+
+/* ── Platforms section ────────────────────────────────────────────────── */
+.platformsSection {
+  padding: 5rem var(--ssb-pad);
+}
+
+.platformsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-top: 2.5rem;
+}
+
+.platformCard {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 1.4rem;
+  border-radius: 10px;
+  border: 1px solid var(--ssb-border);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.platformAvailable {
+  background: rgba(79, 247, 140, 0.06);
+  border-color: rgba(79, 247, 140, 0.25);
+  color: #7affa0;
+}
+
+.platformSoon {
+  background: var(--ssb-card);
+  color: var(--ssb-muted);
+  opacity: 0.7;
+}
+
+.platformName {
+  font-weight: 700;
+}
+
+.platformBadgeLabel {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+}
+
+.platformAvailable .platformBadgeLabel {
+  background: rgba(79, 247, 140, 0.15);
+  color: #4ade80;
+}
+
+.platformSoon .platformBadgeLabel {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ssb-muted);
+}
+
+/* ── Steps — 3-column override ────────────────────────────────────────── */
+.stepsGrid3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.stepsGrid3::before {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .stepsGrid3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── MDA Footer ───────────────────────────────────────────────────────── */
+.mdaFooter {
+  padding: 2.5rem var(--ssb-pad);
+  border-top: 1px solid var(--ssb-border);
+  text-align: center;
+  background: var(--ssb-surface);
+}
+
+.footerLogo {
+  object-fit: contain;
+  height: 28px;
+  width: auto;
+  margin: 0 auto 0.75rem;
+  display: block;
+  opacity: 0.7;
+}
+
+.footerText {
+  font-size: 0.8rem;
+  color: var(--ssb-muted);
+  margin: 0;
+}
+
+/* ── Hero text-align fix for RTL ──────────────────────────────────────── */
+.heroInner {
+  text-align: right;
+}
+
+.heroSub {
+  text-align: right;
+  margin: 0 0 2.2rem;
+}
+
+.heroCta {
+  justify-content: flex-start;
 }
 
 /* ── Responsive adjustments ───────────────────────────────────────────── */
