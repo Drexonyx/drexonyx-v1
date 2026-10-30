@@ -34,7 +34,7 @@ const demoSalon: SocialSellerConfig = {
     { q: 'هل توجد مواقف سيارات؟', a: 'نعم، مواقف مجانية أمام الصالون.' },
   ],
   // Subscription
-  active: true,
+  active: false, // retired — ssb-demo is no longer a public demo endpoint
   activatedAt: new Date('2026-01-01'),
   expiresAt: new Date('2027-12-31'),
   planName: 'Basic AED 299/month',

@@ -13,7 +13,7 @@ interface Props {
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const client = getClient(slug);
-  if (!client) return { title: 'Chat' };
+  if (!client || client.active === false) return { title: 'Chat' };
   return {
     title: `${client.name} — مساعد ذكي`,
     description: `تحدث مع مساعد ${client.name} الذكي`,
@@ -25,6 +25,7 @@ export default async function Page({ params }: Props) {
   const client = getClient(slug);
 
   if (!client) notFound();
+  if (client.active === false) notFound();
 
   return (
     <ChatPage
