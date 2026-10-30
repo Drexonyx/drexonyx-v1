@@ -13,7 +13,7 @@
 - **Dev Branch:** `ccr-3a71ba38-pwua60` (current active session branch)
 - **Production Branch:** `main`
 - **Latest Main Branch Commit:** `210ff06` (PR #49 — chatbot fixes)  
-**Current Production Deployment:** `1588e5e` — PR #49 NOT YET LIVE (ISS-016)
+**Current Production Deployment:** `1588e5e` — PR #49 NOT YET LIVE (ISS-016 — requires explicit owner approval to deploy)
 
 ### Hosting
 - **Platform:** Vercel (free tier — 100 deployments/day limit)
@@ -135,11 +135,12 @@ drexonyx-v1/
 ### CHATBOT SUBSCRIPTION (OWNER-CONFIRMED — 2026-10-30)
 | Tier | Price (AED) | Status |
 |---|---|---|
-| Subscription | 199/month | **OWNER-CONFIRMED** |
+| Basic | 299/month | **OWNER-CONFIRMED** |
+| Advanced | 499/month | In code — UNCONFIRMED (no explicit owner approval) |
+| Professional | 799/month | In code — UNCONFIRMED (no explicit owner approval) |
 
-**⚠️ SUPERSEDED:** AED 299/499/799 tiers = IN CODE BUT NOT APPROVED. Must be updated. See ISS-003.  
 **⚠️ WITHDRAWN:** AED 650 = SUPERSEDED/WITHDRAWN. DO NOT use.  
-**ACTION REQUIRED:** Code in `lib/chatbot/clients.ts` and both promo pages still show 299/499/799 — awaiting owner confirmation of full tier structure before code fix.
+**PENDING:** Owner to confirm whether 499/799 tiers are approved or if service is single-tier at 299 AED/month only.
 
 ---
 
@@ -188,7 +189,7 @@ drexonyx-v1/
 | Admin Notifications | `ADMIN_NOTIFICATION_EMAIL` (defaults to drexonyx.studio@gmail.com) |
 | Orchestration Alerts | `ORCHESTRATION_ALERT_EMAIL` env var |
 | Domain verification | UNVERIFIED (Resend dashboard access required) |
-| Safety Gate | `SALES_OUTREACH_TEST_MODE` = "false" — **LIVE MODE** (intentional, activated 2026-10-07) |
+| Safety Gate | `SALES_OUTREACH_TEST_MODE` = "false" — **LIVE MODE** (intentional, activated 2026-10-07). Real sends require explicit owner approval each time — LIVE MODE is not standing permission for Claude to initiate sends. |
 
 ### 5.3 Cloudflare R2 (Object Storage)
 | Item | Status |
@@ -319,8 +320,8 @@ See `MDA_MASTER_ISSUES_REGISTER.md` for full details. Priority order:
 
 1. **ISS-019** (HIGH) — ENABLE_ADMIN_ROUTES=true on main public project (security anomaly — needs owner decision)
 2. **ISS-002** (HIGH) — Replace Netflix logo in /chat/try background
-3. **ISS-003** (HIGH) — Update chatbot pricing to owner-confirmed 199 AED/month (code + promo pages)
-4. **ISS-016** (MEDIUM) — Deploy PR #49 to production (currently at 1588e5e, not 210ff06)
+3. **ISS-003** (MEDIUM) — 299 AED/month CONFIRMED; owner to confirm 499/799 tiers or declare single-tier
+4. **ISS-016** (MEDIUM) — Deploy PR #49 to production (currently at 1588e5e, not 210ff06) — **requires owner decision**
 5. **ISS-001** (MEDIUM) — Fix chatbot primary model name (gemini-3.5-flash-lite is invalid)
 6. **ISS-004** (MEDIUM) — Update promo.html/promo-en.html CTA to link to /chat/try
 7. **ISS-005** (MEDIUM) — Embed MDA bot widget on /mda page

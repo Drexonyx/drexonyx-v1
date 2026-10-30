@@ -53,19 +53,19 @@
 
 ---
 
-### ISS-003 — Chatbot Subscription Pricing: Code vs. Owner-Approved Price
+### ISS-003 — Chatbot Subscription Pricing: Owner-Confirmed Price
 | Field | Value |
 |---|---|
 | **ID** | ISS-003 |
-| **Status** | OWNER-CONFIRMED — code fix required |
-| **Severity** | HIGH (commercial risk) |
+| **Status** | OWNER-CONFIRMED — 299 AED/month (Basic tier); 499/799 tiers status UNCONFIRMED |
+| **Severity** | MEDIUM (basic tier matches code; upper tiers need confirmation) |
 | **Source** | `lib/chatbot/clients.ts` (system prompts), `public/promo.html`, `public/promo-en.html` |
-| **Evidence** | Owner confirmed (2026-10-30): "صحّح سعر اشتراك Chatbot المعتمد إلى 199 AED/month، ولا تعتمد 299/499/799 كأسعار معتمدة دون موافقتي." Code currently shows: Basic AED 299 / Advanced AED 499 / Professional AED 799. promo.html and promo-en.html both display AED 299/mo prominently. |
-| **Description** | Chatbot subscription pricing in code and promo pages (299/499/799 AED) conflicts with owner-confirmed 199 AED/month. All bot system prompts and both promo pages need updating. |
-| **Proposed Fix** | Owner must confirm complete pricing structure (is 199 AED the only tier? are there still multiple tiers at different prices?), then update: `lib/chatbot/clients.ts` system prompts + `public/promo.html` + `public/promo-en.html`. |
-| **Test Result** | Pending owner confirming full tier structure before code change |
+| **Evidence** | Owner confirmed (2026-10-30): "السعر المعتمد للـ Chatbot هو 299 AED/month، وليس 199 AED. هذا تأكيد نهائي مني." Code currently shows: Basic AED 299 / Advanced AED 499 / Professional AED 799. promo.html shows 299/mo as the entry price. The 299 value in code MATCHES the owner-confirmed price. |
+| **Description** | Chatbot Basic subscription confirmed at 299 AED/month. The 499 and 799 tiers shown in code have not been explicitly approved or rejected by the owner. No code change is needed for the 299 figure. |
+| **Proposed Fix** | Owner should confirm whether AED 499 (Advanced) and AED 799 (Professional) tiers are also approved, or whether the service is single-tier at 299 AED/month only. No code changes until owner confirms tier structure. |
+| **Test Result** | 299 AED/month CONFIRMED. 499/799 PENDING owner decision. |
 | **Affected Systems** | /chat/demo, /chat/try system prompts; /promo.html; /promo-en.html |
-| **Reconciliation Note** | CONFLICT: 199 AED confirmed by owner. Code shows 299/499/799. Fix approved in principle — awaiting owner confirmation of whether 199 is single-tier or lowest tier. |
+| **Reconciliation Note** | Previous session recorded 199 AED — CORRECTED. Owner confirmed 299 AED/month (2026-10-30). Code showing 299 is correct for the confirmed tier. |
 
 ---
 
@@ -171,7 +171,7 @@
 | **Severity** | INFO (was CRITICAL — resolved: this was an intentional owner decision) |
 | **Source** | Vercel Production env vars (2026-10-30); activation date from Vercel metadata |
 | **Evidence** | Vercel Production: `SALES_OUTREACH_TEST_MODE` = "false" (plain type — readable value). Set to "false" on 2026-10-07 with 9 documented safety checks completed by owner before activation. This means real prospect emails ARE being sent by the 5 sales cron jobs. This was intentional — NOT a forgotten setting. |
-| **Description** | Sales outreach is LIVE. Real prospect emails are actively being sent. This is the owner's deliberate choice. |
+| **Description** | Sales outreach is LIVE. Real prospect emails are actively being sent. This is the owner's deliberate choice. **SAFETY RULE:** Do NOT trigger any sales cron manually, send any outreach email, or perform any real send action without explicit owner approval in this conversation. The system being in LIVE MODE does not constitute standing approval for Claude to initiate sends. |
 | **Proposed Fix** | No fix needed. Monitor sales cron logs and Resend delivery reports. If owner wants to pause outreach, set `SALES_OUTREACH_TEST_MODE=true` in Vercel. |
 | **Test Result** | VERIFIED — Live mode confirmed intentional |
 | **Affected Systems** | ALL sales cron jobs (discovery, followups, outreach-send, reply-poll, daily-report) |
@@ -267,8 +267,8 @@
 | **Severity** | MEDIUM |
 | **Source** | Vercel list_deployments (2026-10-30) |
 | **Evidence** | Latest production deployment: SHA `1588e5efae1a0d61f8caaf1a6c0d2e80ad84340a` ("feat(chatbot): language fix, Try Live, model fallback, logo fix"). PR #49 SHA `210ff06` ("fix(chatbot): history role order, markdown rendering, auto text direction") is merged to main but NOT deployed. Vercel daily limit blocked deployment on Oct 29. |
-| **Description** | PR #49 improvements (history role fix, markdown rendering, RTL/LTR auto-direction) are merged to main but production is running the previous commit. |
-| **Proposed Fix** | Trigger a new Vercel production deployment from main to pick up `210ff06`. |
+| **Description** | PR #49 improvements (history role fix, markdown rendering, RTL/LTR auto-direction) are merged to main but production is running the previous commit. Deploying requires a separate explicit owner decision — do NOT trigger a Vercel production deployment without owner approval. |
+| **Proposed Fix** | Owner must approve before deploying. When ready: trigger a new Vercel production deployment from main to pick up `210ff06`. |
 | **Test Result** | NOT LIVE — production at 1588e5e |
 | **Affected Systems** | /api/chatbot, /chat/* |
 | **Reconciliation Note** | Issue confirmed still open. Production is one commit behind main. |
@@ -372,7 +372,7 @@
 |---|---|---|---|---|
 | ISS-001 | MEDIUM | PARTIAL | Chatbot API | Wrong primary model (`gemini-3.5-flash-lite`) — falls back to gemini-2.0-flash |
 | ISS-002 | HIGH | CONFIRMED—CODE | /chat/try | Netflix "N" logo in hero background — fix pending |
-| ISS-003 | HIGH | OWNER-CONFIRMED (fix required) | /chat/demo,try; promo pages | 199 AED/month approved; code still shows 299/499/799 |
+| ISS-003 | MEDIUM | OWNER-CONFIRMED (299 AED/month) | /chat/demo,try; promo pages | 299 AED/month confirmed; 499/799 tiers status unconfirmed |
 | ISS-004 | MEDIUM | CONFIRMED—CODE | promo.html, promo-en.html | CTA links to #demo embed, not /chat/try |
 | ISS-005 | MEDIUM | CONFIRMED—CODE | /mda page | MDA bot widget not embedded |
 | ISS-006 | LOW | DEFERRED | Homepage | No DREXONYX-specific chatbot |
@@ -385,7 +385,7 @@
 | ISS-013 | LOW | PARTIAL | Video production | API key SET; webhook vars missing |
 | ISS-014 | LOW | PARTIAL | Payments | Core keys SET; Ziina test mode unknown |
 | ISS-015 | LOW | PARTIAL | WhatsApp | Verify token SET; app secret + phone number ID missing |
-| ISS-016 | MEDIUM | NOT LIVE | Chatbot | PR #49 merged to main but NOT deployed (production at 1588e5e) |
+| ISS-016 | MEDIUM | NOT LIVE — needs owner decision | Chatbot | PR #49 merged to main but NOT deployed (production at 1588e5e) — requires explicit owner approval to deploy |
 | ISS-017 | INFO | CONFIRMED—FIXED | Documentation | Research prices error corrected (99/199 AED) |
 | ISS-018 | LOW | VERIFIED—VERCEL | Database | DATABASE_URL SET; schema state unverified |
 | ISS-019 | HIGH | CONFIRMED—VERCEL | /admin/* | ENABLE_ADMIN_ROUTES=true on public project (architecture anomaly) |
