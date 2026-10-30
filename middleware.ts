@@ -42,5 +42,5 @@ export function proxy(request: NextRequest) {
 export default proxy;
 
 export const config = {
-  matcher: ['/portal/:path*', '/admin/:path*', '/api/admin/:path*', '/chat/:path*'],
+  matcher: ['/portal/:path*', '/admin/:path*', '/api/admin/:path*', '/chat/:path*', '/social-seller'],
 };
