@@ -21,7 +21,7 @@ export interface ChatbotClient {
   heroSubtitle?: string;
   categories?: ChatCategory[];
   inputPlaceholder?: string;
-  waNumber?: string;       // WhatsApp number for WA button, e.g. "971501234567"; falls back to MDA number if omitted
+  waNumber?: string;       // WhatsApp number for WA button, e.g. "971501234567"; if omitted the WA button is hidden
   // Subscription fields — omit for internal/demo clients (treated as always active)
   active?: boolean;       // false = blocked; omitted = active
   expiresAt?: Date;       // if set and in the past, treated as expired
@@ -65,6 +65,7 @@ const clients: Record<string, ChatbotClient> = {
       },
     ],
     inputPlaceholder: 'Message MDA...',
+    waNumber: '971585806534',
     systemPrompt: `You are a smart assistant for MDA — Master Digital Agency, a design and digital marketing agency by DREXONYX based in Dubai.
 Your job: help clients learn about services, pricing, and getting started.
 
@@ -144,6 +145,7 @@ LANGUAGE RULE (CRITICAL): Always respond in the EXACT same language the user wri
   demo: {
     name: 'DREXONYX Bot',
     language: 'both',
+    waNumber: '971585806534',
     systemPrompt: `You are a smart assistant for DREXONYX — an AI chatbot service for businesses.
 DREXONYX builds custom AI chatbots for any business and installs them on their website within 24 hours.
 
@@ -229,6 +231,7 @@ After collecting all info, show a formatted summary then write exactly:
       },
     ],
     inputPlaceholder: 'Ask anything...',
+    waNumber: '971585806534',
     systemPrompt: `You are a smart live demo assistant — "Try Live" — powered by DREXONYX.
 Your purpose: show prospects what an AI chatbot can do for their business.
 You are the bot itself — a live example of DREXONYX's chatbot product.

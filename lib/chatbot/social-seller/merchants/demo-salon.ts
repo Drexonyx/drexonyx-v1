@@ -35,8 +35,8 @@ const demoSalon: SocialSellerConfig = {
   ],
   // Subscription
   active: true,
-  activatedAt: new Date('2025-01-01'),
-  expiresAt: new Date('2026-01-01'),
+  activatedAt: new Date('2026-01-01'),
+  expiresAt: new Date('2027-12-31'),
   planName: 'Basic AED 299/month',
   ownerContact: '+971500000000',
 };

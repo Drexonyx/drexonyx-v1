@@ -1,5 +1,9 @@
 import { notFound } from 'next/navigation';
 import { getClient } from '@/lib/chatbot/clients';
+// DR 0122: Register Social Seller Bot merchants in the Node.js runtime (separate from
+// the Edge runtime registration in app/api/chatbot/route.ts — they have independent
+// module caches in production and cannot share registered clients).
+import '@/lib/chatbot/social-seller';
 import ChatPage from './ChatPage';
 
 interface Props {
