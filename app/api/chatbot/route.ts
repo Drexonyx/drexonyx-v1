@@ -6,7 +6,7 @@ export const runtime = 'edge';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
-const MODELS = ['gemini-3.5-flash-lite', 'gemini-2.0-flash'];
+const MODELS = ['gemini-2.0-flash-lite', 'gemini-2.0-flash'];
 
 export async function POST(req: NextRequest) {
   try {

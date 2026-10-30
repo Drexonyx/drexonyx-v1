@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import MDAWidget from '@/components/chatbot/MDAWidget';
 import {
   MDALogo,
   ServiceBadge,
@@ -710,6 +711,7 @@ export default function MDAPage() {
           </p>
         </div>
       </footer>
+      <MDAWidget />
     </>
   );
 }
