@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { getAdminSessionFromRequest } from '@/lib/admin/session'
-import { handleCommand, formatCommandResponse } from '../../../../master-digital-agency/command'
+import { handleCommand } from '../../../../master-digital-agency/command'
 
 export const runtime = 'nodejs'
 

@@ -7,7 +7,7 @@
 //   - approval_status logic: NOT_REQUIRED is valid for low-risk standard outreach;
 //     PENDING/APPROVED/REJECTED gates medium/high-risk actions — see getApprovalPolicy
 
-import { and, eq, gt, lt, lte, gte, inArray, isNull, isNotNull, desc, asc, sql, ne } from 'drizzle-orm';
+import { and, eq, lte, gte, inArray, isNull, isNotNull, desc, asc, sql } from 'drizzle-orm';
 import { db } from '@/db/index';
 import {
   salesLeads,
@@ -536,7 +536,7 @@ export async function getSalesStats(now?: Date): Promise<SalesStats> {
     (r) => r.status === 'SENT' && r.channel === 'email',
   ).length;
 
-  const repliesReceived = outreachRows.filter((r) => r.status === 'SENT').length;
+  const _repliesReceived = outreachRows.filter((r) => r.status === 'SENT').length;
 
   return {
     totalLeads: leadRows.length,

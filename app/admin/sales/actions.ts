@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { db } from '@/db/index';
 import { outreachMessages, followUps, salesLeads } from '@/db/schema/sales';
-import { eq, and, isNull } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { sendOutreachEmail } from '@/lib/sales/outreach-sender';
 
 function addBusinessDays(date: Date, days: number): Date {

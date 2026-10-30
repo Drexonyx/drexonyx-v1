@@ -50,11 +50,11 @@ function aiOk(obj: unknown) {
   return { ok: true, text: JSON.stringify(obj) };
 }
 
-function aiOkFenced(obj: unknown) {
+function _aiOkFenced(obj: unknown) {
   return { ok: true, text: '```json\n' + JSON.stringify(obj, null, 2) + '\n```' };
 }
 
-function aiOkProse(obj: unknown) {
+function _aiOkProse(obj: unknown) {
   return { ok: true, text: 'Here is the result:\n\n```json\n' + JSON.stringify(obj) + '\n```\n\nLet me know if you need anything else.' };
 }
 

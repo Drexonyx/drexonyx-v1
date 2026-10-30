@@ -12,7 +12,7 @@ import { Resend } from 'resend';
 import { db } from '@/db/index';
 import { outreachMessages, followUps, salesLeads } from '@/db/schema/sales';
 import { auditEvents } from '@/db/schema/system';
-import { eq, and, isNull, inArray } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import {
   getApprovalPolicy,
   getEmailOptOut,

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -710,6 +711,7 @@ export default function MDAPage() {
           </p>
         </div>
       </footer>
+      <Script src="/chatbot.js?client=mda" strategy="afterInteractive" />
     </>
   );
 }
