@@ -5,6 +5,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { db, ssbSchema } from '@/db';
+import { isPlaceholderValue } from '@/lib/chatbot/ssb-lead-parser';
 
 export const runtime = 'nodejs';
 
@@ -61,6 +62,10 @@ export async function POST(request: NextRequest) {
       { error: 'businessName and contactWhatsapp are required' },
       { status: 400 },
     );
+  }
+
+  if (isPlaceholderValue(body.businessName.trim()) || isPlaceholderValue(body.contactWhatsapp.trim())) {
+    return NextResponse.json({ error: 'Placeholder values are not allowed' }, { status: 400 });
   }
 
   try {
