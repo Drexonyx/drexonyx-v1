@@ -479,6 +479,45 @@
   cursor: not-allowed;
 }
 
+.btnGhost {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--drex-text-secondary);
+  background: transparent;
+  border: 1px solid var(--drex-border);
+  border-radius: 5px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color var(--drex-duration) var(--drex-ease),
+              color var(--drex-duration) var(--drex-ease);
+  font-family: inherit;
+  white-space: nowrap;
+}
+.btnGhost:hover { color: var(--drex-text); border-color: var(--drex-text-muted); }
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.fieldLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--drex-text-muted);
+}
+
+.fieldHint {
+  font-size: 0.72rem;
+  color: var(--drex-text-muted);
+  line-height: 1.4;
+}
+
 .errorInline {
   font-size: 0.7rem;
   color: #f87171;

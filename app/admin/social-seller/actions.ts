@@ -174,6 +174,51 @@ export async function actionCheckPayment(
   return { ok: true, status: newStatus, activated };
 }
 
+// ── Update Lead Status ─────────────────────────────────────────────────────
+const VALID_STATUSES = ['NEW', 'CONTACTED', 'QUALIFIED', 'WON', 'REJECTED'] as const;
+type LeadStatus = (typeof VALID_STATUSES)[number];
+
+export async function actionUpdateLeadStatus(
+  leadId: string,
+  status: string,
+): Promise<{ ok: boolean; reason?: string }> {
+  const session = await getAdminSession();
+  if (!session) redirect('/admin/login');
+
+  if (!VALID_STATUSES.includes(status as LeadStatus)) {
+    return { ok: false, reason: `Invalid status: ${status}` };
+  }
+
+  await db
+    .update(ssbSchema.ssbLeads)
+    .set({ status, updated_at: new Date() })
+    .where(eq(ssbSchema.ssbLeads.id, leadId));
+
+  revalidatePath(`/admin/social-seller/${leadId}`);
+  revalidatePath('/admin/social-seller');
+  revalidatePath('/admin/mda');
+  return { ok: true };
+}
+
+// ── Update Lead Notes ──────────────────────────────────────────────────────
+export async function actionUpdateLeadNotes(
+  leadId: string,
+  notes: string,
+): Promise<{ ok: boolean; reason?: string }> {
+  const session = await getAdminSession();
+  if (!session) redirect('/admin/login');
+
+  const trimmed = notes.trim();
+
+  await db
+    .update(ssbSchema.ssbLeads)
+    .set({ notes: trimmed || null, updated_at: new Date() })
+    .where(eq(ssbSchema.ssbLeads.id, leadId));
+
+  revalidatePath(`/admin/social-seller/${leadId}`);
+  return { ok: true };
+}
+
 // ── Provision Bot (Stage 6) ────────────────────────────────────────────────
 // Generates a SocialSellerConfig from subscription data, stores in ssb_bot_configs,
 // marks QC + delivered, registers in-memory for the current process.

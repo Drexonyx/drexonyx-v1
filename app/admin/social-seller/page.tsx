@@ -1,8 +1,9 @@
 // DR-0130: Admin — SSB leads management view
 import { getAdminSession } from '@/lib/admin/session';
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import { db, ssbSchema } from '@/db';
-import { desc, sql } from 'drizzle-orm';
+import { desc, sql, ilike, eq, and } from 'drizzle-orm';
 import { ConvertLeadButton } from './ConvertLeadButton';
 import s from '../admin.module.css';
 
@@ -21,9 +22,23 @@ function fmt(d: Date | null): string {
   return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-export default async function SocialSellerLeadsPage() {
+export default async function SocialSellerLeadsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; status?: string }>;
+}) {
   const session = await getAdminSession();
   if (!session) redirect('/admin/login');
+
+  const { q, status } = await searchParams;
+
+  const filters = [];
+  if (q?.trim()) {
+    filters.push(ilike(ssbSchema.ssbLeads.business_name, `%${q.trim()}%`));
+  }
+  if (status && status !== 'ALL') {
+    filters.push(eq(ssbSchema.ssbLeads.status, status));
+  }
 
   const leads = await db
     .select({
@@ -41,6 +56,7 @@ export default async function SocialSellerLeadsPage() {
       )`,
     })
     .from(ssbSchema.ssbLeads)
+    .where(filters.length > 0 ? and(...filters) : undefined)
     .orderBy(desc(ssbSchema.ssbLeads.created_at))
     .limit(200);
 
@@ -52,6 +68,30 @@ export default async function SocialSellerLeadsPage() {
           Inbound prospects from the /social-seller page mda-sales agent. Update status after contacting.
         </p>
       </div>
+
+      {/* Search + filter bar */}
+      <form method="GET" style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+        <input
+          type="text"
+          name="q"
+          defaultValue={q ?? ''}
+          placeholder="Search by business name…"
+          className={s.input}
+          style={{ flex: '1', minWidth: '200px' }}
+        />
+        <select name="status" defaultValue={status ?? 'ALL'} className={s.input}>
+          <option value="ALL">All Statuses</option>
+          <option value="NEW">New</option>
+          <option value="CONTACTED">Contacted</option>
+          <option value="QUALIFIED">Qualified</option>
+          <option value="WON">Won</option>
+          <option value="REJECTED">Rejected</option>
+        </select>
+        <button type="submit" className={s.btnPrimary}>Filter</button>
+        {(q || status) && (
+          <Link href="/admin/social-seller" className={s.btnGhost}>Clear</Link>
+        )}
+      </form>
 
       {leads.length === 0 ? (
         <div className={s.emptyState}>
@@ -81,7 +121,9 @@ export default async function SocialSellerLeadsPage() {
                 const badge = STATUS_BADGE[lead.status] ?? STATUS_BADGE.NEW;
                 return (
                   <tr key={lead.id}>
-                    <td className={s.cellPrimary}>{lead.business_name}</td>
+                    <td className={s.cellPrimary}>
+                      <Link href={`/admin/social-seller/${lead.id}`}>{lead.business_name}</Link>
+                    </td>
                     <td>{lead.business_type ?? '—'}</td>
                     <td>{lead.platform ?? '—'}</td>
                     <td className={s.cellMono}>
