@@ -43,6 +43,8 @@ export default async function Page({ params }: Props) {
       heroHighlight={client.heroHighlight}
       heroSubtitle={client.heroSubtitle}
       heroFeatures={client.heroFeatures}
+      heroStyle={client.heroStyle}
+      heroCta={client.heroCta}
       categories={client.categories}
       inputPlaceholder={client.inputPlaceholder}
       waNumber={client.waNumber}

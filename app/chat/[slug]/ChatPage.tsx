@@ -42,6 +42,8 @@ interface Props {
   heroHighlight?: string;
   heroSubtitle?: string;
   heroFeatures?: HeroFeature[];
+  heroStyle?: 'poster';
+  heroCta?: string;
   categories?: ChatCategory[];
   inputPlaceholder?: string;
   waNumber?: string;
@@ -258,6 +260,20 @@ html, body { height: 100%; }
   .pp-nav { display: none; }
   .pp-body { min-height: auto; }
   .pp-cats { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* ── HERO POSTER VARIANT — show reference marketing image directly ── */
+.hero-section.poster {
+  padding: 0;
+  background: none;
+  min-height: unset;
+  position: relative;
+}
+.hero-poster-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-width: 100%;
 }
 .product-panel {
   width: 100%; max-width: 276px; border-radius: 16px;
@@ -521,6 +537,8 @@ export default function ChatPage({
   heroHighlight,
   heroSubtitle,
   heroFeatures,
+  heroStyle,
+  heroCta,
   categories,
   inputPlaceholder,
   waNumber,
@@ -754,8 +772,20 @@ export default function ChatPage({
       <div className="chat-messages">
         {!started ? (
           <div className="welcome-view">
-            {/* Hero — only renders when at least one prop is defined */}
-            {(heroBg || heroTagline || heroTitle || heroHighlight || heroSubtitle) && (
+            {/* Hero — poster variant: display reference marketing image directly */}
+            {heroStyle === 'poster' && (
+              <div className="hero-section poster">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/mda-hero-poster.png"
+                  alt={businessName}
+                  className="hero-poster-img"
+                />
+              </div>
+            )}
+
+            {/* Hero — original dark variant */}
+            {heroStyle !== 'poster' && (heroBg || heroTagline || heroTitle || heroHighlight || heroSubtitle) && (
               <div className="hero-section">
                 {heroBg && <div className="hero-bg" style={{ backgroundImage: `url('${heroBg}')` }} />}
                 <div className="hero-overlay" />

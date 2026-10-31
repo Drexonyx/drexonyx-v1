@@ -25,6 +25,8 @@ export interface ChatbotClient {
   heroHighlight?: string;
   heroSubtitle?: string;
   heroFeatures?: HeroFeature[];
+  heroStyle?: 'poster';
+  heroCta?: string;
   categories?: ChatCategory[];
   inputPlaceholder?: string;
   waNumber?: string;       // WhatsApp number for WA button, e.g. "971501234567"; if omitted the WA button is hidden
@@ -254,6 +256,8 @@ I'm interested in your services
       { icon: 'clock' as const, text: 'دعم مبيعات على مدار الساعة' },
       { icon: 'shield' as const, text: '299 درهم شهرياً' },
     ],
+    heroStyle: 'poster' as const,
+    heroCta: 'ابدأ الآن مع MDA',
     categories: [
       {
         icon: 'utensils' as const,
