@@ -276,6 +276,28 @@ html, body { height: 100%; }
   text-decoration: none; margin-top: 8px; direction: rtl;
 }
 
+/* ── CRM SUBMIT STATES ── */
+.crm-submitting {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: var(--text-soft); font-size: 13px; margin-top: 8px; direction: rtl;
+}
+.crm-spinner {
+  width: 16px; height: 16px; border: 2px solid var(--border);
+  border-top-color: var(--gold); border-radius: 50%;
+  animation: spin .8s linear infinite; flex-shrink: 0;
+}
+@keyframes spin { to{transform:rotate(360deg)} }
+.crm-retry-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: transparent; border: 1.5px solid var(--gold);
+  color: var(--gold); border-radius: 25px;
+  padding: 10px 18px; font-size: 13px; font-weight: 700;
+  cursor: pointer; margin-top: 8px; direction: rtl; font-family: inherit;
+  transition: background .15s;
+}
+.crm-retry-btn:hover { background: var(--gold-dim); }
+.crm-error-msg { font-size: 12px; color: var(--text-soft); margin-top: 8px; direction: rtl; line-height: 1.5; }
+
 /* ── TYPING ── */
 .typing { display: flex; gap: 5px; align-items: center; padding: 4px 2px; }
 .typing span {
@@ -345,12 +367,28 @@ export default function ChatPage({
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [started, setStarted] = useState(false);
+  const [leadSubmitted, setLeadSubmitted] = useState(false);
+  const [crmError, setCrmError] = useState(false);
+  const [crmSubmitting, setCrmSubmitting] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const leadSubmitAttempted = useRef(false);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
+
+  // Trigger CRM submission when bot outputs {{WA_LINK_TEXT:...}}
+  useEffect(() => {
+    if (leadSubmitAttempted.current || !waNumber) return;
+    const lastBot = [...messages].reverse().find(m => m.role === 'assistant');
+    if (!lastBot) return;
+    const waMatch = lastBot.content.match(/\{\{WA_LINK_TEXT:([\s\S]*?)\}\}/);
+    if (waMatch) {
+      submitLeadFromWaText(waMatch[1].trim());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages]);
 
   async function sendMessage(text: string) {
     if (!text.trim() || loading) return;
@@ -393,6 +431,70 @@ export default function ChatPage({
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(input); }
   }
 
+  function parseLeadFields(waText: string): Record<string, string> {
+    const result: Record<string, string> = {};
+    for (const line of waText.split('\n')) {
+      const stripped = line.replace(/^[•\-\*]\s*/, '').trim();
+      const sep = stripped.indexOf(':');
+      if (sep === -1) continue;
+      const k = stripped.slice(0, sep).trim();
+      const v = stripped.slice(sep + 1).trim();
+      if (k === 'النشاط') result.businessName = v;
+      else if (k === 'النوع') result.businessType = v;
+      else if (k === 'المنصة') result.platform = v;
+      else if (k === 'أوقات العمل') result.workingHours = v;
+      else if (k === 'الخدمات/المنتجات') result.services = v;
+      else if (k === 'رقم التواصل') result.contactWhatsapp = v;
+    }
+    return result;
+  }
+
+  async function submitLeadFromWaText(waText: string) {
+    if (leadSubmitAttempted.current) return;
+    leadSubmitAttempted.current = true;
+    setCrmSubmitting(true);
+    setCrmError(false);
+
+    const fields = parseLeadFields(waText);
+    if (!fields.businessName || !fields.contactWhatsapp) {
+      setCrmSubmitting(false);
+      setCrmError(true);
+      leadSubmitAttempted.current = false;
+      return;
+    }
+
+    try {
+      const payload: Record<string, string> = {
+        businessName: fields.businessName,
+        contactWhatsapp: fields.contactWhatsapp,
+        sourceBot: clientId,
+        sourceUrl: typeof window !== 'undefined' ? window.location.pathname : '/',
+      };
+      if (fields.businessType) payload.businessType = fields.businessType;
+      if (fields.platform) payload.platform = fields.platform;
+      if (fields.workingHours) payload.workingHours = fields.workingHours;
+      if (fields.services) payload.services = fields.services;
+
+      const res = await fetch('/api/ssb/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        setLeadSubmitted(true);
+      } else {
+        setCrmError(true);
+        leadSubmitAttempted.current = false;
+      }
+    } catch {
+      setCrmError(true);
+      leadSubmitAttempted.current = false;
+    } finally {
+      setCrmSubmitting(false);
+    }
+  }
+
   function renderWelcome(text: string) {
     return text.split(/(\{\{GOLD:[^}]+\}\})/).map((part, i) => {
       const m = part.match(/\{\{GOLD:([^}]+)\}\}/);
@@ -420,17 +522,50 @@ export default function ChatPage({
       if (!waNumber) {
         return <span>{before ? parseMarkdown(before) : null}</span>;
       }
-      const waText = encodeURIComponent(waMatch[1].trim());
+      const rawWaText = waMatch[1].trim();
+      const waText = encodeURIComponent(rawWaText);
+      const waIcon = (
+        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+          <path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.554 4.118 1.524 5.845L0 24l6.345-1.5A11.93 11.93 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.007-1.373l-.36-.213-3.727.881.934-3.618-.235-.372A9.818 9.818 0 1112 21.818z"/>
+        </svg>
+      );
       return (
         <>
           {before && <span>{parseMarkdown(before)}</span>}
-          <a href={`https://wa.me/${waNumber}?text=${waText}`} target="_blank" rel="noopener noreferrer" className="wa-btn">
-            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-              <path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.554 4.118 1.524 5.845L0 24l6.345-1.5A11.93 11.93 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.007-1.373l-.36-.213-3.727.881.934-3.618-.235-.372A9.818 9.818 0 1112 21.818z"/>
-            </svg>
-            تواصل عبر واتساب
-          </a>
+
+          {/* Saving lead to CRM */}
+          {crmSubmitting && (
+            <div className="crm-submitting">
+              <div className="crm-spinner" />
+              <span>جاري حفظ بياناتك...</span>
+            </div>
+          )}
+
+          {/* CRM saved — show WA handoff button */}
+          {leadSubmitted && (
+            <a href={`https://wa.me/${waNumber}?text=${waText}`} target="_blank" rel="noopener noreferrer" className="wa-btn">
+              {waIcon}
+              تواصل عبر واتساب
+            </a>
+          )}
+
+          {/* CRM failed — show retry; do not claim success */}
+          {crmError && !crmSubmitting && (
+            <>
+              <p className="crm-error-msg">حدث خطأ في حفظ بياناتك. يرجى المحاولة مجدداً.</p>
+              <button
+                className="crm-retry-btn"
+                onClick={() => {
+                  setCrmError(false);
+                  leadSubmitAttempted.current = false;
+                  submitLeadFromWaText(rawWaText);
+                }}
+              >
+                ↻ إعادة المحاولة
+              </button>
+            </>
+          )}
         </>
       );
     }
