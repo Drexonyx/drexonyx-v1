@@ -101,9 +101,9 @@ html, body { height: 100%; }
 }
 
 .chat-root.dark {
-  --bg: #080D1C;
-  --surface: #0D1829;
-  --surface-raised: #1A2540;
+  --bg: #0A1225;
+  --surface: #0F1C32;
+  --surface-raised: #1B2B46;
   --border: rgba(255,255,255,0.09);
   --text: #FFFFFF;
   --text-soft: #D6DCEC;
@@ -193,7 +193,7 @@ html, body { height: 100%; }
 .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
 /* ── WELCOME VIEW ── */
-.welcome-view { display: flex; flex-direction: column; }
+.welcome-view { display: flex; flex-direction: column; padding-bottom: 80px; }
 
 /* ── HERO ── */
 .hero-section {
@@ -218,7 +218,7 @@ html, body { height: 100%; }
 }
 .tagline-dash { font-size: 16px; line-height: 1; }
 .hero-title { font-size: 24px; font-weight: 800; line-height: 1.15; color: #fff; margin-bottom: 10px; }
-.hero-highlight { color: var(--gold); }
+.hero-highlight { color: var(--accent-bright); }
 .hero-sub { font-size: 12px; color: var(--text-soft); line-height: 1.6; }
 
 /* ── WELCOME BOT MSG ── */
@@ -253,8 +253,8 @@ html, body { height: 100%; }
 .categories-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
 @media (min-width: 480px) { .categories-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .category-card {
-  background: rgba(255,255,255,.04);
-  border: 1px solid var(--border);
+  background: rgba(255,255,255,.055);
+  border: 1px solid rgba(255,255,255,0.13);
   border-radius: 14px; padding: 14px 12px;
   cursor: pointer; text-align: left;
   display: flex; flex-direction: row; align-items: center; gap: 12px;

@@ -238,7 +238,7 @@ I'm interested in your services
     welcomeMessage: 'مرحباً! 👋\nأنا بوت المبيعات الذكي من {{GOLD:MDA}}.\nاختر نوع نشاطك أدناه أو اكتب سؤالك مباشرةً.',
     inputPlaceholder: 'اكتب سؤالك...',
     waNumber: '971521770988',
-    heroBg: '/images/chat-hero-mda.png',
+    heroBg: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=1200',
     heroTagline: 'بوت مبيعات ذكي',
     heroTitle: 'حوّل عملاءك إلى',
     heroHighlight: 'مبيعات حقيقية',
