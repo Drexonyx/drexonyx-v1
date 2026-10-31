@@ -1,6 +1,6 @@
 // DR 0121: Chatbot client registry — add new clients here to publish at /chat/<slug>
 export interface ChatCategory {
-  icon: 'monitor' | 'brush' | 'chart';
+  icon: 'monitor' | 'brush' | 'chart' | 'utensils' | 'store' | 'scissors' | 'medical' | 'building' | 'grid';
   title: string;
   desc: string;
   prompt: string;
@@ -238,49 +238,50 @@ I'm interested in your services
     welcomeMessage: 'مرحباً! 👋\nأنا بوت المبيعات الذكي من {{GOLD:MDA}}.\nاختر نوع نشاطك أدناه أو اكتب سؤالك مباشرةً.',
     inputPlaceholder: 'اكتب سؤالك...',
     waNumber: '971521770988',
+    heroBg: '/images/chat-hero-mda.png',
     heroTagline: 'بوت مبيعات ذكي',
     heroTitle: 'حوّل عملاءك إلى',
     heroHighlight: 'مبيعات حقيقية',
     heroSubtitle: '299 درهم شهرياً · إعداد خلال 48 ساعة',
     categories: [
       {
-        icon: 'monitor' as const,
+        icon: 'utensils' as const,
         title: 'مطعم أو كافيه',
         desc: 'قائمة، حجوزات، توصيل',
         prompt: 'لدي مطعم أو كافيه وأريد معرفة المزيد عن البوت.',
       },
       {
-        icon: 'chart' as const,
+        icon: 'store' as const,
         title: 'محل أو متجر',
         desc: 'منتجات، طلبات، خدمة عملاء',
         prompt: 'لدي محل أو متجر إلكتروني وأريد معرفة المزيد.',
       },
       {
-        icon: 'brush' as const,
+        icon: 'scissors' as const,
         title: 'صالون أو سبا',
         desc: 'حجوزات، خدمات، أسعار',
         prompt: 'لدي صالون أو مركز تجميل وأريد معرفة المزيد.',
       },
       {
-        icon: 'monitor' as const,
+        icon: 'medical' as const,
         title: 'عيادة أو صيدلية',
         desc: 'مواعيد، خدمات، موقع',
         prompt: 'لدي عيادة أو صيدلية وأريد معرفة المزيد.',
       },
       {
-        icon: 'chart' as const,
+        icon: 'building' as const,
         title: 'عقارات',
         desc: 'عروض، مواعيد، تسعير',
         prompt: 'أعمل في مجال العقارات وأريد معرفة المزيد.',
       },
       {
-        icon: 'brush' as const,
+        icon: 'monitor' as const,
         title: 'تعليم وكورسات',
         desc: 'مناهج، تسجيل، جدول',
         prompt: 'لدي مركز تعليمي أو كورسات وأريد معرفة المزيد.',
       },
       {
-        icon: 'monitor' as const,
+        icon: 'grid' as const,
         title: 'نشاط آخر',
         desc: 'أي نشاط تجاري آخر',
         prompt: 'لدي نشاط تجاري وأريد معرفة كيف يساعدني البوت.',
