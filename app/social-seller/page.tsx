@@ -118,7 +118,7 @@ const STEPS = [
 const WA_TEXT = encodeURIComponent(
   'مرحباً فريق MDA 👋\nأريد الاشتراك في بوت المبيعات الذكي\n\nالخطة: الأساسية 299 درهم/شهر',
 );
-const WA_HREF = `https://wa.me/971585806534?text=${WA_TEXT}`;
+const WA_HREF = `https://wa.me/971521770988?text=${WA_TEXT}`;
 
 export default function SocialSellerPage() {
   return (

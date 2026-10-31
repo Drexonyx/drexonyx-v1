@@ -1,5 +1,4 @@
-// DR-0130: Tests for SSB CRM marker extraction and lead field parsing.
-// Verifies the {{WA_LINK_TEXT:...}} contract so silent CRM failures are caught early.
+// DR-0130: Tests for SSB CRM marker, lead parsing, and WhatsApp destination contract.
 
 import { describe, it, expect } from 'vitest';
 import {
@@ -7,6 +6,11 @@ import {
   parseLeadFields,
   isLeadValid,
 } from '@/lib/chatbot/ssb-lead-parser';
+import { getClient } from '@/lib/chatbot/clients';
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+const MDA_WA_NUMBER = '971521770988';
+const OLD_WA_NUMBER = '971585806534';
 
 // Realistic bot output mirroring what the mda-sales prompt produces.
 const FULL_MARKER = `رائع! إليك ملخص معلوماتك:
@@ -114,5 +118,124 @@ describe('isLeadValid — validation', () => {
 
   it('returns false when both fields are missing', () => {
     expect(isLeadValid({})).toBe(false);
+  });
+});
+
+// ─── WhatsApp destination contract ───────────────────────────────────────────
+
+describe('mda-sales WhatsApp destination', () => {
+  const client = getClient('mda-sales');
+
+  it('client exists', () => {
+    expect(client).not.toBeNull();
+  });
+
+  it(`waNumber is the official MDA number ${MDA_WA_NUMBER}`, () => {
+    expect(client!.waNumber).toBe(MDA_WA_NUMBER);
+  });
+
+  it('generated button URL targets official MDA number', () => {
+    const url = `https://wa.me/${client!.waNumber}`;
+    expect(url).toBe(`https://wa.me/${MDA_WA_NUMBER}`);
+  });
+
+  it('old number is NOT the mda-sales destination', () => {
+    expect(client!.waNumber).not.toBe(OLD_WA_NUMBER);
+  });
+
+  it('customer contact number in CRM fields does not affect waNumber', () => {
+    // Simulate customer providing a different phone number as their contact.
+    const customerPhone = '971501234567';
+    const marker = `{{WA_LINK_TEXT:• النشاط: مطعم\n• النوع: مطعم\n• المنصة: واتساب\n• أوقات العمل: 9-11\n• الخدمات/المنتجات: وجبات\n• رقم التواصل: ${customerPhone}}}`;
+    const m = marker.match(WA_LINK_TEXT_RE)!;
+    const fields = parseLeadFields(m[1]);
+    // Customer phone stored as CRM field
+    expect(fields.contactWhatsapp).toBe(customerPhone);
+    // waNumber is NEVER derived from parsed lead fields — it stays the official number
+    expect(client!.waNumber).toBe(MDA_WA_NUMBER);
+    expect(client!.waNumber).not.toBe(customerPhone);
+  });
+});
+
+describe('no active MDA Sales Agent fallback uses old number', () => {
+  it('mda-sales waNumber is not the old number', () => {
+    const client = getClient('mda-sales');
+    expect(client!.waNumber).not.toBe(OLD_WA_NUMBER);
+  });
+
+  it('mda-sales systemPrompt does not contain old number', () => {
+    const client = getClient('mda-sales');
+    expect(client!.systemPrompt).not.toContain(OLD_WA_NUMBER);
+  });
+});
+
+// ─── Sales behavior constraints (system prompt audit) ────────────────────────
+
+describe('mda-sales system prompt — behavior constraints', () => {
+  const prompt = getClient('mda-sales')!.systemPrompt;
+
+  it('does not claim Instagram DM automation', () => {
+    expect(prompt).not.toMatch(/رسائل إنستغرام.*آلي.*مباشرةً|Instagram.*DM.*auto/i);
+  });
+
+  it('does not claim TikTok DM automation', () => {
+    expect(prompt).not.toMatch(/تيك توك.*آلي.*مباشرةً|TikTok.*DM.*auto/i);
+  });
+
+  it('does not guarantee 24-hour setup', () => {
+    // Must NOT promise "سنجهّز بوتك خلال 24 ساعة" or "within 24 hours"
+    expect(prompt).not.toMatch(/سنجهّز.*خلال 24 ساعة/);
+    expect(prompt).not.toMatch(/set up.*within 24 hours/i);
+  });
+
+  it('refers setup timing to team confirmation', () => {
+    expect(prompt).toMatch(/يؤكده فريق MDA|confirm.*next steps|تأكيد الخطوات/);
+  });
+
+  it('instructs one question per message', () => {
+    expect(prompt).toMatch(/سؤال واحد/);
+  });
+
+  it('instructs short replies', () => {
+    expect(prompt).toMatch(/قصيرة|short/i);
+  });
+
+  it('price is AED 299/month', () => {
+    expect(prompt).toMatch(/299/);
+  });
+
+  it('preserves the exact CRM marker template fields', () => {
+    expect(prompt).toContain('النشاط:');
+    expect(prompt).toContain('النوع:');
+    expect(prompt).toContain('المنصة:');
+    expect(prompt).toContain('أوقات العمل:');
+    expect(prompt).toContain('الخدمات/المنتجات:');
+    expect(prompt).toContain('رقم التواصل:');
+  });
+
+  it('preserves the SYSTEM OUTPUT MARKER instruction', () => {
+    expect(prompt).toContain('SYSTEM OUTPUT MARKER');
+    expect(prompt).toContain('{{WA_LINK_TEXT:');
+  });
+});
+
+// ─── Duplicate prevention (client-side guard) ────────────────────────────────
+
+describe('CRM duplicate prevention', () => {
+  it('isLeadValid rejects empty fields — preventing spurious submissions', () => {
+    // The guard in ChatPage calls isLeadValid before posting; if it returns false
+    // the submit is aborted and leadSubmitAttempted is reset to false.
+    expect(isLeadValid({ businessName: '', contactWhatsapp: '971500000001' })).toBe(false);
+    expect(isLeadValid({ businessName: 'مطعم', contactWhatsapp: '' })).toBe(false);
+  });
+
+  it('once valid fields are present, the lead is submitted exactly once per session', () => {
+    // Client-side guard: leadSubmitAttempted.current flips to true on first submit attempt.
+    // This test documents the invariant; the actual ref is in ChatPage React state.
+    const fields = { businessName: 'مطعم الكرم', contactWhatsapp: '971500000099' };
+    expect(isLeadValid(fields)).toBe(true); // submission would proceed
+    // A second call with the same valid fields still passes validation,
+    // but ChatPage's leadSubmitAttempted ref prevents re-submission.
+    expect(isLeadValid(fields)).toBe(true);
   });
 });

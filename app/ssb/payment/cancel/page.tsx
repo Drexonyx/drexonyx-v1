@@ -19,7 +19,7 @@ export default function SsbPaymentCancelPage() {
         </p>
         <p style={{ color: '#64748b', fontSize: '0.875rem' }}>
           Contact us on WhatsApp:{' '}
-          <a href="https://wa.me/971585806534" style={{ color: '#4f7df7' }}>+971 58 580 6534</a>
+          <a href="https://wa.me/971521770988" style={{ color: '#4f7df7' }}>+971 52 177 0988</a>
         </p>
       </div>
     </main>

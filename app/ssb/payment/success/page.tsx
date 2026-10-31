@@ -1,6 +1,5 @@
 // DR-0130: Ziina payment success redirect page for SSB customers.
 import type { Metadata } from 'next';
-import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Payment Received — Social Seller Bot',
@@ -20,7 +19,7 @@ export default function SsbPaymentSuccessPage() {
         </p>
         <p style={{ color: '#64748b', fontSize: '0.875rem' }}>
           Questions? Contact us on WhatsApp:{' '}
-          <a href="https://wa.me/971585806534" style={{ color: '#4f7df7' }}>+971 58 580 6534</a>
+          <a href="https://wa.me/971521770988" style={{ color: '#4f7df7' }}>+971 52 177 0988</a>
         </p>
       </div>
     </main>
