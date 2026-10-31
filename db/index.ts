@@ -9,6 +9,7 @@ import * as financialSchema from './schema/financial';
 import * as systemSchema from './schema/system';
 import * as orchestrationSchema from './schema/orchestration';
 import * as salesSchema from './schema/sales';
+import * as ssbSchema from './schema/ssb';
 
 const schema = {
   ...coreSchema,
@@ -19,6 +20,7 @@ const schema = {
   ...systemSchema,
   ...orchestrationSchema,
   ...salesSchema,
+  ...ssbSchema,
 };
 
 export type DbSchema = typeof schema;
@@ -54,4 +56,5 @@ export {
   systemSchema,
   orchestrationSchema,
   salesSchema,
+  ssbSchema,
 };

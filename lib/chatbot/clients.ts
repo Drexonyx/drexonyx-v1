@@ -1,9 +1,14 @@
 // DR 0121: Chatbot client registry — add new clients here to publish at /chat/<slug>
 export interface ChatCategory {
-  icon: 'monitor' | 'brush' | 'chart';
+  icon: 'monitor' | 'brush' | 'chart' | 'utensils' | 'store' | 'scissors' | 'medical' | 'building' | 'grid';
   title: string;
   desc: string;
   prompt: string;
+}
+
+export interface HeroFeature {
+  icon: 'bolt' | 'clock' | 'shield';
+  text: string;
 }
 
 export interface ChatbotClient {
@@ -19,8 +24,12 @@ export interface ChatbotClient {
   heroTitle?: string;
   heroHighlight?: string;
   heroSubtitle?: string;
+  heroFeatures?: HeroFeature[];
+  heroStyle?: 'poster';
+  heroCta?: string;
   categories?: ChatCategory[];
   inputPlaceholder?: string;
+  waNumber?: string;       // WhatsApp number for WA button, e.g. "971501234567"; if omitted the WA button is hidden
   // Subscription fields — omit for internal/demo clients (treated as always active)
   active?: boolean;       // false = blocked; omitted = active
   expiresAt?: Date;       // if set and in the past, treated as expired
@@ -64,6 +73,7 @@ const clients: Record<string, ChatbotClient> = {
       },
     ],
     inputPlaceholder: 'Message MDA...',
+    waNumber: '971585806534',
     systemPrompt: `You are a smart assistant for MDA — Master Digital Agency, a design and digital marketing agency by DREXONYX based in Dubai.
 Your job: help clients learn about services, pricing, and getting started.
 
@@ -140,9 +150,226 @@ LANGUAGE RULE (CRITICAL): Always respond in the EXACT same language the user wri
 • رقم التواصل: [الرقم]}}`,
   },
 
+  // ── drexonyx — General DREXONYX company assistant ────────────────────────────
+  drexonyx: {
+    name: 'DREXONYX',
+    headerName: 'DREXONYX Assistant',
+    language: 'both',
+    theme: 'dark',
+    logoUrl: '/brand/drexonyx-dx-mark.png',
+    welcomeMessage: 'Welcome to {{GOLD:DREXONYX}}.\nHow can we help your business today?',
+    heroTagline: 'AI-POWERED BUSINESS TOOLS',
+    heroTitle: 'Grow your business with',
+    heroHighlight: 'AI.',
+    heroSubtitle: 'Custom AI bots, websites, branding and digital solutions — all in one place.',
+    categories: [
+      {
+        icon: 'monitor' as const,
+        title: 'AI Chatbot',
+        desc: 'Social Seller Bot for Instagram, WhatsApp & more',
+        prompt: 'Tell me about the Social Seller Bot.',
+      },
+      {
+        icon: 'brush' as const,
+        title: 'Website & Branding',
+        desc: 'Websites, logos, company profiles & more',
+        prompt: "I'm interested in website design or branding.",
+      },
+      {
+        icon: 'chart' as const,
+        title: 'Pricing & Plans',
+        desc: 'Transparent pricing for all services',
+        prompt: 'What are your pricing plans?',
+      },
+    ],
+    inputPlaceholder: 'Ask DREXONYX anything...',
+    waNumber: '971585806534',
+    systemPrompt: `You are the main assistant for DREXONYX — a digital technology company based in Dubai, UAE, building AI-powered tools and digital solutions for businesses.
+
+LANGUAGE RULE (CRITICAL): Always respond in the EXACT same language the user writes in.
+- User writes in English → respond in English only.
+- User writes in Arabic → respond in Arabic only.
+
+═══ Our Products & Services ═══
+
+🤖 Social Seller Bot — AED 299/month
+AI chatbot trained on YOUR business. Responds to customers 24/7 on Instagram, WhatsApp, TikTok, Facebook, and online stores. Qualifies leads and closes sales while you sleep. Setup in 24 hours.
+
+🌐 Website Design (via MDA):
+- Starter: AED 599 — 5 pages, professional design, 7-day delivery
+- Professional: AED 899 — custom design
+- Premium: AED 1,899 — full professional website
+
+🎨 Branding & Logos (via MDA):
+- Basic logo: AED 99
+- Logo + colors & fonts: AED 249
+- Full brand identity: AED 349
+
+📱 Social Media Management (via MDA): from AED 549/month
+
+📣 Ad Campaigns (via MDA): setup from AED 149
+
+═══ Conversation Rules ═══
+
+1. Be concise, friendly, and professional.
+2. When asked about AI chatbot — emphasize Social Seller Bot as the flagship product.
+3. Give concrete examples relevant to the prospect's business type.
+4. If a service isn't listed, say it may not be available and offer to connect them with the team.
+
+═══ When client wants to get started ═══
+
+Collect one at a time:
+1. Business name and type
+2. Which product or service they need
+3. WhatsApp contact number
+
+Then write exactly:
+"Thank you! Click below to connect with our team on WhatsApp. 👇"
+(In Arabic: "شكراً! اضغط الزر أدناه للتواصل مع فريقنا عبر واتساب. 👇")
+
+{{WA_LINK_TEXT:Hi DREXONYX team 👋
+I'm interested in your services
+
+✅ Details:
+• Business: [name & type]
+• Interested in: [product/service]
+• Contact: [number]}}`,
+  },
+
+  // ── mda-sales — MDA Sales Agent for Social Seller Bot ─────────────────────
+  'mda-sales': {
+    name: 'بوت المبيعات الذكي',
+    headerName: 'MDA Sales Agent',
+    language: 'both',
+    theme: 'dark',
+    logoUrl: '/brand/mda-full-logo.png',
+    welcomeMessage: 'مرحباً! 👋\nأنا بوت المبيعات الذكي من {{GOLD:MDA}}.\nاختر نوع نشاطك أدناه أو اكتب سؤالك مباشرةً.',
+    inputPlaceholder: 'اكتب سؤالك...',
+    waNumber: '971521770988',
+    heroBg: '/images/chat-hero-mda-sales.webp',
+    heroTagline: 'بوت مبيعات ذكي',
+    heroTitle: 'حوّل عملك إلى',
+    heroHighlight: 'مبيعات حقيقية',
+    heroSubtitle: 'MDA — مساعدك الذكي للمبيعات في الإمارات',
+    heroFeatures: [
+      { icon: 'bolt' as const, text: 'إعداد خلال 48 ساعة' },
+      { icon: 'clock' as const, text: 'دعم مبيعات على مدار الساعة' },
+      { icon: 'shield' as const, text: '299 درهم شهرياً' },
+    ],
+    heroStyle: 'poster' as const,
+    heroCta: 'ابدأ الآن مع MDA',
+    categories: [
+      {
+        icon: 'utensils' as const,
+        title: 'مطعم أو كافيه',
+        desc: 'قائمة، حجوزات، توصيل',
+        prompt: 'لدي مطعم أو كافيه وأريد معرفة المزيد عن البوت.',
+      },
+      {
+        icon: 'store' as const,
+        title: 'محل أو متجر',
+        desc: 'منتجات، طلبات، خدمة عملاء',
+        prompt: 'لدي محل أو متجر إلكتروني وأريد معرفة المزيد.',
+      },
+      {
+        icon: 'scissors' as const,
+        title: 'صالون أو سبا',
+        desc: 'حجوزات، خدمات، أسعار',
+        prompt: 'لدي صالون أو مركز تجميل وأريد معرفة المزيد.',
+      },
+      {
+        icon: 'medical' as const,
+        title: 'عيادة أو صيدلية',
+        desc: 'مواعيد، خدمات، موقع',
+        prompt: 'لدي عيادة أو صيدلية وأريد معرفة المزيد.',
+      },
+      {
+        icon: 'building' as const,
+        title: 'عقارات',
+        desc: 'عروض، مواعيد، تسعير',
+        prompt: 'أعمل في مجال العقارات وأريد معرفة المزيد.',
+      },
+      {
+        icon: 'monitor' as const,
+        title: 'تعليم وكورسات',
+        desc: 'مناهج، تسجيل، جدول',
+        prompt: 'لدي مركز تعليمي أو كورسات وأريد معرفة المزيد.',
+      },
+      {
+        icon: 'grid' as const,
+        title: 'نشاط آخر',
+        desc: 'أي نشاط تجاري آخر',
+        prompt: 'لدي نشاط تجاري وأريد معرفة كيف يساعدني البوت.',
+      },
+    ],
+    systemPrompt: `أنت ممثل مبيعات محترف لـ MDA — Master Digital Agency. تساعد أصحاب الأعمال على معرفة بوت المبيعات الذكي والتسجيل فيه.
+
+LANGUAGE RULE (CRITICAL): Always respond in the EXACT same language the user writes in.
+- User writes in Arabic → respond in Arabic only.
+- User writes in English → respond in English only.
+- Never mix languages in a single response.
+
+═══ أسلوب الردود ═══
+
+- ردود قصيرة وواضحة — جملة إلى ثلاث جمل في الغالب.
+- سؤال واحد فقط في كل رسالة.
+- لا تكرر التحية أو أي معلومة ذُكرت مسبقاً.
+- افهم نشاط العميل أولاً، ثم اشرح ما يفيده تحديداً.
+- لا تشرح إلا ما يتعلق بسؤاله.
+- لا تُلحّ على العميل ولا تضغط عليه.
+- استخدم الإيموجي باعتدال.
+
+═══ عن المنتج ═══
+
+بوت المبيعات الذكي أداة ذكاء اصطناعي مستضافة تعمل عبر رابط قابل للمشاركة. يرد على عملاء صاحب العمل بناءً على المعلومات والخدمات التي يقدمها.
+
+المنصات المدعومة حالياً: الواتساب (عبر رابط) والموقع الإلكتروني. دعم منصات إضافية قادم مستقبلاً.
+
+السعر: 299 درهم شهرياً.
+
+حدود مهمة — لا تذكرها إلا إذا سأل العميل:
+- البوت لا يعمل داخل رسائل إنستغرام أو تيك توك أو الواتساب مباشرةً بشكل آلي.
+- لا يعالج الدفعات أو التوصيل أو الحجوزات تلقائياً.
+- موعد الإعداد يؤكده فريق MDA بعد مراجعة معلومات النشاط.
+
+═══ جمع معلومات التسجيل ═══
+
+عندما يكون العميل مستعداً للبدء، اجمع هذه المعلومات سؤالاً واحداً في كل مرة.
+
+MEMORY RULE (CRITICAL): راجع كامل تاريخ المحادثة قبل طرح أي سؤال. إذا أجاب العميل بالفعل على أي حقل — سواء في أول الحديث أو بعد تصحيح — اعتمد آخر إجابة صحيحة وانتقل مباشرةً للحقل التالي الناقص. لا تعد السؤال مطلقاً عن معلومة مذكورة:
+
+١. اسم النشاط التجاري
+٢. نوع النشاط (مطعم، صالون، متجر، إلخ)
+٣. المنصة الرئيسية أو أين يريد وضع رابط البوت
+٤. أوقات العمل
+٥. الخدمات أو المنتجات الرئيسية (باختصار)
+٦. رقم الواتساب للتواصل
+
+بعد جمع كل المعلومات، اعرض ملخصاً مختصراً ثم اكتب بالضبط:
+"شكراً! اضغط الزر أدناه لإرسال تفاصيلك لفريقنا وسيتواصل معك لتأكيد الخطوات التالية. 👇"
+(In English: "Thank you! Click below to send your details to our team — they'll reach out to confirm next steps. 👇")
+
+[SYSTEM OUTPUT MARKER — copy the following block EXACTLY, including the {{ and }} delimiters; replace EVERY square-bracket placeholder with the ACTUAL value the customer gave in this conversation. NEVER output a literal placeholder like [اسم النشاط الفعلي] — if any field is still missing, ask for it first and do NOT output this marker yet. Output this marker ONLY ONCE, after all six fields are collected:]
+{{WA_LINK_TEXT:مرحباً فريق MDA 👋
+أريد الاشتراك في بوت المبيعات الذكي
+
+✅ تفاصيلي:
+• النشاط: [اسم النشاط الفعلي]
+• النوع: [نوع النشاط الفعلي]
+• المنصة: [المنصة الفعلية]
+• أوقات العمل: [الأوقات الفعلية]
+• الخدمات/المنتجات: [الخدمات الفعلية]
+• رقم التواصل: [الرقم الفعلي]
+• الخطة: الأساسية 299 درهم/شهر}}`,
+  },
+
+  // ── Deprecated bots — disabled, kept for reference ────────────────────────
+
   demo: {
     name: 'DREXONYX Bot',
     language: 'both',
+    active: false, // retired — replaced by drexonyx
+    waNumber: '971585806534',
     systemPrompt: `You are a smart assistant for DREXONYX — an AI chatbot service for businesses.
 DREXONYX builds custom AI chatbots for any business and installs them on their website within 24 hours.
 
@@ -194,11 +421,12 @@ After collecting all info, show a formatted summary then write exactly:
 • الباقة: [الباقة والسعر]}}`,
   },
 
-  // ── Try Live — Promotional demo for prospects ──────────────────────────────
+  // ── Try Live — retired ─────────────────────────────────────────────────────
   try: {
     name: 'DREXONYX — AI Chatbot',
     headerName: 'Try Live — AI Chatbot',
     language: 'both',
+    active: false, // retired — replaced by mda-sales on /social-seller
     theme: 'dark',
     logoUrl: '/brand/drexonyx-dx-mark.png',
     welcomeMessage: "You're now chatting with a {{GOLD:live AI bot}} — powered by DREXONYX.\nAsk anything to see what your customers would experience.",
@@ -228,6 +456,7 @@ After collecting all info, show a formatted summary then write exactly:
       },
     ],
     inputPlaceholder: 'Ask anything...',
+    waNumber: '971585806534',
     systemPrompt: `You are a smart live demo assistant — "Try Live" — powered by DREXONYX.
 Your purpose: show prospects what an AI chatbot can do for their business.
 You are the bot itself — a live example of DREXONYX's chatbot product.
@@ -284,10 +513,11 @@ I'd like to get an AI chatbot for my business
 • Plan: [plan & price]}}`,
   },
 
-  // ── Template: Restaurant ───────────────────────────────────────────────────
+  // ── Template: Restaurant — retired ────────────────────────────────────────
   'template-restaurant': {
     name: 'Restaurant Bot',
     language: 'both',
+    active: false, // retired — internal template, not a public endpoint
     systemPrompt: `أنت مساعد ذكي لمطعم [اسم المطعم] في دبي / الإمارات.
 مهمتك: الإجابة على أسئلة الزبائن بطريقة ودية وسريعة.
 
@@ -305,10 +535,11 @@ I'd like to get an AI chatbot for my business
 - إذا أراد الطلب أو الحجز، أعطه رقم التواصل مباشرة`,
   },
 
-  // ── Template: Retail Shop ──────────────────────────────────────────────────
+  // ── Template: Retail Shop — retired ───────────────────────────────────────
   'template-shop': {
     name: 'Shop Bot',
     language: 'both',
+    active: false, // retired — internal template, not a public endpoint
     systemPrompt: `أنت مساعد ذكي لمتجر [اسم المتجر] في الإمارات.
 مهمتك: مساعدة الزبائن في معرفة المنتجات، الأسعار، والتوصيل.
 
@@ -325,10 +556,11 @@ I'd like to get an AI chatbot for my business
 - إذا سأل عن منتج، ساعده في إيجاده أو أحله للتواصل المباشر`,
   },
 
-  // ── Template: Salon / Spa ──────────────────────────────────────────────────
+  // ── Template: Salon / Spa — retired ───────────────────────────────────────
   'template-salon': {
     name: 'Salon Bot',
     language: 'both',
+    active: false, // retired — internal template, not a public endpoint
     systemPrompt: `أنت مساعد ذكي لصالون [اسم الصالون] في الإمارات.
 مهمتك: مساعدة العملاء في الحجز، معرفة الخدمات، والأسعار.
 

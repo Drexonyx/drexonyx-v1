@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { getClient } from '@/lib/chatbot/clients';
+// DR 0122: Register Social Seller Bot merchants as a module-load side effect.
+import '@/lib/chatbot/social-seller';
 
 export const runtime = 'edge';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
-const MODELS = ['gemini-2.0-flash-lite', 'gemini-2.0-flash'];
+const MODELS = ['gemini-3.5-flash-lite', 'gemini-3.8-flash'];
 
 // In-memory sliding window rate limiter (per Edge instance).
 // Limits: 20 requests / 60 s per (IP × clientId).
@@ -58,7 +60,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const recent = messages.slice(-8) as { role: string; content: string }[];
+    // 30-message window covers a complete mda-sales registration flow (6 Q&A pairs
+    // + back-and-forth + welcome) without truncating early answers.
+    const recent = messages.slice(-30) as { role: string; content: string }[];
     const historyRaw = recent.slice(0, -1).map(m => ({
       role: m.role === 'user' ? 'user' : 'model',
       parts: [{ text: m.content }],
@@ -78,7 +82,7 @@ export async function POST(req: NextRequest) {
                 model: modelName,
                 systemInstruction: client.systemPrompt,
               });
-              const chat = model.startChat({ history, generationConfig: { maxOutputTokens: 300 } });
+              const chat = model.startChat({ history, generationConfig: { maxOutputTokens: 600 } });
               const result = await chat.sendMessageStream(lastMsg.content);
               for await (const chunk of result.stream) {
                 const text = chunk.text();

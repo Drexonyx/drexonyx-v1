@@ -64,7 +64,7 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const h = await headers();
   const pathname = h.get('x-pathname') ?? '';
-  const isChat = pathname.startsWith('/chat/');
+  const isChat = pathname.startsWith('/chat/') || pathname.startsWith('/social-seller');
 
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${bebasNeue.variable}`}>
