@@ -1,0 +1,1063 @@
+/* MDA Admin Dashboard — Dark Navy Theme
+ * Imported alongside admin.module.css for MDA-specific pages.
+ * Overrides --drex-* tokens within .mdaTheme for the entire admin shell.
+ */
+
+/* ── Theme token override ────────────────────────────────────────────────── */
+.mdaTheme {
+  --drex-bg:            #030c1a;
+  --drex-surface:       #07162a;
+  --drex-elevated:      #0d1e36;
+  --drex-border:        #162d48;
+  --drex-border-subtle: #0f1e30;
+  --drex-text:          #e4f0ff;
+  --drex-text-secondary: #7ba4c4;
+  --drex-text-muted:    #2e4f6e;
+  --drex-accent:        #3b82f6;
+  --drex-accent-subtle: rgba(59,130,246,0.12);
+
+  /* MDA palette */
+  --mda-royal:   #1d4ed8;
+  --mda-blue:    #3b82f6;
+  --mda-electric:#60a5fa;
+  --mda-gold:    #f59e0b;
+  --mda-success: #22c55e;
+  --mda-warning: #f59e0b;
+  --mda-danger:  #ef4444;
+
+  background: var(--drex-bg);
+  color: var(--drex-text);
+}
+
+/* ── Shell layout ────────────────────────────────────────────────────────── */
+.mdaShell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--drex-bg);
+  position: relative;
+}
+
+/* ── Sidebar ─────────────────────────────────────────────────────────────── */
+.mdaSidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--drex-surface);
+  border-right: 1px solid var(--drex-border);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 10;
+  transition: transform 240ms cubic-bezier(0.16,1,0.3,1);
+}
+
+.mdaSidebarHeader {
+  padding: 1.25rem 1rem 1rem;
+  border-bottom: 1px solid var(--drex-border);
+}
+
+.mdaLogo {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 0.875rem;
+}
+
+.mdaLogoMark {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--mda-royal) 0%, var(--mda-blue) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.05em;
+  flex-shrink: 0;
+}
+
+.mdaLogoText {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.mdaLogoName {
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--drex-text);
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+
+.mdaLogoSub {
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--drex-text-muted);
+  line-height: 1.3;
+}
+
+.mdaOrgRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.mdaOrgName {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--drex-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mdaRoleBadge {
+  display: inline-block;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mda-electric);
+  background: rgba(96,165,250,0.1);
+  border: 1px solid rgba(96,165,250,0.2);
+  border-radius: 4px;
+  padding: 0.15rem 0.4rem;
+}
+
+/* ── Nav ─────────────────────────────────────────────────────────────────── */
+.mdaNav {
+  flex: 1;
+  padding: 0.75rem 0.625rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.mdaNavItem {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--drex-text-secondary);
+  text-decoration: none;
+  transition: color 200ms ease, background 200ms ease;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.mdaNavItem:hover {
+  color: var(--drex-text);
+  background: var(--drex-elevated);
+}
+
+.mdaNavItemActive {
+  color: var(--mda-electric);
+  background: rgba(59,130,246,0.12);
+}
+
+.mdaNavItemActive .mdaNavIcon {
+  color: var(--mda-blue);
+}
+
+.mdaNavIcon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.mdaNavItemActive .mdaNavIcon {
+  opacity: 1;
+}
+
+.mdaNavLabel {
+  direction: rtl;
+  text-align: right;
+  flex: 1;
+}
+
+/* ── Sidebar footer ──────────────────────────────────────────────────────── */
+.mdaSidebarFooter {
+  padding: 1rem;
+  border-top: 1px solid var(--drex-border);
+}
+
+.mdaMascotArea {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 0;
+  margin-bottom: 0.75rem;
+}
+
+.mdaMascot {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1e3a5f 0%, var(--mda-royal) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.mdaMascotText {
+  display: flex;
+  flex-direction: column;
+}
+
+.mdaMascotName {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--drex-text-secondary);
+}
+
+.mdaMascotStatus {
+  font-size: 0.6rem;
+  color: var(--mda-success);
+  letter-spacing: 0.08em;
+}
+
+/* ── Mobile top bar ──────────────────────────────────────────────────────── */
+.mdaTopBar {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1rem;
+  background: var(--drex-surface);
+  border-bottom: 1px solid var(--drex-border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.mdaMenuBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--drex-text-secondary);
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: color 200ms ease, background 200ms ease;
+}
+
+.mdaMenuBtn:hover {
+  color: var(--drex-text);
+  background: var(--drex-elevated);
+}
+
+.mdaTopLogo {
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--mda-electric);
+  letter-spacing: 0.08em;
+}
+
+/* ── Overlay (mobile drawer backdrop) ───────────────────────────────────── */
+.mdaOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  z-index: 15;
+  opacity: 0;
+  transition: opacity 240ms ease;
+}
+
+.mdaOverlayVisible {
+  opacity: 1;
+}
+
+/* ── Content area ────────────────────────────────────────────────────────── */
+.mdaContent {
+  flex: 1;
+  min-width: 0;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Page content ────────────────────────────────────────────────────────── */
+.mdaPage {
+  padding: 1.75rem 2rem;
+  direction: rtl;
+  text-align: right;
+  flex: 1;
+}
+
+/* ── Page header ─────────────────────────────────────────────────────────── */
+.mdaPageHeader {
+  margin-bottom: 1.75rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.mdaPageTitle {
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--drex-text);
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.mdaPageSubtitle {
+  font-size: 0.8125rem;
+  color: var(--drex-text-secondary);
+  margin-top: 0.25rem;
+}
+
+.mdaPageActions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ── KPI stat cards ──────────────────────────────────────────────────────── */
+.mdaStatGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.mdaStatCard {
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: 10px;
+  padding: 1.25rem 1.25rem 1rem;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 200ms ease;
+}
+
+.mdaStatCard:hover {
+  border-color: var(--mda-blue);
+}
+
+.mdaStatCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--mda-royal), var(--mda-blue));
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.mdaStatCard:hover::before {
+  opacity: 1;
+}
+
+.mdaStatCardGold::before {
+  background: linear-gradient(90deg, #d97706, var(--mda-gold));
+  opacity: 1;
+}
+
+.mdaStatCardGold {
+  border-color: rgba(245,158,11,0.2);
+}
+
+.mdaStatIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.875rem;
+  background: rgba(59,130,246,0.1);
+  color: var(--mda-blue);
+}
+
+.mdaStatIconGold {
+  background: rgba(245,158,11,0.1);
+  color: var(--mda-gold);
+}
+
+.mdaStatLabel {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--drex-text-muted);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  direction: rtl;
+}
+
+.mdaStatValue {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--drex-text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.mdaStatValueBlue {
+  color: var(--mda-electric);
+}
+
+.mdaStatValueGold {
+  color: var(--mda-gold);
+}
+
+.mdaStatValueSuccess {
+  color: var(--mda-success);
+}
+
+.mdaStatDelta {
+  font-size: 0.7rem;
+  color: var(--drex-text-muted);
+  margin-top: 0.375rem;
+}
+
+/* ── Charts row ──────────────────────────────────────────────────────────── */
+.mdaChartsRow {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.mdaChartCard {
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: 10px;
+  padding: 1.25rem;
+}
+
+.mdaChartTitle {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--drex-text);
+  margin-bottom: 1rem;
+  direction: rtl;
+  text-align: right;
+}
+
+.mdaChartSubtitle {
+  font-size: 0.7rem;
+  color: var(--drex-text-muted);
+  margin-bottom: 1rem;
+  direction: rtl;
+  text-align: right;
+}
+
+/* ── Section heading ─────────────────────────────────────────────────────── */
+.mdaSectionHeading {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--drex-text);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  direction: rtl;
+}
+
+.mdaSectionHeadingLine {
+  flex: 1;
+  height: 1px;
+  background: var(--drex-border);
+}
+
+/* ── Leads table ─────────────────────────────────────────────────────────── */
+.mdaTableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--drex-border);
+  border-radius: 10px;
+  background: var(--drex-surface);
+}
+
+.mdaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+  direction: rtl;
+}
+
+.mdaTable th {
+  text-align: right;
+  padding: 0.75rem 1rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--drex-text-muted);
+  font-weight: 700;
+  background: var(--drex-elevated);
+  border-bottom: 1px solid var(--drex-border);
+  white-space: nowrap;
+}
+
+.mdaTable td {
+  padding: 0.875rem 1rem;
+  color: var(--drex-text-secondary);
+  border-bottom: 1px solid var(--drex-border-subtle);
+  vertical-align: middle;
+  text-align: right;
+}
+
+.mdaTable tr:last-child td {
+  border-bottom: none;
+}
+
+.mdaTable tr:hover td {
+  background: var(--drex-elevated);
+}
+
+.mdaCellPrimary {
+  color: var(--drex-text);
+  font-weight: 600;
+}
+
+.mdaCellMono {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.75rem;
+  direction: ltr;
+  text-align: left;
+}
+
+/* ── Mobile lead cards ───────────────────────────────────────────────────── */
+.mdaLeadCards {
+  display: none;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.mdaLeadCard {
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: 10px;
+  padding: 1rem;
+  direction: rtl;
+}
+
+.mdaLeadCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.625rem;
+  gap: 0.5rem;
+}
+
+.mdaLeadCardName {
+  font-weight: 700;
+  color: var(--drex-text);
+  font-size: 0.9375rem;
+}
+
+.mdaLeadCardMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem 1rem;
+  font-size: 0.75rem;
+  color: var(--drex-text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.mdaLeadCardActions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+/* ── Badges ──────────────────────────────────────────────────────────────── */
+.mdaBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 5px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.mdaBadgeNew {
+  background: var(--drex-elevated);
+  color: var(--drex-text-secondary);
+  border: 1px solid var(--drex-border);
+}
+
+.mdaBadgeContacted {
+  background: rgba(59,130,246,0.12);
+  color: var(--mda-electric);
+  border: 1px solid rgba(59,130,246,0.2);
+}
+
+.mdaBadgeQualified {
+  background: rgba(245,158,11,0.1);
+  color: var(--mda-warning);
+  border: 1px solid rgba(245,158,11,0.2);
+}
+
+.mdaBadgeWon {
+  background: rgba(34,197,94,0.1);
+  color: var(--mda-success);
+  border: 1px solid rgba(34,197,94,0.2);
+}
+
+.mdaBadgeRejected {
+  background: rgba(239,68,68,0.1);
+  color: var(--mda-danger);
+  border: 1px solid rgba(239,68,68,0.2);
+}
+
+.mdaBadgeActive {
+  background: rgba(34,197,94,0.1);
+  color: var(--mda-success);
+  border: 1px solid rgba(34,197,94,0.2);
+}
+
+.mdaBadgePending {
+  background: rgba(245,158,11,0.1);
+  color: var(--mda-warning);
+  border: 1px solid rgba(245,158,11,0.2);
+}
+
+.mdaBadgeGold {
+  background: rgba(245,158,11,0.12);
+  color: var(--mda-gold);
+  border: 1px solid rgba(245,158,11,0.25);
+}
+
+/* ── Filter bar ──────────────────────────────────────────────────────────── */
+.mdaFilterBar {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  direction: rtl;
+  align-items: center;
+}
+
+.mdaFilterInput {
+  background: var(--drex-elevated);
+  border: 1px solid var(--drex-border);
+  border-radius: 8px;
+  padding: 0.575rem 0.875rem;
+  color: var(--drex-text);
+  font-size: 0.875rem;
+  font-family: inherit;
+  outline: none;
+  direction: rtl;
+  flex: 1;
+  min-width: 180px;
+}
+
+.mdaFilterInput::placeholder {
+  color: var(--drex-text-muted);
+}
+
+.mdaFilterInput:focus {
+  border-color: var(--mda-blue);
+}
+
+.mdaFilterSelect {
+  background: var(--drex-elevated);
+  border: 1px solid var(--drex-border);
+  border-radius: 8px;
+  padding: 0.575rem 0.875rem;
+  color: var(--drex-text);
+  font-size: 0.875rem;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+}
+
+.mdaFilterSelect:focus {
+  border-color: var(--mda-blue);
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+.mdaBtnPrimary {
+  background: var(--mda-royal);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.575rem 1.125rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 200ms ease, background 200ms ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.mdaBtnPrimary:hover:not(:disabled) {
+  background: var(--mda-blue);
+}
+
+.mdaBtnPrimary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.mdaBtnGhost {
+  background: transparent;
+  color: var(--drex-text-secondary);
+  border: 1px solid var(--drex-border);
+  border-radius: 8px;
+  padding: 0.575rem 1.125rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 200ms ease, border-color 200ms ease;
+  font-family: inherit;
+  white-space: nowrap;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.mdaBtnGhost:hover {
+  color: var(--drex-text);
+  border-color: var(--mda-blue);
+}
+
+.mdaBtnSmall {
+  background: var(--drex-elevated);
+  color: var(--drex-text-secondary);
+  border: 1px solid var(--drex-border);
+  border-radius: 6px;
+  padding: 0.3rem 0.625rem;
+  font-size: 0.725rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 200ms ease;
+  font-family: inherit;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.mdaBtnSmall:hover:not(:disabled) {
+  background: var(--drex-border);
+  color: var(--drex-text);
+}
+
+.mdaBtnSmall:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Empty / error states ────────────────────────────────────────────────── */
+.mdaEmpty {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--drex-text-muted);
+  direction: rtl;
+}
+
+.mdaEmptyIcon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  opacity: 0.4;
+}
+
+.mdaEmptyTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--drex-text-secondary);
+  margin-bottom: 0.375rem;
+}
+
+.mdaError {
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  color: #f87171;
+  font-size: 0.875rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Subscription cards ──────────────────────────────────────────────────── */
+.mdaSubCard {
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  direction: rtl;
+  transition: border-color 200ms ease;
+}
+
+.mdaSubCard:hover {
+  border-color: var(--mda-blue);
+}
+
+.mdaSubCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.875rem;
+}
+
+.mdaSubCardName {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--drex-text);
+}
+
+.mdaSubCardSlug {
+  font-size: 0.75rem;
+  color: var(--drex-text-muted);
+  font-family: var(--font-geist-mono), monospace;
+  direction: ltr;
+  margin-top: 0.2rem;
+}
+
+.mdaSubCardBadges {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.mdaSubCardMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem 1.25rem;
+  font-size: 0.8rem;
+  color: var(--drex-text-secondary);
+  margin-bottom: 1rem;
+}
+
+.mdaSubCardActions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+/* ── Payment history accordion ───────────────────────────────────────────── */
+.mdaPayHistory {
+  margin-top: 0.875rem;
+  border-top: 1px solid var(--drex-border-subtle);
+  padding-top: 0.875rem;
+}
+
+/* ── Revenue summary cards ───────────────────────────────────────────────── */
+.mdaRevGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.mdaRevCard {
+  background: var(--drex-surface);
+  border: 1px solid rgba(245,158,11,0.2);
+  border-radius: 10px;
+  padding: 1.25rem;
+  direction: rtl;
+}
+
+.mdaRevCardLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--drex-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.mdaRevCardValue {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--mda-gold);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.mdaRevCardSub {
+  font-size: 0.7rem;
+  color: var(--drex-text-muted);
+  margin-top: 0.35rem;
+}
+
+/* ── Settings page ───────────────────────────────────────────────────────── */
+.mdaSettingsGrid {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 640px;
+}
+
+.mdaSettingsCard {
+  background: var(--drex-surface);
+  border: 1px solid var(--drex-border);
+  border-radius: 10px;
+  padding: 1.375rem;
+  direction: rtl;
+}
+
+.mdaSettingsCardTitle {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--drex-text);
+  margin-bottom: 0.25rem;
+}
+
+.mdaSettingsCardDesc {
+  font-size: 0.8125rem;
+  color: var(--drex-text-secondary);
+  margin-bottom: 1.125rem;
+  line-height: 1.5;
+}
+
+.mdaInfoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--drex-border-subtle);
+  gap: 1rem;
+}
+
+.mdaInfoRow:last-child {
+  border-bottom: none;
+}
+
+.mdaInfoLabel {
+  font-size: 0.75rem;
+  color: var(--drex-text-muted);
+}
+
+.mdaInfoValue {
+  font-size: 0.8125rem;
+  color: var(--drex-text);
+  font-weight: 500;
+}
+
+/* ── Donut legend ────────────────────────────────────────────────────────── */
+.mdaDonutLegend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.mdaDonutLegendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  direction: rtl;
+}
+
+.mdaDonutLegendDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.mdaDonutLegendLabel {
+  color: var(--drex-text-secondary);
+  flex: 1;
+}
+
+.mdaDonutLegendCount {
+  font-weight: 600;
+  color: var(--drex-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .mdaChartsRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Show top bar on mobile */
+  .mdaTopBar {
+    display: flex;
+  }
+
+  /* Sidebar becomes drawer on mobile */
+  .mdaSidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    transform: translateX(-100%);
+    z-index: 30;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.6);
+  }
+
+  .mdaSidebarOpen {
+    transform: translateX(0);
+  }
+
+  /* Overlay shows when drawer is open */
+  .mdaOverlay {
+    display: block;
+  }
+
+  /* Content doesn't need top padding from sidebar */
+  .mdaContent {
+    flex-direction: column;
+  }
+
+  /* Page has less padding on mobile */
+  .mdaPage {
+    padding: 1.25rem 1rem;
+  }
+
+  /* Hide desktop table, show cards */
+  .mdaTableDesktop {
+    display: none;
+  }
+
+  .mdaLeadCards {
+    display: flex;
+  }
+
+  /* Stat grid adapts */
+  .mdaStatGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .mdaStatValue {
+    font-size: 1.625rem;
+  }
+
+  .mdaFilterBar {
+    flex-direction: column;
+  }
+
+  .mdaFilterInput {
+    min-width: unset;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .mdaStatGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
