@@ -5,6 +5,7 @@ import {
   WA_LINK_TEXT_RE,
   parseLeadFields,
   isLeadValid,
+  isPlaceholderValue,
 } from '@/lib/chatbot/ssb-lead-parser';
 import { getClient } from '@/lib/chatbot/clients';
 
@@ -237,5 +238,125 @@ describe('CRM duplicate prevention', () => {
     // A second call with the same valid fields still passes validation,
     // but ChatPage's leadSubmitAttempted ref prevents re-submission.
     expect(isLeadValid(fields)).toBe(true);
+  });
+});
+
+// ─── Placeholder detection (DR-0130: CRM data integrity) ─────────────────────
+
+describe('isPlaceholderValue — bracket placeholder detection', () => {
+  it('returns true for a typical Arabic placeholder', () => {
+    expect(isPlaceholderValue('[اسم النشاط الفعلي]')).toBe(true);
+  });
+
+  it('returns true for an English placeholder', () => {
+    expect(isPlaceholderValue('[Business Name]')).toBe(true);
+  });
+
+  it('returns true for a single-word placeholder', () => {
+    expect(isPlaceholderValue('[النشاط]')).toBe(true);
+  });
+
+  it('returns false for a real business name', () => {
+    expect(isPlaceholderValue('متجر ملابس أطفال')).toBe(false);
+  });
+
+  it('returns false for an empty string', () => {
+    expect(isPlaceholderValue('')).toBe(false);
+  });
+
+  it('returns false for a value that contains brackets but is not purely bracketed', () => {
+    expect(isPlaceholderValue('متجر [ملابس] أطفال')).toBe(false);
+  });
+
+  it('strips surrounding whitespace before checking', () => {
+    expect(isPlaceholderValue('  [اسم النشاط]  ')).toBe(true);
+  });
+});
+
+describe('parseLeadFields — placeholder values are silently dropped', () => {
+  it('drops a placeholder businessName', () => {
+    const text = `• النشاط: [اسم النشاط الفعلي]\n• رقم التواصل: 971501234567`;
+    const fields = parseLeadFields(text);
+    expect(fields.businessName).toBeUndefined();
+    expect(fields.contactWhatsapp).toBe('971501234567');
+  });
+
+  it('drops a placeholder contactWhatsapp', () => {
+    const text = `• النشاط: مطعم شعبي\n• رقم التواصل: [رقم التواصل]`;
+    const fields = parseLeadFields(text);
+    expect(fields.businessName).toBe('مطعم شعبي');
+    expect(fields.contactWhatsapp).toBeUndefined();
+  });
+
+  it('drops ALL fields when all are placeholders', () => {
+    const text = [
+      '• النشاط: [اسم النشاط الفعلي]',
+      '• النوع: [نوع النشاط]',
+      '• المنصة: [المنصة]',
+      '• أوقات العمل: [أوقات العمل]',
+      '• الخدمات/المنتجات: [الخدمات أو المنتجات]',
+      '• رقم التواصل: [رقم الواتساب]',
+    ].join('\n');
+    const fields = parseLeadFields(text);
+    expect(fields.businessName).toBeUndefined();
+    expect(fields.businessType).toBeUndefined();
+    expect(fields.platform).toBeUndefined();
+    expect(fields.workingHours).toBeUndefined();
+    expect(fields.services).toBeUndefined();
+    expect(fields.contactWhatsapp).toBeUndefined();
+  });
+
+  it('keeps real values alongside placeholder values', () => {
+    const text = `• النشاط: متجر إلكتروني\n• النوع: [نوع النشاط]\n• رقم التواصل: 971509999999`;
+    const fields = parseLeadFields(text);
+    expect(fields.businessName).toBe('متجر إلكتروني');
+    expect(fields.businessType).toBeUndefined();
+    expect(fields.contactWhatsapp).toBe('971509999999');
+  });
+});
+
+describe('isLeadValid — placeholder rejection', () => {
+  it('returns false when businessName is a placeholder', () => {
+    expect(isLeadValid({ businessName: '[اسم النشاط الفعلي]', contactWhatsapp: '971500000001' })).toBe(false);
+  });
+
+  it('returns false when contactWhatsapp is a placeholder', () => {
+    expect(isLeadValid({ businessName: 'مطعم شعبي', contactWhatsapp: '[رقم الواتساب]' })).toBe(false);
+  });
+
+  it('returns false when both required fields are placeholders', () => {
+    expect(isLeadValid({ businessName: '[اسم النشاط]', contactWhatsapp: '[رقم التواصل]' })).toBe(false);
+  });
+
+  it('returns false for a fully-placeholder marker (all 6 fields are undefined after parsing)', () => {
+    const text = [
+      '• النشاط: [اسم النشاط الفعلي]',
+      '• النوع: [نوع النشاط]',
+      '• المنصة: [المنصة]',
+      '• أوقات العمل: [أوقات العمل]',
+      '• الخدمات/المنتجات: [الخدمات أو المنتجات]',
+      '• رقم التواصل: [رقم الواتساب]',
+    ].join('\n');
+    const fields = parseLeadFields(text);
+    expect(isLeadValid(fields)).toBe(false);
+  });
+});
+
+describe('memory / no re-ask contract (documented invariants)', () => {
+  it('a corrected answer is the last value — parser takes the last matching key in the text', () => {
+    // If a customer corrects an earlier answer, the last occurrence wins.
+    // This test documents that parseLeadFields processes lines in order, so
+    // later values naturally overwrite earlier ones for the same field.
+    const text = `• النشاط: متجر قديم\n• النشاط: متجر ملابس أطفال\n• رقم التواصل: 971500000001`;
+    const fields = parseLeadFields(text);
+    // The last seen value wins (parser overwrites on repeated key)
+    expect(fields.businessName).toBe('متجر ملابس أطفال');
+    expect(fields.contactWhatsapp).toBe('971500000001');
+  });
+
+  it('a field already answered is valid — isLeadValid would not block a 2-field lead', () => {
+    // Documents: once both required fields are present, the bot SHOULD issue the
+    // marker (system prompt prevents re-asking; this validates the guard logic).
+    expect(isLeadValid({ businessName: 'تصوير فوتوغرافي', contactWhatsapp: '971509876543' })).toBe(true);
   });
 });

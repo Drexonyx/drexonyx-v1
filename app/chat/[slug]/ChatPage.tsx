@@ -71,17 +71,17 @@ html, body { height: 100%; }
 }
 
 .chat-root.dark {
-  --bg: #0f0f14;
-  --surface: #181820;
-  --border: #252533;
+  --bg: #13131f;
+  --surface: #1c1c2b;
+  --border: #2c2c42;
   --text: #f0eee8;
   --text-soft: #9a9898;
-  --text-muted: #50504e;
+  --text-muted: #56565a;
   --gold: #c9a84c;
   --gold-dim: rgba(201,168,76,0.22);
-  --bubble-bot-bg: #1c1c28;
-  --bubble-bot-border: #28283a;
-  --bubble-bot-text: #e6e4de;
+  --bubble-bot-bg: #232338;
+  --bubble-bot-border: #35355a;
+  --bubble-bot-text: #eae8e0;
   background: var(--bg);
   color: var(--text);
 }
@@ -332,7 +332,7 @@ html, body { height: 100%; }
 .clip-btn:hover { color: var(--gold); }
 .chat-textarea {
   flex: 1;
-  background: rgba(255,255,255,.04); border: 1.5px solid var(--border); border-radius: 22px;
+  background: rgba(255,255,255,.07); border: 1.5px solid var(--border); border-radius: 22px;
   padding: 10px 16px; color: var(--text);
   font-family: var(--font-tajawal), var(--font-inter), sans-serif;
   font-size: 14px; resize: none; min-height: 44px; max-height: 120px;

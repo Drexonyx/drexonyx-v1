@@ -14,9 +14,19 @@ export interface SsbLeadFields {
 }
 
 /**
+ * Returns true when a value is an unfilled placeholder like [اسم النشاط الفعلي].
+ * The bot is instructed to replace these with real values; if it emits the literal
+ * bracket text, the lead must be rejected to prevent garbage data in the CRM.
+ */
+export function isPlaceholderValue(v: string): boolean {
+  return /^\[.+\]$/.test(v.trim());
+}
+
+/**
  * Parses a WA summary text emitted by the mda-sales bot and extracts the
  * structured lead fields. Keys must match the Arabic labels in the
  * {{WA_LINK_TEXT:...}} template in clients.ts.
+ * Placeholder values like [اسم النشاط الفعلي] are silently dropped.
  */
 export function parseLeadFields(waText: string): SsbLeadFields {
   const result: SsbLeadFields = {};
@@ -26,7 +36,7 @@ export function parseLeadFields(waText: string): SsbLeadFields {
     if (sep === -1) continue;
     const k = stripped.slice(0, sep).trim();
     const v = stripped.slice(sep + 1).trim();
-    if (!v) continue;
+    if (!v || isPlaceholderValue(v)) continue;
     if (k === 'النشاط') result.businessName = v;
     else if (k === 'النوع') result.businessType = v;
     else if (k === 'المنصة') result.platform = v;
@@ -37,7 +47,9 @@ export function parseLeadFields(waText: string): SsbLeadFields {
   return result;
 }
 
-/** Returns true when the minimum required fields are present. */
+/** Returns true when the minimum required fields are present and non-placeholder. */
 export function isLeadValid(fields: SsbLeadFields): boolean {
-  return Boolean(fields.businessName?.trim() && fields.contactWhatsapp?.trim());
+  const name = fields.businessName?.trim() ?? '';
+  const wa = fields.contactWhatsapp?.trim() ?? '';
+  return Boolean(name && wa && !isPlaceholderValue(name) && !isPlaceholderValue(wa));
 }

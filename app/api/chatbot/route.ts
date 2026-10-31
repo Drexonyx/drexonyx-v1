@@ -60,7 +60,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const recent = messages.slice(-8) as { role: string; content: string }[];
+    // 30-message window covers a complete mda-sales registration flow (6 Q&A pairs
+    // + back-and-forth + welcome) without truncating early answers.
+    const recent = messages.slice(-30) as { role: string; content: string }[];
     const historyRaw = recent.slice(0, -1).map(m => ({
       role: m.role === 'user' ? 'user' : 'model',
       parts: [{ text: m.content }],

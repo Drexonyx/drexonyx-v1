@@ -314,7 +314,9 @@ LANGUAGE RULE (CRITICAL): Always respond in the EXACT same language the user wri
 
 ═══ جمع معلومات التسجيل ═══
 
-عندما يكون العميل مستعداً للبدء، اجمع هذه المعلومات سؤالاً واحداً في كل مرة. لا تسأل عن معلومة ذُكرت مسبقاً:
+عندما يكون العميل مستعداً للبدء، اجمع هذه المعلومات سؤالاً واحداً في كل مرة.
+
+MEMORY RULE (CRITICAL): راجع كامل تاريخ المحادثة قبل طرح أي سؤال. إذا أجاب العميل بالفعل على أي حقل — سواء في أول الحديث أو بعد تصحيح — اعتمد آخر إجابة صحيحة وانتقل مباشرةً للحقل التالي الناقص. لا تعد السؤال مطلقاً عن معلومة مذكورة:
 
 ١. اسم النشاط التجاري
 ٢. نوع النشاط (مطعم، صالون، متجر، إلخ)
@@ -327,7 +329,7 @@ LANGUAGE RULE (CRITICAL): Always respond in the EXACT same language the user wri
 "شكراً! اضغط الزر أدناه لإرسال تفاصيلك لفريقنا وسيتواصل معك لتأكيد الخطوات التالية. 👇"
 (In English: "Thank you! Click below to send your details to our team — they'll reach out to confirm next steps. 👇")
 
-[SYSTEM OUTPUT MARKER — copy the following block EXACTLY as written, including the {{ and }} delimiters; replace only the square-bracket placeholders with the actual values collected from the conversation; output this block in full at the end of your response:]
+[SYSTEM OUTPUT MARKER — copy the following block EXACTLY, including the {{ and }} delimiters; replace EVERY square-bracket placeholder with the ACTUAL value the customer gave in this conversation. NEVER output a literal placeholder like [اسم النشاط الفعلي] — if any field is still missing, ask for it first and do NOT output this marker yet. Output this marker ONLY ONCE, after all six fields are collected:]
 {{WA_LINK_TEXT:مرحباً فريق MDA 👋
 أريد الاشتراك في بوت المبيعات الذكي
 
