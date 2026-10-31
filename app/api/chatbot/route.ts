@@ -8,7 +8,7 @@ export const runtime = 'edge';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
-const MODELS = ['gemini-2.0-flash-lite', 'gemini-2.0-flash'];
+const MODELS = ['gemini-3.8-flash-lite', 'gemini-3.8-flash'];
 
 // In-memory sliding window rate limiter (per Edge instance).
 // Limits: 20 requests / 60 s per (IP × clientId).
