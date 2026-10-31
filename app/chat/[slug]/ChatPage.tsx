@@ -494,13 +494,6 @@ html, body { height: 100%; }
   padding: 10px 14px;
   background: var(--surface); border-top: 1px solid var(--border); flex-shrink: 0;
 }
-.clip-btn {
-  width: 40px; height: 40px; border-radius: 50%; border: none;
-  background: transparent; color: var(--text-muted); cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; transition: color .15s;
-}
-.clip-btn:hover { color: var(--text-muted); }
 .chat-textarea {
   flex: 1;
   background: var(--input-bg, #292F45); border: 1.5px solid var(--border); border-radius: 22px;
@@ -965,11 +958,6 @@ export default function ChatPage({
 
       {/* INPUT AREA */}
       <div className="chat-input-area">
-        <button className="clip-btn" aria-label="Attach file">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
-          </svg>
-        </button>
         <textarea
           ref={inputRef}
           className="chat-textarea"
