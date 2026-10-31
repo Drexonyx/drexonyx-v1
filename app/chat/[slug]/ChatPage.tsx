@@ -206,19 +206,21 @@ html, body { height: 100%; }
   background: var(--bubble-bot-bg); border: 1px solid var(--bubble-bot-border);
   border-radius: 18px; border-bottom-left-radius: 4px;
   padding: 10px 14px; font-size: 13.5px; line-height: 1.6; color: var(--bubble-bot-text);
+  box-shadow: 0 1px 5px rgba(0,0,0,.22);
 }
 
 /* ── CATEGORIES ── */
 .categories-section { padding: 14px 16px 0; }
 .categories-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .category-card {
-  background: rgba(255,255,255,.04);
+  background: rgba(255,255,255,.055);
   border: 1px solid var(--gold-dim);
   border-radius: 14px; padding: 14px 12px;
   cursor: pointer; text-align: left;
   display: flex; flex-direction: row; align-items: center; gap: 12px;
-  transition: border-color .15s, background .15s;
+  transition: border-color .15s, background .15s, box-shadow .15s;
   font-family: var(--font-inter), sans-serif;
+  box-shadow: 0 1px 4px rgba(0,0,0,.18);
 }
 .category-card:hover, .category-card:focus {
   border-color: var(--gold); background: rgba(201,168,76,.06); outline: none;
@@ -264,6 +266,7 @@ html, body { height: 100%; }
 .bubble.bot {
   background: var(--bubble-bot-bg); border: 1px solid var(--bubble-bot-border);
   border-bottom-left-radius: 4px; color: var(--bubble-bot-text);
+  box-shadow: 0 1px 5px rgba(0,0,0,.22);
 }
 .bubble.user {
   background: linear-gradient(135deg, #c9a84c, #a07830);
@@ -342,7 +345,7 @@ html, body { height: 100%; }
 }
 .chat-root.light .chat-textarea { background: var(--bg); }
 .chat-textarea::placeholder { color: var(--text-muted); }
-.chat-textarea:focus { border-color: rgba(201,168,76,.5); }
+.chat-textarea:focus { border-color: rgba(201,168,76,.7); box-shadow: 0 0 0 3px rgba(201,168,76,.1); }
 .send-btn {
   width: 44px; height: 44px; border-radius: 50%; border: none;
   background: linear-gradient(135deg, #c9a84c, #a07830); color: #fff;
@@ -600,26 +603,28 @@ export default function ChatPage({
       <div className="chat-messages">
         {!started ? (
           <div className="welcome-view">
-            {/* Hero */}
-            <div className="hero-section">
-              {heroBg && <div className="hero-bg" style={{ backgroundImage: `url('${heroBg}')` }} />}
-              <div className="hero-overlay" />
-              <div className="hero-content">
-                {heroTagline && (
-                  <div className="hero-tagline">
-                    <span className="tagline-dash">—</span>
-                    {heroTagline}
-                  </div>
-                )}
-                {(heroTitle || heroHighlight) && (
-                  <h1 className="hero-title">
-                    {heroTitle}
-                    {heroHighlight && <span className="hero-highlight"> {heroHighlight}</span>}
-                  </h1>
-                )}
-                {heroSubtitle && <p className="hero-sub">{heroSubtitle}</p>}
+            {/* Hero — only renders when at least one prop is defined */}
+            {(heroBg || heroTagline || heroTitle || heroHighlight || heroSubtitle) && (
+              <div className="hero-section">
+                {heroBg && <div className="hero-bg" style={{ backgroundImage: `url('${heroBg}')` }} />}
+                <div className="hero-overlay" />
+                <div className="hero-content">
+                  {heroTagline && (
+                    <div className="hero-tagline">
+                      <span className="tagline-dash">—</span>
+                      {heroTagline}
+                    </div>
+                  )}
+                  {(heroTitle || heroHighlight) && (
+                    <h1 className="hero-title">
+                      {heroTitle}
+                      {heroHighlight && <span className="hero-highlight"> {heroHighlight}</span>}
+                    </h1>
+                  )}
+                  {heroSubtitle && <p className="hero-sub">{heroSubtitle}</p>}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Welcome bot message */}
             {welcomeMessage && (

@@ -238,6 +238,10 @@ I'm interested in your services
     welcomeMessage: 'مرحباً! 👋\nأنا بوت المبيعات الذكي من {{GOLD:MDA}}.\nاختر نوع نشاطك أدناه أو اكتب سؤالك مباشرةً.',
     inputPlaceholder: 'اكتب سؤالك...',
     waNumber: '971521770988',
+    heroTagline: 'بوت مبيعات ذكي',
+    heroTitle: 'حوّل عملاءك إلى',
+    heroHighlight: 'مبيعات حقيقية',
+    heroSubtitle: '299 درهم شهرياً · إعداد خلال 48 ساعة',
     categories: [
       {
         icon: 'monitor' as const,
