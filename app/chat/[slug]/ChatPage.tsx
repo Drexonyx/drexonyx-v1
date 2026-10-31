@@ -24,6 +24,11 @@ function BotAvatar({ logoUrl, initials }: { logoUrl?: string; initials: string }
   );
 }
 
+interface HeroFeature {
+  icon: 'bolt' | 'clock' | 'shield';
+  text: string;
+}
+
 interface Props {
   clientId: string;
   businessName: string;
@@ -36,6 +41,7 @@ interface Props {
   heroTitle?: string;
   heroHighlight?: string;
   heroSubtitle?: string;
+  heroFeatures?: HeroFeature[];
   categories?: ChatCategory[];
   inputPlaceholder?: string;
   waNumber?: string;
@@ -197,29 +203,124 @@ html, body { height: 100%; }
 
 /* ── HERO ── */
 .hero-section {
-  position: relative; min-height: 200px;
-  padding: 32px 24px 28px;
-  display: flex; align-items: center; overflow: hidden; flex-shrink: 0;
+  position: relative; min-height: 460px;
+  overflow: hidden; flex-shrink: 0;
 }
+@media (max-width: 600px) { .hero-section { min-height: 260px; } }
 .hero-bg {
   position: absolute; inset: 0;
-  background-size: cover; background-position: 65% center;
-  opacity: .88;
+  background-size: cover; background-position: center 30%;
+  opacity: .72;
 }
 .hero-overlay {
   position: absolute; inset: 0;
-  background: linear-gradient(to right, #0A1225 0%, rgba(10,18,37,.90) 20%, rgba(10,18,37,.55) 48%, rgba(10,18,37,.08) 100%);
+  background: linear-gradient(108deg, rgba(10,18,37,.97) 0%, rgba(10,18,37,.92) 38%, rgba(10,18,37,.70) 62%, rgba(10,18,37,.50) 100%);
 }
-.hero-content { position: relative; z-index: 1; max-width: 72%; }
+.hero-glow {
+  position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse 55% 80% at 82% 50%, rgba(37,99,235,.22) 0%, transparent 68%);
+}
+.hero-inner {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: row; align-items: center;
+  padding: 36px 24px 32px; gap: 20px; min-height: inherit;
+}
+@media (max-width: 600px) { .hero-inner { flex-direction: column; } }
+.hero-left { flex: 0 0 52%; display: flex; flex-direction: column; }
+@media (max-width: 600px) { .hero-left { flex: 1; width: 100%; } }
+.hero-logo-hero { height: 26px; width: auto; max-width: 96px; object-fit: contain; margin-bottom: 14px; }
 .hero-tagline {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 9.5px; font-weight: 700; color: var(--gold);
-  letter-spacing: 1.8px; text-transform: uppercase; margin-bottom: 12px;
+  display: inline-flex; align-items: center; gap: 6px; align-self: flex-start;
+  font-size: 9px; font-weight: 700; color: var(--gold);
+  letter-spacing: 1.8px; text-transform: uppercase; margin-bottom: 14px;
+  background: var(--gold-dim); border: 1px solid rgba(201,168,76,.35);
+  border-radius: 20px; padding: 4px 10px;
 }
-.tagline-dash { font-size: 16px; line-height: 1; }
-.hero-title { font-size: 24px; font-weight: 800; line-height: 1.15; color: #fff; margin-bottom: 10px; }
-.hero-highlight { color: var(--accent-bright); }
-.hero-sub { font-size: 12px; color: var(--text-soft); line-height: 1.6; }
+.hero-title {
+  display: flex; flex-direction: column;
+  font-size: 34px; font-weight: 900; line-height: 1.1; margin-bottom: 12px;
+}
+@media (max-width: 600px) { .hero-title { font-size: 26px; } }
+.hero-line-1 { color: #FFFFFF; text-wrap: balance; }
+.hero-line-2 { color: #4F8AFF; text-wrap: balance; }
+.hero-sub { font-size: 12px; color: var(--text-soft); line-height: 1.6; margin-bottom: 16px; }
+.hero-features { display: flex; flex-direction: column; gap: 9px; }
+.hero-feat { display: flex; align-items: center; gap: 9px; font-size: 11.5px; color: var(--text-soft); font-weight: 500; }
+.hero-feat-icon {
+  width: 22px; height: 22px; border-radius: 6px; flex-shrink: 0;
+  background: var(--gold-dim); border: 1px solid rgba(201,168,76,.25);
+  display: flex; align-items: center; justify-content: center; color: var(--gold);
+}
+/* RIGHT — product panel */
+.hero-right { flex: 0 0 44%; display: flex; align-items: center; justify-content: center; }
+@media (max-width: 600px) {
+  .hero-right { flex: none; width: 100%; margin-top: 16px; }
+  .pp-nav { display: none; }
+  .pp-body { min-height: auto; }
+  .pp-cats { grid-template-columns: repeat(4, 1fr); }
+}
+.product-panel {
+  width: 100%; max-width: 276px; border-radius: 16px;
+  background: rgba(8,15,35,.82); backdrop-filter: blur(16px);
+  border: 1px solid rgba(79,138,255,.30);
+  box-shadow: 0 0 40px rgba(37,99,235,.25), 0 4px 24px rgba(0,0,0,.55);
+  overflow: hidden;
+}
+.pp-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 11px; border-bottom: 1px solid rgba(79,138,255,.18);
+  background: rgba(15,28,50,.92);
+}
+.pp-header-left { display: flex; align-items: center; gap: 7px; }
+.pp-logo { height: 17px; width: auto; max-width: 60px; object-fit: contain; }
+.pp-name { font-size: 10px; font-weight: 700; color: #fff; }
+.pp-status { display: flex; align-items: center; gap: 3px; font-size: 8.5px; color: #3cb87a; margin-top: 1px; }
+.pp-status-dot { width: 5px; height: 5px; background: #3cb87a; border-radius: 50%; }
+.pp-powered { font-size: 7px; color: rgba(79,138,255,.85); font-weight: 600; letter-spacing: .4px; white-space: nowrap; }
+.pp-body { display: flex; min-height: 170px; }
+.pp-nav {
+  width: 72px; flex-shrink: 0; padding: 7px 0;
+  border-right: 1px solid rgba(79,138,255,.15);
+  background: rgba(8,12,28,.5);
+}
+.pp-nav-item {
+  padding: 5px 7px; font-size: 8.5px; color: rgba(255,255,255,.55);
+  display: flex; align-items: center; gap: 4px; direction: rtl;
+}
+.pp-nav-item.active { color: #4F8AFF; background: rgba(79,138,255,.12); }
+.pp-nav-dot { width: 3.5px; height: 3.5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.pp-chat { flex: 1; padding: 8px; display: flex; flex-direction: column; gap: 6px; overflow: hidden; }
+.pp-bot-row { display: flex; align-items: flex-start; gap: 5px; }
+.pp-bot-avatar {
+  width: 19px; height: 19px; border-radius: 5px; flex-shrink: 0;
+  background: rgba(37,99,235,.28); border: 1px solid rgba(79,138,255,.38);
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.pp-bot-bubble {
+  background: rgba(27,43,70,.88); border: 1px solid rgba(255,255,255,.09);
+  border-radius: 8px; border-top-left-radius: 2px;
+  padding: 5px 7px; font-size: 8.5px; color: #D6DCEC; line-height: 1.5;
+  direction: rtl;
+}
+.pp-cats { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.pp-cat {
+  background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.11);
+  border-radius: 6px; padding: 5px 5px; font-size: 8px; color: #D6DCEC;
+  display: flex; align-items: center; gap: 3px; direction: rtl;
+}
+.pp-cat-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent-bright); flex-shrink: 0; }
+.pp-input-row {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 9px; border-top: 1px solid rgba(79,138,255,.15);
+  background: rgba(15,28,50,.92); direction: rtl;
+}
+.pp-input-placeholder {
+  flex: 1; font-size: 8.5px; color: rgba(255,255,255,.35); padding: 3px 0;
+}
+.pp-send {
+  width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+  background: var(--accent); display: flex; align-items: center; justify-content: center;
+}
 
 /* ── WELCOME BOT MSG ── */
 .welcome-msg-row {
@@ -419,6 +520,7 @@ export default function ChatPage({
   heroTitle,
   heroHighlight,
   heroSubtitle,
+  heroFeatures,
   categories,
   inputPlaceholder,
   waNumber,
@@ -657,20 +759,94 @@ export default function ChatPage({
               <div className="hero-section">
                 {heroBg && <div className="hero-bg" style={{ backgroundImage: `url('${heroBg}')` }} />}
                 <div className="hero-overlay" />
-                <div className="hero-content">
-                  {heroTagline && (
-                    <div className="hero-tagline">
-                      <span className="tagline-dash">—</span>
-                      {heroTagline}
+                <div className="hero-glow" />
+                <div className="hero-inner">
+                  {/* LEFT — branding */}
+                  <div className="hero-left">
+                    {logoUrl && (
+                      <Image src={logoUrl} alt={businessName} width={96} height={26} className="hero-logo-hero" unoptimized />
+                    )}
+                    {heroTagline && <div className="hero-tagline">{heroTagline}</div>}
+                    {(heroTitle || heroHighlight) && (
+                      <h1 className="hero-title">
+                        {heroTitle && <span className="hero-line-1">{heroTitle}</span>}
+                        {heroHighlight && <span className="hero-line-2">{heroHighlight}</span>}
+                      </h1>
+                    )}
+                    {heroSubtitle && <p className="hero-sub">{heroSubtitle}</p>}
+                    {heroFeatures && heroFeatures.length > 0 && (
+                      <div className="hero-features">
+                        {heroFeatures.map((feat, i) => (
+                          <div key={i} className="hero-feat">
+                            <div className="hero-feat-icon">
+                              {feat.icon === 'bolt' && (
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                              )}
+                              {feat.icon === 'clock' && (
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                              )}
+                              {feat.icon === 'shield' && (
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                              )}
+                            </div>
+                            <span>{feat.text}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* RIGHT — product panel (desktop only) */}
+                  <div className="hero-right">
+                    <div className="product-panel">
+                      <div className="pp-header">
+                        <div className="pp-header-left">
+                          {logoUrl && (
+                            <Image src={logoUrl} alt="" width={60} height={17} className="pp-logo" unoptimized />
+                          )}
+                          <div>
+                            <div className="pp-name">{displayName}</div>
+                            <div className="pp-status"><span className="pp-status-dot" />Online</div>
+                          </div>
+                        </div>
+                        <div className="pp-powered">POWERED BY DREXONYX</div>
+                      </div>
+                      <div className="pp-body">
+                        <div className="pp-nav">
+                          {categories && categories.slice(0, 5).map((cat, i) => (
+                            <div key={i} className={`pp-nav-item${i === 0 ? ' active' : ''}`}>
+                              <span className="pp-nav-dot" />
+                              {cat.title.split(' ')[0]}
+                            </div>
+                          ))}
+                        </div>
+                        <div className="pp-chat">
+                          <div className="pp-bot-row">
+                            <div className="pp-bot-avatar">
+                              {logoUrl && <Image src={logoUrl} alt="" width={19} height={19} unoptimized />}
+                            </div>
+                            <div className="pp-bot-bubble">مرحباً! اختر نوع نشاطك 👋</div>
+                          </div>
+                          {categories && categories.length > 0 && (
+                            <div className="pp-cats">
+                              {categories.slice(0, 4).map((cat, i) => (
+                                <div key={i} className="pp-cat">
+                                  <span className="pp-cat-dot" />
+                                  {cat.title.split(' ')[0]}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="pp-input-row">
+                        <div className="pp-input-placeholder">اكتب سؤالك...</div>
+                        <div className="pp-send">
+                          <svg width="9" height="9" viewBox="0 0 24 24" fill="white"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                        </div>
+                      </div>
                     </div>
-                  )}
-                  {(heroTitle || heroHighlight) && (
-                    <h1 className="hero-title">
-                      {heroTitle}
-                      {heroHighlight && <span className="hero-highlight"> {heroHighlight}</span>}
-                    </h1>
-                  )}
-                  {heroSubtitle && <p className="hero-sub">{heroSubtitle}</p>}
+                  </div>
                 </div>
               </div>
             )}

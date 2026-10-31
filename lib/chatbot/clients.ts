@@ -6,6 +6,11 @@ export interface ChatCategory {
   prompt: string;
 }
 
+export interface HeroFeature {
+  icon: 'bolt' | 'clock' | 'shield';
+  text: string;
+}
+
 export interface ChatbotClient {
   name: string;
   headerName?: string;
@@ -19,6 +24,7 @@ export interface ChatbotClient {
   heroTitle?: string;
   heroHighlight?: string;
   heroSubtitle?: string;
+  heroFeatures?: HeroFeature[];
   categories?: ChatCategory[];
   inputPlaceholder?: string;
   waNumber?: string;       // WhatsApp number for WA button, e.g. "971501234567"; if omitted the WA button is hidden
@@ -240,9 +246,14 @@ I'm interested in your services
     waNumber: '971521770988',
     heroBg: '/images/chat-hero-mda-sales.webp',
     heroTagline: 'بوت مبيعات ذكي',
-    heroTitle: 'حوّل عملاءك إلى',
+    heroTitle: 'حوّل عملك إلى',
     heroHighlight: 'مبيعات حقيقية',
-    heroSubtitle: '299 درهم شهرياً · إعداد خلال 48 ساعة',
+    heroSubtitle: 'MDA — مساعدك الذكي للمبيعات في الإمارات',
+    heroFeatures: [
+      { icon: 'bolt' as const, text: 'إعداد خلال 48 ساعة' },
+      { icon: 'clock' as const, text: 'دعم مبيعات على مدار الساعة' },
+      { icon: 'shield' as const, text: '299 درهم شهرياً' },
+    ],
     categories: [
       {
         icon: 'utensils' as const,
