@@ -212,7 +212,10 @@ export default function SocialSellerPage() {
             <span className={styles.sectionLabel}>الحل</span>
             <h2 className={styles.sectionTitle}>كيف يساعد MDA Sales Agent؟</h2>
             <p className={styles.sectionSub}>
-              بوت مخصص يتولى التواصل مع عملاءك ويُسلّمهم إليك جاهزين لإغلاق الصفقة.
+              عملاؤك من كل المنصات، وتفاصيلهم تصلك مباشرة على واتساب.
+            </p>
+            <p className={styles.sectionSub} style={{ marginTop: '0.75rem' }}>
+              بمجرد مشاركة رابط البوت عبر منصاتك أو موقعك الإلكتروني، يبدأ باستقبال استفسارات العملاء وجمع بياناتهم، ثم إرسال تفاصيل العملاء المهتمين إلى واتسابك لتتمكن من متابعتهم وإتمام البيع.
             </p>
           </div>
           <div className={styles.cardsGrid}>
