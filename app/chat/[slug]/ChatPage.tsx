@@ -203,12 +203,12 @@ html, body { height: 100%; }
 }
 .hero-bg {
   position: absolute; inset: 0;
-  background-size: cover; background-position: center right;
-  opacity: .75;
+  background-size: cover; background-position: 65% center;
+  opacity: .88;
 }
 .hero-overlay {
   position: absolute; inset: 0;
-  background: linear-gradient(to right, #080D1C 0%, rgba(8,13,28,.93) 22%, rgba(8,13,28,.65) 50%, rgba(8,13,28,.12) 100%);
+  background: linear-gradient(to right, #0A1225 0%, rgba(10,18,37,.90) 20%, rgba(10,18,37,.55) 48%, rgba(10,18,37,.08) 100%);
 }
 .hero-content { position: relative; z-index: 1; max-width: 72%; }
 .hero-tagline {
