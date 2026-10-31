@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
+import { WA_LINK_TEXT_RE, parseLeadFields, isLeadValid } from '@/lib/chatbot/ssb-lead-parser';
 
 interface ChatCategory {
   icon: 'monitor' | 'brush' | 'chart';
@@ -382,8 +383,8 @@ export default function ChatPage({
   useEffect(() => {
     if (leadSubmitAttempted.current || !waNumber) return;
     const lastBot = [...messages].reverse().find(m => m.role === 'assistant');
-    if (!lastBot) return;
-    const waMatch = lastBot.content.match(/\{\{WA_LINK_TEXT:([\s\S]*?)\}\}/);
+    if (!lastBot || !lastBot.content) return;
+    const waMatch = lastBot.content.match(WA_LINK_TEXT_RE);
     if (waMatch) {
       submitLeadFromWaText(waMatch[1].trim());
     }
@@ -431,24 +432,6 @@ export default function ChatPage({
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(input); }
   }
 
-  function parseLeadFields(waText: string): Record<string, string> {
-    const result: Record<string, string> = {};
-    for (const line of waText.split('\n')) {
-      const stripped = line.replace(/^[•\-\*]\s*/, '').trim();
-      const sep = stripped.indexOf(':');
-      if (sep === -1) continue;
-      const k = stripped.slice(0, sep).trim();
-      const v = stripped.slice(sep + 1).trim();
-      if (k === 'النشاط') result.businessName = v;
-      else if (k === 'النوع') result.businessType = v;
-      else if (k === 'المنصة') result.platform = v;
-      else if (k === 'أوقات العمل') result.workingHours = v;
-      else if (k === 'الخدمات/المنتجات') result.services = v;
-      else if (k === 'رقم التواصل') result.contactWhatsapp = v;
-    }
-    return result;
-  }
-
   async function submitLeadFromWaText(waText: string) {
     if (leadSubmitAttempted.current) return;
     leadSubmitAttempted.current = true;
@@ -456,7 +439,11 @@ export default function ChatPage({
     setCrmError(false);
 
     const fields = parseLeadFields(waText);
-    if (!fields.businessName || !fields.contactWhatsapp) {
+    if (!isLeadValid(fields)) {
+      console.error('[CRM] lead parse failed — missing businessName or contactWhatsapp', {
+        waTextSnippet: waText.slice(0, 300),
+        parsed: fields,
+      });
       setCrmSubmitting(false);
       setCrmError(true);
       leadSubmitAttempted.current = false;
@@ -465,8 +452,8 @@ export default function ChatPage({
 
     try {
       const payload: Record<string, string> = {
-        businessName: fields.businessName,
-        contactWhatsapp: fields.contactWhatsapp,
+        businessName: fields.businessName!,
+        contactWhatsapp: fields.contactWhatsapp!,
         sourceBot: clientId,
         sourceUrl: typeof window !== 'undefined' ? window.location.pathname : '/',
       };
@@ -514,7 +501,7 @@ export default function ChatPage({
   }
 
   function renderContent(content: string) {
-    const waMatch = content.match(/\{\{WA_LINK_TEXT:([\s\S]*?)\}\}/);
+    const waMatch = content.match(WA_LINK_TEXT_RE);
     if (waMatch) {
       const before = content.slice(0, content.indexOf('{{WA_LINK_TEXT:'));
       // If no waNumber is configured for this client, hide the button entirely — never

@@ -330,16 +330,17 @@ LANGUAGE RULE (CRITICAL): Always respond in the EXACT same language the user wri
 "شكراً! اضغط الزر أدناه لإرسال تفاصيلك لفريقنا — سنجهّز بوتك خلال 24 ساعة. 👇"
 (In English: "Thank you! Click below to send your details to our team — we'll set up your bot within 24 hours. 👇")
 
+[SYSTEM OUTPUT MARKER — copy the following block EXACTLY as written, including the {{ and }} delimiters; replace only the square-bracket placeholders with the actual values collected from the conversation; output this block in full at the end of your response:]
 {{WA_LINK_TEXT:مرحباً فريق MDA 👋
 أريد الاشتراك في بوت المبيعات الذكي
 
 ✅ تفاصيلي:
-• النشاط: [الاسم]
-• النوع: [النوع]
-• المنصة: [المنصة]
-• أوقات العمل: [الأوقات]
-• الخدمات/المنتجات: [الخدمات]
-• رقم التواصل: [الرقم]
+• النشاط: [اسم النشاط الفعلي]
+• النوع: [نوع النشاط الفعلي]
+• المنصة: [المنصة الفعلية]
+• أوقات العمل: [الأوقات الفعلية]
+• الخدمات/المنتجات: [الخدمات الفعلية]
+• رقم التواصل: [الرقم الفعلي]
 • الخطة: الأساسية 299 درهم/شهر}}`,
   },
 

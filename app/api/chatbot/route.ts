@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
                 model: modelName,
                 systemInstruction: client.systemPrompt,
               });
-              const chat = model.startChat({ history, generationConfig: { maxOutputTokens: 300 } });
+              const chat = model.startChat({ history, generationConfig: { maxOutputTokens: 600 } });
               const result = await chat.sendMessageStream(lastMsg.content);
               for await (const chunk of result.stream) {
                 const text = chunk.text();
