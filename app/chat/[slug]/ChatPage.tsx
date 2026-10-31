@@ -71,17 +71,18 @@ html, body { height: 100%; }
 }
 
 .chat-root.dark {
-  --bg: #13131f;
-  --surface: #1c1c2b;
-  --border: #2c2c42;
-  --text: #f0eee8;
-  --text-soft: #9a9898;
-  --text-muted: #56565a;
+  --bg: #151B2B;
+  --surface: #202438;
+  --border: #414A66;
+  --text: #FFFFFF;
+  --text-soft: #C1C8D8;
+  --text-muted: #7A8AAD;
   --gold: #c9a84c;
-  --gold-dim: rgba(201,168,76,0.22);
-  --bubble-bot-bg: #232338;
-  --bubble-bot-border: #35355a;
-  --bubble-bot-text: #eae8e0;
+  --gold-dim: rgba(201,168,76,0.25);
+  --input-bg: #292F45;
+  --bubble-bot-bg: #30364D;
+  --bubble-bot-border: #414A66;
+  --bubble-bot-text: #FFFFFF;
   background: var(--bg);
   color: var(--text);
 }
@@ -146,6 +147,7 @@ html, body { height: 100%; }
 /* ── MESSAGES AREA ── */
 .chat-messages {
   flex: 1; overflow-y: auto; display: flex; flex-direction: column; scroll-behavior: smooth;
+  background: var(--surface);
 }
 .chat-messages::-webkit-scrollbar { width: 3px; }
 .chat-messages::-webkit-scrollbar-track { background: transparent; }
@@ -167,7 +169,7 @@ html, body { height: 100%; }
 }
 .hero-overlay {
   position: absolute; inset: 0;
-  background: linear-gradient(to right, #0f0f14 0%, rgba(15,15,20,.92) 22%, rgba(15,15,20,.65) 50%, rgba(15,15,20,.15) 100%);
+  background: linear-gradient(to right, #151B2B 0%, rgba(21,27,43,.93) 22%, rgba(21,27,43,.65) 50%, rgba(21,27,43,.12) 100%);
 }
 .hero-content { position: relative; z-index: 1; max-width: 72%; }
 .hero-tagline {
@@ -210,7 +212,7 @@ html, body { height: 100%; }
 .categories-section { padding: 14px 16px 0; }
 .categories-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .category-card {
-  background: rgba(255,255,255,.025);
+  background: rgba(255,255,255,.04);
   border: 1px solid var(--gold-dim);
   border-radius: 14px; padding: 14px 12px;
   cursor: pointer; text-align: left;
@@ -332,7 +334,7 @@ html, body { height: 100%; }
 .clip-btn:hover { color: var(--gold); }
 .chat-textarea {
   flex: 1;
-  background: rgba(255,255,255,.07); border: 1.5px solid var(--border); border-radius: 22px;
+  background: var(--input-bg, #292F45); border: 1.5px solid var(--border); border-radius: 22px;
   padding: 10px 16px; color: var(--text);
   font-family: var(--font-tajawal), var(--font-inter), sans-serif;
   font-size: 14px; resize: none; min-height: 44px; max-height: 120px;
