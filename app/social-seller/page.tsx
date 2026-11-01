@@ -136,6 +136,7 @@ export default function SocialSellerPage() {
             <a href="#how" className={styles.navLink}>كيف يعمل</a>
             <a href="#demo" className={styles.navLink}>تجربة مباشرة</a>
             <a href="#pricing" className={styles.navLink}>الأسعار</a>
+            <a href="/en/social-seller" className={styles.navLink} aria-label="English version">EN</a>
             <a href={WA_HREF} target="_blank" rel="noopener noreferrer" className={styles.headerCta}>
               {WA_ICON}
               ابدأ الآن

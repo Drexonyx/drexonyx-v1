@@ -47,6 +47,8 @@ interface Props {
   categories?: ChatCategory[];
   inputPlaceholder?: string;
   waNumber?: string;
+  lang?: 'ar' | 'en';
+  langSwitchHref?: string;
 }
 
 function CategoryIcon({ type }: { type: string }) {
@@ -515,7 +517,19 @@ html, body { height: 100%; }
 .send-btn:hover:not(:disabled){opacity:.85}
 .send-btn:active:not(:disabled){transform:scale(.93)}
 .send-btn:disabled{opacity:.3;cursor:default;box-shadow:none}
+
+/* ── LANGUAGE SWITCH ── */
+.lang-switch-btn {
+  margin-right: auto; flex-shrink: 0;
+  padding: 4px 10px; border-radius: 6px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--text-muted); font-size: 11px; font-weight: 700;
+  letter-spacing: .04em; text-decoration: none;
+  transition: color .15s, border-color .15s;
+}
+.lang-switch-btn:hover { color: var(--text); border-color: var(--accent); }
 `;
+
 
 export default function ChatPage({
   clientId,
@@ -535,6 +549,8 @@ export default function ChatPage({
   categories,
   inputPlaceholder,
   waNumber,
+  lang = 'ar',
+  langSwitchHref,
 }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -593,7 +609,7 @@ export default function ChatPage({
         setMessages([...newMessages, { role: 'assistant', content: full }]);
       }
     } catch {
-      setMessages([...newMessages, { role: 'assistant', content: 'عذراً، هناك انقطاع مؤقت في الخدمة. يرجى المحاولة خلال لحظات.' }]);
+      setMessages([...newMessages, { role: 'assistant', content: lang === 'en' ? 'Sorry, a temporary service interruption occurred. Please try again in a moment.' : 'عذراً، هناك انقطاع مؤقت في الخدمة. يرجى المحاولة خلال لحظات.' }]);
     } finally {
       setLoading(false);
       inputRef.current?.focus();
@@ -697,7 +713,7 @@ export default function ChatPage({
           {crmSubmitting && (
             <div className="crm-submitting">
               <div className="crm-spinner" />
-              <span>جاري حفظ بياناتك...</span>
+              <span>{lang === 'en' ? 'Saving your details...' : 'جاري حفظ بياناتك...'}</span>
             </div>
           )}
 
@@ -706,8 +722,8 @@ export default function ChatPage({
             <a href={`https://wa.me/${waNumber}?text=${waText}`} target="_blank" rel="noopener noreferrer" className="wa-btn">
               {waIcon}
               <span className="wa-btn-text">
-                <span className="wa-btn-primary">تواصل مع فريق MDA</span>
-                <span className="wa-btn-secondary">Continue with MDA Team</span>
+                <span className="wa-btn-primary">{lang === 'en' ? 'Connect with MDA Team' : 'تواصل مع فريق MDA'}</span>
+                <span className="wa-btn-secondary">{lang === 'en' ? 'via WhatsApp' : 'Continue with MDA Team'}</span>
               </span>
             </a>
           )}
@@ -715,7 +731,7 @@ export default function ChatPage({
           {/* CRM failed — show retry; do not claim success */}
           {crmError && !crmSubmitting && (
             <>
-              <p className="crm-error-msg">حدث خطأ في حفظ بياناتك. يرجى المحاولة مجدداً.</p>
+              <p className="crm-error-msg">{lang === 'en' ? 'An error occurred saving your details. Please try again.' : 'حدث خطأ في حفظ بياناتك. يرجى المحاولة مجدداً.'}</p>
               <button
                 className="crm-retry-btn"
                 onClick={() => {
@@ -724,7 +740,7 @@ export default function ChatPage({
                   submitLeadFromWaText(rawWaText);
                 }}
               >
-                ↻ إعادة المحاولة
+                {lang === 'en' ? '↻ Retry' : '↻ إعادة المحاولة'}
               </button>
             </>
           )}
@@ -759,6 +775,11 @@ export default function ChatPage({
           <span className="powered-label">POWERED BY</span>
           <span className="powered-brand">DREXONYX</span>
         </div>
+        {langSwitchHref && (
+          <a href={langSwitchHref} className="lang-switch-btn" aria-label={lang === 'en' ? 'العربية' : 'English'}>
+            {lang === 'en' ? 'AR' : 'EN'}
+          </a>
+        )}
       </header>
 
       {/* MESSAGES / WELCOME AREA */}
@@ -848,7 +869,7 @@ export default function ChatPage({
                             <div className="pp-bot-avatar">
                               {logoUrl && <Image src={logoUrl} alt="" width={19} height={19} unoptimized />}
                             </div>
-                            <div className="pp-bot-bubble">مرحباً! اختر نوع نشاطك 👋</div>
+                            <div className="pp-bot-bubble">{lang === 'en' ? 'Hello! Choose your business type 👋' : 'مرحباً! اختر نوع نشاطك 👋'}</div>
                           </div>
                           {categories && categories.length > 0 && (
                             <div className="pp-cats">
@@ -863,7 +884,7 @@ export default function ChatPage({
                         </div>
                       </div>
                       <div className="pp-input-row">
-                        <div className="pp-input-placeholder">اكتب سؤالك...</div>
+                        <div className="pp-input-placeholder">{lang === 'en' ? 'Type your question...' : 'اكتب سؤالك...'}</div>
                         <div className="pp-send">
                           <svg width="9" height="9" viewBox="0 0 24 24" fill="white"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
                         </div>
@@ -911,8 +932,8 @@ export default function ChatPage({
                   <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
                 </svg>
                 <div className="sec-privacy-text">
-                  <span className="sec-privacy-main">معلوماتك آمنة وسرية</span>
-                  <span className="sec-privacy-sub">تدعم جميع أحجام الأعمال في الإمارات.</span>
+                  <span className="sec-privacy-main">{lang === 'en' ? 'Your information is secure & private' : 'معلوماتك آمنة وسرية'}</span>
+                  <span className="sec-privacy-sub">{lang === 'en' ? 'Supporting businesses of all sizes in the UAE.' : 'تدعم جميع أحجام الأعمال في الإمارات.'}</span>
                 </div>
               </div>
               <div className="sec-features">
@@ -920,19 +941,19 @@ export default function ChatPage({
                   <svg className="sec-feature-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.65 3.42 2 2 0 0 1 3.64 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.9a16 16 0 0 0 6.06 6.06l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
                   </svg>
-                  <span className="sec-feature-label">دعم متواصل</span>
+                  <span className="sec-feature-label">{lang === 'en' ? '24/7 Support' : 'دعم متواصل'}</span>
                 </div>
                 <div className="sec-feature">
                   <svg className="sec-feature-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
                   </svg>
-                  <span className="sec-feature-label">سرعة في التنفيذ</span>
+                  <span className="sec-feature-label">{lang === 'en' ? 'Fast Setup' : 'سرعة في التنفيذ'}</span>
                 </div>
                 <div className="sec-feature">
                   <svg className="sec-feature-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                   </svg>
-                  <span className="sec-feature-label">حلول مخصصة</span>
+                  <span className="sec-feature-label">{lang === 'en' ? 'Custom Solutions' : 'حلول مخصصة'}</span>
                 </div>
               </div>
             </div>
@@ -942,7 +963,7 @@ export default function ChatPage({
             {messages.map((msg, i) => (
               <div key={i} className={`msg-row ${msg.role}`}>
                 {msg.role === 'assistant' && <BotAvatar logoUrl={logoUrl} initials={initials} />}
-                <div className={`bubble ${msg.role === 'assistant' ? 'bot' : 'user'}`} dir={msg.role === 'assistant' ? 'auto' : 'rtl'}>
+                <div className={`bubble ${msg.role === 'assistant' ? 'bot' : 'user'}`} dir={msg.role === 'assistant' ? 'auto' : (lang === 'en' ? 'ltr' : 'rtl')}>
                   {msg.role === 'assistant' && !msg.content && loading ? (
                     <div className="typing"><span /><span /><span /></div>
                   ) : (

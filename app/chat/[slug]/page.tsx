@@ -29,6 +29,9 @@ export default async function Page({ params }: Props) {
   if (!client) notFound();
   if (client.active === false) notFound();
 
+  // mda-sales has an English counterpart at /en/chat/mda-sales
+  const langSwitchHref = slug === 'mda-sales' ? '/en/chat/mda-sales' : undefined;
+
   return (
     <ChatPage
       clientId={slug}
@@ -48,6 +51,7 @@ export default async function Page({ params }: Props) {
       categories={client.categories}
       inputPlaceholder={client.inputPlaceholder}
       waNumber={client.waNumber}
+      langSwitchHref={langSwitchHref}
     />
   );
 }
