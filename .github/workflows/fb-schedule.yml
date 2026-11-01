@@ -1,10 +1,9 @@
 name: Facebook Daily Campaign
 
-# Fires daily at 07:00 UTC (11:00 AM Dubai/UAE time).
-# Also dispatchable manually for catch-up or one-off date override.
+# Dispatchable manually for catch-up or one-off date override.
+# Cron schedule is intentionally disabled on main — campaign runs on
+# the campaign branch only, dispatched by Claude Code scheduled tasks.
 on:
-  schedule:
-    - cron: '0 7 * * *'
   workflow_dispatch:
     inputs:
       override_date:
