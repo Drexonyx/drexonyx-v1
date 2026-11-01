@@ -128,7 +128,6 @@ export default async function MdaDashboardPage() {
   }
 
   const newLeads30d = linePoints.reduce((a, b) => a + b.count, 0);
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
   return (
     <div className={s.mdaPage}>
