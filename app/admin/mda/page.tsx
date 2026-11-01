@@ -128,6 +128,7 @@ export default async function MdaDashboardPage() {
   }
 
   const newLeads30d = linePoints.reduce((a, b) => a + b.count, 0);
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
   return (
     <div className={s.mdaPage}>
@@ -239,7 +240,7 @@ export default async function MdaDashboardPage() {
           <div className={s.mdaChartTitle}>العملاء الجدد خلال 30 يوماً</div>
           <div className={s.mdaChartSubtitle}>
             إجمالي {newLeads30d} عميل جديد منذ{' '}
-            {new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toLocaleDateString('ar-AE', {
+            {thirtyDaysAgo.toLocaleDateString('ar-AE', {
               day: '2-digit',
               month: 'short',
             })}
