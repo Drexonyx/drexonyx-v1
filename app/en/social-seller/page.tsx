@@ -136,7 +136,7 @@ export default function EnSocialSellerPage() {
             <a href="#how" className={styles.navLink}>How It Works</a>
             <a href="#demo" className={styles.navLink}>Live Demo</a>
             <a href="#pricing" className={styles.navLink}>Pricing</a>
-            <a href="/social-seller" className={styles.navLink} aria-label="Switch to Arabic">عربي</a>
+            <a href="/social-seller" className={styles.navLink} style={{ display: 'inline' }} aria-label="Switch to Arabic">عربي</a>
             <a href={WA_HREF} target="_blank" rel="noopener noreferrer" className={styles.headerCta}>
               {WA_ICON}
               Get Started
