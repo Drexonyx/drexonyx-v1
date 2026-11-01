@@ -373,7 +373,7 @@ MEMORY RULE (CRITICAL): راجع كامل تاريخ المحادثة قبل ط�
     welcomeMessage: 'Hello! 👋\nI\'m the Smart Sales Bot by {{GOLD:MDA}}.\nChoose your business type below or type your question.',
     inputPlaceholder: 'Type your question...',
     waNumber: '971521770988',
-    heroBg: '/images/chat-hero-mda-sales.webp',
+    heroBg: '/images/chat-hero-mda-sales-en.png',
     heroTagline: 'SMART SALES BOT',
     heroTitle: 'Turn your business into',
     heroHighlight: 'real sales',
