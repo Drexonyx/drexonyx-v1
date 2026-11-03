@@ -115,13 +115,14 @@ function validateVideoQC(videoPath, caption) {
 }
 
 // ---------------------------------------------------------------------------
-// Duplicate detection — checks publish log to prevent re-publishing the same
-// media asset. Keyed on imagePath (image posts) or videoPath (video posts).
+// Duplicate detection — keyed on postKey when available, else imagePath/videoPath.
+// Uses postKey-first to allow multiple posts that share a signature image.
 // ---------------------------------------------------------------------------
-function isDuplicate(logPath, mediaPath) {
+function isDuplicate(logPath, mediaPath, postKey) {
   if (!logPath || !existsSync(logPath)) return false;
   try {
     const log = JSON.parse(readFileSync(logPath, 'utf-8'));
+    if (postKey) return log.some(entry => entry.postKey === postKey);
     return Array.isArray(log) && log.some(
       entry => entry.imagePath === mediaPath || entry.videoPath === mediaPath,
     );
@@ -515,6 +516,7 @@ async function main() {
     }
     const imagePath = process.env.IMAGE_PATH?.trim();
     const logPath = process.env.LOG_PATH?.trim() || null;
+    const postKey = process.env.POST_KEY?.trim() || null;
 
     // Step 1: QC
     const qc = validateQC(imagePath, caption);
@@ -523,9 +525,10 @@ async function main() {
       process.exit(1);
     }
 
-    // Step 2: Duplicate detection
-    if (isDuplicate(logPath, imagePath)) {
-      console.log(JSON.stringify({ ok: false, error: `[DUPLICATE] ${imagePath} has already been published` }));
+    // Step 2: Duplicate detection (postKey-first so shared signature images don't collide)
+    if (isDuplicate(logPath, imagePath, postKey)) {
+      const key = postKey ?? imagePath;
+      console.log(JSON.stringify({ ok: false, error: `[DUPLICATE] ${key} has already been published` }));
       process.exit(1);
     }
 
@@ -554,6 +557,7 @@ async function main() {
 
     // Step 5: Write to publish log
     appendToLog(logPath, {
+      ...(postKey ? { postKey } : {}),
       imagePath,
       postId: result.postId,
       publishedAt: new Date().toISOString(),

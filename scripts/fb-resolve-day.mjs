@@ -49,9 +49,10 @@ if (dateArg && /^\d{4}-\d{2}-\d{2}$/.test(dateArg)) {
   targetDate = new Date().toISOString().slice(0, 10);
 }
 
-// Determine slot from UTC hour
+// Determine slot from UTC hour (or from explicit override)
+const slotArg = process.argv[3];
 const utcHour = new Date().getUTCHours();
-const slot = utcHour < 12 ? 'morning' : 'evening';
+const slot = (slotArg && slotArg.trim()) ? slotArg.trim() : (utcHour < 12 ? 'morning' : 'evening');
 console.log(`Resolving: date=${targetDate}  utcHour=${utcHour}  slot=${slot}`);
 
 // Load schedule
@@ -65,15 +66,13 @@ if (!entry) skip(`No post scheduled for ${targetDate} [${slot}]`);
 // Skip if already published in schedule
 if (entry.status === 'published') skip(`Day ${entry.day} already marked published`);
 
-// Compute a stable dedup key for this post
-const postKey = entry.mediaType === 'text'
-  ? `${entry.date}-${entry.slot}`
-  : (entry.imagePath ?? entry.videoPath ?? `${entry.date}-${entry.slot}`);
+// Compute a stable dedup key — always date+slot so shared signature images don't collide
+const postKey = `${entry.date}-${entry.slot}`;
 
 // Guard against double-post: check publish log
 if (existsSync(logFile)) {
   const log = JSON.parse(readFileSync(logFile, 'utf-8'));
-  if (log.some(l => l.postKey === postKey || (entry.imagePath && l.imagePath === entry.imagePath))) {
+  if (log.some(l => l.postKey === postKey)) {
     skip(`${postKey} already in publish log`);
   }
 }
