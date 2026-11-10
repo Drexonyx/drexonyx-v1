@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  DREXONYX GROUP — DX Monogram Mark (Light Variant)
+  Approved Concept D · Creative Bold
+  Use on white/light backgrounds.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 92" fill="none" role="img"
+     aria-label="DREXONYX GROUP DX monogram mark — light">
+  <defs>
+    <!-- Deep navy-to-steel gradient: strong contrast on light backgrounds -->
+    <linearGradient id="dgl-chrome" x1="0.08" y1="0" x2="0.92" y2="1">
+      <stop offset="0%"   stop-color="#0A1830"/>
+      <stop offset="20%"  stop-color="#1E3460"/>
+      <stop offset="40%"  stop-color="#304E80"/>
+      <stop offset="58%"  stop-color="#4868A0"/>
+      <stop offset="72%"  stop-color="#2A4472"/>
+      <stop offset="88%"  stop-color="#162848"/>
+      <stop offset="100%" stop-color="#091420"/>
+    </linearGradient>
+    <linearGradient id="dgl-chrome-x" x1="0.9" y1="0" x2="0.1" y2="1">
+      <stop offset="0%"   stop-color="#0C1C38"/>
+      <stop offset="22%"  stop-color="#223A6A"/>
+      <stop offset="45%"  stop-color="#3858A0"/>
+      <stop offset="60%"  stop-color="#2C4A88"/>
+      <stop offset="80%"  stop-color="#1A3058"/>
+      <stop offset="100%" stop-color="#0A1828"/>
+    </linearGradient>
+    <linearGradient id="dgl-blue-accent" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#0088DD"/>
+      <stop offset="45%"  stop-color="#0044BB"/>
+      <stop offset="100%" stop-color="#001E88"/>
+    </linearGradient>
+    <linearGradient id="dgl-inner-edge" x1="0" y1="0.5" x2="1" y2="0.5">
+      <stop offset="0%"   stop-color="#1A2E50"/>
+      <stop offset="60%"  stop-color="#2A3E68"/>
+      <stop offset="100%" stop-color="#0E1E34"/>
+    </linearGradient>
+  </defs>
+
+  <!-- D outer -->
+  <path d="M4,2 L50,2 L68,10 L80,24 L84,46 L80,68 L68,82 L50,90 L4,90 Z"
+        fill="url(#dgl-chrome)"/>
+  <!-- D counter -->
+  <path d="M18,16 L50,16 L62,24 L68,38 L70,46 L68,54 L62,68 L50,76 L18,76 Z"
+        fill="#EEF3FF"/>
+  <!-- D bow wall -->
+  <path d="M62,24 L68,10 L80,24 L84,46 L80,68 L68,82 L62,68 L68,54 L70,46 L68,38 Z"
+        fill="url(#dgl-inner-edge)"/>
+  <!-- Blue accent edge -->
+  <path d="M80,24 L88,30 L92,46 L88,62 L80,68 L84,46 Z"
+        fill="url(#dgl-blue-accent)" opacity="0.90"/>
+
+  <!-- X bar 1 -->
+  <path d="M94,2 L114,2 L166,90 L146,90 Z"
+        fill="url(#dgl-chrome)"/>
+  <!-- X bar 2 -->
+  <path d="M146,2 L166,2 L114,90 L94,90 Z"
+        fill="url(#dgl-chrome-x)"/>
+</svg>

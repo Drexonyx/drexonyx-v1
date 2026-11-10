@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  DX STUDIO — Horizontal Lockup (Dark Variant)
+  Approved Concept D · Creative Bold
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 92" fill="none" role="img"
+     aria-label="DX STUDIO horizontal logo lockup">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&amp;display=swap');
+      .sg-brand { font-family: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif; }
+    </style>
+    <linearGradient id="dxsh-chrome" x1="0.08" y1="0" x2="0.92" y2="1">
+      <stop offset="0%"   stop-color="#1A2A48"/>
+      <stop offset="12%"  stop-color="#3A5484"/>
+      <stop offset="28%"  stop-color="#6888B4"/>
+      <stop offset="44%"  stop-color="#B8D2E8"/>
+      <stop offset="54%"  stop-color="#E8F4FF"/>
+      <stop offset="64%"  stop-color="#C2D8F0"/>
+      <stop offset="78%"  stop-color="#6080A8"/>
+      <stop offset="100%" stop-color="#1C2E4E"/>
+    </linearGradient>
+    <linearGradient id="dxsh-chrome-x" x1="0.9" y1="0" x2="0.1" y2="1">
+      <stop offset="0%"   stop-color="#203050"/>
+      <stop offset="30%"  stop-color="#7898C4"/>
+      <stop offset="56%"  stop-color="#E6F2FF"/>
+      <stop offset="82%"  stop-color="#506888"/>
+      <stop offset="100%" stop-color="#182840"/>
+    </linearGradient>
+    <linearGradient id="dxsh-red" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#FF4040"/>
+      <stop offset="45%"  stop-color="#E81C2C"/>
+      <stop offset="100%" stop-color="#991010"/>
+    </linearGradient>
+    <linearGradient id="dxsh-play" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#FF3030"/>
+      <stop offset="100%" stop-color="#CC0A18"/>
+    </linearGradient>
+    <linearGradient id="dxsh-inner" x1="0" y1="0.5" x2="1" y2="0.5">
+      <stop offset="0%"   stop-color="#2A3E68"/>
+      <stop offset="60%"  stop-color="#506888"/>
+      <stop offset="100%" stop-color="#182C46"/>
+    </linearGradient>
+    <clipPath id="dxsh-bar1-clip">
+      <path d="M94,2 L114,2 L166,90 L146,90 Z"/>
+    </clipPath>
+    <linearGradient id="dxsh-text" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#E8F4FF"/>
+      <stop offset="100%" stop-color="#A8C0D8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- DX STUDIO mark -->
+  <g transform="translate(0,2.5) scale(0.941)">
+    <path d="M4,2 L50,2 L68,10 L80,24 L84,46 L80,68 L68,82 L50,90 L4,90 Z"
+          fill="url(#dxsh-chrome)"/>
+    <path d="M18,16 L50,16 L62,24 L68,38 L70,46 L68,54 L62,68 L50,76 L18,76 Z"
+          fill="#07091C"/>
+    <path d="M62,24 L68,10 L80,24 L84,46 L80,68 L68,82 L62,68 L68,54 L70,46 L68,38 Z"
+          fill="url(#dxsh-inner)"/>
+    <path d="M80,24 L88,30 L92,46 L88,62 L80,68 L84,46 Z"
+          fill="url(#dxsh-red)" opacity="0.95"/>
+    <!-- Play button -->
+    <path d="M28,33 L28,59 L57,46 Z" fill="url(#dxsh-play)"/>
+    <!-- X bar 1 -->
+    <path d="M94,2 L114,2 L166,90 L146,90 Z" fill="url(#dxsh-chrome)"/>
+    <!-- X bar 2 -->
+    <path d="M146,2 L166,2 L114,90 L94,90 Z" fill="url(#dxsh-chrome-x)"/>
+    <!-- Film perforations -->
+    <g clip-path="url(#dxsh-bar1-clip)">
+      <rect x="106" y="6"  width="10" height="6" rx="1.5" fill="#030810" opacity="0.75"/>
+      <rect x="118" y="22" width="10" height="6" rx="1.5" fill="#030810" opacity="0.75"/>
+      <rect x="129" y="38" width="10" height="6" rx="1.5" fill="#030810" opacity="0.75"/>
+      <rect x="141" y="54" width="10" height="6" rx="1.5" fill="#030810" opacity="0.75"/>
+      <rect x="150" y="68" width="9"  height="6" rx="1.5" fill="#030810" opacity="0.75"/>
+    </g>
+  </g>
+
+  <!-- Divider: red accent line for DX STUDIO -->
+  <line x1="176" y1="12" x2="176" y2="80" stroke="#E81C2C" stroke-width="1" opacity="0.40"/>
+
+  <!-- DX STUDIO wordmark -->
+  <text x="188" y="44" class="sg-brand"
+        font-size="26" font-weight="700" letter-spacing="0.04em"
+        fill="url(#dxsh-text)">DX STUDIO</text>
+
+  <!-- Tagline: pipe-separated categories -->
+  <text x="188" y="62" class="sg-brand"
+        font-size="9" font-weight="400" letter-spacing="0.14em"
+        fill="#8FA0B4">FILM</text>
+  <text x="216" y="62" class="sg-brand"
+        font-size="9" fill="#E81C2C" opacity="0.70">|</text>
+  <text x="222" y="62" class="sg-brand"
+        font-size="9" font-weight="400" letter-spacing="0.14em"
+        fill="#8FA0B4">VIDEO</text>
+  <text x="257" y="62" class="sg-brand"
+        font-size="9" fill="#E81C2C" opacity="0.70">|</text>
+  <text x="263" y="62" class="sg-brand"
+        font-size="9" font-weight="400" letter-spacing="0.14em"
+        fill="#8FA0B4">CREATIVE CONTENT</text>
+</svg>

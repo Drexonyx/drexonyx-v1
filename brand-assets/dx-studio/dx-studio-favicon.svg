@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  DX STUDIO — Favicon SVG
+  Approved Concept D · Creative Bold
+  DX mark with red accent + play button indicator.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" role="img"
+     aria-label="DX STUDIO favicon">
+  <defs>
+    <linearGradient id="fav-dxs-chrome" x1="0.08" y1="0" x2="0.92" y2="1">
+      <stop offset="0%"   stop-color="#1A2A48"/>
+      <stop offset="28%"  stop-color="#6888B4"/>
+      <stop offset="54%"  stop-color="#E8F4FF"/>
+      <stop offset="78%"  stop-color="#6080A8"/>
+      <stop offset="100%" stop-color="#1C2E4E"/>
+    </linearGradient>
+    <linearGradient id="fav-dxs-chrome-x" x1="0.9" y1="0" x2="0.1" y2="1">
+      <stop offset="0%"   stop-color="#203050"/>
+      <stop offset="56%"  stop-color="#E6F2FF"/>
+      <stop offset="100%" stop-color="#182840"/>
+    </linearGradient>
+    <linearGradient id="fav-dxs-red" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#FF4040"/>
+      <stop offset="100%" stop-color="#991010"/>
+    </linearGradient>
+    <linearGradient id="fav-dxs-inner" x1="0" y1="0.5" x2="1" y2="0.5">
+      <stop offset="0%"   stop-color="#2A3E68"/>
+      <stop offset="100%" stop-color="#182C46"/>
+    </linearGradient>
+  </defs>
+
+  <!-- D outer -->
+  <path d="M1,1 L10,1 L14,3 L17,7 L18,16 L17,25 L14,29 L10,31 L1,31 Z"
+        fill="url(#fav-dxs-chrome)"/>
+  <!-- D counter -->
+  <path d="M4,5 L10,5 L13,7 L14.5,11 L15,16 L14.5,21 L13,25 L10,27 L4,27 Z"
+        fill="#07091C"/>
+  <!-- D bow wall -->
+  <path d="M13,7 L14,3 L17,7 L18,16 L17,25 L14,29 L13,25 L14.5,21 L15,16 L14.5,11 Z"
+        fill="url(#fav-dxs-inner)"/>
+  <!-- Red accent edge -->
+  <path d="M17,7 L19.5,9 L20.5,16 L19.5,23 L17,25 L18,16 Z"
+        fill="url(#fav-dxs-red)" opacity="0.95"/>
+  <!-- Play button (small triangle in D counter) -->
+  <path d="M6,11 L6,21 L14,16 Z" fill="#E81C2C" opacity="0.90"/>
+  <!-- X bar 1 (\) -->
+  <path d="M21,1 L25,1 L31,31 L27,31 Z"
+        fill="url(#fav-dxs-chrome)"/>
+  <!-- X bar 2 (/) -->
+  <path d="M27,1 L31,1 L25,31 L21,31 Z"
+        fill="url(#fav-dxs-chrome-x)"/>
+</svg>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  MDA — Master Digital Agency Favicon SVG
+  Approved Concept D · Creative Bold
+  Three ascending signal bars + cyan arc, optimised for small sizes.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" role="img"
+     aria-label="MDA favicon">
+  <defs>
+    <linearGradient id="fav-mda-bar1" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%"   stop-color="#18CCFF"/>
+      <stop offset="45%"  stop-color="#1050EE"/>
+      <stop offset="100%" stop-color="#003ACC"/>
+    </linearGradient>
+    <linearGradient id="fav-mda-bar2" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%"   stop-color="#22D4FF"/>
+      <stop offset="45%"  stop-color="#1A60F4"/>
+      <stop offset="100%" stop-color="#0040D8"/>
+    </linearGradient>
+    <linearGradient id="fav-mda-bar3" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%"   stop-color="#2CDCFF"/>
+      <stop offset="40%"  stop-color="#1A6FFF"/>
+      <stop offset="100%" stop-color="#0048E0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Bar 1 — left, shortest -->
+  <rect x="1"  y="17" width="6" height="13" rx="1.5" fill="url(#fav-mda-bar1)"/>
+  <!-- Bar 2 — center, medium -->
+  <rect x="10" y="10" width="6" height="20" rx="1.5" fill="url(#fav-mda-bar2)"/>
+  <!-- Bar 3 — right, tallest -->
+  <rect x="19" y="3"  width="6" height="27" rx="1.5" fill="url(#fav-mda-bar3)"/>
+  <!-- Cyan arc -->
+  <path d="M 1,27 C 7,1 21,1 31,8"
+        stroke="#00C4FF" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+</svg>

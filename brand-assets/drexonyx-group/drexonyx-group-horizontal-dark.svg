@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  DREXONYX GROUP — Horizontal Lockup (Dark Variant)
+  Mark + wordmark. Font: Space Grotesk (requires font to be installed or linked).
+  Convert text to outlines before final print/press production.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 92" fill="none" role="img"
+     aria-label="DREXONYX GROUP horizontal logo lockup">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&amp;display=swap');
+      .sg-brand { font-family: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif; }
+    </style>
+    <linearGradient id="dgh-chrome" x1="0.08" y1="0" x2="0.92" y2="1">
+      <stop offset="0%"   stop-color="#1A2A48"/>
+      <stop offset="12%"  stop-color="#3A5484"/>
+      <stop offset="28%"  stop-color="#6888B4"/>
+      <stop offset="44%"  stop-color="#B8D2E8"/>
+      <stop offset="54%"  stop-color="#E8F4FF"/>
+      <stop offset="64%"  stop-color="#C2D8F0"/>
+      <stop offset="78%"  stop-color="#6080A8"/>
+      <stop offset="100%" stop-color="#1C2E4E"/>
+    </linearGradient>
+    <linearGradient id="dgh-chrome-x" x1="0.9" y1="0" x2="0.1" y2="1">
+      <stop offset="0%"   stop-color="#203050"/>
+      <stop offset="30%"  stop-color="#7898C4"/>
+      <stop offset="56%"  stop-color="#E6F2FF"/>
+      <stop offset="82%"  stop-color="#506888"/>
+      <stop offset="100%" stop-color="#182840"/>
+    </linearGradient>
+    <linearGradient id="dgh-blue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#00CCFF"/>
+      <stop offset="45%"  stop-color="#1A6FFF"/>
+      <stop offset="100%" stop-color="#0033CC"/>
+    </linearGradient>
+    <linearGradient id="dgh-inner" x1="0" y1="0.5" x2="1" y2="0.5">
+      <stop offset="0%"   stop-color="#2A3E68"/>
+      <stop offset="60%"  stop-color="#506888"/>
+      <stop offset="100%" stop-color="#182C46"/>
+    </linearGradient>
+    <!-- Text gradient: silver for wordmark -->
+    <linearGradient id="dgh-text" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#E8F4FF"/>
+      <stop offset="100%" stop-color="#A8C0D8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ═══ DX MARK (scaled at left) ═══ -->
+  <!-- Scale 170×92 mark to fit 160×87 slot at x=0 -->
+  <g transform="translate(0,2.5) scale(0.941)">
+    <!-- D outer -->
+    <path d="M4,2 L50,2 L68,10 L80,24 L84,46 L80,68 L68,82 L50,90 L4,90 Z"
+          fill="url(#dgh-chrome)"/>
+    <!-- D counter -->
+    <path d="M18,16 L50,16 L62,24 L68,38 L70,46 L68,54 L62,68 L50,76 L18,76 Z"
+          fill="#07091C"/>
+    <!-- D bow wall -->
+    <path d="M62,24 L68,10 L80,24 L84,46 L80,68 L68,82 L62,68 L68,54 L70,46 L68,38 Z"
+          fill="url(#dgh-inner)"/>
+    <!-- Blue accent -->
+    <path d="M80,24 L88,30 L92,46 L88,62 L80,68 L84,46 Z"
+          fill="url(#dgh-blue)" opacity="0.90"/>
+    <!-- X bar 1 -->
+    <path d="M94,2 L114,2 L166,90 L146,90 Z"
+          fill="url(#dgh-chrome)"/>
+    <!-- X bar 2 -->
+    <path d="M146,2 L166,2 L114,90 L94,90 Z"
+          fill="url(#dgh-chrome-x)"/>
+  </g>
+
+  <!-- ═══ VERTICAL DIVIDER ═══ -->
+  <line x1="176" y1="12" x2="176" y2="80"
+        stroke="#1A6FFF" stroke-width="1" opacity="0.35"/>
+
+  <!-- ═══ TEXT BLOCK ═══ -->
+  <!-- DREXONYX primary wordmark -->
+  <text x="188" y="44"
+        class="sg-brand"
+        font-size="26" font-weight="700" letter-spacing="0.04em"
+        fill="url(#dgh-text)">DREXONYX</text>
+
+  <!-- GROUP sub-label with dash accents -->
+  <line x1="188" y1="55" x2="200" y2="55" stroke="#1A6FFF" stroke-width="1.2"/>
+  <text x="204" y="58"
+        class="sg-brand"
+        font-size="11" font-weight="600" letter-spacing="0.18em"
+        fill="#8FA0B4">GROUP</text>
+  <line x1="253" y1="55" x2="265" y2="55" stroke="#1A6FFF" stroke-width="1.2"/>
+
+  <!-- Tagline -->
+  <text x="188" y="72"
+        class="sg-brand"
+        font-size="8.5" font-weight="300" letter-spacing="0.20em"
+        fill="#546078">DIGITAL BUSINESS ECOSYSTEM</text>
+</svg>

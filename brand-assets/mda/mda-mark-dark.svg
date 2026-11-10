@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  MDA — Master Digital Agency Mark (Dark Variant)
+  Approved Concept D · Creative Bold
+  Three ascending signal bars + cyan arc.
+  Use on dark/navy backgrounds.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56" fill="none" role="img"
+     aria-label="MDA Master Digital Agency mark">
+  <defs>
+    <!-- Bar gradient: cyan top → electric blue mid → deep blue base -->
+    <linearGradient id="mda-bar1" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%"   stop-color="#18CCFF"/>
+      <stop offset="45%"  stop-color="#1050EE"/>
+      <stop offset="100%" stop-color="#003ACC"/>
+    </linearGradient>
+    <linearGradient id="mda-bar2" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%"   stop-color="#22D4FF"/>
+      <stop offset="45%"  stop-color="#1A60F4"/>
+      <stop offset="100%" stop-color="#0040D8"/>
+    </linearGradient>
+    <linearGradient id="mda-bar3" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%"   stop-color="#2CDCFF"/>
+      <stop offset="40%"  stop-color="#1A6FFF"/>
+      <stop offset="100%" stop-color="#0048E0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ═══ THREE ASCENDING SIGNAL BARS ═══ -->
+  <!-- All bars bottom-aligned at y=52 (4px bottom margin) -->
+
+  <!-- Bar 1 — left, shortest (22px tall) -->
+  <rect x="2"  y="30" width="11" height="22" rx="2.5" fill="url(#mda-bar1)"/>
+
+  <!-- Bar 2 — center, medium (34px tall) -->
+  <rect x="17" y="18" width="11" height="34" rx="2.5" fill="url(#mda-bar2)"/>
+
+  <!-- Bar 3 — right, tallest (46px tall) -->
+  <rect x="32" y="6"  width="11" height="46" rx="2.5" fill="url(#mda-bar3)"/>
+
+  <!-- ═══ CYAN ARC ═══ -->
+  <!-- Sweeps from lower-left up and over to upper-right: upward growth / signal trajectory -->
+  <!-- Cubic bezier: starts at base-left, arcs high above bars, ends at upper-right -->
+  <path d="M 1,46 C 12,2 36,2 54,14"
+        stroke="#00C4FF" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+</svg>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  DX STUDIO — DX Monogram Mark (Light Variant)
+  Approved Concept D · Creative Bold
+  Use on white/light backgrounds.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 92" fill="none" role="img"
+     aria-label="DX STUDIO DX monogram mark — light">
+  <defs>
+    <linearGradient id="dxsl-chrome" x1="0.08" y1="0" x2="0.92" y2="1">
+      <stop offset="0%"   stop-color="#0A1830"/>
+      <stop offset="20%"  stop-color="#1E3460"/>
+      <stop offset="40%"  stop-color="#304E80"/>
+      <stop offset="58%"  stop-color="#4868A0"/>
+      <stop offset="72%"  stop-color="#2A4472"/>
+      <stop offset="88%"  stop-color="#162848"/>
+      <stop offset="100%" stop-color="#091420"/>
+    </linearGradient>
+    <linearGradient id="dxsl-chrome-x" x1="0.9" y1="0" x2="0.1" y2="1">
+      <stop offset="0%"   stop-color="#0C1C38"/>
+      <stop offset="22%"  stop-color="#223A6A"/>
+      <stop offset="45%"  stop-color="#3858A0"/>
+      <stop offset="60%"  stop-color="#2C4A88"/>
+      <stop offset="80%"  stop-color="#1A3058"/>
+      <stop offset="100%" stop-color="#0A1828"/>
+    </linearGradient>
+    <!-- RED accent (same identity, adapted for light background) -->
+    <linearGradient id="dxsl-red-accent" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#CC2020"/>
+      <stop offset="45%"  stop-color="#B01020"/>
+      <stop offset="100%" stop-color="#7A0810"/>
+    </linearGradient>
+    <linearGradient id="dxsl-play" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#CC2020"/>
+      <stop offset="100%" stop-color="#990810"/>
+    </linearGradient>
+    <linearGradient id="dxsl-inner-edge" x1="0" y1="0.5" x2="1" y2="0.5">
+      <stop offset="0%"   stop-color="#1A2E50"/>
+      <stop offset="60%"  stop-color="#2A3E68"/>
+      <stop offset="100%" stop-color="#0E1E34"/>
+    </linearGradient>
+    <clipPath id="dxsl-bar1-clip">
+      <path d="M94,2 L114,2 L166,90 L146,90 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- D outer -->
+  <path d="M4,2 L50,2 L68,10 L80,24 L84,46 L80,68 L68,82 L50,90 L4,90 Z"
+        fill="url(#dxsl-chrome)"/>
+  <!-- D counter -->
+  <path d="M18,16 L50,16 L62,24 L68,38 L70,46 L68,54 L62,68 L50,76 L18,76 Z"
+        fill="#EEF3FF"/>
+  <!-- D bow wall -->
+  <path d="M62,24 L68,10 L80,24 L84,46 L80,68 L68,82 L62,68 L68,54 L70,46 L68,38 Z"
+        fill="url(#dxsl-inner-edge)"/>
+  <!-- Red accent edge -->
+  <path d="M80,24 L88,30 L92,46 L88,62 L80,68 L84,46 Z"
+        fill="url(#dxsl-red-accent)" opacity="0.95"/>
+  <!-- Play button -->
+  <path d="M28,33 L28,59 L57,46 Z"
+        fill="url(#dxsl-play)"/>
+
+  <!-- X bar 1 -->
+  <path d="M94,2 L114,2 L166,90 L146,90 Z"
+        fill="url(#dxsl-chrome)"/>
+  <!-- X bar 2 -->
+  <path d="M146,2 L166,2 L114,90 L94,90 Z"
+        fill="url(#dxsl-chrome-x)"/>
+  <!-- Film strip perforations -->
+  <g clip-path="url(#dxsl-bar1-clip)">
+    <rect x="106" y="6"  width="10" height="6" rx="1.5" fill="#EEF3FF" opacity="0.60"/>
+    <rect x="118" y="22" width="10" height="6" rx="1.5" fill="#EEF3FF" opacity="0.60"/>
+    <rect x="129" y="38" width="10" height="6" rx="1.5" fill="#EEF3FF" opacity="0.60"/>
+    <rect x="141" y="54" width="10" height="6" rx="1.5" fill="#EEF3FF" opacity="0.60"/>
+    <rect x="150" y="68" width="9"  height="6" rx="1.5" fill="#EEF3FF" opacity="0.60"/>
+    <rect x="157" y="80" width="7"  height="5" rx="1.5" fill="#EEF3FF" opacity="0.50"/>
+  </g>
+</svg>

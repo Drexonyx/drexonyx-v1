@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  DREXONYX GROUP — DX Monogram Mark (Dark Variant)
+  Approved Concept D · Creative Bold
+  Use on dark/navy backgrounds.
+  NOTE: Text-to-paths required before final print/press production.
+  Chrome gradient approximates the reference metallic effect;
+  full photorealistic rendering requires production finishing in Illustrator/Figma.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 92" fill="none" role="img"
+     aria-label="DREXONYX GROUP DX monogram mark">
+  <defs>
+    <!-- Chrome silver-blue gradient: simulates metallic highlight/shadow across the mark -->
+    <linearGradient id="dg-chrome" x1="0.08" y1="0" x2="0.92" y2="1">
+      <stop offset="0%"   stop-color="#1A2A48"/>
+      <stop offset="12%"  stop-color="#3A5484"/>
+      <stop offset="28%"  stop-color="#6888B4"/>
+      <stop offset="44%"  stop-color="#B8D2E8"/>
+      <stop offset="54%"  stop-color="#E8F4FF"/>
+      <stop offset="64%"  stop-color="#C2D8F0"/>
+      <stop offset="78%"  stop-color="#6080A8"/>
+      <stop offset="100%" stop-color="#1C2E4E"/>
+    </linearGradient>
+    <!-- Secondary chrome gradient: slightly different angle for X, adds depth distinction -->
+    <linearGradient id="dg-chrome-x" x1="0.9" y1="0" x2="0.1" y2="1">
+      <stop offset="0%"   stop-color="#203050"/>
+      <stop offset="14%"  stop-color="#445E8C"/>
+      <stop offset="30%"  stop-color="#7898C4"/>
+      <stop offset="46%"  stop-color="#C0D6EC"/>
+      <stop offset="56%"  stop-color="#E6F2FF"/>
+      <stop offset="68%"  stop-color="#B0CADF"/>
+      <stop offset="82%"  stop-color="#506888"/>
+      <stop offset="100%" stop-color="#182840"/>
+    </linearGradient>
+    <!-- Blue accent glow: right face of D bow — brand-specific blue identity -->
+    <linearGradient id="dg-blue-accent" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#00CCFF"/>
+      <stop offset="45%"  stop-color="#1A6FFF"/>
+      <stop offset="100%" stop-color="#0033CC"/>
+    </linearGradient>
+    <!-- Inner edge taper gradient: used for the transition between outer and counter -->
+    <linearGradient id="dg-inner-edge" x1="0" y1="0.5" x2="1" y2="0.5">
+      <stop offset="0%"   stop-color="#2A3E68"/>
+      <stop offset="60%"  stop-color="#506888"/>
+      <stop offset="100%" stop-color="#182C46"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ═══ D LETTER ═══ -->
+  <!-- Outer D shape: left vertical stem + angular faceted right bow -->
+  <!-- Points: left-top → right-top → upper bow-facet → max-width → lower bow-facet → right-bottom → left-bottom -->
+  <path d="M4,2 L50,2 L68,10 L80,24 L84,46 L80,68 L68,82 L50,90 L4,90 Z"
+        fill="url(#dg-chrome)"/>
+
+  <!-- Inner counter void (D aperture) -->
+  <path d="M18,16 L50,16 L62,24 L68,38 L70,46 L68,54 L62,68 L50,76 L18,76 Z"
+        fill="#07091C"/>
+
+  <!-- Right bow face: thin chrome strip between counter and outer right edge -->
+  <!-- Creates the "D bow" wall — slightly different gradient angle for depth -->
+  <path d="M62,24 L68,10 L80,24 L84,46 L80,68 L68,82 L62,68 L68,54 L70,46 L68,38 Z"
+        fill="url(#dg-inner-edge)"/>
+
+  <!-- Blue accent edge: rightmost face of D — DREXONYX GROUP brand accent color -->
+  <path d="M80,24 L88,30 L92,46 L88,62 L80,68 L84,46 Z"
+        fill="url(#dg-blue-accent)" opacity="0.90"/>
+
+  <!-- ═══ X LETTER ═══ -->
+  <!-- X bar 1: top-left → bottom-right diagonal stroke (\ direction) -->
+  <path d="M94,2 L114,2 L166,90 L146,90 Z"
+        fill="url(#dg-chrome)"/>
+
+  <!-- X bar 2: top-right → bottom-left diagonal stroke (/ direction) -->
+  <path d="M146,2 L166,2 L114,90 L94,90 Z"
+        fill="url(#dg-chrome-x)"/>
+
+  <!-- X center junction highlight: brightens the overlap region -->
+  <path d="M114,2 L130,46 L114,90 L94,90 L126,46 L94,2 Z"
+        fill="#E8F4FF" opacity="0.06"/>
+</svg>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  MDA — Master Digital Agency Mark (Light Variant)
+  Approved Concept D · Creative Bold
+  Use on white/light backgrounds.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56" fill="none" role="img"
+     aria-label="MDA Master Digital Agency mark — light">
+  <defs>
+    <linearGradient id="mdal-bar1" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%"   stop-color="#0088CC"/>
+      <stop offset="45%"  stop-color="#0040AA"/>
+      <stop offset="100%" stop-color="#002888"/>
+    </linearGradient>
+    <linearGradient id="mdal-bar2" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%"   stop-color="#0094D8"/>
+      <stop offset="45%"  stop-color="#0048BB"/>
+      <stop offset="100%" stop-color="#002E99"/>
+    </linearGradient>
+    <linearGradient id="mdal-bar3" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%"   stop-color="#00A0E4"/>
+      <stop offset="40%"  stop-color="#0055CC"/>
+      <stop offset="100%" stop-color="#0036AA"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Bar 1 — left, shortest -->
+  <rect x="2"  y="30" width="11" height="22" rx="2.5" fill="url(#mdal-bar1)"/>
+  <!-- Bar 2 — center, medium -->
+  <rect x="17" y="18" width="11" height="34" rx="2.5" fill="url(#mdal-bar2)"/>
+  <!-- Bar 3 — right, tallest -->
+  <rect x="32" y="6"  width="11" height="46" rx="2.5" fill="url(#mdal-bar3)"/>
+  <!-- Cyan arc (deeper for light background) -->
+  <path d="M 1,46 C 12,2 36,2 54,14"
+        stroke="#0088CC" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+</svg>

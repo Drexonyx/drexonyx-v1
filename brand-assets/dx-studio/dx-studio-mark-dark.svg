@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  DX STUDIO — DX Monogram Mark (Dark Variant)
+  Approved Concept D · Creative Bold
+  Brand-specific differentiators: red play button in D counter, film strip
+  perforations on X, red accent edge.
+  Use on dark/navy backgrounds.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 92" fill="none" role="img"
+     aria-label="DX STUDIO DX monogram mark">
+  <defs>
+    <!-- Shared chrome gradient — same metallic base as DREXONYX GROUP -->
+    <linearGradient id="dxs-chrome" x1="0.08" y1="0" x2="0.92" y2="1">
+      <stop offset="0%"   stop-color="#1A2A48"/>
+      <stop offset="12%"  stop-color="#3A5484"/>
+      <stop offset="28%"  stop-color="#6888B4"/>
+      <stop offset="44%"  stop-color="#B8D2E8"/>
+      <stop offset="54%"  stop-color="#E8F4FF"/>
+      <stop offset="64%"  stop-color="#C2D8F0"/>
+      <stop offset="78%"  stop-color="#6080A8"/>
+      <stop offset="100%" stop-color="#1C2E4E"/>
+    </linearGradient>
+    <linearGradient id="dxs-chrome-x" x1="0.9" y1="0" x2="0.1" y2="1">
+      <stop offset="0%"   stop-color="#203050"/>
+      <stop offset="14%"  stop-color="#445E8C"/>
+      <stop offset="30%"  stop-color="#7898C4"/>
+      <stop offset="46%"  stop-color="#C0D6EC"/>
+      <stop offset="56%"  stop-color="#E6F2FF"/>
+      <stop offset="68%"  stop-color="#B0CADF"/>
+      <stop offset="82%"  stop-color="#506888"/>
+      <stop offset="100%" stop-color="#182840"/>
+    </linearGradient>
+    <!-- RED accent: DX STUDIO brand-specific — intentional, approved, do not change -->
+    <linearGradient id="dxs-red-accent" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#FF4040"/>
+      <stop offset="45%"  stop-color="#E81C2C"/>
+      <stop offset="100%" stop-color="#991010"/>
+    </linearGradient>
+    <!-- Play button gradient: solid red with slight top highlight -->
+    <linearGradient id="dxs-play" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#FF3030"/>
+      <stop offset="100%" stop-color="#CC0A18"/>
+    </linearGradient>
+    <linearGradient id="dxs-inner-edge" x1="0" y1="0.5" x2="1" y2="0.5">
+      <stop offset="0%"   stop-color="#2A3E68"/>
+      <stop offset="60%"  stop-color="#506888"/>
+      <stop offset="100%" stop-color="#182C46"/>
+    </linearGradient>
+    <!-- Film strip clip path: bar 1 of X (\ diagonal) -->
+    <clipPath id="dxs-bar1-clip">
+      <path d="M94,2 L114,2 L166,90 L146,90 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- ═══ D LETTER ═══ -->
+  <!-- Outer D shape: same geometry as DREXONYX GROUP mark -->
+  <path d="M4,2 L50,2 L68,10 L80,24 L84,46 L80,68 L68,82 L50,90 L4,90 Z"
+        fill="url(#dxs-chrome)"/>
+
+  <!-- Inner counter void -->
+  <path d="M18,16 L50,16 L62,24 L68,38 L70,46 L68,54 L62,68 L50,76 L18,76 Z"
+        fill="#07091C"/>
+
+  <!-- D bow wall -->
+  <path d="M62,24 L68,10 L80,24 L84,46 L80,68 L68,82 L62,68 L68,54 L70,46 L68,38 Z"
+        fill="url(#dxs-inner-edge)"/>
+
+  <!-- RED accent edge: DX STUDIO differentiator — replaces blue accent of GROUP -->
+  <path d="M80,24 L88,30 L92,46 L88,62 L80,68 L84,46 Z"
+        fill="url(#dxs-red-accent)" opacity="0.95"/>
+
+  <!-- ★ PLAY BUTTON: right-pointing triangle in D counter — DX STUDIO differentiator -->
+  <!-- Centered within counter void (x:18-70, y:16-76); center ≈ (44,46) -->
+  <path d="M28,33 L28,59 L57,46 Z"
+        fill="url(#dxs-play)"/>
+  <!-- Play button inner highlight edge -->
+  <path d="M28,33 L28,38 L52,46 L28,54 L28,59 L57,46 Z"
+        fill="#FF5050" opacity="0.20"/>
+
+  <!-- ═══ X LETTER ═══ -->
+  <!-- X bar 1: top-left → bottom-right (\ direction) -->
+  <path d="M94,2 L114,2 L166,90 L146,90 Z"
+        fill="url(#dxs-chrome)"/>
+
+  <!-- X bar 2: top-right → bottom-left (/ direction) -->
+  <path d="M146,2 L166,2 L114,90 L94,90 Z"
+        fill="url(#dxs-chrome-x)"/>
+
+  <!-- ★ FILM STRIP PERFORATIONS on X bar 1: DX STUDIO differentiator -->
+  <!-- 6 dark rounded rects clipped to bar 1, positioned along its right/outer edge -->
+  <g clip-path="url(#dxs-bar1-clip)">
+    <!-- Perforations follow the \ diagonal at equal spacing, inset from right edge -->
+    <rect x="106" y="6"  width="10" height="6" rx="1.5" fill="#030810" opacity="0.75"/>
+    <rect x="118" y="22" width="10" height="6" rx="1.5" fill="#030810" opacity="0.75"/>
+    <rect x="129" y="38" width="10" height="6" rx="1.5" fill="#030810" opacity="0.75"/>
+    <rect x="141" y="54" width="10" height="6" rx="1.5" fill="#030810" opacity="0.75"/>
+    <rect x="150" y="68" width="9"  height="6" rx="1.5" fill="#030810" opacity="0.75"/>
+    <rect x="157" y="80" width="7"  height="5" rx="1.5" fill="#030810" opacity="0.65"/>
+  </g>
+
+  <!-- X center junction highlight -->
+  <path d="M114,2 L130,46 L114,90 L94,90 L126,46 L94,2 Z"
+        fill="#E8F4FF" opacity="0.05"/>
+</svg>

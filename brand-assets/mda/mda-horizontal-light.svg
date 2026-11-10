@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  MDA — Master Digital Agency Horizontal Lockup (Light Variant)
+  Approved Concept D · Creative Bold
+  Use on white/light backgrounds.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 92" fill="none" role="img"
+     aria-label="MDA Master Digital Agency horizontal logo lockup — light">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&amp;display=swap');
+      .sg-brand { font-family: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif; }
+    </style>
+    <linearGradient id="mdahl-bar1" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%"   stop-color="#0088CC"/>
+      <stop offset="45%"  stop-color="#0040AA"/>
+      <stop offset="100%" stop-color="#002888"/>
+    </linearGradient>
+    <linearGradient id="mdahl-bar2" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%"   stop-color="#0094D8"/>
+      <stop offset="45%"  stop-color="#0048BB"/>
+      <stop offset="100%" stop-color="#002E99"/>
+    </linearGradient>
+    <linearGradient id="mdahl-bar3" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%"   stop-color="#00A0E4"/>
+      <stop offset="40%"  stop-color="#0055CC"/>
+      <stop offset="100%" stop-color="#0036AA"/>
+    </linearGradient>
+  </defs>
+
+  <!-- MDA mark — scaled to ~72×72, centered -->
+  <g transform="translate(8,10) scale(1.286)">
+    <!-- Bar 1 — left, shortest -->
+    <rect x="2"  y="30" width="11" height="22" rx="2.5" fill="url(#mdahl-bar1)"/>
+    <!-- Bar 2 — center, medium -->
+    <rect x="17" y="18" width="11" height="34" rx="2.5" fill="url(#mdahl-bar2)"/>
+    <!-- Bar 3 — right, tallest -->
+    <rect x="32" y="6"  width="11" height="46" rx="2.5" fill="url(#mdahl-bar3)"/>
+    <!-- Cyan arc -->
+    <path d="M 1,46 C 12,2 36,2 54,14"
+          stroke="#0088CC" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  </g>
+
+  <!-- Divider: blue accent line -->
+  <line x1="90" y1="12" x2="90" y2="80" stroke="#0044BB" stroke-width="1" opacity="0.25"/>
+
+  <!-- MDA primary wordmark -->
+  <text x="102" y="44"
+        class="sg-brand"
+        font-size="26" font-weight="700" letter-spacing="0.04em"
+        fill="#0B0F1E">MDA</text>
+
+  <!-- Sub-label with dash accents -->
+  <line x1="102" y1="55" x2="114" y2="55" stroke="#0044BB" stroke-width="1.2"/>
+  <text x="118" y="58"
+        class="sg-brand"
+        font-size="9" font-weight="600" letter-spacing="0.18em"
+        fill="#304878">MASTER DIGITAL AGENCY</text>
+  <line x1="286" y1="55" x2="298" y2="55" stroke="#0044BB" stroke-width="1.2"/>
+
+  <!-- Tagline -->
+  <text x="102" y="72"
+        class="sg-brand"
+        font-size="8.5" font-weight="300" letter-spacing="0.20em"
+        fill="#6080A0">GROW SMARTER · SCALE FASTER</text>
+</svg>
