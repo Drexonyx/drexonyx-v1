@@ -38,13 +38,6 @@
       <stop offset="40%"  stop-color="#1A6FFF"/>
       <stop offset="100%" stop-color="#0033CC"/>
     </linearGradient>
-    <linearGradient id="dgh-blue-sweep" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%"   stop-color="#00CCFF" stop-opacity="0"/>
-      <stop offset="30%"  stop-color="#00DDFF" stop-opacity="0.9"/>
-      <stop offset="50%"  stop-color="#22EEFF" stop-opacity="1"/>
-      <stop offset="70%"  stop-color="#00CCFF" stop-opacity="0.9"/>
-      <stop offset="100%" stop-color="#0066FF" stop-opacity="0"/>
-    </linearGradient>
     <linearGradient id="dgh-inner" x1="0" y1="0.5" x2="1" y2="0.5">
       <stop offset="0%"   stop-color="#1E3260"/>
       <stop offset="50%"  stop-color="#3A5484"/>
@@ -72,9 +65,6 @@
     <!-- Blue accent -->
     <path d="M80,24 L88,30 L92,46 L88,62 L80,68 L84,46 Z"
           fill="url(#dgh-blue)" opacity="1.0"/>
-    <!-- Blue vertical sweep accent -->
-    <rect x="88" y="2" width="5" height="88" rx="2.5"
-          fill="url(#dgh-blue-sweep)"/>
     <!-- X bar 1 -->
     <path d="M94,2 L114,2 L166,90 L146,90 Z"
           fill="url(#dgh-chrome)"/>
