@@ -113,6 +113,18 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Group Brands Identity ─────────────────────────────────────── */}
+      <section className={styles.brandIdentity} aria-label="DREXONYX Group Brands">
+        <Image
+          src="/brand/drexonyx-brands-identity.png"
+          alt="DREXONYX GROUP · DX STUDIO · Master Digital Agency"
+          width={1536}
+          height={864}
+          className={styles.brandIdentityImg}
+          priority
+        />
+      </section>
+
       {/* ── Services: editorial 4-col card grid ───────────────────────── */}
       <section className={styles.services} aria-labelledby="services-heading">
         <div className="container">

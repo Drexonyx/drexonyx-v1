@@ -930,3 +930,16 @@
     padding: 5rem 0;
   }
 }
+
+/* ── Group Brands Identity ─────────────────────────────────────────────────── */
+.brandIdentity {
+  width: 100%;
+  background: #040810;
+  line-height: 0;
+}
+
+.brandIdentityImg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
