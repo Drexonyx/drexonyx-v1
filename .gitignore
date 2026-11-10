@@ -41,3 +41,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# R06 brand review — pending owner approval before commit
+brand-assets/R06-review/
