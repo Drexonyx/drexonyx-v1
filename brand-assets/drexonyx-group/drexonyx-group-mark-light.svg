@@ -7,33 +7,46 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 92" fill="none" role="img"
      aria-label="DREXONYX GROUP DX monogram mark — light">
   <defs>
-    <!-- Deep navy-to-steel gradient: strong contrast on light backgrounds -->
+    <!-- Deep navy-to-steel gradient: strong contrast on light backgrounds with crisp highlight -->
     <linearGradient id="dgl-chrome" x1="0.08" y1="0" x2="0.92" y2="1">
-      <stop offset="0%"   stop-color="#0A1830"/>
-      <stop offset="20%"  stop-color="#1E3460"/>
-      <stop offset="40%"  stop-color="#304E80"/>
-      <stop offset="58%"  stop-color="#4868A0"/>
-      <stop offset="72%"  stop-color="#2A4472"/>
-      <stop offset="88%"  stop-color="#162848"/>
-      <stop offset="100%" stop-color="#091420"/>
+      <stop offset="0%"   stop-color="#06101E"/>
+      <stop offset="16%"  stop-color="#162848"/>
+      <stop offset="32%"  stop-color="#2C4472"/>
+      <stop offset="45%"  stop-color="#5878A0"/>
+      <stop offset="50%"  stop-color="#8AAAC8"/>
+      <stop offset="55%"  stop-color="#4A6888"/>
+      <stop offset="68%"  stop-color="#1E3258"/>
+      <stop offset="84%"  stop-color="#0C1C38"/>
+      <stop offset="100%" stop-color="#040C1A"/>
     </linearGradient>
     <linearGradient id="dgl-chrome-x" x1="0.9" y1="0" x2="0.1" y2="1">
-      <stop offset="0%"   stop-color="#0C1C38"/>
-      <stop offset="22%"  stop-color="#223A6A"/>
-      <stop offset="45%"  stop-color="#3858A0"/>
-      <stop offset="60%"  stop-color="#2C4A88"/>
-      <stop offset="80%"  stop-color="#1A3058"/>
-      <stop offset="100%" stop-color="#0A1828"/>
+      <stop offset="0%"   stop-color="#081220"/>
+      <stop offset="16%"  stop-color="#1A2E50"/>
+      <stop offset="32%"  stop-color="#304A78"/>
+      <stop offset="45%"  stop-color="#506898"/>
+      <stop offset="50%"  stop-color="#7A9AB8"/>
+      <stop offset="55%"  stop-color="#405E80"/>
+      <stop offset="68%"  stop-color="#182C4E"/>
+      <stop offset="84%"  stop-color="#0A1A30"/>
+      <stop offset="100%" stop-color="#040C1A"/>
     </linearGradient>
     <linearGradient id="dgl-blue-accent" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%"   stop-color="#0088DD"/>
-      <stop offset="45%"  stop-color="#0044BB"/>
+      <stop offset="40%"  stop-color="#0044BB"/>
       <stop offset="100%" stop-color="#001E88"/>
     </linearGradient>
+    <!-- Blue vertical sweep: matches dark variant — prominent sweep accent -->
+    <linearGradient id="dgl-blue-sweep" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#0088CC" stop-opacity="0"/>
+      <stop offset="30%"  stop-color="#0099DD" stop-opacity="0.85"/>
+      <stop offset="50%"  stop-color="#00AAEE" stop-opacity="0.95"/>
+      <stop offset="70%"  stop-color="#0088CC" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#0044AA" stop-opacity="0"/>
+    </linearGradient>
     <linearGradient id="dgl-inner-edge" x1="0" y1="0.5" x2="1" y2="0.5">
-      <stop offset="0%"   stop-color="#1A2E50"/>
-      <stop offset="60%"  stop-color="#2A3E68"/>
-      <stop offset="100%" stop-color="#0E1E34"/>
+      <stop offset="0%"   stop-color="#101E38"/>
+      <stop offset="50%"  stop-color="#1E3050"/>
+      <stop offset="100%" stop-color="#080E1C"/>
     </linearGradient>
   </defs>
 
@@ -48,7 +61,10 @@
         fill="url(#dgl-inner-edge)"/>
   <!-- Blue accent edge -->
   <path d="M80,24 L88,30 L92,46 L88,62 L80,68 L84,46 Z"
-        fill="url(#dgl-blue-accent)" opacity="0.90"/>
+        fill="url(#dgl-blue-accent)" opacity="1.0"/>
+  <!-- Blue vertical sweep accent -->
+  <rect x="88" y="2" width="5" height="88" rx="2.5"
+        fill="url(#dgl-blue-sweep)"/>
 
   <!-- X bar 1 -->
   <path d="M94,2 L114,2 L166,90 L146,90 Z"

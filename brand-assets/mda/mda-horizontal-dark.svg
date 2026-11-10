@@ -64,9 +64,4 @@
         fill="#8FA0B4">MASTER DIGITAL AGENCY</text>
   <line x1="286" y1="55" x2="298" y2="55" stroke="#1A6FFF" stroke-width="1.2"/>
 
-  <!-- Tagline -->
-  <text x="102" y="72"
-        class="sg-brand"
-        font-size="8.5" font-weight="300" letter-spacing="0.20em"
-        fill="#546078">GROW SMARTER · SCALE FASTER</text>
 </svg>
