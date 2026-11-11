@@ -2,370 +2,324 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./page.module.css";
-import { PORTFOLIO_ITEMS } from "@/lib/portfolio";
 
 export const metadata: Metadata = {
-  title: "DREXONYX — Performance Creative Studio",
+  title: "DREXONYX GROUP — Digital & Creative Solutions",
   description:
-    "Dubai-based performance creative studio. AI-powered UGC advertising for global brands — creative at scale, built to perform.",
+    "Dubai-based creative group delivering brand, design, and digital solutions for growing businesses worldwide.",
 };
+
+/* ─── Why DREXONYX — preserved for future /about or /why-us page ─────────────
+   UNCOMMENT and render when a dedicated page is created.
+
+const WHY_FEATURES = [
+  {
+    num: "01",
+    title: "UGC That Sells",
+    desc: "Creator-led creative designed around hooks, benefits and conversion.",
+    icon: "bars",
+  },
+  {
+    num: "02",
+    title: "Cinematic When It Matters",
+    desc: "Premium visual storytelling when the product needs more than standard UGC.",
+    icon: "video",
+  },
+  {
+    num: "03",
+    title: "Built for Brands",
+    desc: "Fast production, consistent quality, and creative built around the brief.",
+    icon: "team",
+  },
+];
+
+<section className={styles.why} aria-labelledby="why-heading">
+  <div className="container">
+    <p className={styles.eyebrow}>Why DREXONYX</p>
+    <h2 id="why-heading" className={styles.whyHeading}>
+      AI Speed. Human Creative Direction.
+    </h2>
+    <ul className={styles.whyList}>
+      {WHY_FEATURES.map((f) => (
+        <li key={f.num} className={styles.whyItem}>
+          <span className={styles.whyNum}>{f.num}</span>
+          <strong className={styles.whyTitle}>{f.title}</strong>
+          <p className={styles.whyDesc}>{f.desc}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+─────────────────────────────────────────────────────────────────────────── */
+
+/* ─── Industries — preserved for future /services or /about page ─────────────
+   UNCOMMENT and render when a dedicated page is created.
+
+const INDUSTRIES = ["Startups", "SMEs", "E-commerce", "Hospitality", "Retail", "Enterprise"];
+
+<section className={styles.industries} aria-labelledby="industries-heading">
+  <div className="container">
+    <p className={styles.eyebrow}>Industries</p>
+    <h2 id="industries-heading" className={styles.sectionHeading}>
+      Trusted by Ambitious Brands
+    </h2>
+    <div className={styles.industriesStrip}>
+      {INDUSTRIES.map((industry) => (
+        <div key={industry} className={styles.industryItem}>
+          <span className={styles.industryLabel}>{industry}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+─────────────────────────────────────────────────────────────────────────── */
 
 const SERVICES = [
   {
-    number: "01",
-    title: "UGC Content",
-    desc: "Authentic UGC video creative built for TikTok, Reels, and Meta — hook-first structure designed to convert at scale.",
-    href: "/services",
+    icon: (
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <path d="M15 12L6 20l9 8" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M25 12l9 8-9 8" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M22 8l-4 24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    ),
+    title: "Digital Presence",
+    desc: "Website design and professional landing pages built to perform and convert at scale.",
   },
   {
-    number: "02",
-    title: "Cinematic Commercials",
-    desc: "High-production cinematic brand films and commercials — visually elevated storytelling for global campaign launches.",
-    href: "/services",
+    icon: (
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <rect x="4" y="10" width="22" height="20" rx="2" stroke="currentColor" strokeWidth="1.75" />
+        <path d="M26 16.5l9-5v17l-9-5V16.5Z" stroke="currentColor" strokeWidth="1.75" strokeLinejoin="round" />
+        <circle cx="12" cy="20" r="3" stroke="currentColor" strokeWidth="1.5" />
+      </svg>
+    ),
+    title: "Creative Production",
+    desc: "Video and commercial content production — visual storytelling for your brand identity.",
   },
   {
-    number: "03",
-    title: "Product Films",
-    desc: "Studio-quality product showcase films and hero visuals — precision-crafted to elevate your brand's product presence.",
-    href: "/services",
+    icon: (
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <rect x="8" y="14" width="24" height="18" rx="3" stroke="currentColor" strokeWidth="1.75" />
+        <circle cx="15" cy="23" r="2.5" stroke="currentColor" strokeWidth="1.5" />
+        <circle cx="25" cy="23" r="2.5" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M20 10v4M17 10h6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+        <path d="M4 23h4M36 23h-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    ),
+    title: "Sales Automation",
+    desc: "AI-powered sales agents and CRM management for scalable, automated revenue growth.",
   },
   {
-    number: "04",
-    title: "Social Creative",
-    desc: "Performance-led static and motion creative for feed, story, and display — built to stop the scroll and drive action.",
-    href: "/services",
+    icon: (
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <path d="M20 5L4 13l16 8 16-8-16-8Z" stroke="currentColor" strokeWidth="1.75" strokeLinejoin="round" />
+        <path d="M4 21l16 8 16-8" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M4 29l16 8 16-8" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+    title: "Integrated Solutions",
+    desc: "Digital transformation and tailored solutions for ambitious brands ready to scale.",
   },
 ] as const;
 
-
-const INDUSTRIES = [
-  "Startups",
-  "SMEs",
-  "E-commerce",
-  "Hospitality",
-  "Retail",
-  "Enterprise",
-];
-
-const PROCESS_STEPS = [
-  { num: "01", title: "Campaign Brief", desc: "Submit your objectives, audience, and platform targets." },
-  { num: "02", title: "Creative Strategy", desc: "We develop data-backed direction aligned to your goals." },
-  { num: "03", title: "Production", desc: "AI-assisted pipeline turns concepts into campaign-ready assets." },
-  { num: "04", title: "Quality Control", desc: "Every deliverable reviewed against brand and platform specs." },
-  { num: "05", title: "Delivery", desc: "Platform-ready files on time, revision-supported." },
-];
+const BENEFITS = [
+  {
+    icon: (
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+        <circle cx="18" cy="18" r="13" stroke="currentColor" strokeWidth="1.75" />
+        <circle cx="18" cy="18" r="8" stroke="currentColor" strokeWidth="1.5" />
+        <circle cx="18" cy="18" r="3" fill="currentColor" />
+        <path d="M18 4v3M18 29v3M4 18h3M29 18h3" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+      </svg>
+    ),
+    title: "Digital Market Expertise",
+    desc: "A team combining creativity and technology — rooted in Dubai's global business market.",
+  },
+  {
+    icon: (
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="1.75" />
+        <circle cx="24" cy="12" r="5" stroke="currentColor" strokeWidth="1.75" />
+        <path d="M2 32c0-5.523 4.477-10 10-10h12c5.523 0 10 4.477 10 10" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+      </svg>
+    ),
+    title: "Your Growth Partner",
+    desc: "From concept to full execution — we build strategies that deliver real business results.",
+  },
+  {
+    icon: (
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+        <path d="M18 4L4 10v6c0 8.627 5.985 16.681 14 18.956C26.015 32.681 32 24.627 32 16v-6L18 4Z" stroke="currentColor" strokeWidth="1.75" strokeLinejoin="round" />
+        <path d="M12 18l4 4 8-8" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+    title: "Results-Focused",
+    desc: "Scalable, operational solutions designed to deliver measurable outcomes for your brand.",
+  },
+] as const;
 
 export default function HomePage() {
-  const featured = PORTFOLIO_ITEMS;
-
   return (
-    <>
-      {/* ── Hero: two-panel cinematic composition ─────────────────────── */}
+    <div className={styles.page}>
+
+      {/* ── Hero: Dubai nightscape ────────────────────────────────────── */}
       <section className={styles.hero} aria-labelledby="hero-heading">
-        {/* Left: dark editorial copy panel */}
-        <div className={styles.heroLeft}>
-          <p className={styles.heroEyebrow}>Global Creative Production</p>
-          <h1 id="hero-heading" className={styles.heroWordmark}>
+        <div
+          className={styles.heroBg}
+          style={{ backgroundImage: `url('/images/dubai-night.jpg')` }}
+          aria-hidden="true"
+        />
+        <div className={styles.heroOverlay} aria-hidden="true" />
+        <div className={styles.heroContent}>
+          <p className={styles.heroEyebrow}>
+            <span className={styles.heroEyebrowLine} aria-hidden="true" />
+            DREXONYX GROUP
+          </p>
+          <h1 id="hero-heading" className={styles.heroHeading}>
+            Digital &amp; Creative Solutions<br />for Brand Growth
+          </h1>
+          <p className={styles.heroSub}>
+            Design&ensp;·&ensp;Content Production&ensp;·&ensp;Sales Automation&ensp;·&ensp;Integrated Digital Solutions
+          </p>
+          <div className={styles.heroCtas}>
+            <Link href="/start-project" className={styles.heroBtnPrimary}>
+              Request a Quote →
+            </Link>
+            <Link href="/portfolio" className={styles.heroBtnOutline}>
+              ▶&ensp;View Our Work
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Brand Ecosystem: 2 clickable brand cards ─────────────────── */}
+      <section className={styles.brands} aria-label="DREXONYX Group — Brand Ecosystem">
+        <div className={styles.brandsGrid}>
+          <Link href="/services" className={styles.brandCardLink} aria-label="DX STUDIO — Video, Production, Creative Media">
             <Image
-              src="/brand/drexonyx-hero-wordmark.png"
-              alt="DREXONYX"
-              width={2018}
-              height={206}
-              className={styles.heroWordmarkImg}
+              src="/images/brands-dx-card.png"
+              alt="DX STUDIO — Video, Production, Creative Media"
+              width={836}
+              height={831}
+              className={styles.brandsCardImg}
+              sizes="(max-width: 860px) 100vw, 50vw"
               priority
             />
-          </h1>
-          <div className={styles.heroBody}>
-            <p className={styles.heroTagline}>
-              Powerful Creative Content<br />for Modern Brands
-            </p>
-            <p className={styles.heroSub}>
-              Dubai-based performance creative studio. AI-powered UGC advertising
-              for brands worldwide — creative at scale, built to perform.
-            </p>
-            <div className={styles.heroCtas}>
-              <Link href="/start-project" className={styles.ctaPrimary}>
-                Start Project →
-              </Link>
-              <Link href="/portfolio" className={styles.ctaSecondary}>
-                ▶ Watch Showreel
-              </Link>
-            </div>
-          </div>
-          <p className={styles.heroLocation}>Dubai, UAE · Global</p>
-        </div>
-
-        {/* Right: static background panel */}
-        <div className={styles.heroRight} aria-hidden="true">
-          <Image
-            src="/images/drexonyx-creative-crew-hero.png"
-            alt=""
-            fill
-            className={styles.heroImg}
-            priority
-            sizes="55vw"
-          />
-          <div className={styles.heroRightEdge} />
-          <div className={styles.heroCred}>
-            <span className={styles.heroCredCity}>Dubai</span>
-            <span className={styles.heroCredSub}>A Global Stage<br />for Bolder Ideas</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Group Brands Identity ─────────────────────────────────────── */}
-      <section className={styles.brandIdentity} aria-label="DREXONYX Group Brands">
-        <Image
-          src="/brand/drexonyx-brands-identity.png"
-          alt="DREXONYX GROUP · DX STUDIO · Master Digital Agency"
-          width={1536}
-          height={864}
-          className={styles.brandIdentityImg}
-          priority
-        />
-      </section>
-
-      {/* ── Services: editorial 4-col card grid ───────────────────────── */}
-      <section className={styles.services} aria-labelledby="services-heading">
-        <div className="container">
-          <p className={styles.sectionEyebrow}>Our Services</p>
-          <h2 id="services-heading" className={styles.sectionHeading}>
-            Complete Creative Solutions
-          </h2>
-          <p className={styles.sectionSub}>
-            End-to-end creative production — from cinematic commercials to performance UGC, built to perform globally.
-          </p>
-          <div className={styles.serviceCards}>
-            {SERVICES.map((s) => (
-              <article key={s.number} className={styles.serviceCard}>
-                <span className={styles.serviceCardNum} aria-hidden="true">
-                  {s.number}
-                </span>
-                <div className={styles.serviceCardBody}>
-                  <h3 className={styles.serviceCardTitle}>{s.title}</h3>
-                  <p className={styles.serviceCardDesc}>{s.desc}</p>
-                </div>
-                <Link href={s.href} className={styles.serviceCardLink}>
-                  Learn More →
-                </Link>
-              </article>
-            ))}
-          </div>
-          <div className={styles.servicesCta}>
-            <Link href="/services" className={styles.ctaOutline}>
-              Explore All Services
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Featured Work: cinematic card grid ────────────────────────── */}
-      <section className={styles.featuredWork} aria-labelledby="featured-heading">
-        <div className="container">
-          <p className={styles.sectionEyebrow}>Featured Work</p>
-          <h2 id="featured-heading" className={styles.sectionHeading}>
-            Studio Production Samples
-          </h2>
-          <p className={styles.sectionSub}>
-            Performance-focused creative built across UGC video, static ads, and campaign strategy.
-          </p>
-          {featured.length === 0 ? (
-            <div className={styles.featuredEmpty}>
-              <p>Studio work samples are added as production is completed. Check back soon.</p>
-            </div>
-          ) : (
-            <div className={styles.featuredGrid}>
-              {featured.map((item) => (
-                <article
-                  key={item.id}
-                  className={styles.featuredCard}
-                >
-                  <div className={styles.featuredCardMedia}>
-                    {item.thumbnailSrc && (
-                      <Image
-                        src={item.thumbnailSrc}
-                        alt={item.title}
-                        fill
-                        className={styles.featuredCardImg}
-                        sizes="(max-width: 900px) 100vw, (max-width: 1200px) 65vw, 800px"
-                      />
-                    )}
-                    {item.mediaType === 'video' && item.src && (
-                      <video
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                        preload="none"
-                        className={styles.featuredCardVideo}
-                      >
-                        <source src={item.src} type="video/mp4" />
-                      </video>
-                    )}
-                    <div className={styles.featuredCardOverlay} />
-                    <div className={styles.featuredCardText}>
-                      <p className={styles.featuredCategory}>{item.category}</p>
-                      <p className={styles.featuredTitle}>{item.title}</p>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
-          <div className={styles.featuredCta}>
-            <Link href="/portfolio" className={styles.ctaOutline}>
-              View Full Portfolio
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── How It Works ──────────────────────────────────────────────── */}
-      <section className={styles.process} aria-labelledby="process-heading">
-        <div className="container">
-          <p className={styles.sectionEyebrow}>How It Works</p>
-          <h2 id="process-heading" className={styles.sectionHeading}>
-            From Brief to Delivery
-          </h2>
-          <p className={styles.sectionSub}>
-            A structured, transparent production process designed for performance marketers who move fast.
-          </p>
-          <div className={styles.processSteps}>
-            {PROCESS_STEPS.map((step) => (
-              <div key={step.num} className={styles.processStep}>
-                <span className={styles.processNum}>{step.num}</span>
-                <p className={styles.processTitle}>{step.title}</p>
-                <p className={styles.processDesc}>{step.desc}</p>
-              </div>
-            ))}
-          </div>
-          <Link href="/how-it-works" className={styles.ctaOutline}>
-            See Full Process
+          </Link>
+          <Link href="/mda" className={styles.brandCardLink} aria-label="MDA — Master Digital Agency">
+            <Image
+              src="/images/brands-mda-card.png"
+              alt="MDA — Master Digital Agency"
+              width={836}
+              height={831}
+              className={styles.brandsCardImg}
+              sizes="(max-width: 860px) 100vw, 50vw"
+              priority
+            />
           </Link>
         </div>
       </section>
 
-      {/* ── Why DREXONYX ──────────────────────────────────────────────── */}
-      <section className={styles.why} aria-labelledby="why-heading">
-        <div className={styles.whyBg} aria-hidden="true">
-          <Image
-            src="/images/drexonyx-hero-final.webp"
-            alt=""
-            fill
-            className={styles.whyImg}
-            sizes="100vw"
-          />
-          <div className={styles.whyOverlay} />
-        </div>
-        <div className="container">
-          <div className={styles.whyContent}>
-            <div className={styles.whyEyebrowRow}>
-              <p className={styles.sectionEyebrow}>Why DREXONYX</p>
-              <div className={styles.whyEyebrowLine} aria-hidden="true" />
+      {/* ── Services: light section, 4-col with dividers ─────────────── */}
+      <section className={styles.services} aria-labelledby="services-heading">
+        <div className={styles.svcInner}>
+          <div className={styles.svcHeader}>
+            <div className={styles.sectionTitleWrapDark}>
+              <span className={styles.titleDecLineDark} aria-hidden="true" />
+              <h2 id="services-heading" className={styles.svcHeading}>Our Featured Services</h2>
+              <span className={styles.titleDecLineDark} aria-hidden="true" />
             </div>
-            <h2 id="why-heading" className={styles.whyHeading}>
-              AI Speed.<br />
-              <span className={styles.whyHeadingAccent}>Human Creative<br />Direction.</span>
-            </h2>
-            <p className={styles.whyBody}>
-              AI-assisted production built for UGC that looks intentional — not generated.
-            </p>
-            <ul className={styles.whyFeatures}>
-              <li className={styles.whyFeature}>
-                <div className={styles.whyFeatureIcon} aria-hidden="true">
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <rect x="2" y="10" width="3.5" height="8" rx="0.5" stroke="currentColor" strokeWidth="1.5" />
-                    <rect x="8.25" y="6" width="3.5" height="12" rx="0.5" stroke="currentColor" strokeWidth="1.5" />
-                    <rect x="14.5" y="2" width="3.5" height="16" rx="0.5" stroke="currentColor" strokeWidth="1.5" />
-                  </svg>
-                </div>
-                <div className={styles.whyFeatureContent}>
-                  <span className={styles.whyFeatureNum}>01</span>
-                  <p className={styles.whyFeatureTitle}>UGC That Sells</p>
-                  <p className={styles.whyFeatureDesc}>Creator-led creative designed around hooks, benefits and conversion.</p>
-                </div>
-              </li>
-              <li className={styles.whyFeature}>
-                <div className={styles.whyFeatureIcon} aria-hidden="true">
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <rect x="1.5" y="5.5" width="11" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.5" />
-                    <path d="M12.5 8.5L18 6v8l-5.5-2.5V8.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-                  </svg>
-                </div>
-                <div className={styles.whyFeatureContent}>
-                  <span className={styles.whyFeatureNum}>02</span>
-                  <p className={styles.whyFeatureTitle}>Cinematic When It Matters</p>
-                  <p className={styles.whyFeatureDesc}>Premium visual storytelling when the product needs more than standard UGC.</p>
-                </div>
-              </li>
-              <li className={styles.whyFeature}>
-                <div className={styles.whyFeatureIcon} aria-hidden="true">
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <circle cx="7" cy="7" r="2.75" stroke="currentColor" strokeWidth="1.5" />
-                    <circle cx="13" cy="7" r="2.75" stroke="currentColor" strokeWidth="1.5" />
-                    <path d="M1 17c0-3.314 2.686-5.5 6-5.5h.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                    <path d="M19 17c0-3.314-2.686-5.5-6-5.5H8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                  </svg>
-                </div>
-                <div className={styles.whyFeatureContent}>
-                  <span className={styles.whyFeatureNum}>03</span>
-                  <p className={styles.whyFeatureTitle}>Built for Brands</p>
-                  <p className={styles.whyFeatureDesc}>Fast production, consistent quality, and creative built around the brief.</p>
-                </div>
-              </li>
-            </ul>
-            <Link href="/start-project" className={styles.whyCta}>
-              Start Your Project →
-            </Link>
           </div>
-        </div>
-      </section>
-
-      {/* ── Industries ────────────────────────────────────────────────── */}
-      <section className={styles.industries} aria-labelledby="industries-heading">
-        <div className="container">
-          <p className={styles.sectionEyebrow}>Industries</p>
-          <h2 id="industries-heading" className={styles.sectionHeading}>
-            Trusted by Ambitious Brands
-          </h2>
-          <div className={styles.industriesStrip}>
-            {INDUSTRIES.map((industry) => (
-              <div key={industry} className={styles.industryItem}>
-                <span className={styles.industryLabel}>{industry}</span>
-              </div>
+          <div className={styles.svcGrid}>
+            {SERVICES.map((s, i) => (
+              <article key={s.title} className={styles.svcCard}>
+                {i > 0 && <span className={styles.svcDivider} aria-hidden="true" />}
+                <div className={styles.svcCardInner}>
+                  <div className={styles.svcIcon}>{s.icon}</div>
+                  <h3 className={styles.svcTitle}>{s.title}</h3>
+                  <p className={styles.svcDesc}>{s.desc}</p>
+                  <Link href="/services" className={styles.svcLink}>
+                    Learn More →
+                  </Link>
+                </div>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── CTA band: cinematic editorial ────────────────────────────── */}
-      <section className={styles.ctaBand} aria-labelledby="cta-band-heading">
-        <div className={styles.ctaBandBg} aria-hidden="true">
-          <Image
-            src="/images/drexonyx-creative-crew-hero.png"
-            alt=""
-            fill
-            className={styles.ctaBandBgImg}
-            sizes="100vw"
-          />
-          <div className={styles.ctaBandOverlay} />
-        </div>
-        <div className="container">
-          <div className={styles.ctaBandContent}>
-            <p className={styles.ctaBandEyebrow}>Ready to Create Something Extraordinary?</p>
-            <h2 id="cta-band-heading" className={styles.ctaBandHeading}>
-              Let&apos;s Bring Your<br />Vision to Life.
-            </h2>
-            <p className={styles.ctaBandSub}>
-              Dubai-based. Globally active. Tell us about your brand and we&apos;ll
-              bring your vision to the world.
-            </p>
-            <Link href="/start-project" className={styles.ctaPrimaryLarge}>
-              Start Project →
-            </Link>
-          </div>
+      {/* ── Benefits Strip: dark band, 3 items ──────────────────────── */}
+      <section className={styles.benefits} aria-label="Why choose DREXONYX Group">
+        <div className={styles.benefitsInner}>
+          {BENEFITS.map((b, i) => (
+            <div key={b.title} className={styles.benefitItem}>
+              {i > 0 && <span className={styles.benefitDivider} aria-hidden="true" />}
+              <div className={styles.benefitContent}>
+                <div className={styles.benefitIcon}>{b.icon}</div>
+                <div className={styles.benefitText}>
+                  <p className={styles.benefitTitle}>{b.title}</p>
+                  <p className={styles.benefitDesc}>{b.desc}</p>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
-    </>
+
+      {/* ── Contact: desk scene + copy ───────────────────────────────── */}
+      <section className={styles.contact} aria-labelledby="contact-heading">
+        {/* Left: desk workspace with DREXONYX GROUP branded mug */}
+        <div className={styles.contactLeft} aria-hidden="true">
+          <div
+            className={styles.contactBg}
+            style={{ backgroundImage: `url('/images/desk-dubai.jpg')` }}
+          />
+          <div className={styles.contactBgOverlay} />
+        </div>
+
+        {/* Right: contact CTA */}
+        <div className={styles.contactRight}>
+          <h2 id="contact-heading" className={styles.contactHeading}>
+            Let&apos;s Talk About<br />Your Project
+          </h2>
+          <p className={styles.contactBody}>
+            Tell us your idea and we&apos;ll propose the best solution —
+            from strategy to delivery, we build creative systems that perform.
+          </p>
+          <Link href="/start-project" className={styles.contactCta}>
+            Contact Us →
+          </Link>
+        </div>
+      </section>
+
+      {/* ── Homepage Footer ──────────────────────────────────────────── */}
+      <footer className={styles.hpFooter} aria-label="Site footer">
+        <div className={styles.hpFooterInner}>
+          <Image
+            src="/brand/logos/drexonyx-header-logo.png"
+            alt="DREXONYX GROUP"
+            width={430}
+            height={95}
+            className={styles.hpFooterLogo}
+          />
+          <p className={styles.hpFooterTagline}>
+            Digital &amp; Creative Solutions for Growing Brands
+          </p>
+          <nav className={styles.hpFooterNav} aria-label="Footer navigation">
+            <Link href="/about" className={styles.hpFooterLink}>About</Link>
+            <Link href="/services" className={styles.hpFooterLink}>Services</Link>
+            <Link href="/portfolio" className={styles.hpFooterLink}>Portfolio</Link>
+            <Link href="/start-project" className={styles.hpFooterLink}>Contact</Link>
+          </nav>
+          <p className={styles.hpFooterCopy}>
+            © {new Date().getFullYear()} DREXONYX GROUP. All rights reserved.
+          </p>
+        </div>
+      </footer>
+
+    </div>
   );
 }

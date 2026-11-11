@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import HomepageHeader from "@/components/HomepageHeader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -65,6 +66,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const h = await headers();
   const pathname = h.get('x-pathname') ?? '';
   const isChat = pathname.startsWith('/chat/') || pathname.startsWith('/social-seller');
+  const isHomepage = pathname === '/';
 
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${bebasNeue.variable}`}>
@@ -74,7 +76,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             Skip to main content
           </a>
         )}
-        {!isChat && <Navigation />}
+        {!isChat && !isHomepage && <Navigation />}
+        {!isChat && isHomepage && <HomepageHeader />}
         {isChat ? (
           children
         ) : (
@@ -82,7 +85,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             {children}
           </main>
         )}
-        {!isChat && <Footer />}
+        {!isChat && !isHomepage && <Footer />}
         <Analytics />
       </body>
     </html>
