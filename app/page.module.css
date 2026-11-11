@@ -155,6 +155,7 @@
 .brandCardLink {
   display: block;
   line-height: 0;
+  overflow: hidden;
   transition: opacity 0.2s;
 }
 

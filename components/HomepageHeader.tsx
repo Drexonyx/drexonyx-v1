@@ -7,7 +7,6 @@ import styles from "./HomepageHeader.module.css";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
-  { href: "/about", label: "About Us" },
   { href: "/services", label: "Services" },
   { href: "/portfolio", label: "Our Work" },
   { href: "/start-project", label: "Contact" },
@@ -73,13 +72,6 @@ export default function HomepageHeader() {
                 {l.label}
               </Link>
             ))}
-            <Link
-              href="/start-project"
-              className={styles.drawerCta}
-              onClick={() => setOpen(false)}
-            >
-              Request a Quote
-            </Link>
           </nav>
         </div>
       )}

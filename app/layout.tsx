@@ -3,7 +3,6 @@ import { Geist, Geist_Mono, Bebas_Neue } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { headers } from "next/headers";
 import "./globals.css";
-import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import HomepageHeader from "@/components/HomepageHeader";
 
@@ -66,26 +65,29 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const h = await headers();
   const pathname = h.get('x-pathname') ?? '';
   const isChat = pathname.startsWith('/chat/') || pathname.startsWith('/social-seller');
+  const isPortal = pathname.startsWith('/portal');
+  const isAdmin = pathname.startsWith('/admin');
   const isHomepage = pathname === '/';
+  const isMda = pathname === '/mda';
+  const isPublicSite = !isChat && !isPortal && !isAdmin;
 
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${bebasNeue.variable}`}>
       <body>
-        {!isChat && (
+        {isPublicSite && (
           <a href="#main-content" className="skip-link">
             Skip to main content
           </a>
         )}
-        {!isChat && !isHomepage && <Navigation />}
-        {!isChat && isHomepage && <HomepageHeader />}
+        {isPublicSite && <HomepageHeader />}
         {isChat ? (
           children
         ) : (
-          <main id="main-content" tabIndex={-1}>
+          <main id="main-content" tabIndex={-1} style={isPublicSite && !isHomepage ? { paddingTop: '88px' } : undefined}>
             {children}
           </main>
         )}
-        {!isChat && !isHomepage && <Footer />}
+        {isPublicSite && !isHomepage && !isMda && <Footer />}
         <Analytics />
       </body>
     </html>

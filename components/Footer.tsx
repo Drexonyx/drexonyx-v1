@@ -93,20 +93,20 @@ export default function Footer() {
         <div className={styles.brandStripInner}>
           <div className={styles.brandStripLogo}>
             <Image
-              src="/brand/drexonyx-dx-full-logo.png"
-              alt="DREXONYX — Creative Digital Technology"
-              width={1752}
-              height={886}
+              src="/brand/logos/drexonyx-group-logo.png"
+              alt="DREXONYX GROUP"
+              width={1536}
+              height={1024}
               className={styles.brandStripDxLogo}
             />
           </div>
           <div className={styles.brandStripDivider} aria-hidden="true" />
           <div className={styles.brandStripLogo}>
             <Image
-              src="/brand/mda-full-logo.png"
+              src="/brand/logos/mda-logo.png"
               alt="MDA — Master Digital Agency, a DREXONYX Brand"
-              width={1820}
-              height={864}
+              width={1536}
+              height={1024}
               className={styles.brandStripMdaLogo}
             />
           </div>
