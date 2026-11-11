@@ -832,6 +832,7 @@
     height: 100%;
     object-fit: cover;
     object-position: center 56%;
+    transform: scale(1.12);
   }
   .brandCard {
     min-height: auto;
@@ -884,8 +885,11 @@
 }
 
 @media (max-width: 600px) {
+  .hero {
+    align-items: flex-start;
+  }
   .heroContent {
-    padding: 140px 20px 80px;
+    padding: 80px 20px 60px;
   }
   .heroBreakMobile {
     display: block;
@@ -900,7 +904,7 @@
   }
   .heroBtnPrimary,
   .heroBtnOutline {
-    width: 100%;
+    width: 100%;  
     justify-content: center;
   }
   .brandsInner {
