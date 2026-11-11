@@ -142,6 +142,7 @@
 .brands {
   background: #050915;
   display: block;
+  overflow: hidden;
 }
 
 .brandsGrid {
@@ -238,6 +239,13 @@
   position: relative;
   z-index: 1;
   padding-bottom: 60px;
+}
+
+@media (max-width: 860px) {
+  .brandsGrid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
 }
 
 /* Floor reflection under each card */
