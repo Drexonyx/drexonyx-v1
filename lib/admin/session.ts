@@ -11,6 +11,16 @@ import { createHmac, timingSafeEqual, randomBytes } from 'crypto';
 import type { AdminSession, AdminRole } from './types';
 import { ADMIN_ROLES } from './types';
 
+// Startup check: fires once at module load (cold start). Warns when falling back to
+// AUTH_SECRET, which means admin sessions share a signing key with NextAuth sessions.
+if (!process.env.ADMIN_SESSION_SECRET) {
+  console.warn(
+    '[admin/session] ADMIN_SESSION_SECRET is not set — ' +
+    'falling back to AUTH_SECRET. Admin sessions share a signing key with NextAuth sessions. ' +
+    'Set ADMIN_SESSION_SECRET (production only) in Vercel to isolate them.'
+  );
+}
+
 const COOKIE_NAME = 'admin_session';
 const SESSION_DURATION_SEC = 8 * 60 * 60; // 8 hours
 

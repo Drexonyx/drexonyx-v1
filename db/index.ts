@@ -33,6 +33,16 @@ function getDb() {
     if (!connectionString) {
       throw new Error('DATABASE_URL environment variable is not set');
     }
+    // Guard: Vercel preview deployments must declare PREVIEW_DB_ISOLATED=true alongside
+    // a branch-specific DATABASE_URL that points to an isolated Neon branch. Without this,
+    // a preview deployment may silently connect to the production database.
+    if (process.env.VERCEL_ENV === 'preview' && process.env.PREVIEW_DB_ISOLATED !== 'true') {
+      throw new Error(
+        'Preview database isolation check failed: PREVIEW_DB_ISOLATED is not set to "true". ' +
+        'Set PREVIEW_DB_ISOLATED=true in Vercel alongside an isolated branch DATABASE_URL ' +
+        'for this preview branch. Do not point a preview deployment at the production database.'
+      );
+    }
     // prepare: false — required for Neon's connection pooler (PgBouncer in transaction mode
     // does not support named prepared statements). Safe for direct connections too.
     const client = postgres(connectionString, { prepare: false });
