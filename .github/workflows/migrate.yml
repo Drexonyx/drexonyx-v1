@@ -1,10 +1,19 @@
 name: Database Migration
 
+# WARNING: The Drizzle migration journal (db/migrations/meta/_journal.json) only covers
+# migrations 0000–0008. 28 SQL files exist on disk (0000–0027). Running drizzle-kit migrate
+# against a database that has already applied 0009–0027 outside the journal will produce
+# unpredictable results. Verify the journal and migration state in Neon before triggering.
+
 on:
   workflow_dispatch:
     inputs:
       confirm:
         description: 'Type MIGRATE to confirm execution against the production database'
+        required: true
+        type: string
+      journal_verified:
+        description: 'WARNING: journal only covers 0000–0008 but 28 SQL files exist. Type JOURNAL_OK to confirm you have verified migration state in Neon first.'
         required: true
         type: string
 
@@ -13,9 +22,9 @@ permissions:
 
 jobs:
   migrate:
-    name: Apply Drizzle migrations (0000–0006)
+    name: Apply Drizzle Migrations
     runs-on: ubuntu-latest
-    if: github.event.inputs.confirm == 'MIGRATE'
+    if: github.event.inputs.confirm == 'MIGRATE' && github.event.inputs.journal_verified == 'JOURNAL_OK'
 
     steps:
       - name: Checkout repository

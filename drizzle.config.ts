@@ -7,6 +7,7 @@ export default defineConfig({
   dbCredentials: {
     url: process.env.DATABASE_URL!,
   },
+  // orchestration schema is excluded: it is managed by a separate migration path and must not be touched by drizzle-kit
   schemaFilter: ['core', 'identity', 'commercial', 'production', 'financial', 'system', 'sales', 'ssb'],
   verbose: true,
   strict: true,

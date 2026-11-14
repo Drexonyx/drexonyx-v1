@@ -8,6 +8,8 @@ on:
 jobs:
   poll:
     runs-on: ubuntu-latest
+    # Disabled: duplicates the daily Vercel cron in vercel.json; this ran 288×/day unnecessarily
+    if: false
     steps:
       - name: Poll generations endpoint
         run: |
