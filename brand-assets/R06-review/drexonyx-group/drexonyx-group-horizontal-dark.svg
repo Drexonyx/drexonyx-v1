@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  R06 — DREXONYX GROUP — Horizontal Lockup (Dark Variant)
+  Faithfully extracted from approved Concept D reference image.
+  Chrome: high-contrast gradient approximation. No vertical sweep rect.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 92" fill="none" role="img"
+     aria-label="DREXONYX GROUP horizontal logo lockup — dark">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&amp;display=swap');
+      .sg-brand { font-family: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif; }
+    </style>
+    <linearGradient id="r6dgdh-chrome" x1="0.08" y1="0" x2="0.92" y2="1">
+      <stop offset="0%"   stop-color="#060C18"/>
+      <stop offset="10%"  stop-color="#182840"/>
+      <stop offset="26%"  stop-color="#3858A0"/>
+      <stop offset="40%"  stop-color="#8CAED0"/>
+      <stop offset="48%"  stop-color="#E0F0FF"/>
+      <stop offset="51%"  stop-color="#F8FEFF"/>
+      <stop offset="56%"  stop-color="#C8DCF0"/>
+      <stop offset="70%"  stop-color="#304870"/>
+      <stop offset="86%"  stop-color="#101828"/>
+      <stop offset="100%" stop-color="#030810"/>
+    </linearGradient>
+    <linearGradient id="r6dgdh-chrome-x" x1="0.92" y1="0" x2="0.08" y2="1">
+      <stop offset="0%"   stop-color="#040A14"/>
+      <stop offset="10%"  stop-color="#162238"/>
+      <stop offset="26%"  stop-color="#3060A8"/>
+      <stop offset="40%"  stop-color="#8AB0D4"/>
+      <stop offset="48%"  stop-color="#DCF0FF"/>
+      <stop offset="51%"  stop-color="#F4FCFF"/>
+      <stop offset="56%"  stop-color="#C0D8EE"/>
+      <stop offset="70%"  stop-color="#2C4468"/>
+      <stop offset="86%"  stop-color="#0E1826"/>
+      <stop offset="100%" stop-color="#030810"/>
+    </linearGradient>
+    <linearGradient id="r6dgdh-blue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#00E0FF"/>
+      <stop offset="35%"  stop-color="#1A6FFF"/>
+      <stop offset="100%" stop-color="#0030CC"/>
+    </linearGradient>
+    <linearGradient id="r6dgdh-bow" x1="0" y1="0.5" x2="1" y2="0.5">
+      <stop offset="0%"   stop-color="#1A2C50"/>
+      <stop offset="45%"  stop-color="#304868"/>
+      <stop offset="100%" stop-color="#0C1828"/>
+    </linearGradient>
+    <linearGradient id="r6dgdh-text" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#E8F4FF"/>
+      <stop offset="100%" stop-color="#A8C0D8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- DX mark — R06 gradients -->
+  <g transform="translate(0,2.5) scale(0.941)">
+    <path d="M4,2 L50,2 L68,10 L80,24 L84,46 L80,68 L68,82 L50,90 L4,90 Z"
+          fill="url(#r6dgdh-chrome)"/>
+    <path d="M18,16 L50,16 L62,24 L68,38 L70,46 L68,54 L62,68 L50,76 L18,76 Z"
+          fill="#07091C"/>
+    <path d="M62,24 L68,10 L80,24 L84,46 L80,68 L68,82 L62,68 L68,54 L70,46 L68,38 Z"
+          fill="url(#r6dgdh-bow)"/>
+    <path d="M80,24 L88,30 L92,46 L88,62 L80,68 L84,46 Z"
+          fill="url(#r6dgdh-blue)"/>
+    <path d="M94,2 L114,2 L166,90 L146,90 Z"  fill="url(#r6dgdh-chrome)"/>
+    <path d="M146,2 L166,2 L114,90 L94,90 Z"  fill="url(#r6dgdh-chrome-x)"/>
+    <path d="M114,2 L130,46 L114,90 L94,90 L126,46 L94,2 Z" fill="#F0F8FF" opacity="0.05"/>
+  </g>
+
+  <!-- Divider -->
+  <line x1="176" y1="12" x2="176" y2="80" stroke="#1A6FFF" stroke-width="1" opacity="0.35"/>
+
+  <!-- DREXONYX wordmark -->
+  <text x="188" y="44" class="sg-brand"
+        font-size="26" font-weight="700" letter-spacing="0.04em"
+        fill="url(#r6dgdh-text)">DREXONYX</text>
+
+  <!-- GROUP sub-label with dash accents -->
+  <line x1="188" y1="55" x2="200" y2="55" stroke="#1A6FFF" stroke-width="1.2"/>
+  <text x="204" y="58" class="sg-brand"
+        font-size="11" font-weight="600" letter-spacing="0.18em"
+        fill="#8FA0B4">GROUP</text>
+  <line x1="253" y1="55" x2="265" y2="55" stroke="#1A6FFF" stroke-width="1.2"/>
+
+  <!-- Tagline -->
+  <text x="188" y="72" class="sg-brand"
+        font-size="8.5" font-weight="300" letter-spacing="0.20em"
+        fill="#546078">DIGITAL BUSINESS ECOSYSTEM</text>
+</svg>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  R06 — DREXONYX GROUP — DX Monogram Mark (Light Variant)
+  Faithfully extracted from approved Concept D reference image.
+  Chrome: high-contrast gradient adapted for light/white backgrounds.
+  Counter fill changed to near-white to remain visible on white.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 92" fill="none" role="img"
+     aria-label="DREXONYX GROUP DX monogram mark — light">
+  <defs>
+    <!-- Chrome: same diagonal banding, slightly adjusted for visibility on white -->
+    <linearGradient id="r6dgl-chrome" x1="0.08" y1="0" x2="0.92" y2="1">
+      <stop offset="0%"   stop-color="#060C18"/>
+      <stop offset="10%"  stop-color="#182840"/>
+      <stop offset="26%"  stop-color="#3858A0"/>
+      <stop offset="40%"  stop-color="#8CAED0"/>
+      <stop offset="48%"  stop-color="#C8E0F4"/>
+      <stop offset="51%"  stop-color="#E0EEFB"/>
+      <stop offset="56%"  stop-color="#A0C0DC"/>
+      <stop offset="70%"  stop-color="#304870"/>
+      <stop offset="86%"  stop-color="#101828"/>
+      <stop offset="100%" stop-color="#030810"/>
+    </linearGradient>
+    <linearGradient id="r6dgl-chrome-x" x1="0.92" y1="0" x2="0.08" y2="1">
+      <stop offset="0%"   stop-color="#040A14"/>
+      <stop offset="10%"  stop-color="#162238"/>
+      <stop offset="26%"  stop-color="#3060A8"/>
+      <stop offset="40%"  stop-color="#8AB0D4"/>
+      <stop offset="48%"  stop-color="#C4DCEE"/>
+      <stop offset="51%"  stop-color="#DCECf8"/>
+      <stop offset="56%"  stop-color="#98B8CE"/>
+      <stop offset="70%"  stop-color="#2C4468"/>
+      <stop offset="86%"  stop-color="#0E1826"/>
+      <stop offset="100%" stop-color="#030810"/>
+    </linearGradient>
+    <!-- Blue accent: same as dark variant -->
+    <linearGradient id="r6dgl-blue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#00C8F0"/>
+      <stop offset="35%"  stop-color="#1060EE"/>
+      <stop offset="100%" stop-color="#0028B8"/>
+    </linearGradient>
+    <!-- D bow wall: dark on light background -->
+    <linearGradient id="r6dgl-bow" x1="0" y1="0.5" x2="1" y2="0.5">
+      <stop offset="0%"   stop-color="#1A2C50"/>
+      <stop offset="45%"  stop-color="#304868"/>
+      <stop offset="100%" stop-color="#0C1828"/>
+    </linearGradient>
+  </defs>
+
+  <!-- D outer: left stem + angular faceted bow -->
+  <path d="M4,2 L50,2 L68,10 L80,24 L84,46 L80,68 L68,82 L50,90 L4,90 Z"
+        fill="url(#r6dgl-chrome)"/>
+  <!-- D counter: light fill for white backgrounds -->
+  <path d="M18,16 L50,16 L62,24 L68,38 L70,46 L68,54 L62,68 L50,76 L18,76 Z"
+        fill="#EEF3FF"/>
+  <!-- D bow wall: thin chrome strip -->
+  <path d="M62,24 L68,10 L80,24 L84,46 L80,68 L68,82 L62,68 L68,54 L70,46 L68,38 Z"
+        fill="url(#r6dgl-bow)"/>
+  <!-- Blue accent: rightmost face of D -->
+  <path d="M80,24 L88,30 L92,46 L88,62 L80,68 L84,46 Z"
+        fill="url(#r6dgl-blue)"/>
+
+  <!-- X bar 1: \ diagonal -->
+  <path d="M94,2 L114,2 L166,90 L146,90 Z"
+        fill="url(#r6dgl-chrome)"/>
+  <!-- X bar 2: / diagonal -->
+  <path d="M146,2 L166,2 L114,90 L94,90 Z"
+        fill="url(#r6dgl-chrome-x)"/>
+  <!-- X center junction: subtle brightening where bars overlap -->
+  <path d="M114,2 L130,46 L114,90 L94,90 L126,46 L94,2 Z"
+        fill="#F0F8FF" opacity="0.04"/>
+</svg>
