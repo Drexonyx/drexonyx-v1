@@ -1,10 +1,17 @@
 name: Database Migration
 
-# The Drizzle migration journal (db/migrations/meta/_journal.json) only covers
-# migrations 0000–0008. 29 SQL files exist on disk (0000–0027 plus
-# 0008_orchestration_schema.sql applied outside drizzle-kit). The journal
-# integrity check step below will FAIL and block migration until the journal
-# is repaired to account for all SQL files.
+# The Drizzle migration journal (db/migrations/meta/_journal.json) covers
+# migrations 0000–0008 (9 entries). 29 SQL files exist on disk:
+# - 9 drizzle-managed files in the journal (0000–0008 with generated names)
+# - 14 orchestration-managed files excluded from drizzle-kit (listed in
+#   db/migrations/meta/external_migrations.txt; only touch 'orchestration' schema)
+# - 6 drizzle-managed files WITHOUT journal entries yet:
+#     0021_self_service_checkout_fixes, 0022_credit_system,
+#     0023_credit_packages_v2, 0024_production_credit_events,
+#     0026_email_optouts, 0027_ssb
+#
+# The integrity check below excludes orchestration files and FAILS until
+# journal entries are added for the 6 drizzle-managed orphan migrations.
 
 on:
   workflow_dispatch:
@@ -41,25 +48,47 @@ jobs:
       - name: Verify journal integrity
         run: |
           set -e
-          JOURNAL_COUNT=$(jq '.entries | length' db/migrations/meta/_journal.json)
-          SQL_COUNT=$(ls db/migrations/*.sql 2>/dev/null | wc -l | tr -d ' ')
-          echo "Journal entries: $JOURNAL_COUNT"
-          echo "SQL files on disk: $SQL_COUNT"
-          if [ "$JOURNAL_COUNT" -ne "$SQL_COUNT" ]; then
-            echo ""
-            echo "ERROR: Journal has $JOURNAL_COUNT entries but $SQL_COUNT SQL files exist."
-            echo "SQL files not referenced in the journal:"
-            for f in db/migrations/*.sql; do
-              tag=$(basename "$f" .sql)
-              if ! jq -e --arg tag "$tag" '.entries[] | select(.tag == $tag)' \
-                   db/migrations/meta/_journal.json > /dev/null 2>&1; then
-                echo "  - $tag"
-              fi
-            done
-            echo ""
-            echo "BLOCKED: Repair the journal before running migrations."
+          EXTERNAL_FILE="db/migrations/meta/external_migrations.txt"
+          if [ ! -f "$EXTERNAL_FILE" ]; then
+            echo "ERROR: $EXTERNAL_FILE not found"
             exit 1
           fi
+
+          JOURNAL_COUNT=$(jq '.entries | length' db/migrations/meta/_journal.json)
+          echo "Journal entries: $JOURNAL_COUNT"
+
+          ORPHAN_FILES=()
+          DRIZZLE_SQL_COUNT=0
+          for f in db/migrations/*.sql; do
+            basename_f=$(basename "$f")
+            # Skip files managed outside drizzle-kit (orchestration schema only)
+            if grep -qxF "$basename_f" "$EXTERNAL_FILE"; then
+              continue
+            fi
+            DRIZZLE_SQL_COUNT=$((DRIZZLE_SQL_COUNT + 1))
+            tag=$(basename "$f" .sql)
+            if ! jq -e --arg tag "$tag" '.entries[] | select(.tag == $tag)' \
+                 db/migrations/meta/_journal.json > /dev/null 2>&1; then
+              ORPHAN_FILES+=("$tag")
+            fi
+          done
+
+          echo "Drizzle-managed SQL files (excluding orchestration): $DRIZZLE_SQL_COUNT"
+
+          if [ "${#ORPHAN_FILES[@]}" -gt 0 ]; then
+            echo ""
+            echo "ERROR: $DRIZZLE_SQL_COUNT drizzle-managed SQL files found, $JOURNAL_COUNT in journal."
+            echo "These SQL files have no journal entry:"
+            for tag in "${ORPHAN_FILES[@]}"; do
+              echo "  - $tag"
+            done
+            echo ""
+            echo "BLOCKED: Add journal entries for the above migrations before running db:migrate."
+            echo "Run: SELECT tag FROM drizzle.__drizzle_migrations ORDER BY applied_at"
+            echo "to verify which are already applied in the database before adding entries."
+            exit 1
+          fi
+
           echo "Journal integrity check PASSED."
 
       - name: Run Drizzle migrations

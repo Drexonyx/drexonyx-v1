@@ -1,0 +1,19 @@
+# Orchestration-managed migrations — NOT tracked by drizzle-kit.
+# These files modify the 'orchestration' schema which is excluded from
+# drizzle.config.ts schemaFilter. They are applied separately and should
+# never appear as missing journal entries in the drizzle integrity check.
+# Any file added here must ONLY touch the 'orchestration' schema.
+0008_orchestration_schema.sql
+0009_orchestration_phase2.sql
+0010_production_qc_agents.sql
+0011_finance_agent.sql
+0012_reporting_agent.sql
+0013_analytics_agent.sql
+0014_communication_agent.sql
+0015_lead_hunter_agent.sql
+0016_website_production_agent.sql
+0017_drexonyx_website_agent.sql
+0018_facebook_marketing_agent.sql
+0019_whatsapp_foundation.sql
+0020_whatsapp_idempotency.sql
+0025_sales_agent_intents.sql
