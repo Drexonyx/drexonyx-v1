@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Bebas_Neue } from "next/font/google";
+import { Geist, Geist_Mono, Bebas_Neue, Cairo, Space_Grotesk } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { headers } from "next/headers";
 import "./globals.css";
 import Footer from "@/components/Footer";
 import HomepageHeader from "@/components/HomepageHeader";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,6 +23,16 @@ const bebasNeue = Bebas_Neue({
   variable: "--font-bebas",
 });
 
+const cairo = Cairo({
+  subsets: ["arabic", "latin"],
+  variable: "--font-cairo",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.drexonyx.com"),
   title: {
@@ -33,14 +44,14 @@ export const metadata: Metadata = {
   keywords: ["UGC advertising", "performance creative", "AI advertising", "brand campaigns", "Dubai", "UAE", "UGC studio"],
   icons: {
     icon: [
-      { url: "/brand/icon-16.png", sizes: "16x16", type: "image/png" },
-      { url: "/brand/icon-32.png", sizes: "32x32", type: "image/png" },
-      { url: "/brand/icon-96.png", sizes: "96x96", type: "image/png" },
-      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+      { url: "/brand/r06/drexonyx-group-mark-dark-32px.png", sizes: "32x32", type: "image/png" },
+      { url: "/brand/r06/drexonyx-group-mark-dark-64px.png", sizes: "64x64", type: "image/png" },
+      { url: "/brand/r06/drexonyx-group-mark-dark-128px.png", sizes: "128x128", type: "image/png" },
+      { url: "/brand/r06/drexonyx-group-mark-dark-256px.png", sizes: "256x256", type: "image/png" },
+      { url: "/brand/r06/drexonyx-group-mark-dark-512px.png", sizes: "512x512", type: "image/png" },
     ],
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
-    shortcut: "/brand/icon-32.png",
+    apple: [{ url: "/brand/r06/drexonyx-group-apple-touch-icon-180px.png", sizes: "180x180", type: "image/png" }],
+    shortcut: "/brand/r06/drexonyx-group-mark-dark-32px.png",
   },
   manifest: "/manifest.json",
   openGraph: {
@@ -72,23 +83,25 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const isPublicSite = !isChat && !isPortal && !isAdmin;
 
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${bebasNeue.variable}`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${bebasNeue.variable} ${cairo.variable} ${spaceGrotesk.variable}`}>
       <body>
-        {isPublicSite && (
-          <a href="#main-content" className="skip-link">
-            Skip to main content
-          </a>
-        )}
-        {isPublicSite && <HomepageHeader />}
-        {isChat ? (
-          children
-        ) : (
-          <main id="main-content" tabIndex={-1} style={isPublicSite && !isHomepage ? { paddingTop: '88px' } : undefined}>
-            {children}
-          </main>
-        )}
-        {isPublicSite && !isHomepage && !isMda && <Footer />}
-        <Analytics />
+        <LanguageProvider>
+          {isPublicSite && (
+            <a href="#main-content" className="skip-link">
+              Skip to main content
+            </a>
+          )}
+          {isPublicSite && <HomepageHeader />}
+          {isChat ? (
+            children
+          ) : (
+            <main id="main-content" tabIndex={-1} style={isPublicSite && !isHomepage ? { paddingTop: '88px' } : undefined}>
+              {children}
+            </main>
+          )}
+          {isPublicSite && !isHomepage && !isMda && <Footer />}
+          <Analytics />
+        </LanguageProvider>
       </body>
     </html>
   );

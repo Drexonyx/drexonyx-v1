@@ -38,16 +38,17 @@
 .nav {
   display: flex;
   align-items: center;
-  gap: 36px;
+  gap: 32px;
 }
 
 .navLink {
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(255, 255, 255, 0.68);
   text-decoration: none;
   letter-spacing: 0.04em;
   transition: color 0.18s;
+  white-space: nowrap;
 }
 
 .navLink:hover,
@@ -63,24 +64,46 @@
   flex-shrink: 0;
 }
 
-.cta {
+/* ── Language toggle (globe + EN | AR) ───────────────────── */
+.langToggle {
   display: inline-flex;
   align-items: center;
-  padding: 10px 24px;
-  background: #c89b4a;
-  color: #060b1a;
-  font-size: 12.5px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  text-decoration: none;
-  border-radius: 2px;
-  transition: background 0.18s, transform 0.14s;
+  gap: 6px;
+  padding: 7px 13px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: color 0.18s, border-color 0.18s;
+  font-family: inherit;
+  white-space: nowrap;
 }
 
-.cta:hover {
-  background: #d9aa58;
-  transform: translateY(-1px);
+.langToggle:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.globeIcon {
+  color: #1d8cf8;
+  flex-shrink: 0;
+}
+
+.langToggleEn,
+.langToggleAr {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.langToggleSep {
+  color: rgba(255, 255, 255, 0.28);
+  font-weight: 300;
+  font-size: 10px;
 }
 
 /* ── Hamburger ───────────────────────────────────────────── */
@@ -137,19 +160,34 @@
   color: #fff;
 }
 
-.drawerCta {
-  display: block;
+.drawerLangToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   margin-top: 20px;
-  padding: 14px 24px;
-  background: #c89b4a;
-  color: #060b1a;
-  font-size: 13.5px;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  text-decoration: none;
-  border-radius: 2px;
-  text-align: center;
+  padding: 12px 20px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* ── RTL overrides: keep logo anchored left ──────────────── */
+html[dir="rtl"] .inner {
+  flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .nav {
+  flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .actions {
+  flex-direction: row-reverse;
 }
 
 /* ── Responsive ──────────────────────────────────────────── */
@@ -157,7 +195,7 @@
   .nav {
     display: none;
   }
-  .cta {
+  .langToggle {
     display: none;
   }
   .burger {

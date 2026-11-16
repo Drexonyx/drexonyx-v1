@@ -125,9 +125,9 @@ export default function SocialSellerPage() {
       <header className={styles.header}>
         <div className={styles.headerInner}>
           <Image
-            src="/brand/mda-full-logo.png"
+            src="/brand/r06/mda-horizontal-dark-800px.png"
             alt="MDA — Master Digital Agency"
-            width={130}
+            width={174}
             height={40}
             className={styles.logo}
             priority
@@ -394,9 +394,9 @@ export default function SocialSellerPage() {
       <footer className={styles.footer}>
         <div className={styles.footerInner}>
           <Image
-            src="/brand/mda-full-logo.png"
+            src="/brand/r06/mda-horizontal-dark-800px.png"
             alt="MDA — Master Digital Agency"
-            width={100}
+            width={139}
             height={32}
             className={styles.footerLogo}
           />

@@ -12,9 +12,9 @@
   --drex-text-muted: #52525b;
 
   /* Accent */
-  --drex-accent: #C8980A;
-  --drex-accent-dim: #b08508;
-  --drex-accent-subtle: rgba(200, 152, 10, 0.12);
+  --drex-accent: #1d8cf8;
+  --drex-accent-dim: #0070e0;
+  --drex-accent-subtle: rgba(29, 140, 248, 0.12);
 
   /* Layout */
   --drex-container: 1200px;
@@ -51,6 +51,9 @@
   --mda-radius-sm:      4px;
   --mda-radius:         8px;
   --mda-radius-lg:      12px;
+
+  /* Arabic / RTL typography */
+  --font-arabic: var(--font-cairo), 'Cairo', 'Noto Sans Arabic', sans-serif;
 }
 
 *,
@@ -84,6 +87,10 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+html[dir="rtl"] body {
+  font-family: var(--font-arabic);
 }
 
 a {

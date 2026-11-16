@@ -407,10 +407,10 @@ export default function MDAPage() {
         <div className={styles.container}>
           <div className={styles.mdaBrandBlock}>
             <Image
-              src="/brand/mda-logo-transparent.png"
+              src="/brand/r06/mda-horizontal-dark-800px.png"
               alt="MDA — Master Digital Agency"
-              width={1820}
-              height={864}
+              width={800}
+              height={184}
               className={styles.mdaBrandLogo}
               priority
             />
@@ -665,7 +665,7 @@ export default function MDAPage() {
       <footer className={styles.mdaFooter} aria-label="MDA brand footer">
         <div className={styles.container}>
           <div className={styles.mdaFooterInner}>
-            <MDALogo size="sm" assetSrc="/mda/mda-logo.png" />
+            <MDALogo size="sm" assetSrc="/brand/r06/mda-horizontal-dark-800px.png" />
             <nav className={styles.mdaFooterNav} aria-label="MDA footer navigation">
               <ul className={styles.mdaFooterLinks} role="list">
                 <li>

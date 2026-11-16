@@ -27,10 +27,10 @@ export default function Footer() {
         <div className={styles.brand}>
           <Link href="/" className={styles.logo} aria-label="DREXONYX home">
             <Image
-              src="/brand/drexonyx-circular-emblem.png"
+              src="/brand/r06/drexonyx-group-mark-dark-256px.png"
               alt="DREXONYX"
-              width={1254}
-              height={1254}
+              width={256}
+              height={256}
               className={styles.logoImg}
             />
           </Link>
@@ -93,20 +93,20 @@ export default function Footer() {
         <div className={styles.brandStripInner}>
           <div className={styles.brandStripLogo}>
             <Image
-              src="/brand/logos/drexonyx-group-logo.png"
+              src="/brand/r06/drexonyx-group-horizontal-dark-800px.png"
               alt="DREXONYX GROUP"
-              width={1536}
-              height={1024}
+              width={800}
+              height={184}
               className={styles.brandStripDxLogo}
             />
           </div>
           <div className={styles.brandStripDivider} aria-hidden="true" />
           <div className={styles.brandStripLogo}>
             <Image
-              src="/brand/logos/mda-logo.png"
+              src="/brand/r06/mda-horizontal-dark-800px.png"
               alt="MDA — Master Digital Agency, a DREXONYX Brand"
-              width={1536}
-              height={1024}
+              width={800}
+              height={184}
               className={styles.brandStripMdaLogo}
             />
           </div>
