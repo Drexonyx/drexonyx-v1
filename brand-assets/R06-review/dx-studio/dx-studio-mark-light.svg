@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  R06 — DX STUDIO — DX Monogram Mark (Light Variant)
+  Faithfully extracted from approved Concept D reference image.
+  RED accent is intentional and approved. Do not change.
+  Counter fill changed to near-white for light backgrounds.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 92" fill="none" role="img"
+     aria-label="DX STUDIO DX monogram mark — light">
+  <defs>
+    <linearGradient id="r6dxsl-chrome" x1="0.08" y1="0" x2="0.92" y2="1">
+      <stop offset="0%"   stop-color="#060C18"/>
+      <stop offset="10%"  stop-color="#182840"/>
+      <stop offset="26%"  stop-color="#3858A0"/>
+      <stop offset="40%"  stop-color="#8CAED0"/>
+      <stop offset="48%"  stop-color="#C8E0F4"/>
+      <stop offset="51%"  stop-color="#E0EEFB"/>
+      <stop offset="56%"  stop-color="#A0C0DC"/>
+      <stop offset="70%"  stop-color="#304870"/>
+      <stop offset="86%"  stop-color="#101828"/>
+      <stop offset="100%" stop-color="#030810"/>
+    </linearGradient>
+    <linearGradient id="r6dxsl-chrome-x" x1="0.92" y1="0" x2="0.08" y2="1">
+      <stop offset="0%"   stop-color="#040A14"/>
+      <stop offset="10%"  stop-color="#162238"/>
+      <stop offset="26%"  stop-color="#3060A8"/>
+      <stop offset="40%"  stop-color="#8AB0D4"/>
+      <stop offset="48%"  stop-color="#C4DCEE"/>
+      <stop offset="51%"  stop-color="#DCECf8"/>
+      <stop offset="56%"  stop-color="#98B8CE"/>
+      <stop offset="70%"  stop-color="#2C4468"/>
+      <stop offset="86%"  stop-color="#0E1826"/>
+      <stop offset="100%" stop-color="#030810"/>
+    </linearGradient>
+    <!-- RED accent: intentional, approved — do not change to blue or any other color -->
+    <linearGradient id="r6dxsl-red" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#FF4040"/>
+      <stop offset="45%"  stop-color="#E81C2C"/>
+      <stop offset="100%" stop-color="#991010"/>
+    </linearGradient>
+    <!-- Play button: red fill with highlight -->
+    <linearGradient id="r6dxsl-play" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#FF3030"/>
+      <stop offset="100%" stop-color="#CC0A18"/>
+    </linearGradient>
+    <linearGradient id="r6dxsl-bow" x1="0" y1="0.5" x2="1" y2="0.5">
+      <stop offset="0%"   stop-color="#1A2C50"/>
+      <stop offset="45%"  stop-color="#304868"/>
+      <stop offset="100%" stop-color="#0C1828"/>
+    </linearGradient>
+    <!-- Film strip clip: bar 1 of X -->
+    <clipPath id="r6dxsl-bar1-clip">
+      <path d="M94,2 L114,2 L166,90 L146,90 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- D outer -->
+  <path d="M4,2 L50,2 L68,10 L80,24 L84,46 L80,68 L68,82 L50,90 L4,90 Z"
+        fill="url(#r6dxsl-chrome)"/>
+  <!-- D counter: light fill for white backgrounds -->
+  <path d="M18,16 L50,16 L62,24 L68,38 L70,46 L68,54 L62,68 L50,76 L18,76 Z"
+        fill="#EEF3FF"/>
+  <!-- D bow wall -->
+  <path d="M62,24 L68,10 L80,24 L84,46 L80,68 L68,82 L62,68 L68,54 L70,46 L68,38 Z"
+        fill="url(#r6dxsl-bow)"/>
+  <!-- RED accent edge — approved, do not change -->
+  <path d="M80,24 L88,30 L92,46 L88,62 L80,68 L84,46 Z"
+        fill="url(#r6dxsl-red)" opacity="0.95"/>
+
+  <!-- Play button triangle — DX STUDIO differentiator from reference -->
+  <path d="M28,33 L28,59 L57,46 Z" fill="url(#r6dxsl-play)"/>
+  <path d="M28,33 L28,38 L52,46 L28,54 L28,59 L57,46 Z" fill="#FF5050" opacity="0.20"/>
+
+  <!-- X bar 1 -->
+  <path d="M94,2 L114,2 L166,90 L146,90 Z" fill="url(#r6dxsl-chrome)"/>
+  <!-- X bar 2 -->
+  <path d="M146,2 L166,2 L114,90 L94,90 Z" fill="url(#r6dxsl-chrome-x)"/>
+
+  <!-- Film strip perforations -->
+  <g clip-path="url(#r6dxsl-bar1-clip)">
+    <rect x="106" y="6"  width="10" height="6" rx="1.5" fill="#030810" opacity="0.65"/>
+    <rect x="118" y="22" width="10" height="6" rx="1.5" fill="#030810" opacity="0.65"/>
+    <rect x="129" y="38" width="10" height="6" rx="1.5" fill="#030810" opacity="0.65"/>
+    <rect x="141" y="54" width="10" height="6" rx="1.5" fill="#030810" opacity="0.65"/>
+    <rect x="150" y="68" width="9"  height="6" rx="1.5" fill="#030810" opacity="0.65"/>
+    <rect x="157" y="80" width="7"  height="5" rx="1.5" fill="#030810" opacity="0.55"/>
+  </g>
+</svg>
