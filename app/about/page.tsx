@@ -5,25 +5,40 @@ import styles from "./page.module.css";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "About DREXONYX — a performance creative studio built for modern brands running paid social and performance marketing campaigns.",
+    "About DREXONYX — a technology and digital solutions group. Custom software, AI automation, digital commerce, and enterprise integration for businesses that are ready to scale.",
 };
 
 const VALUES = [
   {
-    title: "Performance Over Aesthetics",
-    desc: "Beautiful creative that doesn't convert isn't doing its job. We judge every asset against performance criteria first.",
+    title: "Engineering Precision",
+    desc: "Correct, maintainable, and built to scale. Every codebase, pipeline, and integration we deliver is held to an engineering standard, not a delivery deadline.",
   },
   {
-    title: "Authentic, Not Manufactured",
-    desc: "UGC advertising works because it feels real. We protect authenticity at every production stage.",
+    title: "Outcome-First Thinking",
+    desc: "Every technical decision is measured against a business outcome. We don't build technology for its own sake — we build what moves the needle.",
   },
   {
-    title: "Brief Discipline",
-    desc: "We work within scope. A clear brief produces better creative faster than an open-ended one.",
+    title: "Clear Scope, Clean Delivery",
+    desc: "We work within defined scope and deliver against it. No scope creep, no vague estimations, no half-finished implementations.",
   },
   {
     title: "Continuous Improvement",
-    desc: "Every campaign generates data. We feed performance insights back into creative direction on every engagement.",
+    desc: "Every engagement generates insights. We feed those back into better decisions, better architecture, and better outcomes on every subsequent project.",
+  },
+] as const;
+
+const DIVISIONS = [
+  {
+    name: "Master Digital Agency (MDA)",
+    focus: "Marketing & Digital Infrastructure",
+    desc: "MDA is the marketing and digital agency arm of DREXONYX GROUP. It delivers digital marketing strategy, media production, campaign execution, and brand infrastructure for clients across the GCC and beyond.",
+    href: "/mda",
+  },
+  {
+    name: "DX Studio",
+    focus: "Technology & Systems Engineering",
+    desc: "DX Studio is the technology and systems engineering arm. It builds custom software, deploys AI automation, engineers digital commerce platforms, and integrates enterprise systems for businesses at every stage of digital maturity.",
+    href: "/services",
   },
 ] as const;
 
@@ -34,14 +49,14 @@ export default function AboutPage() {
         <div className="container">
           <div className={styles.heroBadge}>About</div>
           <h1 id="about-hero-heading" className={styles.heroHeading}>
-            Performance Creative,
+            Technology-led.
             <br />
-            <span className={styles.heroAccent}>Built From First Principles</span>
+            <span className={styles.heroAccent}>Built to Scale.</span>
           </h1>
           <p className={styles.heroSub}>
-            DREXONYX is a performance creative studio. We exist to build UGC advertising that
-            works — authentic, brand-safe, and optimized for the platforms where modern brands
-            compete.
+            DREXONYX is a technology and digital solutions group. We build the software,
+            automation systems, and digital infrastructure that growing businesses need to
+            operate at their best.
           </p>
         </div>
       </section>
@@ -54,32 +69,55 @@ export default function AboutPage() {
                 Why We Exist
               </h2>
               <p className={styles.missionText}>
-                The advertising landscape shifted. Audiences stopped responding to polished,
-                produced brand content and started trusting peer recommendation, authentic
-                experience, and human-scale storytelling. UGC advertising emerged to bridge that
-                gap — and most brands are not yet equipped to produce it well or at the volume
-                that modern paid media demands.
+                Modern businesses are built on digital systems — but most lack the in-house
+                engineering capacity to build, integrate, and evolve those systems as they
+                grow. The gap between where a business operates today and where its technology
+                should be is where DREXONYX operates.
               </p>
               <p className={styles.missionText}>
-                DREXONYX was built to solve that problem. We combine creative strategy,
-                AI-assisted production, and rigorous QC into a studio built specifically for
-                performance UGC advertising.
+                We combine product engineering, AI-led automation, and enterprise integration
+                expertise under one roof — working as a long-term technical partner to companies
+                at every stage of digital maturity. Not a vendor. Not an agency. A builder.
               </p>
             </div>
             <div className={styles.missionSidebar}>
               <div className={styles.missionStat}>
-                <div className={styles.missionStatLabel}>Studio Focus</div>
-                <div className={styles.missionStatValue}>Performance UGC</div>
+                <div className={styles.missionStatLabel}>Focus</div>
+                <div className={styles.missionStatValue}>Technology & Digital Solutions</div>
               </div>
               <div className={styles.missionStat}>
-                <div className={styles.missionStatLabel}>Production Model</div>
-                <div className={styles.missionStatValue}>AI-Assisted Studio</div>
+                <div className={styles.missionStatLabel}>Delivery Model</div>
+                <div className={styles.missionStatValue}>Engineering-led Studio</div>
               </div>
               <div className={styles.missionStat}>
-                <div className={styles.missionStatLabel}>Platform Expertise</div>
-                <div className={styles.missionStatValue}>Meta · TikTok · YouTube</div>
+                <div className={styles.missionStatLabel}>Scale</div>
+                <div className={styles.missionStatValue}>SME to Enterprise</div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.divisionsSection} aria-labelledby="divisions-heading">
+        <div className="container">
+          <h2 id="divisions-heading" className={styles.sectionHeading}>
+            Group Divisions
+          </h2>
+          <p className={styles.divisionsIntro}>
+            DREXONYX GROUP operates through two specialist brands — each focused on a
+            distinct domain, working together on integrated client mandates.
+          </p>
+          <div className={styles.divisionsGrid}>
+            {DIVISIONS.map((div) => (
+              <div key={div.name} className={styles.divisionCard}>
+                <div className={styles.divisionFocus}>{div.focus}</div>
+                <h3 className={styles.divisionName}>{div.name}</h3>
+                <p className={styles.divisionDesc}>{div.desc}</p>
+                <Link href={div.href} className={styles.divisionLink}>
+                  Learn more →
+                </Link>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -100,29 +138,17 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className={styles.teamSection} aria-labelledby="team-heading">
-        <div className="container">
-          <h2 id="team-heading" className={styles.sectionHeading}>
-            The Team
-          </h2>
-          <p className={styles.teamNote}>
-            Team profiles will be published as DREXONYX grows its public presence. For now, the
-            work speaks.
-          </p>
-        </div>
-      </section>
-
       <section className={styles.ctaBand} aria-labelledby="about-cta-heading">
         <div className="container">
           <h2 id="about-cta-heading" className={styles.ctaBandHeading}>
             Work with us
           </h2>
           <p className={styles.ctaBandSub}>
-            Ready to build performance creative for your brand? Start your campaign brief.
+            Tell us what you&apos;re trying to build. We&apos;ll scope the right engagement.
           </p>
           <div className={styles.ctaRow}>
-            <Link href="/start-project" className={styles.ctaPrimary}>
-              Start Project
+            <Link href="/contact" className={styles.ctaPrimary}>
+              Get in Touch
             </Link>
             <Link href="/services" className={styles.ctaSecondary}>
               View Services

@@ -5,7 +5,7 @@ import styles from "./page.module.css";
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Get in touch with DREXONYX — Dubai-based performance creative studio. AI-powered UGC advertising for global brands.",
+    "Get in touch with DREXONYX — a Dubai-based technology and digital solutions group. Custom software, AI automation, digital commerce, and enterprise integration for businesses ready to scale.",
 };
 
 export default function ContactPage() {
@@ -18,8 +18,8 @@ export default function ContactPage() {
             Let&apos;s Talk
           </h1>
           <p className={styles.heroSub}>
-            Dubai-based and globally active. Reach out to start a conversation
-            about your next campaign.
+            Dubai-based and globally active. Reach out to discuss your project — software,
+            automation, commerce, or enterprise integration.
           </p>
         </div>
       </section>
@@ -28,7 +28,7 @@ export default function ContactPage() {
         <div className="container">
           <div className={styles.contactGrid}>
             <div className={styles.contactBlock}>
-              <div className={styles.contactLabel}>Studio Location</div>
+              <div className={styles.contactLabel}>Location</div>
               <div className={styles.contactValue}>Dubai, UAE · Global</div>
             </div>
             <div className={styles.contactBlock}>
@@ -43,8 +43,8 @@ export default function ContactPage() {
             <div className={styles.contactBlock}>
               <div className={styles.contactLabel}>Response Time</div>
               <div className={styles.contactValue}>
-                We respond within one business day. Submit your brief and
-                we&apos;ll take it from there.
+                We respond within one business day. Share your brief and we&apos;ll take it
+                from there.
               </div>
             </div>
           </div>

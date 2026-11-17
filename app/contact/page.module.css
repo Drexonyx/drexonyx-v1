@@ -1,7 +1,7 @@
 .hero {
   padding: 6rem 0 5rem;
   border-bottom: 1px solid var(--drex-border);
-  background: radial-gradient(ellipse 60% 40% at 50% -5%, rgba(200, 152, 10, 0.07) 0%, transparent 70%);
+  background: radial-gradient(ellipse 60% 40% at 50% -5%, rgba(29, 140, 248, 0.07) 0%, transparent 70%);
 }
 
 .eyebrow {
@@ -52,7 +52,7 @@
 }
 
 .contactBlock:hover {
-  border-color: rgba(200, 152, 10, 0.2);
+  border-color: rgba(29, 140, 248, 0.2);
 }
 
 .contactLabel {
@@ -93,7 +93,7 @@
   padding: 0.8125rem 1.875rem;
   font-size: 0.9375rem;
   font-weight: 700;
-  color: #000;
+  color: #fff;
   background: var(--drex-accent);
   border-radius: 8px;
   transition: background var(--drex-duration) var(--drex-ease),
@@ -104,7 +104,7 @@
 .ctaPrimary:hover {
   background: var(--drex-accent-dim);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(200, 152, 10, 0.3);
+  box-shadow: 0 8px 24px rgba(29, 140, 248, 0.3);
 }
 
 .ctaSecondary {

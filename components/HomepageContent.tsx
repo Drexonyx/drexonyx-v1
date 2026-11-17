@@ -14,6 +14,13 @@ const SVC_IMAGES = [
   { src: "/images/r07/service-software.png",    alt: "Custom Software"    },
 ];
 
+const SVC_SLUGS = [
+  "enterprise-systems",
+  "digital-commerce",
+  "ai-automation",
+  "custom-software",
+];
+
 export default function HomepageContent() {
   const { isAr } = useLanguage();
   const t = isAr ? ar : en;
@@ -98,7 +105,7 @@ export default function HomepageContent() {
                   <h3 className={styles.svcTitle}>{card.title}</h3>
                   <p className={styles.svcDesc}>{card.desc}</p>
                   <Link
-                    href="/services"
+                    href={`/services/${SVC_SLUGS[i]}`}
                     className={styles.svcLink}
                     aria-label={card.title}
                   >
@@ -145,14 +152,7 @@ export default function HomepageContent() {
             {/* DX STUDIO */}
             <Link href="/services" className={styles.brandCard}>
               <div className={styles.brandLogoWrap}>
-                <Image
-                  src="/brand/r06/dx-studio-horizontal-dark-800px.png"
-                  alt={t.brands.dxName}
-                  width={800}
-                  height={184}
-                  className={styles.brandLogo}
-                  sizes="(max-width: 860px) 220px, 260px"
-                />
+                <p className={styles.brandCardWordmark}>DX Studio</p>
               </div>
               <div className={styles.brandCardBody}>
                 <p className={styles.brandCardName}>{t.brands.dxName}</p>
@@ -164,21 +164,87 @@ export default function HomepageContent() {
         </div>
       </section>
 
-      {/*
-      ── WHY DREXONYX / BENEFITS — preserved per CLAUDE.md ──────────
-      <section className={styles.benefits} aria-label="...">
-        {t.benefits.map((b, i) => (
-          <div key={b.title} className={styles.benefitItem}>...</div>
-        ))}
-      </section>
-      */}
+      {/* ═══ WHY DREXONYX ══════════════════════════════════════════ */}
+      <section className={styles.why} aria-labelledby="why-heading">
+        <div className={styles.whyInner}>
+          <p className={styles.whyEyebrow}>Why DREXONYX</p>
+          <h2 id="why-heading" className={styles.whyHeading}>
+            {isAr ? "ماذا يميّزنا" : "Engineering meets business reality."}
+          </h2>
 
-      {/*
-      ── INDUSTRIES / CONTACT — preserved per CLAUDE.md ─────────────
-      <section className={styles.contact} aria-labelledby="contact-heading">
-        ...
+          <div className={styles.whyGrid}>
+            <div className={styles.whyCard}>
+              <div className={styles.whyNum}>01</div>
+              <h3 className={styles.whyTitle}>
+                {isAr ? "منهجية هندسية" : "Engineering-led"}
+              </h3>
+              <p className={styles.whyDesc}>
+                {isAr
+                  ? "كل نظام نبنيه يخضع لمعايير هندسية صارمة — أداء، قابلية صيانة، وأمان."
+                  : "Every system we build is held to a real engineering standard — not just shipped to meet a deadline."}
+              </p>
+            </div>
+
+            <div className={styles.whyCard}>
+              <div className={styles.whyNum}>02</div>
+              <h3 className={styles.whyTitle}>
+                {isAr ? "النتائج أولاً" : "Outcome-first"}
+              </h3>
+              <p className={styles.whyDesc}>
+                {isAr
+                  ? "كل قرار تقني نتخذه مقاس بأثره على الأعمال — نبني ما يحرّك الإبرة."
+                  : "Every technical decision is measured against a business outcome. We build what moves the needle."}
+              </p>
+            </div>
+
+            <div className={styles.whyCard}>
+              <div className={styles.whyNum}>03</div>
+              <h3 className={styles.whyTitle}>
+                {isAr ? "كفاءة شاملة" : "Full-stack capability"}
+              </h3>
+              <p className={styles.whyDesc}>
+                {isAr
+                  ? "برمجيات مخصصة، أتمتة ذكية، تجارة رقمية، وتكامل أنظمة — تحت سقف واحد."
+                  : "Custom software, AI automation, digital commerce, and enterprise integration — one team, one roof."}
+              </p>
+            </div>
+
+            <div className={styles.whyCard}>
+              <div className={styles.whyNum}>04</div>
+              <h3 className={styles.whyTitle}>
+                {isAr ? "ميزة المجموعة" : "Group advantage"}
+              </h3>
+              <p className={styles.whyDesc}>
+                {isAr
+                  ? "DREXONYX GROUP تجمع بين DX Studio لهندسة التقنية وMDA لبنية التسويق الرقمي."
+                  : "DX Studio for technology engineering and MDA for digital marketing infrastructure — both under DREXONYX GROUP."}
+              </p>
+            </div>
+          </div>
+        </div>
       </section>
-      */}
+
+      {/* ═══ FINAL CTA ═══════════════════════════════════════════════ */}
+      <section className={styles.finalCta} aria-labelledby="final-cta-heading">
+        <div className={styles.finalCtaInner}>
+          <h2 id="final-cta-heading" className={styles.finalCtaHeading}>
+            {isAr ? "ابدأ البناء الآن" : "Start Building Smarter."}
+          </h2>
+          <p className={styles.finalCtaSub}>
+            {isAr
+              ? "أخبرنا بمشروعك وسنضع خطة التنفيذ المناسبة."
+              : "Tell us what you're trying to build. We'll scope the right engagement."}
+          </p>
+          <div className={styles.finalCtaBtns}>
+            <a href="/contact" className={styles.finalCtaPrimary}>
+              {isAr ? "تواصل معنا ←" : "Get in Touch →"}
+            </a>
+            <a href="/services" className={styles.finalCtaOutline}>
+              {isAr ? "استعرض الخدمات" : "View Services"}
+            </a>
+          </div>
+        </div>
+      </section>
 
       {/* ═══ FOOTER ══════════════════════════════════════════════════ */}
       <footer

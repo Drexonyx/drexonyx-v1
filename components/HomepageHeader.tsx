@@ -48,13 +48,15 @@ export default function HomepageHeader() {
       <div className={styles.inner}>
         <Link href="/" className={styles.logoLink} aria-label="DREXONYX GROUP — Home">
           <Image
-            src="/brand/r06/drexonyx-group-horizontal-dark-800px.png"
-            alt="DREXONYX GROUP"
-            width={800}
-            height={184}
-            className={styles.logo}
+            src="/brand/r06/dx-mark-official.png"
+            alt=""
+            width={1774}
+            height={887}
+            className={styles.logoMark}
             priority
+            aria-hidden="true"
           />
+          <span className={styles.logoWordmark}>DREXONYX<span className={styles.logoGroup}>GROUP</span></span>
         </Link>
 
         <nav className={styles.nav} aria-label="Main navigation">

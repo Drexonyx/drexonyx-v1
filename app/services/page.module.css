@@ -1,7 +1,7 @@
 .hero {
   padding: 5rem 0 4rem;
   border-bottom: 1px solid var(--drex-border);
-  background: radial-gradient(ellipse 60% 40% at 50% -5%, rgba(200, 152, 10, 0.07) 0%, transparent 70%);
+  background: radial-gradient(ellipse 60% 40% at 50% -5%, rgba(29, 140, 248, 0.07) 0%, transparent 70%);
 }
 
 .heroEyebrow {
@@ -19,6 +19,11 @@
   letter-spacing: -0.04em;
   color: var(--drex-text);
   margin-bottom: 1.25rem;
+  line-height: 1.1;
+}
+
+.heroAccent {
+  color: var(--drex-accent);
 }
 
 .heroSub {
@@ -35,7 +40,7 @@
 .servicesGrid {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1rem;
 }
 
 .serviceCard {
@@ -46,12 +51,11 @@
   border: 1px solid var(--drex-border);
   border-radius: 12px;
   background: var(--drex-surface);
-  margin-bottom: 1rem;
   transition: border-color var(--drex-duration) var(--drex-ease);
 }
 
 .serviceCard:hover {
-  border-color: rgba(200, 152, 10, 0.25);
+  border-color: rgba(29, 140, 248, 0.25);
 }
 
 .serviceNumber {
@@ -107,6 +111,21 @@
   border-radius: 50%;
 }
 
+.serviceDetailLink {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--drex-accent);
+  text-decoration: none;
+  margin-top: 0.25rem;
+  transition: gap var(--drex-duration) var(--drex-ease);
+}
+
+.serviceDetailLink:hover {
+  opacity: 0.8;
+}
+
 .ctaBand {
   padding: 5rem 0;
   border-top: 1px solid var(--drex-border);
@@ -148,7 +167,7 @@
 .ctaPrimary:hover {
   background: var(--drex-accent-dim);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(200, 152, 10, 0.3);
+  box-shadow: 0 8px 24px rgba(29, 140, 248, 0.3);
 }
 
 @media (max-width: 640px) {

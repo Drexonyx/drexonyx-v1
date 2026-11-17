@@ -387,6 +387,16 @@ html[dir="rtl"] .brandStripLabel { text-align: right; }
 
 html[dir="rtl"] .brandLogo { object-position: right center; }
 
+.brandCardWordmark {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #f0f4ff;
+  margin: 0;
+  line-height: 1;
+  padding: 10px 0;
+}
+
 .brandCardBody {
   flex: 1;
   display: flex;
@@ -430,6 +440,178 @@ html[dir="rtl"] .brandCardDesc { text-align: right; }
 html[dir="rtl"] .brandCard:hover .brandCardArrow { transform: translateX(-4px); }
 
 /* ════════════════════════════════════════════════════════════════════════
+   WHY DREXONYX
+   ════════════════════════════════════════════════════════════════════════ */
+.why {
+  background: #060b1a;
+  padding: 80px 0 88px;
+  border-top: 1px solid rgba(42, 127, 255, 0.07);
+}
+
+.whyInner {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 48px;
+}
+
+.whyEyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(42, 127, 255, 0.7);
+  margin: 0 0 16px;
+}
+
+html[dir="rtl"] .whyEyebrow { text-align: right; }
+
+.whyHeading {
+  font-family: var(--font-space-grotesk, var(--font-geist-sans)), system-ui, sans-serif;
+  font-size: clamp(1.6rem, 2.2vw, 2.1rem);
+  font-weight: 700;
+  color: #f0f4ff;
+  letter-spacing: -0.015em;
+  margin: 0 0 44px;
+}
+
+html[dir="rtl"] .whyHeading {
+  font-family: var(--font-cairo), system-ui, sans-serif;
+  text-align: right;
+}
+
+.whyGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.whyCard {
+  padding: 28px 24px 32px;
+  background: #0d1f3c;
+  border: 1px solid rgba(42, 127, 255, 0.11);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color 0.2s;
+}
+.whyCard:hover { border-color: rgba(42, 127, 255, 0.28); }
+
+.whyNum {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: rgba(42, 127, 255, 0.55);
+}
+
+.whyTitle {
+  font-family: var(--font-space-grotesk, var(--font-geist-sans)), system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f0f4ff;
+  margin: 0;
+  line-height: 1.3;
+}
+
+html[dir="rtl"] .whyTitle {
+  font-family: var(--font-cairo), system-ui, sans-serif;
+  text-align: right;
+}
+
+.whyDesc {
+  font-size: 0.85rem;
+  line-height: 1.65;
+  color: rgba(240, 244, 255, 0.52);
+  margin: 0;
+}
+
+html[dir="rtl"] .whyDesc { text-align: right; }
+
+/* ════════════════════════════════════════════════════════════════════════
+   FINAL CTA
+   ════════════════════════════════════════════════════════════════════════ */
+.finalCta {
+  background: #040d1e;
+  border-top: 1px solid rgba(42, 127, 255, 0.1);
+  padding: 80px 0 88px;
+}
+
+.finalCtaInner {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 48px;
+}
+
+.finalCtaHeading {
+  font-family: var(--font-space-grotesk, var(--font-geist-sans)), system-ui, sans-serif;
+  font-size: clamp(2rem, 3vw, 2.75rem);
+  font-weight: 800;
+  color: #f0f4ff;
+  letter-spacing: -0.025em;
+  margin: 0 0 16px;
+}
+
+html[dir="rtl"] .finalCtaHeading {
+  font-family: var(--font-cairo), system-ui, sans-serif;
+  text-align: right;
+}
+
+.finalCtaSub {
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: rgba(240, 244, 255, 0.55);
+  max-width: 50ch;
+  margin: 0 0 36px;
+}
+
+html[dir="rtl"] .finalCtaSub { text-align: right; }
+
+.finalCtaBtns {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+html[dir="rtl"] .finalCtaBtns { flex-direction: row-reverse; }
+
+.finalCtaPrimary {
+  display: inline-flex;
+  align-items: center;
+  padding: 15px 30px;
+  background: #2a7fff;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  border-radius: 8px;
+  white-space: nowrap;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+.finalCtaPrimary:hover {
+  background: #1a6be6;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(42, 127, 255, 0.28);
+}
+
+.finalCtaOutline {
+  display: inline-flex;
+  align-items: center;
+  padding: 15px 26px;
+  background: rgba(42, 127, 255, 0.07);
+  color: rgba(240, 244, 255, 0.72);
+  border: 1px solid rgba(42, 127, 255, 0.25);
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  border-radius: 8px;
+  white-space: nowrap;
+  transition: background 0.2s, border-color 0.2s;
+}
+.finalCtaOutline:hover { background: rgba(42,127,255,0.14); border-color: rgba(42,127,255,0.5); }
+
+/* ════════════════════════════════════════════════════════════════════════
    HOMEPAGE FOOTER
    ════════════════════════════════════════════════════════════════════════ */
 .hpFooter {
@@ -471,9 +653,10 @@ html[dir="rtl"] .hpFooterInner { flex-direction: row-reverse; }
    RESPONSIVE
    ════════════════════════════════════════════════════════════════════════ */
 
-/* ── Tablet: 4-col services → 2-col ───────────────────────────── */
+/* ── Tablet: 4-col services / why → 2-col ─────────────────────── */
 @media (max-width: 1100px) {
-  .svcGrid {
+  .svcGrid,
+  .whyGrid {
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
   }
@@ -531,6 +714,8 @@ html[dir="rtl"] .hpFooterInner { flex-direction: row-reverse; }
 
   .svcInner,
   .brandStripInner,
+  .whyInner,
+  .finalCtaInner,
   .hpFooterInner {
     padding: 0 20px;
   }
@@ -543,6 +728,10 @@ html[dir="rtl"] .hpFooterInner { flex-direction: row-reverse; }
   }
 
   .brandStrip { padding: 56px 0 64px; }
+
+  .why { padding: 56px 0 64px; }
+  .whyGrid { grid-template-columns: 1fr; gap: 12px; }
+  .finalCta { padding: 56px 0 64px; }
 
   .brandCards {
     grid-template-columns: 1fr;

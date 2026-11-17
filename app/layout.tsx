@@ -36,12 +36,21 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.drexonyx.com"),
   title: {
-    default: "DREXONYX — Performance Creative Studio",
+    default: "DREXONYX — Technology & Digital Solutions",
     template: "%s | DREXONYX",
   },
   description:
-    "Dubai-based performance creative studio. AI-powered UGC advertising for global brands — creative at scale, built to perform.",
-  keywords: ["UGC advertising", "performance creative", "AI advertising", "brand campaigns", "Dubai", "UAE", "UGC studio"],
+    "Dubai-based technology and digital solutions group. Custom software, AI automation, digital commerce, and enterprise integration for businesses ready to scale.",
+  keywords: [
+    "custom software development",
+    "AI automation",
+    "digital commerce",
+    "enterprise integration",
+    "technology solutions",
+    "Dubai",
+    "UAE",
+    "DREXONYX",
+  ],
   icons: {
     icon: [
       { url: "/brand/r06/drexonyx-group-mark-dark-32px.png", sizes: "32x32", type: "image/png" },
@@ -57,16 +66,16 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "DREXONYX",
-    title: "DREXONYX — Performance Creative Studio",
+    title: "DREXONYX — Technology & Digital Solutions",
     description:
-      "Dubai-based performance creative studio. AI-powered UGC advertising for global brands — creative at scale, built to perform.",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "DREXONYX — Performance Creative Studio" }],
+      "Dubai-based technology and digital solutions group. Custom software, AI automation, digital commerce, and enterprise integration for businesses ready to scale.",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "DREXONYX — Technology & Digital Solutions" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "DREXONYX — Performance Creative Studio",
+    title: "DREXONYX — Technology & Digital Solutions",
     description:
-      "Dubai-based performance creative studio. AI-powered UGC advertising for global brands — creative at scale, built to perform.",
+      "Dubai-based technology and digital solutions group. Custom software, AI automation, digital commerce, and enterprise integration for businesses ready to scale.",
     images: ["/opengraph-image"],
   },
   robots: { index: true, follow: true },
