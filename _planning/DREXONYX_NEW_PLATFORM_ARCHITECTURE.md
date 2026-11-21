@@ -1,10 +1,10 @@
 # DREXONYX — New Platform Architecture
 
-**Document version:** 2.0 (revised 2026-11-21)  
-**Previous version:** 1.0 (MDA-agency framing, no AI permission levels)  
+**Document version:** 3.0 (revised 2026-11-21)  
+**Previous version:** 2.0 (tech stack justified by V1 usage; "inherited from V1, proven" language; oversimplified permission model)  
 **Prepared by:** Claude Code  
 **Status:** DRAFT — AWAITING CEO REVIEW AND APPROVAL  
-**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v1.0
+**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v2.0
 
 ---
 
@@ -37,7 +37,7 @@ This platform is not a customer-facing SaaS product. It is the internal nervous 
 | P3 | **Single source of truth** | All company knowledge, decisions, and business data live in one structured system. No document scatter across chat threads, Google Docs, and spreadsheets. |
 | P4 | **Audit everything** | Every action — human or agent — is logged. The platform is always explainable and reversible. |
 | P5 | **Zero unnecessary subscriptions** | Prefer existing infrastructure (GitHub, Vercel, Neon, Cloudflare). Pay only for what delivers clear business value. |
-| P6 | **Clean architecture from day one** | No scope creep, no technical debt inheritance from V1. Each module is independently buildable and testable. |
+| P6 | **Clean architecture from day one** | No scope creep. No technical debt inheritance from V1. Each module is independently buildable and testable. |
 | P7 | **Security by default** | Server-side authorization on every request. No client-trusted data. Secrets never in source code or browser. |
 
 ---
@@ -92,26 +92,13 @@ The platform is organized into 11 domains. Each domain is a fully owned module w
 - Agent Outputs — results staged for review before any external action
 - Performance — agent success rate, average task time, error patterns
 
-**Key design rule:** An agent's output is never automatically published, sent, or applied. It enters a "staged" state and requires human review before proceeding.
+**Key design rule:** An agent's output is never automatically published, sent, or applied to an external system. It enters a "staged" state and requires human review before proceeding — except for AUTONOMOUS-level actions that are explicitly pre-approved.
 
 ### 3.3 Company Management
 **Purpose:** Official company records, settings, team, and documents.
 
-**Core views:**
-- Company profile (name, brand, domains, contacts, legal identity)
-- Team directory (users, roles, permissions)
-- Official documents (contracts, registrations, certificates)
-- Brand assets (logos, fonts, colors, templates)
-
 ### 3.4 Company Knowledge Base
 **Purpose:** Structured, queryable repository of everything DREXONYX knows — about its market, products, customers, processes, and competitors.
-
-**Core views:**
-- Articles / documents — categorized knowledge entries
-- Research library — market research, competitor analysis, pricing studies
-- Process playbooks — SOPs for every repeatable operation
-- Decisions log — why each major decision was made and by whom
-- AI-searchable interface — natural language queries against the knowledge base
 
 ### 3.5 Product Portfolio Management
 **Purpose:** Manage all DREXONYX software products and services — from development status through licensing, customers, and support.
@@ -122,72 +109,23 @@ The platform is organized into 11 domains. Each domain is a fully owned module w
 3. **Auto Workshop Management System**
 4. **DREXONYX International Trade System**
 
-**Core views:**
-- Software product catalog — all 4 initial products with version history, development status, pricing tiers
-- License registry — licenses issued per product, expiry tracking
-- Customer registry — clients using each product
-- Support tickets — per-product support management
-- Demo library — the five website demo sites and future demos (organized by industry)
-- Delivery standards — per-service QC checklists and production standards
-- MDA service catalog — if MDA operations continue (pending CEO Decision D10)
-
 ### 3.6 Software Development Operations
 **Purpose:** Track the health of all DREXONYX software projects, deployments, and technical work.
-
-**Core views:**
-- Project registry — all repos, branches, deployment status
-- Build & deployment status — Vercel deployments, CI results
-- Technical debt register — known issues, deferred items
-- Test suite health — test coverage, failure trends
 
 ### 3.7 Sales & Customer Acquisition
 **Purpose:** Manage the full sales funnel from lead discovery through conversion.
 
-**Core views:**
-- Lead pipeline — Kanban from NEW through WON/REJECTED
-- Outreach queue — drafted messages awaiting review and send
-- Proposals — pending and sent proposals with payment status
-- Conversion tracking — funnel metrics, channel performance
-- Opt-out registry — email opt-outs, compliance records
-
 ### 3.8 Marketing Operations
 **Purpose:** Plan, produce, and publish marketing content. Track campaign performance.
 
-**Core views:**
-- Content calendar — scheduled posts and campaigns
-- Asset library — approved marketing materials
-- Publishing queue — content staged for social/web publishing
-- Campaign tracker — active campaigns, spend, results
-- Social analytics — engagement, reach, follower trends
-
 ### 3.9 Finance & Business Reporting
-**Purpose:** Track company revenue, costs, and financial health. No bookkeeping replacement — reporting and visibility only in Phase 1.
-
-**Core views:**
-- Revenue tracker — invoices, payments received, payment links
-- Expense register — costs by category
-- P&L summary — month-to-date, year-to-date
-- Cash flow view — upcoming inflows/outflows
-- Financial reports — weekly/monthly snapshots
+**Purpose:** Track company revenue, costs, and financial health. Reporting and visibility only in Phase 1 — not a bookkeeping replacement.
 
 ### 3.10 Task Management & Workflow Orchestration
 **Purpose:** Assign, track, and automate tasks. Connect tasks to agents and approvals.
 
-**Core views:**
-- Task board — all active tasks by domain and owner
-- Workflow templates — repeatable multi-step processes
-- Automation rules — trigger-condition-action definitions
-- Scheduled jobs — recurring automations with execution history
-
 ### 3.11 Human Approval & Security Controls
 **Purpose:** Central registry of all pending approvals and security controls. The human override layer for every AI and automated action.
-
-**Core views:**
-- Approval queue — consolidated list of everything awaiting human decision
-- Audit log — append-only record of every action taken in the platform
-- Security rules — which actions require approval, by whom
-- API key management — external credentials catalog (names only, never values)
-- Access control — user roles and permission assignments
 
 ---
 
@@ -215,7 +153,7 @@ The platform follows a strict layered dependency model. Inner layers never depen
 ├─────────────────────────────────────────────────────────────────────┤
 │  INFRASTRUCTURE                                                      │
 │  Concrete implementations: Drizzle/Neon, Cloudflare R2,             │
-│  Resend, Anthropic SDK, Higgsfield, Ziina, GitHub API               │
+│  Resend, Anthropic SDK, Ziina, GitHub API                            │
 ├─────────────────────────────────────────────────────────────────────┤
 │  EXTERNAL PROVIDERS                                                  │
 │  Neon · Cloudflare · Anthropic · Resend · Vercel · GitHub · Ziina   │
@@ -230,29 +168,25 @@ The platform follows a strict layered dependency model. Inner layers never depen
 
 ---
 
-## 5. Technology Stack
+## 5. Technology Stack (Independent Evaluation)
 
-| Layer | Technology | Rationale |
-|---|---|---|
-| Framework | Next.js (App Router, TypeScript) | Proven, existing team familiarity, Vercel-native |
-| Auth | NextAuth v5 | Already integrated, battle-tested in V1 |
-| Database ORM | Drizzle ORM | Type-safe, migration-based, proven in V1 |
-| Database | Neon PostgreSQL | Serverless, free tier, existing account |
-| File Storage | Cloudflare R2 | S3-compatible, free tier, existing account |
-| AI Provider | Anthropic API (Claude models) | Best-in-class reasoning, existing API key |
-| AI Fallback | Google Gemini API | Secondary provider for cost optimization |
-| Email | Resend | Existing account, transactional + outreach |
-| Payments | Ziina | UAE-first, AED, existing integration |
-| Deployment | Vercel | Existing account, GitHub integration |
-| Version Control | GitHub | Existing organization and repo |
-| CI/CD | GitHub Actions | Free, proven workflow in V1 |
-| Testing | Vitest | Existing, fast, TypeScript-native |
+Each technology is chosen on its merits for this project. No choice is made because V1 used it.
 
-**Not introduced for the new platform (unless CEO approves):**
-- No new SaaS subscriptions
-- No paid CRM, Notion, Jira, Slack (use built-in modules)
-- No separate database services
-- No containerized infrastructure (Vercel serverless handles this)
+| Technology | Why it fits this project | Main alternative | Cost | Complexity | Security | Vendor risk | Status |
+|---|---|---|---|---|---|---|---|
+| **Next.js (App Router, TypeScript)** | Strong server/client boundary prevents credential exposure; TypeScript eliminates runtime errors; App Router has clean file-based routing for a large internal application; server components fetch data server-side only | Remix — similar server-first model; slightly better streaming primitives | Free; open source | Medium — App Router has learning curve | Server components enforce server-side data access; `NEXT_PUBLIC_*` convention makes secrets visible | Medium — optimized for Vercel; self-hosting possible | PROPOSED |
+| **Auth.js v5 (NextAuth)** | Maintained; Next.js-native; session management entirely server-side; supports credentials provider for email+password; no third-party session storage required | Lucia Auth — lighter, more manual; Clerk — fully managed, $25+/month, vendor lock-in | Free (self-hosted); open source | Medium — session configuration has complexity | Established security model; bcrypt hashing; no browser-accessible session storage | Low — open source, self-hosted | PROPOSED |
+| **Drizzle ORM** | Type-safe SQL without abstraction magic; migration-based schema management; works with Neon's connection pooler; lightweight runtime | Prisma — popular, heavier runtime, more abstraction; Kysely — pure query builder, no schema management | Free; open source | Low — straightforward TypeScript API | No runtime injection risk via type system; explicit queries | None — open source | PROPOSED |
+| **Neon PostgreSQL** | Serverless PostgreSQL; branch-based dev/preview/production workflow from one project; standard PostgreSQL compatibility means no vendor lock-in for data | Supabase — PostgreSQL plus BaaS extras (overkill for internal tool); Railway — simpler ops, $5/month base | **PENDING VERIFICATION** — free tier reported as 1 project, 10 branches, 0.5 GB RAM, 10 GB storage. Verify actual account plan before recommending strategy. | Low — standard PostgreSQL | TLS enforced; standard PostgreSQL authentication | Medium — startup; data portability via standard pg_dump | PROPOSED — pending account verification |
+| **Cloudflare R2** | S3-compatible object storage; existing account; zero egress fees (unlike S3); bucket isolation is straightforward | AWS S3 — industry standard, egress costs; Vercel Blob — simpler API, $0.023/GB | **PENDING VERIFICATION** — free tier reported as 10 GB storage. Verify actual account usage. | Low — standard S3 API | Access key auth; no public access by default; bucket policy controls | Low — existing account; standard S3 API for portability | PROPOSED |
+| **Anthropic API (Claude)** | Required for AI agent workforce; Claude models (Haiku/Sonnet) support tool use and structured output; reliable for complex reasoning tasks | OpenAI GPT-4o — comparable capability; Google Gemini — free tier available, useful as fallback | **PENDING VERIFICATION** — pricing changes frequently. Verify current Claude Haiku, Sonnet pricing. | Low — HTTP API | API key auth; no user data retained server-side | Medium — single provider; Gemini as fallback | PROPOSED |
+| **Resend (email)** | Existing account; dedicated email delivery; simple API; supports custom domains for DKIM/SPF | Postmark — similar; SendGrid — complex, free tier available | **PENDING VERIFICATION** — free tier reported as 3,000 emails/month, 100/day. Verify account plan, usage, and sender domain status. Do not change email configuration during planning. | Low | DKIM/SPF via domain configuration | Low — existing account | PROPOSED — pending verification |
+| **Vercel (deployment)** | Zero-config Next.js deployment; preview URLs per branch; env var management; existing account | Railway — more flexible, $5/month base; Render — similar | **PENDING VERIFICATION** — Hobby plan reported as free with no project count limit, but bandwidth and function limits apply. Verify current account and project count. | Low — GitHub integration | HTTPS auto-provisioned; server env vars never reach browser | High — Next.js deeply optimized for Vercel; self-hosting is significantly more complex | PROPOSED — pending account verification |
+| **Ziina** | UAE/AED payment processing; existing merchant setup; AED invoicing | Stripe — global, more features; Telr — UAE alternative | **PENDING VERIFICATION** — verify current merchant account status and transaction fee rate | Low | Webhook HMAC verification; PCI handled by Ziina | Medium — UAE-regional | PROPOSED |
+| **GitHub** | Standard version control; free for unlimited private repos; GitHub Actions CI free tier (2,000 minutes/month) | GitLab — self-hostable; Bitbucket — similar | Free for the organization's existing account | Low | Branch protection; secret scanning available | Low — industry standard | PROPOSED |
+| **Vitest** | Fast TypeScript-native test runner; works without compilation overhead; excellent for domain logic unit tests | Jest — popular, more ecosystem; Playwright (for E2E, separate layer) | Free; open source | Low | N/A (testing tool) | Low — open source | PROPOSED |
+
+**All technology choices are PROPOSED and require CEO approval before implementation begins.**
 
 ---
 
@@ -261,6 +195,7 @@ The platform follows a strict layered dependency model. Inner layers never depen
 The new platform is an **internal tool**. There is no public registration.
 
 **User types:**
+
 | Role | Access | Description |
 |---|---|---|
 | `ceo` | All modules, all actions | Founder/CEO — no restrictions |
@@ -268,7 +203,7 @@ The new platform is an **internal tool**. There is no public registration.
 | `agent` | Programmatic write-access to task queue and outputs only | AI agents acting on behalf of the platform |
 
 **Rules:**
-- NextAuth v5, Credentials provider (email + password, bcrypt hashed)
+- Auth.js v5, Credentials provider (email + password, bcrypt hashed)
 - Session carries `role`, `userId` — never trusted from client payload
 - All routes under `/` require authentication (no public portal)
 - Every consequential action checks role server-side before executing
@@ -283,7 +218,7 @@ The new platform is an **internal tool**. There is no public registration.
 Every agent action is classified into exactly one of three permission levels. No agent may change its own permission level.
 
 **AUTONOMOUS** — Executes and applies without human review
-- Generating draft text, reports, summaries for internal review
+- Generating draft text, reports, summaries for internal records
 - Analyzing data and producing structured output
 - Discovering and enriching prospect data from public sources
 - Scoring and classifying leads
@@ -291,19 +226,23 @@ Every agent action is classified into exactly one of three permission levels. No
 - Running status checks and QC reports
 
 **POLICY-BOUND** — Executes within defined policies; applies if within policy limits
-- Drafting outreach messages (within approved templates, within daily volume limits)
+- Sending standard outreach emails within approved templates, within daily volume limits, to opted-in or verified prospect lists
+- Queuing content for social publishing within approved campaign parameters
 - Scheduling tasks and reminders
 - Updating project status records
-- Queuing content for publishing (not publishing itself)
+- Triggering pre-approved workflows within defined parameters
+- Routine notifications to internal stakeholders
+
+The boundary: when a POLICY-BOUND action would exceed a policy limit or no matching policy applies, the action escalates to CEO-ONLY.
 
 **CEO-ONLY** — Never executes without an explicit human approval record. Any agent action in this category that proceeds without an approval record in `security.approvals` is a code defect — not a configuration choice.
-- Sending any external communication (email, social, any channel)
-- Publishing any content to external platforms
-- Creating, modifying, or deleting financial records
-- Issuing invoices or processing payments
-- Making any change to external service configuration
-- Deleting any record from the system (soft or hard)
-- Making strategic, legal, or ownership decisions
+- Financial transactions — invoices, payments, expense commitments
+- Legal commitments — contracts, terms, agreements
+- Ownership and strategic decisions
+- Security-critical changes — credentials, permissions, access
+- Mass communications exceeding policy limits
+- Irreversible actions — deletions, decommissions, DNS changes
+- Any new external service account or subscription
 
 ### 7.2 Emergency Stop
 
@@ -360,11 +299,13 @@ One PostgreSQL instance (Neon), multiple schemas:
 | `agents` | agent_definitions, agent_tasks, agent_outputs | Agents |
 | `system` | idempotency_keys, audit_events, settings | System-wide |
 
-**Design patterns (inherited from V1, proven):**
-- CAS (Compare-And-Swap) state transitions with `WHERE status = 'EXPECTED'`
-- Idempotency keys on all external operations and webhooks
-- Append-only audit_events table — never updated, never deleted
+**Design patterns (implemented fresh — not copied from V1):**
+- CAS (Compare-And-Swap) state transitions with `WHERE status = 'EXPECTED'` — prevents race conditions on status columns
+- Idempotency keys on all external operations and webhooks — prevents duplicate processing
+- Append-only audit_events table — never updated, never deleted — tamper-evident log
 - All foreign keys reference `identity.users.id` or domain-local records
+
+These are well-established engineering patterns, not V1 innovations. They are implemented fresh.
 
 ---
 
@@ -390,23 +331,23 @@ These rules apply to all code, all modules, forever:
 
 ## 10. What Requires CEO Approval Before Implementation Begins
 
-See DREXONYX_MASTER_BLUEPRINT.md, Part XI for the complete list of 14 CEO decisions (D1–D14).
+See DREXONYX_MASTER_BLUEPRINT.md, Part XI for the complete CEO Decision Sheet (D1–D11).
 
 The minimum approvals required before Phase 1 begins:
 
-| Decision | Item | Proposal |
+| Decision | Item | Status |
 |---|---|---|
-| D1 | Repository name | `drexonyx-platform` |
-| D2 | Platform subdomain | `app.drexonyx.com` |
-| D3 | Neon database strategy | Option A: second free Neon account |
-| D5 | Stripe | Confirm if Stripe account needed in new platform |
-| D10 | MDA sub-brand | Confirm if MDA operations continue |
-| D11 | Technology stack | Next.js, Drizzle, Neon, Vercel, Auth.js |
-| D13 | Public website | Keep V1 at drexonyx.com during Phases 1–5 |
-| D14 | Phase 1 start | CEO approves all planning documents |
+| D1 | Confirm company direction | PENDING CEO DECISION |
+| D2 | MDA sub-brand direction | PENDING CEO DECISION |
+| D4 | Public website strategy | PENDING CEO DECISION |
+| D6 | Stripe account existence | PENDING VERIFICATION |
+| D7 | Neon account plan and strategy | PENDING VERIFICATION |
+| D8 | Resend sender domain status | PENDING VERIFICATION |
+
+**Technology stack:** The stack listed in Section 5 above is PROPOSED. Claude recommends it based on independent evaluation. CEO may approve it as proposed, modify choices, or request additional information before approving.
 
 ---
 
-*Document version: 2.0 — Revised 2026-11-21 by Claude Code*  
-*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v1.0*  
-*Supersedes: v1.0 (2026-11-21, MDA-agency framing, no AI permission levels)*
+*Document version: 3.0 — Revised 2026-11-21 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v2.0*  
+*Supersedes: v2.0 (tech stack justified by V1 usage; "inherited from V1, proven" language; oversimplified permission model — CEO-ONLY applied to all external communications)*

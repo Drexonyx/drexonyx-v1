@@ -1,10 +1,10 @@
 # DREXONYX — Implementation Roadmap
 
-**Document version:** 2.0 (revised 2026-11-21)  
+**Document version:** 3.0 (revised 2026-11-21)  
 **Previous version:** 1.0 (11 phases, MDA-agency framing)  
 **Prepared by:** Claude Code  
 **Status:** DRAFT — AWAITING CEO REVIEW AND APPROVAL  
-**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v1.0
+**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v2.0
 
 ---
 
@@ -29,7 +29,7 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
 - [ ] CEO confirms platform subdomain (proposed: `app.drexonyx.com`)
 - [ ] CEO confirms database strategy (proposed: second free Neon account)
 - [ ] CEO approves proposed technology stack (Next.js, Drizzle, Neon, Vercel, Auth.js)
-- [ ] CEO confirms V1 public site strategy (proposed: keep V1 at drexonyx.com during build)
+- [ ] CEO confirms V1 public site strategy — select Option A (keep V1 during build), B (build new site independently and switch over), or C (retire V1 after new site verified) — see Master Blueprint Part VI.B
 
 **Nothing is built until every gate above is checked.**
 
@@ -272,7 +272,7 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
 
 | Item | Why Out of Scope |
 |---|---|
-| Public DREXONYX website rebuild | V1 continues at drexonyx.com during Phases 1–5; rebuild is a Phase 5+ decision |
+| Public DREXONYX website rebuild | PENDING CEO DECISION (D4) — Options A/B/C defined in Master Blueprint Part VI.B; no assumption made |
 | Client-facing customer portal | Internal-only platform |
 | Android native apps | Separate product; separate timeline (PENDING CEO DECISION) |
 | Fleet Tracker | Separate product; not part of new platform (PENDING CEO DECISION) |
@@ -295,6 +295,6 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
 
 ---
 
-*Document version: 2.0 — Revised 2026-11-21 by Claude Code*  
-*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v1.0*  
-*Supersedes: v1.0 (11-phase plan from 2026-11-21)*
+*Document version: 3.0 — Revised 2026-11-21 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v2.0*  
+*Supersedes: v2.0 (2026-11-21, assumed Option A for public website; referenced Master Blueprint v1.0; referenced 14-decision CEO sheet)*

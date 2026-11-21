@@ -1,10 +1,10 @@
 # DREXONYX — Legacy Preservation Plan & Resource Classification
 
-**Document version:** 2.0 (revised 2026-11-21)  
-**Previous version:** 1.0 (single asset list, 9 categories A–I)  
+**Document version:** 3.0 (revised 2026-11-21)  
+**Previous version:** 2.0 (auto-classified V1 repo and demo sites as permanent KEEP; auto-retired research files; lacked PENDING VERIFICATION category)  
 **Prepared by:** Claude Code  
 **Status:** DRAFT — AWAITING CEO REVIEW AND APPROVAL  
-**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v1.0
+**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v2.0
 
 ---
 
@@ -25,7 +25,10 @@ This document classifies every identified DREXONYX asset, external service, and 
 | **REFERENCE ONLY** | Historical information useful for decisions. Must not be imported into or connected to the new application. | No action needed |
 | **REBUILD** | The concept or capability is valuable; it must be rewritten fresh in the new platform. | Per-phase as roadmap specifies |
 | **RETIRE** | No longer needed. Can eventually be removed after CEO individual sign-off. | Phase 6 only |
-| **PENDING CEO DECISION** | Future use unclear. CEO must decide before any action. | CEO determines timing |
+| **PENDING CEO DECISION** | Current value or dependencies not fully established. CEO must decide before any action — including retirement. | CEO determines timing |
+| **PENDING VERIFICATION** | Classification depends on data not yet confirmed (e.g. account plan details). | Verify first, then classify |
+
+**Important:** No resource is classified as RETIRE without understanding its dependencies. Many resources below that might appear disposable depend on active services (V1 is live; demo sites are deployed). These are PENDING CEO DECISION until the CEO confirms the dependencies are resolved.
 
 ---
 
@@ -36,7 +39,7 @@ This document classifies every identified DREXONYX asset, external service, and 
 | Resource | Classification | Notes |
 |---|---|---|
 | GitHub organization: `drexonyx` | KEEP | Permanent infrastructure |
-| Repository: `drexonyx-v1` | KEEP | Legacy preservation — do not delete, do not modify |
+| Repository: `drexonyx-v1` | PENDING CEO DECISION | Currently serves the live public website via Vercel. Cannot be deleted while V1 is live. Once V1 is retired and new public site is in place, CEO confirms: archive or delete. |
 | New repository: `drexonyx-platform` | (To create in Phase 1) | New platform home |
 | V1 GitHub Actions workflows | REFERENCE ONLY | CI/CD patterns reference |
 | V1 GitHub Actions secrets | KEEP | V1 operational secrets stay with V1 |
@@ -53,7 +56,7 @@ This document classifies every identified DREXONYX asset, external service, and 
 | Resource | Classification | Notes |
 |---|---|---|
 | Vercel account (drexonyx.studio@gmail.com) | KEEP | Account is infrastructure |
-| Vercel project: V1 → drexonyx.com | KEEP | Continues serving public website until new platform is ready |
+| Vercel project: V1 → drexonyx.com | PENDING CEO DECISION | Required while V1 is live. Once V1 is retired and new public site is ready, this project can be decommissioned. Timing depends on CEO's public website decision (D4). |
 | New Vercel project: `drexonyx-platform` | (To create in Phase 1) | New platform deployment |
 | Old Vercel preview deployments (V1) | PENDING CEO DECISION → RETIRE | CEO confirms before cleaning up |
 
@@ -65,7 +68,7 @@ This document classifies every identified DREXONYX asset, external service, and 
 |---|---|---|
 | Neon account (existing) | KEEP | Account is infrastructure |
 | V1 Neon project — production database | KEEP — NEVER CONNECT | All V1 data preserved. New platform must never connect to it. |
-| V1 Neon branches (dev/preview) | REFERENCE ONLY | Available if V1 investigation needed |
+| V1 Neon branches (dev/preview) | PENDING CEO DECISION | May be useful if V1 investigations are needed. Candidates for deletion once V1 is confirmed retired. |
 | New Neon project (new platform) | (To create in Phase 1) | Completely fresh — isolated from V1 |
 
 **Neon Free Tier Constraint:** 1 project per account. CEO Decision D3 required before Phase 1:
@@ -93,7 +96,7 @@ This document classifies every identified DREXONYX asset, external service, and 
 | Resend account | KEEP BUT RECONFIGURE | Same account; new API key for new platform |
 | Existing Resend API key (V1) | KEEP — DO NOT SHARE | V1 continues using its own key |
 | New Resend API key (new platform) | (To generate in Phase 1) | Fresh key, separate from V1 |
-| Existing sender domain configuration | KEEP IF DOMAIN VERIFIED | If `info@drexonyx.com` verified in Resend, reusable in new platform |
+| Existing sender domain configuration | PENDING VERIFICATION | Verify: (1) is a sender domain (e.g. drexonyx.com) verified in the account? (2) what is current plan sending limit? (3) what is current monthly usage? Do not change email configuration during planning. |
 
 ---
 
@@ -189,19 +192,21 @@ V1 uses schemas: `core`, `identity`, `commercial`, `production`, `financial`, `s
 | `ssb` | REFERENCE ONLY | V1 Social Seller Bot subscription system (not documented in earlier planning) |
 | `orchestration` | REFERENCE ONLY | V1 agent orchestration tables |
 
-### 4.3 Five Production Demo Sites (KEEP — DEPLOYED)
+### 4.3 Five Production Demo Sites (PENDING CEO DECISION)
 
-The five demo sites remain deployed on Vercel. They are MDA's primary sales asset.
+The five demo sites are currently deployed on Vercel. They represent completed MDA work and may serve as a sales portfolio.
 
-| Demo | Industry | Status |
+| Demo | Industry | Current status |
 |---|---|---|
-| Blades & Co | Barbershop | KEEP — Live on Vercel |
-| Vitalis Clinic | Medical / Clinic | KEEP — Live on Vercel |
-| Lumière Studio | Salon | KEEP — Live on Vercel |
-| Zafran & Oud | Restaurant | KEEP — Live on Vercel |
-| Pinnacle Properties | Real Estate | KEEP — Live on Vercel |
+| Blades & Co | Barbershop | Live on Vercel |
+| Vitalis Clinic | Medical / Clinic | Live on Vercel |
+| Lumière Studio | Salon | Live on Vercel |
+| Zafran & Oud | Restaurant | Live on Vercel |
+| Pinnacle Properties | Real Estate | Live on Vercel |
 
-No action required. They remain deployed indefinitely. The new platform's Product Portfolio module will reference these.
+**CEO must decide:** Retain all indefinitely as portfolio assets? Retire specific demos? Retire all? The decision depends on whether MDA continues as a sub-brand (CEO Decision D2) and whether these sites are still presented to prospects.
+
+**Do not retire any demo site without explicit CEO sign-off on that specific site.**
 
 ### 4.4 MDA Business Documents (REFERENCE ONLY)
 
@@ -215,13 +220,13 @@ No action required. They remain deployed indefinitely. The new platform's Produc
 | Facebook lead generation research | REFERENCE ONLY | Historical outreach research |
 | MDA Client Acquisition Plan | REFERENCE ONLY | Historical sales planning |
 
-### 4.5 MDA Completed Deliverables (KEEP)
+### 4.5 MDA Completed Deliverables
 
 | Asset | Classification | Notes |
 |---|---|---|
-| Company Profile v1–v6 (HTML + PDF) | KEEP | Portfolio assets |
-| MDA Service Catalog v1–v3 | KEEP | Portfolio reference |
-| build-catalog-v3.py | REFERENCE ONLY | Python build script; keep for reference |
+| Company Profile v1–v6 (HTML + PDF) | PENDING CEO DECISION | Completed agency work. Value depends on whether MDA continues as a sub-brand. CEO decides: retain as portfolio, archive, or retire. |
+| MDA Service Catalog v1–v3 | PENDING CEO DECISION | Same as above. |
+| build-catalog-v3.py | REFERENCE ONLY | Python build script; keep for reference if catalog is rebuilt. |
 
 ### 4.6 Lead and Prospect Data
 
@@ -230,7 +235,7 @@ No action required. They remain deployed indefinitely. The new platform's Produc
 | LEAD_TRACKER.csv | PENDING CEO DECISION | Active leads. Manual review and import to new sales system, or leave as V1 historical record. |
 | FLASH_DELIVERY_DUBAI_LEADS.csv / .json | PENDING CEO DECISION | Prospect data. Same decision as above. |
 | OVERSEAS_RECRUITMENT_AGENCIES data | REFERENCE ONLY | Research output |
-| 25+ root-level research dump files | RETIRE (Phase 6) | Move to `_archive/` subfolder in V1 or delete after backup confirmation in Phase 6 |
+| 25+ root-level research dump files | PENDING CEO DECISION | CEO reviews before classifying as RETIRE. Some may contain useful competitive or market research worth preserving in Knowledge Base. Do not delete without CEO sign-off. |
 | FINAL_REJECTION_LOG, FINAL_RFQ, etc. | RETIRE (Phase 6) | Historical outreach artifacts |
 
 ### 4.7 V1 Architecture Decision Records (REFERENCE ONLY)
@@ -254,7 +259,7 @@ The following actions are forbidden at any time, in any phase, without an explic
 | Delete GitHub Actions secrets in V1 | Breaks the V1 generation polling pipeline |
 | Modify DNS for drexonyx.com | Risks taking the public website offline |
 | Delete the Cloudflare account or change DNS nameservers | Breaks DNS and SSL for drexonyx.com |
-| Delete the five demo sites from Vercel | Removes primary MDA sales asset |
+| Delete any demo site from Vercel | Removes MDA portfolio asset without CEO sign-off |
 
 ---
 
@@ -274,6 +279,6 @@ Before Phase 1 begins, the CEO confirms:
 
 ---
 
-*Document version: 2.0 — Revised 2026-11-21 by Claude Code*  
-*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v1.0*  
-*Supersedes: v1.0 (9-category A–I format from 2026-11-21)*
+*Document version: 3.0 — Revised 2026-11-21 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v2.0*  
+*Supersedes: v2.0 (auto-classified V1 repo and demo sites as permanent KEEP; auto-retired research files; lacked PENDING VERIFICATION category; lacked resource type column)*

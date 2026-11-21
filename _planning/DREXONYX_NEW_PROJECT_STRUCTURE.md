@@ -1,10 +1,10 @@
 # DREXONYX — New Project Structure
 
-**Document version:** 2.0 (revised 2026-11-21)  
+**Document version:** 3.0 (revised 2026-11-21)  
 **Previous version:** 1.0 (MDA-agency product framing)  
 **Prepared by:** Claude Code  
 **Status:** DRAFT — AWAITING CEO REVIEW AND APPROVAL  
-**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v1.0
+**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v2.0
 
 ---
 
@@ -16,7 +16,7 @@
 | GitHub organization | `drexonyx` |
 | Primary domain | `drexonyx.com` (existing, Vercel) |
 | Deployment target | Vercel (existing account) |
-| Node version | `^22.22.2 \|\| ^24.15.0 \|\| >=26.0.0` (same as V1) |
+| Node version | `^22.22.2 \|\| ^24.15.0 \|\| >=26.0.0` |
 | Framework | Next.js 16+ (App Router, TypeScript) |
 
 ---
@@ -381,6 +381,6 @@ The following are **not in scope** for the initial repository setup:
 
 ---
 
-*Document version: 2.0 — Revised 2026-11-21 by Claude Code*  
-*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v1.0*  
-*Supersedes: v1.0 (2026-11-21, MDA-agency product framing)*
+*Document version: 3.0 — Revised 2026-11-21 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v2.0*  
+*Supersedes: v2.0 (2026-11-21, "(same as V1)" qualifier on Node version; referenced Master Blueprint v1.0)*

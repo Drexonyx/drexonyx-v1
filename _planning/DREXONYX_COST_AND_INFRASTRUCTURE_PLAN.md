@@ -1,17 +1,17 @@
 # DREXONYX — Cost & Infrastructure Plan
 
-**Document version:** 2.0 (revised 2026-11-21)  
-**Previous version:** 1.0 (missing Stripe, Fleet Tracker/Expo, incorrect phase numbering)  
+**Document version:** 3.0 (revised 2026-11-21)  
+**Previous version:** 2.0 (provider limits stated as facts without UNVERIFIED labels; "already proven" infrastructure framing)  
 **Prepared by:** Claude Code  
 **Status:** DRAFT — AWAITING CEO REVIEW AND APPROVAL  
-**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v1.0  
-**Note:** All cost figures are estimates. Verify with current provider pricing before committing.
+**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v2.0  
+**Note:** All cost figures and plan limits are estimates from public documentation. UNVERIFIED figures must be confirmed against actual account dashboards before committing to any infrastructure strategy.
 
 ---
 
 ## 1. Design Principle: Minimize Operating Cost
 
-The new platform is built on infrastructure already paid for and already proven. No new paid services are introduced without a clear business case and CEO approval. Free tiers are maximized before any paid upgrade.
+The new platform uses existing infrastructure where the accounts are already in place. No new paid services are introduced without a clear business case and CEO approval. Free tiers are used before any paid upgrade. Existing accounts do not automatically mean the same plan limits apply — each must be verified against the actual account dashboard.
 
 **Cost rule:** Every line item below must justify its cost with a specific business outcome. Generic "nice to have" services are excluded.
 
@@ -33,56 +33,60 @@ The new platform is built on infrastructure already paid for and already proven.
 
 ### 2.2 Vercel
 - **Account:** Existing (`drexonyx.studio@gmail.com`)
-- **Plan:** Hobby (free)
-- **What's included:**
-  - Unlimited deployments
-  - 100 GB bandwidth/month
-  - Serverless functions (100 GB-hours/month)
+- **Plan:** Hobby (free) — **PENDING VERIFICATION** — verify current project count and that Hobby plan accommodates one more project
+- **What's included (UNVERIFIED — verify against current Vercel dashboard):**
+  - Unlimited deployments (reported)
+  - 100 GB bandwidth/month (reported)
+  - Serverless functions (100 GB-hours/month reported)
   - Preview deployments
   - Custom domain
 - **New platform need:** One additional Vercel project for `drexonyx-platform`
-- **Limitation on free plan:** Only 1 member (no team collaboration), no password protection for preview URLs
-- **Additional cost:** $0
+- **Limitation on free plan (UNVERIFIED):** Only 1 member (no team collaboration), no password protection for preview URLs
+- **Additional cost:** $0 (pending verification)
 - **Upgrade trigger (Vercel Pro at $20/month):**
   - Team members need Vercel access
   - Preview URL password protection needed
-  - Bandwidth exceeds 100 GB/month (unlikely for internal platform)
+  - Bandwidth exceeds Hobby plan limits
 
 ### 2.3 Neon PostgreSQL
 - **Account:** Existing
-- **Plan:** Free tier
-- **What's included:**
-  - 10 GB storage
-  - 10 GB transfer/month
-  - 0.5 GB RAM
-  - 1 project, 10 branches
+- **Plan:** Free tier — **PENDING VERIFICATION** — verify current plan tier and actual project count against Neon dashboard
+- **What's included (UNVERIFIED — verify against current Neon dashboard):**
+  - 10 GB storage (reported)
+  - 10 GB transfer/month (reported)
+  - 0.5 GB RAM (reported)
+  - 1 project, 10 branches (reported)
 - **New platform need:** Second database project for `drexonyx-platform`
-- **Free tier constraint:** 1 project per free account — CEO must decide:
-  - Option A: Create a second Neon account (free) for the new platform
-  - Option B: Upgrade to Neon Launch ($19/month) for unlimited projects on one account
-  - Option C: Use separate PostgreSQL schemas within the existing Neon project (not recommended — separation is cleaner)
-- **Recommended:** Option A (second free account) for now — upgrade when database grows > 8 GB
+- **Free tier constraint (PENDING VERIFICATION):** If the free tier allows only 1 project, the new platform needs a separate strategy. CEO must decide after account is verified:
+  - Option A: Create a second Neon account (free) for the new platform — $0
+  - Option B: Upgrade existing Neon account to Launch ($19/month) for unlimited projects on one account
+  - Option C: Use separate PostgreSQL schemas within the existing Neon project — not recommended (risks proximity to V1 production data; schema separation is not isolation)
+- **Recommendation (after verification):** Option A (second free account) — upgrade when database grows > 8 GB
 - **Additional cost:** $0 (Option A) or $19/month (Option B)
-- **Upgrade trigger:** Data exceeds 8 GB, or RAM constraints cause slow queries
+- **Upgrade trigger:** Data exceeds free tier storage, or RAM constraints cause slow queries
 
 ### 2.4 Cloudflare
 - **Account:** Existing
 - **Services in use:** Cloudflare R2 (object storage), DNS, possibly Workers
-- **R2 Free tier:**
-  - 10 GB storage/month
-  - 1 million Class A operations/month (writes, lists, deletes)
-  - 10 million Class B operations/month (reads)
+- **R2 Free tier (UNVERIFIED — verify against current Cloudflare dashboard):**
+  - 10 GB storage/month (reported)
+  - 1 million Class A operations/month (writes, lists, deletes) (reported)
+  - 10 million Class B operations/month (reads) (reported)
 - **New platform need:** Second R2 bucket for `drexonyx-platform` assets (documents, images)
 - **Additional cost:** $0 (well within free tier for internal platform)
 - **Upgrade trigger:** Storage exceeds 8 GB or operations exceed free tier limits
 
 ### 2.5 Resend (Email)
 - **Account:** Existing
-- **Plan:** Free tier
-- **What's included:** 3,000 emails/month, 100/day
-- **New platform need:** Shared — same account used for new platform
-- **Additional cost:** $0
-- **Upgrade trigger (Resend Pro at $20/month):** Outreach volume exceeds 3,000 emails/month
+- **Plan:** Free tier — **PENDING VERIFICATION** — verify current plan limits, monthly usage, and whether sender domain is configured
+- **What's included (UNVERIFIED — verify against current Resend dashboard):**
+  - 3,000 emails/month, 100/day (reported)
+  - Verify: is a sender domain (e.g. drexonyx.com) already verified for DKIM/SPF? This is required before the new platform uses Resend for outreach.
+  - Verify: current monthly email usage (V1 may already be consuming part of the quota)
+- **Do not change email configuration during planning phase.**
+- **New platform need:** Shared account; new API key
+- **Additional cost:** $0 (pending verification)
+- **Upgrade trigger (Resend Pro at $20/month):** Outreach volume exceeds free tier limits
 
 ### 2.6 Domain
 - **Domain:** `drexonyx.com` (existing, already registered and paid)
@@ -100,21 +104,22 @@ These costs scale with usage and have no fixed monthly floor.
 
 The new platform's AI Agent Workforce runs on Claude. Cost depends on which model and how many tasks run per month.
 
-| Model | Input | Output | Recommended Use |
-|---|---|---|---|
-| Claude Haiku 3.5 | $0.80/MTok | $4.00/MTok | High-volume, simple tasks (lead scoring, brief summaries) |
-| Claude Sonnet 4.5 | $3.00/MTok | $15.00/MTok | Standard agents (lead discovery, outreach draft, daily brief) |
-| Claude Opus 4.5 | $15.00/MTok | $75.00/MTok | Complex reasoning — use only for critical decisions, not routine tasks |
+| Model | Input | Output | Recommended Use | Status |
+|---|---|---|---|---|
+| Claude Haiku 3.5 | $0.80/MTok | $4.00/MTok | High-volume, simple tasks (lead scoring, brief summaries) | UNVERIFIED — pricing changes |
+| Claude Sonnet 4.5 | $3.00/MTok | $15.00/MTok | Standard agents (lead discovery, outreach draft, daily brief) | UNVERIFIED — pricing changes |
+| Claude Opus 4.5 | $15.00/MTok | $75.00/MTok | Complex reasoning — use only for critical decisions, not routine tasks | UNVERIFIED — pricing changes |
 
-**Estimated monthly usage (Phase 1–4, light usage):**
+**Verify current pricing:** Anthropic changes model pricing regularly. Verify actual current prices at the Anthropic console before using these figures in any budget planning.
+
+**Estimated monthly usage (Phase 1–4, light usage) — ILLUSTRATIVE ONLY:**
 - 50 agent tasks/month × 2,000 tokens average input + 1,000 tokens output = ~150,000 tokens/month
-- Using Claude Sonnet: ~$2.25/month
-- Using Claude Haiku: ~$0.72/month
+- Rough estimate at reported Sonnet pricing: ~$2–3/month
+- Rough estimate at reported Haiku pricing: ~$0.50–1/month
 
-**Estimated monthly usage (Phase 4–8, active sales + marketing):**
+**Estimated monthly usage (Phase 4+, active sales + marketing) — ILLUSTRATIVE ONLY:**
 - 500 agent tasks/month × 3,000 tokens average = ~1.5 MTok/month
-- Using Sonnet: ~$9/month
-- Using Haiku for routine + Sonnet for complex: ~$3–6/month
+- Rough estimate using Haiku for routine + Sonnet for complex: ~$3–10/month
 
 **Cost rule:** Always use the cheapest model that produces acceptable quality for the task type. Use Haiku for structured data extraction and scoring; Sonnet for drafting and analysis; Opus only when explicitly required.
 
@@ -295,7 +300,7 @@ The following services are explicitly excluded unless the CEO approves them:
 
 ## 9. CEO Decisions Required on Infrastructure
 
-See DREXONYX_MASTER_BLUEPRINT.md, Part XI for the complete list of 14 CEO decisions (D1–D14).
+See DREXONYX_MASTER_BLUEPRINT.md, Part XI for the complete CEO Decision Sheet (D1–D11, in four categories: A Strategic, B Verification-Required, C Deferrable, D Claude decides).
 
 Infrastructure-specific decisions:
 
@@ -328,6 +333,6 @@ For current Phase 1–4 (1 CEO, 50–200 agent tasks/month): **under $20/month t
 
 ---
 
-*Document version: 2.0 — Revised 2026-11-21 by Claude Code*  
-*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v1.0*  
-*Supersedes: v1.0 (2026-11-21, missing Stripe/Expo/Fleet Tracker, incorrect phase numbering)*
+*Document version: 3.0 — Revised 2026-11-21 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v2.0*  
+*Supersedes: v2.0 (2026-11-21, unverified provider figures presented as confirmed; referenced 14-decision CEO sheet)*
