@@ -1,9 +1,9 @@
 # DREXONYX — Legacy Preservation Plan & Resource Classification
 
-**Document version:** 3.0 (revised 2026-11-21)  
+**Document version:** 3.1 (revised 2026-11-21)  
 **Previous version:** 2.0 (auto-classified V1 repo and demo sites as permanent KEEP; auto-retired research files; lacked PENDING VERIFICATION category)  
 **Prepared by:** Claude Code  
-**Status:** DRAFT — AWAITING CEO REVIEW AND APPROVAL  
+**Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
 **Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v2.0
 
 ---
@@ -29,6 +29,21 @@ This document classifies every identified DREXONYX asset, external service, and 
 | **PENDING VERIFICATION** | Classification depends on data not yet confirmed (e.g. account plan details). | Verify first, then classify |
 
 **Important:** No resource is classified as RETIRE without understanding its dependencies. Many resources below that might appear disposable depend on active services (V1 is live; demo sites are deployed). These are PENDING CEO DECISION until the CEO confirms the dependencies are resolved.
+
+### Resource Type Distinction
+
+Retaining an external account does NOT automatically retain everything within it. Each level is a separate decision:
+
+| Resource level | Example | Decision required |
+|---|---|---|
+| External account | Vercel account, Neon account, GitHub organization | Retain the account itself |
+| Project within account | V1 Vercel project, V1 Neon database, `drexonyx-v1` repository | Separate decision per project |
+| Production data | V1 database records, V1 R2 bucket contents | Separate decision — treat as production data |
+| Credentials | V1 API keys, GitHub Actions secrets | Separate decision — do not share with new platform |
+| Active deployment | V1 live at drexonyx.com, demo site URLs | Separate decision — depends on public website strategy |
+| Local files / repository | Research files, Android projects, CSVs | Separate decision per file group |
+
+Classifying an **account** as KEEP does not classify its projects, data, credentials, deployments, or files. Each item in this document is classified individually.
 
 ---
 
@@ -279,6 +294,6 @@ Before Phase 1 begins, the CEO confirms:
 
 ---
 
-*Document version: 3.0 — Revised 2026-11-21 by Claude Code*  
-*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v2.0*  
-*Supersedes: v2.0 (auto-classified V1 repo and demo sites as permanent KEEP; auto-retired research files; lacked PENDING VERIFICATION category; lacked resource type column)*
+*Document version: 3.1 — Revised 2026-11-21 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.1*  
+*Supersedes: v3.0 (lacked explicit account-vs-project-vs-data distinction; did not state that retaining an account does not retain its contents)*

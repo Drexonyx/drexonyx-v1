@@ -1,9 +1,9 @@
 # DREXONYX — Cost & Infrastructure Plan
 
-**Document version:** 3.0 (revised 2026-11-21)  
+**Document version:** 3.1 (revised 2026-11-21)  
 **Previous version:** 2.0 (provider limits stated as facts without UNVERIFIED labels; "already proven" infrastructure framing)  
 **Prepared by:** Claude Code  
-**Status:** DRAFT — AWAITING CEO REVIEW AND APPROVAL  
+**Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
 **Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v2.0  
 **Note:** All cost figures and plan limits are estimates from public documentation. UNVERIFIED figures must be confirmed against actual account dashboards before committing to any infrastructure strategy.
 
@@ -14,6 +14,20 @@
 The new platform uses existing infrastructure where the accounts are already in place. No new paid services are introduced without a clear business case and CEO approval. Free tiers are used before any paid upgrade. Existing accounts do not automatically mean the same plan limits apply — each must be verified against the actual account dashboard.
 
 **Cost rule:** Every line item below must justify its cost with a specific business outcome. Generic "nice to have" services are excluded.
+
+### Cost Claim Labels
+
+Every cost figure and plan limit in this document carries one of these labels:
+
+| Label | Meaning |
+|---|---|
+| **CONFIRMED — DASHBOARD** | Verified directly from the account dashboard in this session |
+| **FREE TIER AVAILABLE** | Provider publicly offers a free tier; this account's actual plan and eligibility have NOT been confirmed |
+| **PENDING VERIFICATION** | Must be checked against the actual account dashboard before this figure can be used in planning |
+| **ILLUSTRATIVE** | A usage estimate based on stated assumptions — not a forecast or commitment |
+| **UNVERIFIED** | Taken from public documentation or pricing pages; may have changed |
+
+**No cost figure in this document is CONFIRMED — DASHBOARD.** All figures are either FREE TIER AVAILABLE, PENDING VERIFICATION, UNVERIFIED, or ILLUSTRATIVE. Do not publish a fixed monthly total or commit to any infrastructure strategy until the PENDING VERIFICATION items are confirmed.
 
 ---
 
@@ -300,22 +314,22 @@ The following services are explicitly excluded unless the CEO approves them:
 
 ## 9. CEO Decisions Required on Infrastructure
 
-See DREXONYX_MASTER_BLUEPRINT.md, Part XI for the complete CEO Decision Sheet (D1–D11, in four categories: A Strategic, B Verification-Required, C Deferrable, D Claude decides).
+For the complete, authoritative CEO Decision Register, see **DREXONYX_MASTER_BLUEPRINT.md, Part XI (D1–D11)**. That register is the single source of truth. Decision IDs used in this document refer to those same IDs.
 
-Infrastructure-specific decisions:
+Infrastructure-specific decisions referenced from the Master Blueprint register:
 
-| Decision ID | Item | Options | Recommendation |
-|---|---|---|---|
-| D1 | Repository name | `drexonyx-platform` / other | `drexonyx-platform` |
-| D2 | Platform subdomain | `app.drexonyx.com` / `platform.drexonyx.com` / other | `app.drexonyx.com` |
-| D3 | Neon database | A) Second free account / B) Upgrade existing to $19/month | **A — second free account** |
-| D4 | Vercel plan | Hobby (free, 1 member) / Pro ($20/month, team) | Hobby until team grows |
-| D5 | Stripe | Confirm if account exists and needed in new platform | PENDING |
-| D6 | Ziina AED 599 payment link | Reuse in new platform / Create new / Retire | PENDING |
-| D7 | Active leads CSV | Manual review and import / Leave as V1 historical | PENDING |
-| D8 | Fleet Tracker / Expo | Continue separately / Pause | PENDING |
-| D9 | Android projects | Continue separately / Pause | PENDING — pause recommended |
-| Infra | Cloudflare R2 bucket | Same bucket new folder / New dedicated bucket | **New dedicated bucket** |
+| Master Blueprint ID | Infrastructure relevance |
+|---|---|
+| D7 (Neon strategy) | Determines whether a second free Neon account or a paid upgrade is needed for Phase 1 |
+| D6 (Stripe) | Determines whether Stripe credentials are needed in the new platform's `.env.example` |
+| D8 (Resend sender domain) | Determines whether Resend is usable for outreach in Phase 4 or requires domain setup first |
+| D4 (Public website strategy) | Determines whether V1 Vercel project remains active and whether a new public site Vercel project is eventually added |
+
+**Decisions Claude has already made (no CEO input needed — see Master Blueprint Part XI Section D):**
+- Repository name: `drexonyx-platform`
+- Platform subdomain: `app.drexonyx.com`
+- R2 bucket: new dedicated bucket for new platform
+- Test-mode defaults: `SALES_OUTREACH_TEST_MODE=true`, `ZIINA_TEST_MODE=true`
 
 ---
 
@@ -333,6 +347,6 @@ For current Phase 1–4 (1 CEO, 50–200 agent tasks/month): **under $20/month t
 
 ---
 
-*Document version: 3.0 — Revised 2026-11-21 by Claude Code*  
-*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v2.0*  
-*Supersedes: v2.0 (2026-11-21, unverified provider figures presented as confirmed; referenced 14-decision CEO sheet)*
+*Document version: 3.1 — Revised 2026-11-21 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.1*  
+*Supersedes: v3.0 (contained conflicting local decision table D1–D9 that did not match Master Blueprint D1–D11; lacked cost label key distinguishing verified vs unverified claims)*

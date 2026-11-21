@@ -1,9 +1,9 @@
 # DREXONYX — Implementation Roadmap
 
-**Document version:** 3.0 (revised 2026-11-21)  
+**Document version:** 3.1 (revised 2026-11-21)  
 **Previous version:** 1.0 (11 phases, MDA-agency framing)  
 **Prepared by:** Claude Code  
-**Status:** DRAFT — AWAITING CEO REVIEW AND APPROVAL  
+**Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
 **Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v2.0
 
 ---
@@ -17,21 +17,30 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
 ---
 
 ## Phase 0 — Blueprint and Approval ← CURRENT PHASE
-**Goal:** Complete planning documents. CEO reviews and approves everything before any code is written.
+**Status: DOCUMENTATION COMPLETE, CEO APPROVAL PENDING**
 
-**What is happening now:**
-- Master Blueprint created (`_planning/DREXONYX_MASTER_BLUEPRINT.md`)
-- All 5 supporting planning documents updated
+**Goal:** Deliver complete, coherent planning documents for CEO review. Phase 1 is blocked until the CEO explicitly approves the Master Blueprint and authorizes repository creation.
+
+**What is complete:**
+- Master Blueprint v3.1 (`_planning/DREXONYX_MASTER_BLUEPRINT.md`)
+- All 5 supporting planning documents at v3.1
+- Three-system separation documented (CEO Command Center / Public Website / Commercial Products)
+- Authoritative CEO Decision Register established (D1–D11)
 
 **CEO gates before Phase 1 begins:**
-- [ ] CEO approves DREXONYX_MASTER_BLUEPRINT.md
-- [ ] CEO confirms repository name (proposed: `drexonyx-platform`)
-- [ ] CEO confirms platform subdomain (proposed: `app.drexonyx.com`)
-- [ ] CEO confirms database strategy (proposed: second free Neon account)
-- [ ] CEO approves proposed technology stack (Next.js, Drizzle, Neon, Vercel, Auth.js)
-- [ ] CEO confirms V1 public site strategy — select Option A (keep V1 during build), B (build new site independently and switch over), or C (retire V1 after new site verified) — see Master Blueprint Part VI.B
 
-**Nothing is built until every gate above is checked.**
+| Gate | Category | Blocking? |
+|---|---|---|
+| Approve DREXONYX_MASTER_BLUEPRINT.md v3.1 | Strategic | Yes — nothing starts without this |
+| Confirm D1 (company direction as AI-Native Technology Company) | Strategic | Yes |
+| Decide D4 (public website strategy: Option A, B, or C) | Strategic | Yes — determines V1 resource plan |
+| Decide D7 (Neon strategy: second free account vs. upgrade) | Requires verification | Yes — determines Phase 1 database setup |
+| Decide D8 (Resend sender domain: verify before Phase 4 outreach) | Requires verification | Phase 4 — not blocking Phase 1 |
+| Confirm technology stack direction | Technical | Yes — Claude has recommended; CEO confirms or redirects |
+
+**CEO decisions deferred to Phase 4–6:** D2 (MDA), D3 (product priorities), D5 (lead data), D6 (Stripe), D9 (Fleet Tracker), D10 (Android), D11 (demo sites) — do not delay Phase 1 start for these.
+
+**Phase 1 remains blocked until the CEO explicitly states: "Proceed to Phase 1 — create the repository."**
 
 ---
 
@@ -74,7 +83,8 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
 - `/security/approvals`: unified approval queue (empty initially, ready to receive)
 - `/security/audit`: paginated, filterable audit log viewer
 - `/security/access`: user management (add users, assign roles)
-- Emergency stop toggle: one action in `/security` suspends all agent task dispatch
+- Emergency stop toggle: one action in `/security` enables or disables all agent task dispatch
+- **Initial state: agents disabled.** `system.settings.agent_emergency_stop` is seeded as `true`. No agents run until the CEO completes the activation checklist below.
 
 **Domain logic:**
 - Approval gate engine: `domain/security/approval-gate.ts`
@@ -83,12 +93,21 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
 
 **Tests:** 50+ tests covering approval gate, audit log immutability, emergency stop enforcement, role-based authorization on every route
 
-**Success criteria:**
+**Phase 2 success criteria:**
 - CEO can log in and see the command dashboard
 - CEO can manually add/update KPIs
 - Approval queue is live and renderable
-- Emergency stop toggle works — sets `system.settings.agent_emergency_stop = true`, verified by test that no task dispatches when flag is true
+- Emergency stop mechanism verified end-to-end: set true → dispatch blocked; set false → dispatch resumes
 - An approval cannot be bypassed — test confirms staged output requires human action to advance
+
+**Agent activation gate (CEO completes before Phase 3 begins):**
+- [ ] Agent permissions configured in `/security`
+- [ ] At least one execution policy defined and reviewed
+- [ ] Audit logging verified: test actions appear correctly in `audit_events`
+- [ ] Emergency stop tested end-to-end (see success criteria above)
+- [ ] CEO explicitly sets `agent_emergency_stop = false` via `/security` to enable agents
+
+**Agents remain disabled until every item above is checked.** Phase 3 begins only after CEO enables agents.
 
 **Duration estimate:** 4–6 days
 
@@ -285,16 +304,18 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
 
 ## Safety Flags (Always True by Default)
 
-| Flag | Default | Change requires |
-|---|---|---|
-| `SALES_OUTREACH_TEST_MODE` | `true` | Explicit CEO authorization |
-| `ZIINA_TEST_MODE` | `true` | CEO authorization with business/legal clearance |
-| `agent_emergency_stop` | `false` (agents active) | CEO toggle in `/security` |
+| Flag | Initial value | Meaning | Change requires |
+|---|---|---|---|
+| `SALES_OUTREACH_TEST_MODE` | `true` | All outreach emails redirected to test address; no live sends | Explicit CEO authorization |
+| `ZIINA_TEST_MODE` | `true` | Payment processing in test mode; no real transactions | CEO authorization with business/legal clearance |
+| `agent_emergency_stop` | `true` (**agents disabled**) | All agent dispatch blocked; no tasks run | CEO sets to `false` after completing Phase 2 agent activation checklist |
 
 **All three flags are enforced in code, tested in CI, and cannot be bypassed programmatically.**
 
+**Important:** `agent_emergency_stop = true` is not a temporary setup state — it is the deliberate initial state. Agents do not run until the CEO explicitly enables them after completing the Phase 2 activation checklist. Having the emergency stop mechanism available does not mean agents are permitted to start.
+
 ---
 
-*Document version: 3.0 — Revised 2026-11-21 by Claude Code*  
-*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v2.0*  
-*Supersedes: v2.0 (2026-11-21, assumed Option A for public website; referenced Master Blueprint v1.0; referenced 14-decision CEO sheet)*
+*Document version: 3.1 — Revised 2026-11-21 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.1*  
+*Supersedes: v3.0 (agent_emergency_stop incorrectly defaulted to false (active); Phase 0 lacked explicit "approval pending" status; Phase 2 had no agent activation checklist gate; safety flags table showed wrong initial value)*

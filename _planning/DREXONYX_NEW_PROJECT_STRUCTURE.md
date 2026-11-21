@@ -1,9 +1,9 @@
 # DREXONYX — New Project Structure
 
-**Document version:** 3.0 (revised 2026-11-21)  
+**Document version:** 3.1 (revised 2026-11-21)  
 **Previous version:** 1.0 (MDA-agency product framing)  
 **Prepared by:** Claude Code  
-**Status:** DRAFT — AWAITING CEO REVIEW AND APPROVAL  
+**Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
 **Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v2.0
 
 ---
@@ -21,9 +21,13 @@
 
 ---
 
-## 1a. Absolute Fresh Start
+## 1a. Scope and System Identification
 
-This repository is built from scratch. Zero V1 code is imported. The structure below is designed for the new platform as an AI-Native Technology Company operating system — not for the MDA digital agency model. See DREXONYX_MASTER_BLUEPRINT.md for the company scope (10 business areas, 4 initial software products).
+**This document describes System A — the CEO Command Center only.** The public DREXONYX website (System B) and DREXONYX's commercial software products (CBMS, RMS, etc.) are separate systems with separate repositories and separate development phases. See Master Blueprint Part II.B.
+
+This repository is built from scratch. Zero V1 code is imported. The structure below is designed for the CEO Command Center — the private internal operating system of DREXONYX. It is not the public website, and it does not contain the commercial software products.
+
+**Directories are created only when their phase begins.** This document shows the full intended structure across all phases. Phase 1–3 creates the CEO Command Center, security infrastructure, and agent platform only. Phase 4–5 modules are not created as empty placeholders — they are added when their phase begins.
 
 ---
 
@@ -364,23 +368,29 @@ CI requirement: All tests must pass before any PR merges.
 
 ---
 
-## 10. What This Structure Intentionally Excludes (Phase 1)
+## 10. What This Structure Intentionally Excludes
 
-The following are **not in scope** for the initial repository setup:
+The following are **not in scope** for this repository:
 
-| Excluded | Reason |
-|---|---|
-| Client portal | New platform is internal-only |
-| Public DREXONYX website | drexonyx.com continues serving V1 during Phases 1–5; new public site is Phase 5+ |
-| Payment checkout flow | No public purchases in Phase 1 |
-| Android native apps | PENDING CEO DECISION — separate product, separate timeline |
-| Fleet Tracker | PENDING CEO DECISION — separate product, not in platform scope |
-| CMS or blog | Not needed in Phase 1 |
-| Multi-tenancy | Single-tenant (DREXONYX internal) |
-| SSB (Social Seller Bot) | V1-only feature; not rebuilt unless CEO requests |
+| Excluded | System | Reason |
+|---|---|---|
+| Public DREXONYX website | System B | Separate system, separate repository. PENDING CEO DECISION (D4). |
+| Commercial software products (CBMS, RMS, etc.) | System C | Each is a separate repository and deployment. This repo only tracks them in a Product Portfolio management module. |
+| Client portal | N/A | Internal-only platform |
+| Resend email integration | Phase 4+ | Not needed until outreach begins |
+| Ziina payment integration | Phase 5+ | Not needed until payment processing begins |
+| Facebook / WhatsApp API | Phase 5+ | Marketing operations; not needed until Phase 5 |
+| GitHub API (DevOps) | Phase 5+ | DevOps visibility; not needed until Phase 5 |
+| Cloudflare R2 | Phase 2+ | Add when file storage is first needed — not Day 1 |
+| Google Gemini | Phase 3+ | Add AI fallback when it is actually needed — not Day 1 |
+| Android native apps | PENDING D10 | Separate product; separate timeline |
+| Fleet Tracker | PENDING D9 | Separate product; not in platform scope |
+| CMS or blog | N/A | Not needed for internal platform |
+| Multi-tenancy | N/A | Single-tenant (DREXONYX internal) |
+| SSB (Social Seller Bot) | V1-only | Not rebuilt unless CEO requests |
 
 ---
 
-*Document version: 3.0 — Revised 2026-11-21 by Claude Code*  
-*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v2.0*  
-*Supersedes: v2.0 (2026-11-21, "(same as V1)" qualifier on Node version; referenced Master Blueprint v1.0)*
+*Document version: 3.1 — Revised 2026-11-21 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.1*  
+*Supersedes: v3.0 (lacked three-system scope note; excluded table assumed V1-continues for public website; did not distinguish Phase 1–3 structures from Phase 4–5 future directories)*

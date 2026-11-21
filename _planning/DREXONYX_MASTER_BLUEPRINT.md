@@ -3,7 +3,7 @@
 **Document version:** 2.0 (revised 2026-11-21)  
 **Previous version:** 1.0 (contained V1-dependent rationale, over-classified resources, oversimplified permission model, 14 redundant CEO decisions)  
 **Prepared by:** Claude Code  
-**Status:** DRAFT — AWAITING CEO REVIEW AND APPROVAL  
+**Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
 **Authority:** This document is the authoritative foundation. All other planning documents derive from it.
 
 ---
@@ -66,6 +66,59 @@ DREXONYX is a technology company. Its business scope covers 10 areas:
 ### MDA (Master Digital Agency)
 
 MDA is a **sub-brand** that operated as the initial commercial entry point. It is not the company's identity. CEO must decide whether to continue MDA as a sub-brand or fully rebrand under DREXONYX. See CEO Decision Sheet, Decision D2.
+
+---
+
+## PART II.B — THREE DISTINCT DREXONYX SYSTEMS
+
+DREXONYX operates three distinct system types. These are independent applications. They do not share repositories, deployments, database projects, or development phases. They must not be conflated in planning or implementation.
+
+### System A — CEO Command Center (Private)
+
+| Field | Value |
+|---|---|
+| **Purpose** | Internal operating system through which the CEO commands the entire company |
+| **Access** | Private — requires authentication. Zero public access. Not indexed by search engines. |
+| **Proposed domain** | `app.drexonyx.com` |
+| **Repository** | `drexonyx-platform` (to create in Phase 1) |
+| **Users** | DREXONYX CEO and future staff only |
+| **Build status** | Phases 1–5 of this plan |
+| **Contains** | AI Agent Workforce, Approval Queues, Knowledge Base, Sales Pipeline, Marketing, Finance, Tasks, Product Portfolio management interface |
+| **Does NOT contain** | Public web pages, client portals, the commercial software products themselves |
+
+### System B — Public DREXONYX Website
+
+| Field | Value |
+|---|---|
+| **Purpose** | Company's public presence on the internet |
+| **Access** | Public — no authentication |
+| **Domain** | `drexonyx.com` |
+| **Current state** | V1 (`drexonyx-v1` repository) is live |
+| **Build status** | PENDING CEO DECISION (D4) — Options A/B/C defined in Section VI.B |
+| **Repository** | `drexonyx-v1` now; new repo when rebuilt (separate from `drexonyx-platform`) |
+| **Contains** | Company information, services, contact |
+| **Critical rule** | The CEO Command Center is never the public website. These are separate deployments, separate repositories, separate applications. |
+
+### System C — Commercial Software Products
+
+| Field | Value |
+|---|---|
+| **Purpose** | Software products DREXONYX sells to clients |
+| **Products** | CBMS, RMS, Auto Workshop MS, DREXONYX International Trade System |
+| **Access** | Varies per product (B2B SaaS, deployed on-premises, etc.) |
+| **Domain** | Determined per product |
+| **Repository** | Each product requires its own separate repository |
+| **Build status** | PENDING CEO DECISION (D3 — which product first, and when) |
+| **Relationship to Command Center** | The CEO Command Center has a Product Portfolio module that tracks and manages these products. The products themselves are not built inside the Command Center. |
+| **Phase 0–5 scope** | No commercial product development is in scope until the CEO Command Center is live and the CEO has confirmed product priorities (D3). |
+
+### Why separation is required
+
+| Risk if conflated | Consequence |
+|---|---|
+| CEO Command Center mixed with public website | Public traffic could reach internal routes; authentication bypass risk |
+| Commercial products mixed with Command Center | Dependency conflicts; different release cycles; customer data in internal system |
+| All three in one repository | Cannot deploy independently; product updates break internal platform |
 
 ---
 
@@ -492,7 +545,7 @@ Non-negotiable rules for all code in the new platform, forever:
 7. CEO-ONLY agent outputs are always staged. Auto-apply for this permission level is a code defect.
 8. `SALES_OUTREACH_TEST_MODE=true` by default. Changing to `false` requires explicit CEO authorization.
 9. `ZIINA_TEST_MODE=true` by default. Changing to `false` requires CEO authorization with business/legal clearance.
-10. `agent_emergency_stop` checked before every task dispatch, regardless of permission level.
+10. **Agent execution is disabled by default.** The initial database seed sets `agent_emergency_stop = true` (all agent dispatch blocked). This is not an emergency stop that is toggled during a crisis — it is the initial safe state of the system. The CEO explicitly enables agent execution (sets the flag to `false`) only after: (a) agent permissions are configured in the platform, (b) execution policies are defined, (c) audit logging is verified end-to-end, (d) the emergency stop mechanism is tested. The flag is then checked before every task dispatch at runtime. Do not confuse the emergency stop mechanism being present with permission to start agents automatically.
 11. No database credentials shared between new platform and V1.
 12. No API keys shared between new platform and V1 — separate keys per platform.
 13. No secrets in Git history. `.env.local` gitignored.
@@ -524,9 +577,11 @@ CEO-approved, item-by-item deletion of confirmed obsolete V1 resources.
 
 ---
 
-## PART XI — CEO DECISION SHEET (SIMPLIFIED)
+## PART XI — AUTHORITATIVE CEO DECISION REGISTER (D1–D11)
 
-The decisions below require CEO input because they affect company direction, ownership, cost, security, or are irreversible. Technical decisions that Claude can make with clear reasoning are not on this list — those are documented in the Architecture document.
+This is the **single source of truth** for all CEO decisions. Decision IDs (D1–D11) are defined once in this register. All other planning documents reference these IDs without redefining them or introducing their own numbering. If a supporting document appears to define its own decision numbering that conflicts with these IDs, this register takes precedence.
+
+Decisions appear on this list because they affect company direction, ownership, cost, security, or are irreversible. Technical and operational decisions Claude can make with clear reasoning appear in Section D or in the Architecture document.
 
 ### A. Strategic Decisions (CEO Must Decide)
 
@@ -586,6 +641,13 @@ Before Phase 1 begins:
 - Cloudflare Workers existence
 - Stripe account existence and status
 
+**Before agent execution is enabled (Phase 2 prerequisite — agents start disabled):**
+- [ ] Agent permission levels configured in `/security`
+- [ ] At least one execution policy defined and reviewed
+- [ ] Audit log verified: test actions appear in `audit_events` correctly
+- [ ] Emergency stop mechanism tested end-to-end: toggle true → confirm dispatch blocked; toggle false → confirm dispatch resumes
+- [ ] CEO explicitly sets `agent_emergency_stop = false` to enable agents
+
 **Before any Phase 6 cleanup action:**
 - Individual CEO sign-off on each specific deletion
 
@@ -607,5 +669,5 @@ Before Phase 1 begins:
 
 ---
 
-*Document version: 2.0 — Revised 2026-11-21 by Claude Code*  
-*Supersedes: v1.0 (contained V1-dependent rationale, over-classified resources, oversimplified permission model, 14 redundant CEO decisions)*
+*Document version: 3.1 — Revised 2026-11-21 by Claude Code*  
+*Supersedes: v2.0 (lacked three-system separation; decision register shared numbering with supporting docs; agent execution incorrectly defaulted to enabled; Phase 0 labeled as implementation-ready)*

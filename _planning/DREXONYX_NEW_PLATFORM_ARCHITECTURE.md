@@ -1,9 +1,9 @@
 # DREXONYX — New Platform Architecture
 
-**Document version:** 3.0 (revised 2026-11-21)  
+**Document version:** 3.1 (revised 2026-11-21)  
 **Previous version:** 2.0 (tech stack justified by V1 usage; "inherited from V1, proven" language; oversimplified permission model)  
 **Prepared by:** Claude Code  
-**Status:** DRAFT — AWAITING CEO REVIEW AND APPROVAL  
+**Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
 **Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v2.0
 
 ---
@@ -25,6 +25,8 @@ The new platform is a genuinely new creation. This means:
 This is not a migration, reorganization, or refactor of V1. It is a new platform.
 
 This platform is not a customer-facing SaaS product. It is the internal nervous system of DREXONYX itself.
+
+**This architecture document covers System A — the CEO Command Center only.** The public DREXONYX website (System B) and DREXONYX's commercial software products (System C) are separate applications with their own repositories, deployments, and development phases. See Master Blueprint Part II.B for the three-system separation. No code, schema, or deployment from System A is shared with System B or System C.
 
 ---
 
@@ -126,6 +128,28 @@ The platform is organized into 11 domains. Each domain is a fully owned module w
 
 ### 3.11 Human Approval & Security Controls
 **Purpose:** Central registry of all pending approvals and security controls. The human override layer for every AI and automated action.
+
+---
+
+### 3.12 MVP Phase Scope
+
+Not all modules are built in Phase 1–3. Modules are added when the CEO has a real need for them, not to populate an empty directory structure.
+
+| Module | Phase | Rationale |
+|---|---|---|
+| CEO Command Center (3.1) | Phase 1–2 | P0 — first screen; home for KPIs, alerts, daily briefs |
+| Human Approval & Security (3.11) | Phase 1–2 | P0 — approval queue and audit log must exist before any agent runs |
+| AI Agent Workforce (3.2) | Phase 3 | Requires Phase 2 security infrastructure first |
+| Company Knowledge Base (3.4) | Phase 3–4 | Required for seeding business context into agents |
+| Product Portfolio (3.5) | Phase 4 | Register products; manage catalog, demos |
+| Company Management (3.3) | Phase 4 | Company records, settings — needed for Business Operations phase |
+| Sales & Customer Acquisition (3.7) | Phase 4 | POLICY-BOUND outreach requires Phase 3 agent infrastructure |
+| Task Management (3.10) | Phase 4 | Task workflow depends on domain modules existing first |
+| Finance & Business Reporting (3.9) | Phase 5 | Requires Ziina webhook; depends on Product and Sales being live |
+| Marketing Operations (3.8) | Phase 5 | Requires Phase 3 agents and Phase 4 content types |
+| Software Development Operations (3.6) | Phase 5 | GitHub API integration added when other modules are stable |
+
+**Rule:** No empty module directory is created before its phase. Build what is needed; add the next module when its phase begins.
 
 ---
 
@@ -244,13 +268,24 @@ The boundary: when a POLICY-BOUND action would exceed a policy limit or no match
 - Irreversible actions — deletions, decommissions, DNS changes
 - Any new external service account or subscription
 
-### 7.2 Emergency Stop
+### 7.2 Agent Startup State and Emergency Stop
 
-A `agent_emergency_stop` boolean in `system.settings` controls all agent dispatch. When `true`:
-- No new tasks are dispatched
+**Initial state: agents disabled.** The database seed sets `system.settings.agent_emergency_stop = true`. All agent dispatch is blocked from the moment the platform starts. This is not a temporary state to be cleared during deployment — it is the deliberate safe initial state.
+
+**Agent activation checklist (Phase 2 gate — CEO completes before enabling agents):**
+1. Agent permissions configured in `/security`
+2. At least one execution policy defined and reviewed
+3. Audit logging verified: test actions appear correctly in `audit_events`
+4. Emergency stop tested end-to-end: set true → confirm no dispatch; set false → confirm dispatch resumes
+5. CEO explicitly sets `agent_emergency_stop = false` via `/security` toggle
+
+**Runtime behavior when `agent_emergency_stop = true`:**
+- No new tasks are dispatched regardless of permission level
 - Running tasks complete their current step and halt before the next
 - The CEO toggles this in `/security`
-- All emergency stop events are logged to `audit_events` with timestamp and actor
+- All state changes logged to `audit_events` with timestamp and actor
+
+**Do not confuse:** An emergency stop mechanism existing in the platform is not authorization to start agents. Agents do not run until the CEO completes the activation checklist above and sets the flag to `false`.
 
 ### 7.3 Agent Contract
 
@@ -286,18 +321,20 @@ interface AgentDefinition<TInput, TOutput> {
 
 One PostgreSQL instance (Neon), multiple schemas:
 
-| Schema | Tables | Owner module |
-|---|---|---|
-| `identity` | users, sessions, roles | Auth |
-| `command` | kpis, alerts, daily_briefs | CEO Command Center |
-| `knowledge` | articles, documents, research_items, decisions | Knowledge Base |
-| `products` | service_catalog, pricing_tiers, demos, delivery_standards | Products |
-| `sales` | leads, lead_sources, outreach_messages, proposals, opt_outs | Sales |
-| `marketing` | campaigns, content_items, publishing_queue, analytics_snapshots | Marketing |
-| `finance` | invoices, payments, expenses, financial_snapshots | Finance |
-| `tasks` | tasks, workflows, workflow_steps, automation_rules | Tasks |
-| `agents` | agent_definitions, agent_tasks, agent_outputs | Agents |
-| `system` | idempotency_keys, audit_events, settings | System-wide |
+| Schema | Tables | Owner module | Phase |
+|---|---|---|---|
+| `system` | idempotency_keys, audit_events, settings (`agent_emergency_stop` seeded `true`) | System-wide | Phase 1 — created first |
+| `identity` | users, sessions, roles | Auth | Phase 1 |
+| `command` | kpis, alerts, daily_briefs | CEO Command Center | Phase 2 |
+| `agents` | agent_definitions, agent_tasks, agent_outputs | AI Agents | Phase 3 |
+| `knowledge` | articles, documents, research_items, decisions | Knowledge Base | Phase 3–4 |
+| `products` | service_catalog, pricing_tiers, demos, delivery_standards | Products | Phase 4 |
+| `sales` | leads, lead_sources, outreach_messages, proposals, opt_outs | Sales | Phase 4 |
+| `tasks` | tasks, workflows, workflow_steps, automation_rules | Tasks | Phase 4 |
+| `finance` | invoices, payments, expenses, financial_snapshots | Finance | Phase 5 |
+| `marketing` | campaigns, content_items, publishing_queue, analytics_snapshots | Marketing | Phase 5 |
+
+**Rule:** A schema is created only when its phase begins. Do not create empty schemas ahead of time.
 
 **Design patterns (implemented fresh — not copied from V1):**
 - CAS (Compare-And-Swap) state transitions with `WHERE status = 'EXPECTED'` — prevents race conditions on status columns
@@ -321,7 +358,7 @@ These rules apply to all code, all modules, forever:
 6. **Approval gates cannot be bypassed programmatically.** Only a human approval record in `security.approvals` advances a CEO-ONLY action.
 7. **CEO-ONLY agent outputs are always staged.** Auto-apply is a code defect for this permission level.
 8. **Test mode flags are `true` by default.** (`SALES_OUTREACH_TEST_MODE=true`, `ZIINA_TEST_MODE=true`). Changing either to `false` requires explicit CEO authorization.
-9. **Emergency stop is enforced before every task dispatch.** If `system.settings.agent_emergency_stop = true`, no task is dispatched regardless of permission level.
+9. **Agents are disabled by default.** `system.settings.agent_emergency_stop` is seeded as `true`. No agent task dispatches until the CEO completes the Phase 2 activation checklist and explicitly enables agents. This flag is then enforced before every task dispatch at runtime.
 10. **No secrets in Git history.** `.env.local` is gitignored. Never commit credentials.
 11. **Financial records are created by domain logic, never by agents directly.**
 12. **No database credentials shared between the new platform and V1.**
@@ -350,4 +387,6 @@ The minimum approvals required before Phase 1 begins:
 
 *Document version: 3.0 — Revised 2026-11-21 by Claude Code*  
 *Source of authority: DREXONYX_MASTER_BLUEPRINT.md v2.0*  
-*Supersedes: v2.0 (tech stack justified by V1 usage; "inherited from V1, proven" language; oversimplified permission model — CEO-ONLY applied to all external communications)*
+*Document version: 3.1 — Revised 2026-11-21 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.1*  
+*Supersedes: v3.0 (lacked three-system separation; all 11 modules treated as Phase 1 scope; agent execution defaulted to enabled; all schemas created upfront)*
