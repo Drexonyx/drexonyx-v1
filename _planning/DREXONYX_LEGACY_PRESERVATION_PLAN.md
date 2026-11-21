@@ -1,215 +1,279 @@
-# DREXONYX — Legacy Preservation Plan
+# DREXONYX — Legacy Preservation Plan & Resource Classification
 
-**Document type:** Legacy Protection & Asset Inventory — AWAITING CEO APPROVAL  
+**Document version:** 2.0 (revised 2026-11-21)  
+**Previous version:** 1.0 (single asset list, 9 categories A–I)  
 **Prepared by:** Claude Code  
-**Date:** 2026-11-21  
-**Status:** DRAFT — Do not execute any archival or deletion action without CEO sign-off
+**Status:** DRAFT — AWAITING CEO REVIEW AND APPROVAL  
+**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v1.0
 
 ---
 
 ## 1. Purpose
 
-This document defines how the existing `drexonyx-v1` repository and all its assets are preserved, what intellectual property is identified for reuse, and what protection measures are in place. No destructive action is recommended at any point.
+This document classifies every identified DREXONYX asset, external service, and V1 codebase component into one of six categories. It is the operational companion to the Master Blueprint's resource inventory (Part VII).
+
+**No action — no deletion, archival, reconfiguration, or cleanup — may be taken until the CEO reviews and approves Phase 6, with individual sign-off on each item.**
 
 ---
 
-## 2. What the Legacy Platform Is
+## 2. The Six Classification Categories
 
-`drexonyx-v1` is a fully implemented Next.js platform (Phase 21) containing:
-- A UGC advertising video production system (admin + client portals)
-- An AI generation pipeline (Higgsfield AI)
-- An MDA (Master Digital Agency) sales engine
-- An MDA demo production and delivery workflow
-- 955+ automated tests
-- Extensive architecture decision records (ADRs)
-- Business development documentation and research
-- Five production demo websites
-- Three Android project variants
-- A Fleet Tracker sub-application
-
-This is a substantial body of work. It must not be deleted or archived without a deliberate, CEO-approved process.
+| Category | Meaning | Action timing |
+|---|---|---|
+| **KEEP** | Retain exactly as-is. Already suitable for the new company. | No action needed |
+| **KEEP BUT RECONFIGURE** | Retain the account; create new project/bucket/key/credentials for the new platform. | Phase 1 — set up new credentials only |
+| **REFERENCE ONLY** | Historical information useful for decisions. Must not be imported into or connected to the new application. | No action needed |
+| **REBUILD** | The concept or capability is valuable; it must be rewritten fresh in the new platform. | Per-phase as roadmap specifies |
+| **RETIRE** | No longer needed. Can eventually be removed after CEO individual sign-off. | Phase 6 only |
+| **PENDING CEO DECISION** | Future use unclear. CEO must decide before any action. | CEO determines timing |
 
 ---
 
-## 3. Preservation Actions (Immediate)
+## 3. External Service Account Classifications
 
-### 3.1 Repository Protection — Action Required from CEO
+### 3.1 Version Control
 
-The following must be confirmed with the CEO before any new work begins:
-
-| Action | Who does it | Purpose |
+| Resource | Classification | Notes |
 |---|---|---|
-| Tag the current state of `main` branch as `v1-legacy-snapshot` | CEO or developer | Permanent immutable reference point |
-| Enable branch protection on `main` in GitHub Settings | CEO | Prevent accidental force-pushes |
-| Confirm Vercel production deployment is NOT disturbed | CEO | drexonyx.com stays live |
-| Confirm Neon database is NOT dropped or modified | CEO | All V1 data is preserved |
-| Confirm Cloudflare R2 bucket is NOT touched | CEO | All V1 assets are preserved |
+| GitHub organization: `drexonyx` | KEEP | Permanent infrastructure |
+| Repository: `drexonyx-v1` | KEEP | Legacy preservation — do not delete, do not modify |
+| New repository: `drexonyx-platform` | (To create in Phase 1) | New platform home |
+| V1 GitHub Actions workflows | REFERENCE ONLY | CI/CD patterns reference |
+| V1 GitHub Actions secrets | KEEP | V1 operational secrets stay with V1 |
 
-**None of these require code changes. All are GitHub/Vercel/Neon configuration actions.**
-
-### 3.2 Development Isolation
-
-The new platform will be built in a **separate GitHub repository** (`drexonyx-platform` — name subject to CEO approval). The legacy repository `drexonyx-v1` will never be modified as part of new platform development. The two repositories are independent.
+**Protected actions (forbidden without CEO sign-off):**
+- Force-push to `drexonyx-v1/main`
+- Delete or archive `drexonyx-v1`
+- Rotate or delete V1 GitHub Actions secrets
 
 ---
 
-## 4. Intellectual Property Inventory
+### 3.2 Deployment
 
-### Category A — Preserve and Reuse Directly
-*High-confidence reuse. Can be copied or adapted into the new platform without redesign.*
-
-| Asset | Location in V1 | Why Valuable |
+| Resource | Classification | Notes |
 |---|---|---|
-| MDA Source of Truth & Operating Rules | `master-digital-agency/business-development/MDA_SOURCE_OF_TRUTH_AND_OPERATING_RULES.md` | Complete business rules, pricing, service scope, evidence standards — CEO-approved |
-| MDA Company Profile Production Standard | `master-digital-agency/business-development/MDA_COMPANY_PROFILE_PRODUCTION_STANDARD.md` | Full production, QC, and delivery workflow for company profile service |
-| MDA Demo Production Standard (T1–T13) | `DREXONYX_MASTER_HANDOFF.md` §T | 13-step commercial workflow for website demo → payment → delivery. CEO-approved. |
-| Approved MDA pricing table | `master-digital-agency/business-development/MDA_SOURCE_OF_TRUTH_AND_OPERATING_RULES.md` §5 | Full service price list, CEO-approved 2026-10-21 |
-| MDA service catalog | `lib/catalog/mda-services.ts` | Canonical catalog data in code |
-| Security patterns (HMAC verification, idempotency keys, audit events) | `app/api/webhooks/`, `db/schema/system.ts`, `lib/agent/` | Proven, production-tested security patterns. Reuse the pattern, not the code. |
-| AI agent architecture (dispatch → stage → approve → execute) | `lib/agent/driver.ts`, `lib/agent/terminal.ts` | Proven agent execution model. Reuse the concept. |
-| Sales engine skills | `lib/skills/sales/` | 5 AI skills for lead discovery, qualification, scoring, outreach |
-| Sales DB schema | `db/schema/sales.ts` | Well-designed relational schema for the sales funnel |
-| Outreach approval policy logic | `lib/sales/queries.ts` | Defines which outreach requires human approval |
-| Ziina payment integration | `lib/ziina.ts` | UAE-specific, AED, proven |
-| Environment variable security model | `ARCHITECTURE.md` §3, `DREXONYX_MASTER_HANDOFF.md` §E | Security classification of all env vars |
-| NextAuth v5 dual-portal pattern | `auth.ts`, `auth.config.ts` | CAS-safe session model |
-
-### Category B — Preserve for Reference, Rebuild Cleanly
-*Valuable knowledge, but the code or structure should be redesigned for the new platform.*
-
-| Asset | Location in V1 | Note |
-|---|---|---|
-| Generation pipeline concept | `lib/agent/driver.ts`, `lib/admin/automated-pipeline.ts` | The pattern (fire → webhook → materialize → QC → approve) is sound. The specific Higgsfield implementation can be rebuilt cleaner. |
-| Admin portal UI structure | `app/admin/` | 30+ admin sub-routes. UI patterns are good reference but new platform has different modules. |
-| Drizzle ORM schema patterns | `db/schema/` | CAS state machines, schema separation, RLS SQL — rebuild using same patterns. |
-| Email templates and opt-out system | `lib/email/`, `lib/sales/outreach-sender.ts` | Email structure is good. Rebuild for new platform's email module. |
-| Facebook publish skill | `lib/skills/facebook-publish.ts` | Reference for the HUMAN_GATE pattern in Marketing Operations module. |
-| WhatsApp webhook handler | `app/api/webhooks/whatsapp/` | Reference for inbound message routing architecture. |
-| Skills framework | `lib/skills/` | The skill module pattern (input → AI call → structured output) is clean. Apply to new agent architecture. |
-
-### Category C — Five Production Demo Websites
-*Fully built, CEO-approved, live on Vercel. Must be preserved as deployed assets.*
-
-| Demo | Industry | Location |
-|---|---|---|
-| Blades & Co | Barbershop | `demo-sites/barbershop/` |
-| Vitalis Clinic | Medical / Clinic | `demo-sites/clinic/` |
-| Lumière Studio | Salon | `demo-sites/salon/` |
-| Zafran & Oud | Restaurant | `demo-sites/restaurant/` |
-| Pinnacle Properties | Real Estate | `demo-sites/realestate/` |
-
-These five demo sites are MDA's primary sales asset. They demonstrate the AED 599 website offer to prospects. They must remain deployed and accessible indefinitely. No action required — they are already live.
-
-**In the new platform:** The Product Portfolio module will reference and manage these demos. No rebuild is needed.
-
-### Category D — Architecture Decision Records
-*103+ ADR documents recording every significant technical decision in V1.*
-
-| Asset | Location | Recommendation |
-|---|---|---|
-| Full ADR library | `docs/decisions/` (103+ files) | Archive with the legacy repo. The new platform starts its own ADR sequence. The V1 decisions are historical context, not binding constraints. |
-
-### Category E — Business Development Research
-*Market research, outreach, pricing analysis conducted during V1 build.*
-
-| Asset | Location | Status |
-|---|---|---|
-| Dubai company profile pricing research | `master-digital-agency/business-development/DUBAI_COMPANY_PROFILE_PRICING_RESEARCH.md` | UNVERIFIED — keep as reference only |
-| Facebook lead generation research | `master-digital-agency/business-development/FACEBOOK_LEAD_GENERATION_RESEARCH.md` | Reference |
-| Lead tracker CSV | `master-digital-agency/business-development/LEAD_TRACKER.csv` | ACTIVE — migrate to new platform's Sales module |
-| MDA client acquisition plan | `master-digital-agency/business-development/MDA_CLIENT_ACQUISITION_PLAN.md` | Reference |
-| Manpower research files (25 root-level files) | Repo root | Business development research — archive in V1, do not carry to new platform |
-| Flash delivery Dubai leads | `FLASH_DELIVERY_DUBAI_LEADS.csv`, `.json` | Active prospect data — migrate to new Sales module |
-| Overseas recruitment agencies research | `OVERSEAS_RECRUITMENT_AGENCIES_*.{csv,json,html,xlsx}` | Research output — archive in V1 |
-
-### Category F — MDA Deliverables
-*Completed client/agency work products.*
-
-| Asset | Location | Recommendation |
-|---|---|---|
-| Company Profile v4 | `master-digital-agency/deliverables/company-profile-v4/` | Preserve as portfolio reference in new platform |
-| NEXORA portfolio sample | `master-digital-agency/deliverables/NEXORA-portfolio-sample/` | Preserve as portfolio reference |
-| MDA service catalog | `master-digital-agency/deliverables/mda-service-catalog/` | Migrate to new platform Product Portfolio module |
-
-### Category G — Android Projects
-*Three Android project variants.*
-
-| Asset | Location | Recommendation |
-|---|---|---|
-| android-project | `android-project/` | Pause development during new platform build |
-| android-official | `android-official/` | Preserve in legacy repo |
-| android-play | `android-play/` | Preserve in legacy repo |
-| APKs | `android-apk/` | Preserve as release artifacts |
-
-**Recommendation:** Android development is paused during the new platform build phase. No action required. These remain safely in the V1 repo.
-
-### Category H — Fleet Tracker
-*A standalone sub-application.*
-
-| Asset | Location | Recommendation |
-|---|---|---|
-| Fleet Tracker app | `apps/fleet-tracker/` | Treat as an independent product. Not part of the new platform. Remains in V1 repo until it has its own. |
-
-### Category I — Pricing & Commercial Data
-*All CEO-approved pricing and commercial decisions.*
-
-| Item | Value | Source |
-|---|---|---|
-| MDA website packages | AED 599 / 899 / 1,899 | CONFIRMED—USER 2026-10-21 |
-| MDA branding | AED 99 / 249 / 349 | CONFIRMED—USER 2026-10-21 |
-| MDA company profiles | AED 60 / 160 / 249 | CONFIRMED—USER 2026-10-21 |
-| Graphic design | AED 49 / 99 / 249 | CONFIRMED—USER 2026-10-21 |
-| Social media management | AED 549 / 899 per month | CONFIRMED—USER 2026-10-21 |
-| Ziina payment URL | `https://pay.ziina.com/drexonyx/Md6AyFJ0z?source=app` | CONFIRMED—must not change without CEO approval |
-
-All pricing migrates to the new platform's Product Portfolio module as the canonical service catalog.
+| Vercel account (drexonyx.studio@gmail.com) | KEEP | Account is infrastructure |
+| Vercel project: V1 → drexonyx.com | KEEP | Continues serving public website until new platform is ready |
+| New Vercel project: `drexonyx-platform` | (To create in Phase 1) | New platform deployment |
+| Old Vercel preview deployments (V1) | PENDING CEO DECISION → RETIRE | CEO confirms before cleaning up |
 
 ---
 
-## 5. What to Leave Behind
+### 3.3 Database
 
-The following assets have no reuse value in the new platform and should remain in the V1 repo without being carried over:
+| Resource | Classification | Notes |
+|---|---|---|
+| Neon account (existing) | KEEP | Account is infrastructure |
+| V1 Neon project — production database | KEEP — NEVER CONNECT | All V1 data preserved. New platform must never connect to it. |
+| V1 Neon branches (dev/preview) | REFERENCE ONLY | Available if V1 investigation needed |
+| New Neon project (new platform) | (To create in Phase 1) | Completely fresh — isolated from V1 |
 
-| Asset | Why Not Carried |
-|---|---|
-| 25+ root-level research dump files (`MANPOWER_*`, `OVERSEAS_*`, `FLASH_DELIVERY_*`, `FINAL_*`) | Loose research artifacts that belong in the Knowledge Base module as structured entries, not raw files at repo root |
-| Client portal code (`app/portal/`) | New platform is internal-only. No client portal in Phase 1. |
-| Video production pipeline (`lib/agent/`, `app/admin/production/`) | Will be rebuilt cleanly as a module when needed |
-| Legacy public demo HTML files (`public/demo.html`, `public/promo.html`, etc.) | Replaced by the new demo sites |
-| Old DB schema design artifacts from early phases | Superseded by current V1 schema |
+**Neon Free Tier Constraint:** 1 project per account. CEO Decision D3 required before Phase 1:
+- **Option A (Recommended):** Second free Neon account for new platform
+- **Option B:** Upgrade existing account to Launch ($19/month)
 
 ---
 
-## 6. Strictly Prohibited Actions
+### 3.4 Storage
 
-The following actions are forbidden without explicit CEO approval and a written recovery plan:
+| Resource | Classification | Notes |
+|---|---|---|
+| Cloudflare account | KEEP | Account is infrastructure |
+| DNS for drexonyx.com | KEEP — DO NOT CHANGE | Primary domain; active SSL |
+| R2 bucket (V1 assets — videos, images) | KEEP — NEVER CONNECT | V1 production storage |
+| New R2 bucket for new platform | (To create in Phase 1) | Fresh bucket, completely separate |
+| Cloudflare Workers (if any) | PENDING CEO DECISION | Verify if any Workers exist first |
+
+---
+
+### 3.5 Email
+
+| Resource | Classification | Notes |
+|---|---|---|
+| Resend account | KEEP BUT RECONFIGURE | Same account; new API key for new platform |
+| Existing Resend API key (V1) | KEEP — DO NOT SHARE | V1 continues using its own key |
+| New Resend API key (new platform) | (To generate in Phase 1) | Fresh key, separate from V1 |
+| Existing sender domain configuration | KEEP IF DOMAIN VERIFIED | If `info@drexonyx.com` verified in Resend, reusable in new platform |
+
+---
+
+### 3.6 Domain
+
+| Resource | Classification | Notes |
+|---|---|---|
+| drexonyx.com | KEEP | Primary company domain |
+| Any existing subdomains | PENDING CEO DECISION | CEO to confirm which subdomains exist |
+| New subdomain: `app.drexonyx.com` | (To create in Phase 1) | New platform URL |
+
+---
+
+### 3.7 AI Providers
+
+| Resource | Classification | Notes |
+|---|---|---|
+| Anthropic API account | KEEP BUT RECONFIGURE | Same account; generate new API key for new platform |
+| Existing ANTHROPIC_API_KEY (V1) | KEEP — DO NOT SHARE | V1 uses its own key |
+| Google AI Studio account (Gemini) | KEEP BUT RECONFIGURE | Free tier; same account usable with fresh key |
+| Existing GEMINI_API_KEY (V1) | KEEP — DO NOT SHARE | V1 uses its own key |
+
+---
+
+### 3.8 Payment Providers
+
+| Resource | Classification | Notes |
+|---|---|---|
+| Ziina account | KEEP BUT RECONFIGURE | Same account; fresh credentials for new platform |
+| Existing Ziina payment link: `https://pay.ziina.com/drexonyx/Md6AyFJ0z?source=app` | PENDING CEO DECISION | AED 599 MDA website offer link. If MDA operations continue, may still be needed. CEO must confirm (Decision D6). |
+| Stripe account | PENDING CEO DECISION | V1 had Stripe (STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET in .env.example). Verify account exists. CEO to decide if Stripe is needed in new platform (Decision D5). |
+
+---
+
+### 3.9 Social and Messaging APIs
+
+| Resource | Classification | Notes |
+|---|---|---|
+| Facebook Graph API access | PENDING CEO DECISION | V1 had Facebook organic publishing. New platform may need it in Marketing Operations (Phase 5). Do not set up until needed. |
+| WhatsApp Cloud API | RETIRE from new platform | V1 had inbound WhatsApp. Not in new platform Phase 1–5 scope. CEO confirms retirement at Phase 6. |
+| Meta Business Manager access | PENDING CEO DECISION | May be needed for Facebook publishing |
+
+---
+
+### 3.10 Mobile and Device
+
+| Resource | Classification | Notes |
+|---|---|---|
+| Fleet Tracker source code (`apps/fleet-tracker/`) | PENDING CEO DECISION | Expo/React Native app. Wialon GPS integration. Expo account: `drexonyx.studio`. Bundle ID: `com.drexonyx.fleettracker`. Treated as a separate product. |
+| Expo account (drexonyx.studio) | PENDING CEO DECISION | Required for Fleet Tracker builds |
+| Wialon GPS API access | PENDING CEO DECISION | GPS tracking platform required by Fleet Tracker |
+| Android project — android-project/ | PENDING CEO DECISION | Native Android project |
+| Android project — android-official/ | PENDING CEO DECISION | Official release variant |
+| Android project — android-play/ | PENDING CEO DECISION | Google Play store variant (includes store listing materials) |
+| android-apk/ debug builds | RETIRE (eventually) | Debug APKs; not production releases |
+| Google Play Developer account | PENDING CEO DECISION | Required if Android apps are published |
+
+**Recommendation:** Pause Fleet Tracker and all Android native development during Phases 1–5. CEO to restart as separate product workstreams when ready.
+
+---
+
+## 4. V1 Codebase Asset Classifications
+
+### 4.1 Application Code (REFERENCE ONLY — no imports)
+
+All V1 application code is classified as **REFERENCE ONLY**. No file, function, or module from V1 may be copied into the new platform. The patterns and concepts are valuable; they are rewritten fresh.
+
+| V1 concept | New platform equivalent | Rebuild value |
+|---|---|---|
+| CAS state transitions | `domain/*/state-machine.ts` | HIGH — rebuild exact pattern |
+| Idempotency key pattern | `db/schema/system.ts` | HIGH — rebuild exact pattern |
+| Append-only audit events | `db/schema/system.ts` | HIGH — rebuild exact pattern |
+| HMAC webhook verification | `app/api/webhooks/**` | HIGH — rebuild exact pattern |
+| Test-mode safety flags | `.env.example`, agent executor | HIGH — rebuild exact pattern |
+| AI skill contract (input → AI → structured output) | `domain/agents/definitions/` | MEDIUM — apply to new agent definitions |
+| Lead funnel state machine | `domain/sales/pipeline.ts` | MEDIUM — fresh schema, same state concept |
+| Approval gate for outreach | `domain/security/approval-gate.ts` | HIGH — critical pattern, rebuild |
+| Agent dispatch → stage → approve | `domain/agents/executor.ts` | MEDIUM — reference for new executor |
+
+### 4.2 V1 Database Schemas (REFERENCE ONLY)
+
+V1 uses schemas: `core`, `identity`, `commercial`, `production`, `financial`, `system`, `sales`, `ssb`, `orchestration`. These remain in the V1 Neon project. The new platform starts its own schema set with no overlap.
+
+| V1 Schema | Classification | Notes |
+|---|---|---|
+| `core` | REFERENCE ONLY | V1 core business data |
+| `identity` | REFERENCE ONLY | V1 auth data |
+| `commercial` | REFERENCE ONLY | V1 commercial records |
+| `production` | REFERENCE ONLY | V1 video generation pipeline |
+| `financial` | REFERENCE ONLY | V1 financial records |
+| `system` | REFERENCE ONLY | V1 audit events, idempotency keys |
+| `sales` | REFERENCE ONLY | V1 lead and outreach data |
+| `ssb` | REFERENCE ONLY | V1 Social Seller Bot subscription system (not documented in earlier planning) |
+| `orchestration` | REFERENCE ONLY | V1 agent orchestration tables |
+
+### 4.3 Five Production Demo Sites (KEEP — DEPLOYED)
+
+The five demo sites remain deployed on Vercel. They are MDA's primary sales asset.
+
+| Demo | Industry | Status |
+|---|---|---|
+| Blades & Co | Barbershop | KEEP — Live on Vercel |
+| Vitalis Clinic | Medical / Clinic | KEEP — Live on Vercel |
+| Lumière Studio | Salon | KEEP — Live on Vercel |
+| Zafran & Oud | Restaurant | KEEP — Live on Vercel |
+| Pinnacle Properties | Real Estate | KEEP — Live on Vercel |
+
+No action required. They remain deployed indefinitely. The new platform's Product Portfolio module will reference these.
+
+### 4.4 MDA Business Documents (REFERENCE ONLY)
+
+| Asset | Classification | Location in V1 |
+|---|---|---|
+| MDA Source of Truth & Operating Rules | REFERENCE ONLY | `master-digital-agency/business-development/MDA_SOURCE_OF_TRUTH_AND_OPERATING_RULES.md` |
+| MDA Demo Production Standard (T1–T13) | REFERENCE ONLY | `DREXONYX_MASTER_HANDOFF.md` §T |
+| MDA Company Profile Production Standard | REFERENCE ONLY | `master-digital-agency/business-development/MDA_COMPANY_PROFILE_PRODUCTION_STANDARD.md` |
+| CEO-approved MDA pricing (2026-10-21) | REFERENCE ONLY — HISTORICAL | Requires re-approval for new platform context |
+| Dubai company profile pricing research | REFERENCE ONLY — UNVERIFIED | Snippet-based; cannot be used as market evidence |
+| Facebook lead generation research | REFERENCE ONLY | Historical outreach research |
+| MDA Client Acquisition Plan | REFERENCE ONLY | Historical sales planning |
+
+### 4.5 MDA Completed Deliverables (KEEP)
+
+| Asset | Classification | Notes |
+|---|---|---|
+| Company Profile v1–v6 (HTML + PDF) | KEEP | Portfolio assets |
+| MDA Service Catalog v1–v3 | KEEP | Portfolio reference |
+| build-catalog-v3.py | REFERENCE ONLY | Python build script; keep for reference |
+
+### 4.6 Lead and Prospect Data
+
+| Asset | Classification | Notes |
+|---|---|---|
+| LEAD_TRACKER.csv | PENDING CEO DECISION | Active leads. Manual review and import to new sales system, or leave as V1 historical record. |
+| FLASH_DELIVERY_DUBAI_LEADS.csv / .json | PENDING CEO DECISION | Prospect data. Same decision as above. |
+| OVERSEAS_RECRUITMENT_AGENCIES data | REFERENCE ONLY | Research output |
+| 25+ root-level research dump files | RETIRE (Phase 6) | Move to `_archive/` subfolder in V1 or delete after backup confirmation in Phase 6 |
+| FINAL_REJECTION_LOG, FINAL_RFQ, etc. | RETIRE (Phase 6) | Historical outreach artifacts |
+
+### 4.7 V1 Architecture Decision Records (REFERENCE ONLY)
+
+The 103+ ADR documents in `docs/decisions/` record every significant technical decision in V1. They are classified as **REFERENCE ONLY**. The new platform starts its own ADR sequence (Decision #0001 onwards). V1 decisions are historical context, not binding constraints.
+
+---
+
+## 5. Protected Actions — Forbidden Without CEO Sign-Off
+
+The following actions are forbidden at any time, in any phase, without an explicit CEO instruction for that specific action:
 
 | Action | Why Forbidden |
 |---|---|
-| Delete or archive the `drexonyx-v1` GitHub repository | Destroys all V1 history, ADRs, and in-progress work |
-| Drop or modify the Neon production database | Destroys live customer and business data |
-| Delete the Cloudflare R2 bucket | Destroys all stored video and image assets |
-| Unpublish or delete Vercel production deployment | Takes drexonyx.com offline |
-| Force-push to `main` on `drexonyx-v1` | Destroys commit history |
-| Revoke or rotate production API keys | Breaks live production services |
-| Delete GitHub Actions secrets | Breaks the generation polling pipeline |
+| Delete or archive the `drexonyx-v1` GitHub repository | Destroys all V1 history, 103+ ADRs, and all in-progress sub-projects |
+| Drop, modify, or connect to the V1 Neon production database | Destroys live production data; risks data contamination |
+| Delete the V1 Cloudflare R2 bucket | Destroys all V1 video and image assets |
+| Unpublish or delete the Vercel production deployment for drexonyx.com | Takes the public website offline |
+| Force-push to `main` on `drexonyx-v1` | Destroys V1 commit history |
+| Revoke or rotate production API keys for V1 | Breaks live production services |
+| Delete GitHub Actions secrets in V1 | Breaks the V1 generation polling pipeline |
+| Modify DNS for drexonyx.com | Risks taking the public website offline |
+| Delete the Cloudflare account or change DNS nameservers | Breaks DNS and SSL for drexonyx.com |
+| Delete the five demo sites from Vercel | Removes primary MDA sales asset |
 
 ---
 
-## 7. Recommended Preservation Checklist
+## 6. Phase 0 Preservation Checklist
 
-Before starting new platform development, the CEO confirms:
+Before Phase 1 begins, the CEO confirms:
 
 - [ ] `git tag v1-legacy-snapshot` created on `drexonyx-v1/main`
 - [ ] GitHub branch protection enabled on `drexonyx-v1/main`
 - [ ] Vercel production deployment confirmed live at drexonyx.com
-- [ ] Neon production database confirmed accessible (no schema changes)
-- [ ] Cloudflare R2 bucket confirmed intact
+- [ ] Neon V1 production database confirmed accessible (no schema changes made)
+- [ ] Cloudflare R2 V1 bucket confirmed intact
 - [ ] Five demo sites confirmed accessible (barbershop, clinic, salon, restaurant, realestate)
-- [ ] `LEAD_TRACKER.csv` and `FLASH_DELIVERY_DUBAI_LEADS` data reviewed — confirm whether active prospects need manual follow-up before new platform is ready
-- [ ] Android APKs confirmed stored (can be downloaded from repo if needed)
+- [ ] `LEAD_TRACKER.csv` and `FLASH_DELIVERY_DUBAI_LEADS` data reviewed — confirm whether active prospects need manual follow-up before new platform is ready (Decision D7)
+- [ ] Stripe account status confirmed (Decision D5)
 - [ ] CEO has reviewed this document and approved it
 
 ---
 
-*End of Document 2 — DREXONYX_LEGACY_PRESERVATION_PLAN.md*
+*Document version: 2.0 — Revised 2026-11-21 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v1.0*  
+*Supersedes: v1.0 (9-category A–I format from 2026-11-21)*

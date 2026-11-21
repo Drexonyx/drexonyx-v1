@@ -1,9 +1,10 @@
 # DREXONYX — New Project Structure
 
-**Document type:** Proposed Directory Structure — AWAITING CEO APPROVAL  
+**Document version:** 2.0 (revised 2026-11-21)  
+**Previous version:** 1.0 (MDA-agency product framing)  
 **Prepared by:** Claude Code  
-**Date:** 2026-11-21  
-**Status:** DRAFT — Do not create the repository or any files without CEO sign-off
+**Status:** DRAFT — AWAITING CEO REVIEW AND APPROVAL  
+**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v1.0
 
 ---
 
@@ -17,6 +18,12 @@
 | Deployment target | Vercel (existing account) |
 | Node version | `^22.22.2 \|\| ^24.15.0 \|\| >=26.0.0` (same as V1) |
 | Framework | Next.js 16+ (App Router, TypeScript) |
+
+---
+
+## 1a. Absolute Fresh Start
+
+This repository is built from scratch. Zero V1 code is imported. The structure below is designed for the new platform as an AI-Native Technology Company operating system — not for the MDA digital agency model. See DREXONYX_MASTER_BLUEPRINT.md for the company scope (10 business areas, 4 initial software products).
 
 ---
 
@@ -116,7 +123,7 @@ drexonyx-platform/
 │   │   ├── identity.ts          # users, sessions
 │   │   ├── command.ts           # kpis, alerts, briefs
 │   │   ├── knowledge.ts         # articles, documents, research
-│   │   ├── products.ts          # catalog, demos, standards
+│   │   ├── products.ts          # software catalog, versions, licenses, customers, demos
 │   │   ├── sales.ts             # leads, outreach, proposals
 │   │   ├── marketing.ts         # campaigns, content, publishing
 │   │   ├── finance.ts           # invoices, payments, expenses
@@ -150,10 +157,10 @@ drexonyx-platform/
 │
 │   # Knowledge Base Content (static files for initial seed)
 ├── knowledge-seed/
-│   ├── products/                # MDA service catalog entries
-│   ├── processes/               # SOPs, production standards
-│   ├── decisions/               # Architecture decisions (new series)
-│   └── research/                # Migrated/referenced research
+│   ├── products/                # DREXONYX software product specs; MDA service catalog (if MDA continues)
+│   ├── processes/               # SOPs, production standards (from V1 reference material)
+│   ├── decisions/               # Architecture decisions (new series, starts at #0001)
+│   └── research/                # Referenced research (manually curated from V1 reference only)
 │
 │   # Governance Documents
 ├── ARCHITECTURE.md              # Platform architecture + security rules
@@ -364,13 +371,16 @@ The following are **not in scope** for the initial repository setup:
 | Excluded | Reason |
 |---|---|
 | Client portal | New platform is internal-only |
-| Public marketing site | drexonyx.com continues serving from V1 during transition |
+| Public DREXONYX website | drexonyx.com continues serving V1 during Phases 1–5; new public site is Phase 5+ |
 | Payment checkout flow | No public purchases in Phase 1 |
-| Android app | Separate product, separate timeline |
-| Fleet Tracker | Separate product, not in platform scope |
+| Android native apps | PENDING CEO DECISION — separate product, separate timeline |
+| Fleet Tracker | PENDING CEO DECISION — separate product, not in platform scope |
 | CMS or blog | Not needed in Phase 1 |
 | Multi-tenancy | Single-tenant (DREXONYX internal) |
+| SSB (Social Seller Bot) | V1-only feature; not rebuilt unless CEO requests |
 
 ---
 
-*End of Document 3 — DREXONYX_NEW_PROJECT_STRUCTURE.md*
+*Document version: 2.0 — Revised 2026-11-21 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v1.0*  
+*Supersedes: v1.0 (2026-11-21, MDA-agency product framing)*

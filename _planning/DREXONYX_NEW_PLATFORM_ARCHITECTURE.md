@@ -1,17 +1,30 @@
 # DREXONYX — New Platform Architecture
 
-**Document type:** Proposed Architecture — AWAITING CEO APPROVAL  
+**Document version:** 2.0 (revised 2026-11-21)  
+**Previous version:** 1.0 (MDA-agency framing, no AI permission levels)  
 **Prepared by:** Claude Code  
-**Date:** 2026-11-21  
-**Status:** DRAFT — Do not implement without CEO sign-off
+**Status:** DRAFT — AWAITING CEO REVIEW AND APPROVAL  
+**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v1.0
 
 ---
 
-## 1. Vision
+## 1. Vision and Absolute Fresh Start
 
-DREXONYX is building an **AI-Native Company Operating System** — a single internal platform through which the Founder/CEO commands and observes the entire company. Every business domain — sales, production, marketing, finance, knowledge, task orchestration — is a module within this platform. AI agents act as the company's digital workforce; humans retain authority over all consequential decisions.
+**DREXONYX is an AI-Native Technology Company.** The company's business scope spans 10 domains: Software Products, Custom Software Solutions, AI Solutions, Business Automation, Enterprise Systems, CRM and Management Systems, Web Applications, E-commerce and Digital Platforms, Technology Integration, and Future Technology. MDA (Master Digital Agency) is a sub-brand, not the company's identity.
 
-This is not a customer-facing SaaS product. It is the internal nervous system of DREXONYX itself.
+DREXONYX is building an **AI-Native Company Operating System** — a single internal platform through which the Founder/CEO commands and observes the entire company. Every business domain — sales, production, marketing, finance, knowledge, task orchestration, product portfolio — is a module within this platform. AI agents act as the company's digital workforce; humans retain authority over all consequential decisions.
+
+**Absolute Fresh Start Requirement (CEO Decision 2026-11-21):**
+The new platform is a genuinely new creation. This means:
+- New GitHub repository (no code carried from `drexonyx-v1`)
+- New database project (no connection to V1 Neon databases)
+- New authentication system (not shared with V1)
+- New environment configuration (separate API keys per platform)
+- Patterns from V1 are referenced and rebuilt fresh — never copied
+
+This is not a migration, reorganization, or refactor of V1. It is a new platform.
+
+This platform is not a customer-facing SaaS product. It is the internal nervous system of DREXONYX itself.
 
 ---
 
@@ -101,13 +114,22 @@ The platform is organized into 11 domains. Each domain is a fully owned module w
 - AI-searchable interface — natural language queries against the knowledge base
 
 ### 3.5 Product Portfolio Management
-**Purpose:** Manage all DREXONYX and MDA products and services — catalog, pricing, demos, delivery standards.
+**Purpose:** Manage all DREXONYX software products and services — from development status through licensing, customers, and support.
+
+**Initial software products (CEO-confirmed 2026-11-21):**
+1. **CBMS** — Commercial Brokerage Management System
+2. **RMS** — Retail Management System
+3. **Auto Workshop Management System**
+4. **DREXONYX International Trade System**
 
 **Core views:**
-- Service catalog — MDA and DREXONYX products with approved pricing
-- Demo library — the five demo sites and future demos, organized by industry
-- Delivery standards — per-product QC checklists and production standards
-- Portfolio showcase — categorized client work and agency concepts (correctly labeled)
+- Software product catalog — all 4 initial products with version history, development status, pricing tiers
+- License registry — licenses issued per product, expiry tracking
+- Customer registry — clients using each product
+- Support tickets — per-product support management
+- Demo library — the five website demo sites and future demos (organized by industry)
+- Delivery standards — per-service QC checklists and production standards
+- MDA service catalog — if MDA operations continue (pending CEO Decision D10)
 
 ### 3.6 Software Development Operations
 **Purpose:** Track the health of all DREXONYX software projects, deployments, and technical work.
@@ -256,37 +278,68 @@ The new platform is an **internal tool**. There is no public registration.
 
 ## 7. AI Agent Architecture
 
+### 7.1 Three Permission Levels (CEO-Confirmed 2026-11-21)
+
+Every agent action is classified into exactly one of three permission levels. No agent may change its own permission level.
+
+**AUTONOMOUS** — Executes and applies without human review
+- Generating draft text, reports, summaries for internal review
+- Analyzing data and producing structured output
+- Discovering and enriching prospect data from public sources
+- Scoring and classifying leads
+- Generating daily/weekly company briefs
+- Running status checks and QC reports
+
+**POLICY-BOUND** — Executes within defined policies; applies if within policy limits
+- Drafting outreach messages (within approved templates, within daily volume limits)
+- Scheduling tasks and reminders
+- Updating project status records
+- Queuing content for publishing (not publishing itself)
+
+**CEO-ONLY** — Never executes without an explicit human approval record. Any agent action in this category that proceeds without an approval record in `security.approvals` is a code defect — not a configuration choice.
+- Sending any external communication (email, social, any channel)
+- Publishing any content to external platforms
+- Creating, modifying, or deleting financial records
+- Issuing invoices or processing payments
+- Making any change to external service configuration
+- Deleting any record from the system (soft or hard)
+- Making strategic, legal, or ownership decisions
+
+### 7.2 Emergency Stop
+
+A `agent_emergency_stop` boolean in `system.settings` controls all agent dispatch. When `true`:
+- No new tasks are dispatched
+- Running tasks complete their current step and halt before the next
+- The CEO toggles this in `/security`
+- All emergency stop events are logged to `audit_events` with timestamp and actor
+
+### 7.3 Agent Contract
+
 Agents are typed TypeScript modules following a defined contract:
 
 ```typescript
 interface AgentDefinition<TInput, TOutput> {
-  id: string                           // e.g. "sales.lead.discover"
+  id: string                             // e.g. "sales.lead.discover"
   name: string
   domain: PlatformDomain
+  permissionLevel: 'AUTONOMOUS' | 'POLICY_BOUND' | 'CEO_ONLY'
   inputSchema: ZodSchema<TInput>
   outputSchema: ZodSchema<TOutput>
-  requiresApproval: ApprovalPolicy     // NEVER | ALWAYS | CONDITIONAL
-  approvalCondition?: (output: TOutput) => boolean
+  policyCheck?: (output: TOutput, policy: AgentPolicy) => boolean  // for POLICY_BOUND
   execute: (input: TInput, context: AgentContext) => Promise<TOutput>
 }
 ```
 
 **Execution model:**
-1. Task is queued with input and metadata
-2. Agent executes — calls AI API, processes results
-3. Output is written to `agent_outputs` table with status `STAGED`
-4. If `requiresApproval = NEVER` and output is safe (checked by policy): auto-applies
-5. If approval required: surfaces in CEO Command Center and Approval queue
-6. Human approves/rejects/edits → action executes or is discarded
-7. All steps written to audit log
-
-**Approval policy defaults:**
-- Sending any external message (email, social post): `ALWAYS`
-- Creating or modifying financial records: `ALWAYS`
-- Deleting any record: `ALWAYS`
-- Drafting text for review: `NEVER`
-- Analyzing data and producing a report: `NEVER`
-- Discovering leads from public data: `NEVER`
+1. Executor checks `agent_emergency_stop` flag — if true, task is not dispatched
+2. Task is queued with input, metadata, and permission level recorded
+3. Agent executes — calls AI API, processes results
+4. Output is written to `agent_outputs` table with status `STAGED`
+5. AUTONOMOUS: auto-applies if output passes content safety check
+6. POLICY_BOUND: applies if output is within policy limits; otherwise surfaces for review
+7. CEO_ONLY: always surfaces in CEO Command Center and Approval queue — never auto-applies
+8. Human approves/rejects → action executes or is discarded
+9. All steps written to audit log
 
 ---
 
@@ -323,30 +376,37 @@ These rules apply to all code, all modules, forever:
 2. **Server-side authorization on every request.** UI hiding is never authorization.
 3. **Webhook handlers verify HMAC signatures before processing.**
 4. **Idempotency keys guard all external mutations.**
-5. **Audit log is append-only.** No delete or update operations on `audit_events`.
-6. **Approval gates cannot be bypassed programmatically.** Only human action advances an approval.
-7. **AI agent outputs are staged, not auto-applied, for consequential actions.**
-8. **Test mode flags are `true` by default.** (`SALES_OUTREACH_TEST_MODE`, `ZIINA_TEST_MODE`)
-9. **No secrets in Git history.** `.env.local` is gitignored.
-10. **Financial records are created by domain logic, never by agents directly.**
+5. **Audit log is append-only.** No delete or update operations on `audit_events`. Ever.
+6. **Approval gates cannot be bypassed programmatically.** Only a human approval record in `security.approvals` advances a CEO-ONLY action.
+7. **CEO-ONLY agent outputs are always staged.** Auto-apply is a code defect for this permission level.
+8. **Test mode flags are `true` by default.** (`SALES_OUTREACH_TEST_MODE=true`, `ZIINA_TEST_MODE=true`). Changing either to `false` requires explicit CEO authorization.
+9. **Emergency stop is enforced before every task dispatch.** If `system.settings.agent_emergency_stop = true`, no task is dispatched regardless of permission level.
+10. **No secrets in Git history.** `.env.local` is gitignored. Never commit credentials.
+11. **Financial records are created by domain logic, never by agents directly.**
+12. **No database credentials shared between the new platform and V1.**
+13. **No API keys shared between the new platform and V1.** Separate keys per platform.
 
 ---
 
 ## 10. What Requires CEO Approval Before Implementation Begins
 
-The following decisions are proposed but not finalized:
+See DREXONYX_MASTER_BLUEPRINT.md, Part XI for the complete list of 14 CEO decisions (D1–D14).
 
-| Item | Proposal | Decision Needed |
+The minimum approvals required before Phase 1 begins:
+
+| Decision | Item | Proposal |
 |---|---|---|
-| New repository name | `drexonyx-platform` | Approve or change name |
-| Authentication | Internal-only, no public access | Confirm — no client portal in Phase 1 |
-| AI model default | Claude Sonnet (balanced cost/quality) | Confirm |
-| Payment integration | Ziina only (Phase 1), Stripe optional (Phase 2+) | Confirm |
-| Android continuity | Pause Android projects during new platform build | Confirm |
-| Fleet Tracker | Treat as a separate product, not part of new platform | Confirm |
-| Vercel plan | Hobby (free) unless team collaboration is needed | Confirm |
-| Neon tier | Free (0.5 GB) initially, upgrade when data grows | Confirm |
+| D1 | Repository name | `drexonyx-platform` |
+| D2 | Platform subdomain | `app.drexonyx.com` |
+| D3 | Neon database strategy | Option A: second free Neon account |
+| D5 | Stripe | Confirm if Stripe account needed in new platform |
+| D10 | MDA sub-brand | Confirm if MDA operations continue |
+| D11 | Technology stack | Next.js, Drizzle, Neon, Vercel, Auth.js |
+| D13 | Public website | Keep V1 at drexonyx.com during Phases 1–5 |
+| D14 | Phase 1 start | CEO approves all planning documents |
 
 ---
 
-*End of Document 1 — DREXONYX_NEW_PLATFORM_ARCHITECTURE.md*
+*Document version: 2.0 — Revised 2026-11-21 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v1.0*  
+*Supersedes: v1.0 (2026-11-21, MDA-agency framing, no AI permission levels)*

@@ -1,283 +1,256 @@
 # DREXONYX — Implementation Roadmap
 
-**Document type:** Phased Build Plan — AWAITING CEO APPROVAL  
+**Document version:** 2.0 (revised 2026-11-21)  
+**Previous version:** 1.0 (11 phases, MDA-agency framing)  
 **Prepared by:** Claude Code  
-**Date:** 2026-11-21  
-**Status:** DRAFT — Do not begin any phase without CEO approval of that phase
+**Status:** DRAFT — AWAITING CEO REVIEW AND APPROVAL  
+**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v1.0
 
 ---
 
 ## Guiding Principle
 
-Build the smallest version that is immediately useful to the CEO, then expand. Each phase delivers a working, deployable increment. No phase is a "setup only" phase — every phase has a usable output.
+Build the smallest version that is immediately useful to the CEO, then expand. Each phase delivers a working, deployable increment. No phase is "setup only" — every phase has a usable output the CEO can operate in.
 
-The roadmap is sequential per domain but parallel within a phase where possible. Phases are defined by business value, not by technical complexity.
-
----
-
-## Phase 0 — Foundation & Legacy Protection
-**Duration:** 3–5 days  
-**Goal:** New repository exists, is deployable, and the legacy repository is protected.
-
-### Deliverables
-- [ ] `drexonyx-platform` GitHub repository created (name subject to CEO approval)
-- [ ] `v1-legacy-snapshot` tag created on `drexonyx-v1/main`
-- [ ] Branch protection enabled on `drexonyx-v1/main`
-- [ ] New project scaffolded: Next.js 16+, TypeScript, NextAuth v5, Drizzle + Neon, ESLint, Vitest
-- [ ] `db/schema/system.ts` — `audit_events` + `idempotency_keys` tables
-- [ ] `db/schema/identity.ts` — `users` table
-- [ ] Authentication working: login page → platform shell → redirect to `/command`
-- [ ] Empty platform shell with module navigation sidebar
-- [ ] GitHub Actions CI: lint + typecheck + test + build
-- [ ] Vercel project created (staging deployment)
-- [ ] `.env.example` with full variable inventory
-- [ ] `ARCHITECTURE.md` and `CLAUDE.md` committed
-
-### Success Criteria
-- Developer (Claude Code) can log in to the new platform at the staging URL
-- CI passes on every push
-- `drexonyx-v1` remains completely untouched
-
-### CEO Approvals Required Before Starting
-- Confirm repository name `drexonyx-platform`
-- Confirm Vercel account is available for a second project
-- Confirm Neon account can support a second database (or second schema on same instance)
+The roadmap follows the 6-phase structure confirmed by the CEO.
 
 ---
 
-## Phase 1 — CEO Command Center (Skeleton)
-**Duration:** 5–7 days  
-**Goal:** The CEO has a working home screen that shows company state at a glance.
+## Phase 0 — Blueprint and Approval ← CURRENT PHASE
+**Goal:** Complete planning documents. CEO reviews and approves everything before any code is written.
 
-### Deliverables
-- [ ] `/command` dashboard — empty-state design that makes the KPI tiles obvious
-- [ ] `db/schema/command.ts` — `kpis`, `alerts`, `daily_briefs` tables
-- [ ] Manual KPI entry: CEO can add/update company KPIs (revenue, active leads, tasks open)
-- [ ] Alert system: CEO can create and dismiss alerts
-- [ ] Platform sidebar navigation: all 11 module links, active state indicator
-- [ ] Responsive design: works on desktop and mobile
-- [ ] 50+ tests covering auth, command domain logic, audit logging
+**What is happening now:**
+- Master Blueprint created (`_planning/DREXONYX_MASTER_BLUEPRINT.md`)
+- All 5 supporting planning documents updated
 
-### Success Criteria
-- CEO can log in, see the command dashboard, and manually track 3–5 key company metrics
-- All navigation links render (even if modules are placeholder "coming soon" pages)
-- Zero unhandled errors in Vercel logs
+**CEO gates before Phase 1 begins:**
+- [ ] CEO approves DREXONYX_MASTER_BLUEPRINT.md
+- [ ] CEO confirms repository name (proposed: `drexonyx-platform`)
+- [ ] CEO confirms platform subdomain (proposed: `app.drexonyx.com`)
+- [ ] CEO confirms database strategy (proposed: second free Neon account)
+- [ ] CEO approves proposed technology stack (Next.js, Drizzle, Neon, Vercel, Auth.js)
+- [ ] CEO confirms V1 public site strategy (proposed: keep V1 at drexonyx.com during build)
+
+**Nothing is built until every gate above is checked.**
 
 ---
 
-## Phase 2 — Human Approval & Security Controls
-**Duration:** 4–5 days  
-**Goal:** The approval and audit infrastructure is live before any agent or automation does anything.
+## Phase 1 — Fresh Project Foundation
+**Goal:** A deployable, authenticated shell exists. Database is fresh and completely isolated from V1.
+
+### What is delivered
+- New GitHub repository created: `drexonyx-platform` (or CEO-approved name)
+- Next.js (App Router, TypeScript) scaffolded from scratch — zero V1 code imported
+- NextAuth v5: single CEO login (email + password, bcrypt hashed)
+- Database: **new Neon project**, isolated from V1 — first schemas:
+  - `system` — `audit_events` (append-only), `idempotency_keys`, `settings` (including `agent_emergency_stop`)
+  - `identity` — `users`, `sessions`, `roles`
+- Empty platform shell: authenticated route `/`, sidebar with all future module links
+- GitHub Actions CI: lint + typecheck + test + build (every push)
+- Vercel project created: `app.drexonyx.com` staging deployment
+- `.env.example` with complete variable inventory and security classifications
+- `ARCHITECTURE.md` and `CLAUDE.md` committed to new repository
+- 30+ tests: auth, audit log immutability, emergency stop flag behavior
+
+**Success criteria:** CEO can log in at the staging URL. CI passes on every push. Zero connection to V1. Audit log records every login.
+
+**Duration estimate:** 3–5 days
+
+---
+
+## Phase 2 — CEO Command Center MVP
+**Goal:** The CEO has a usable home screen and all safety infrastructure (approval queue, audit log, emergency stop) is live before any AI agent runs.
 
 **Rationale:** Build the security layer before the workforce layer. Approvals and audit logging must be rock-solid before agents start producing outputs.
 
-### Deliverables
-- [ ] `db/schema/agents.ts` — `agent_definitions`, `agent_tasks`, `agent_outputs` tables
-- [ ] `db/schema/system.ts` expanded — settings table
-- [ ] `/security/approvals` — list of pending approvals (empty initially)
-- [ ] `/security/audit` — paginated audit log viewer
-- [ ] `/security/access` — user management (CEO can add users, assign roles)
-- [ ] Approval gate engine: `domain/security/approval-gate.ts`
-- [ ] Every subsequent agent action routes through this gate
-- [ ] 30+ tests covering approval policies, audit log immutability
+### What is delivered
 
-### Success Criteria
-- CEO can view the full audit log
-- An agent output placed in `STAGED` state appears in the approval queue
-- An approval cannot be bypassed — test confirms staged output requires human action
+**New database schemas:**
+- `command` — `kpis`, `alerts`, `daily_briefs`
+- `agents` — `definitions`, `task_queue`, `outputs` (all statuses including STAGED)
 
----
+**Platform modules:**
+- `/command` dashboard: KPI tiles (manual entry), alerts, company health view
+- `/security/approvals`: unified approval queue (empty initially, ready to receive)
+- `/security/audit`: paginated, filterable audit log viewer
+- `/security/access`: user management (add users, assign roles)
+- Emergency stop toggle: one action in `/security` suspends all agent task dispatch
 
-## Phase 3 — AI Agent Workforce (Core Infrastructure)
-**Duration:** 7–10 days  
-**Goal:** The agent execution engine is live and can run a real task.
+**Domain logic:**
+- Approval gate engine: `domain/security/approval-gate.ts`
+- KPI state management: `domain/command/kpis.ts`
+- Alert lifecycle: `domain/command/alerts.ts`
 
-### Deliverables
-- [ ] Agent definition registry: `domain/agents/definitions/`
-- [ ] Agent executor: `domain/agents/executor.ts` — input validation → AI call → output staging
-- [ ] Anthropic Claude provider: `infrastructure/ai/anthropic.ts`
-- [ ] Google Gemini fallback: `infrastructure/ai/gemini.ts`
-- [ ] Task queue system: dispatch → running → staged → approved/rejected
-- [ ] `/agents` dashboard — task queue with status, output preview, approve/reject buttons
-- [ ] `/agents/tasks/:id` — task detail with full input, output, and audit trail
-- [ ] First live agent: **Daily Brief Generator** — summarizes yesterday's activity across all modules into a paragraph for the CEO Command Center
-- [ ] Test: 40+ tests covering executor, approval policies, AI provider mock
+**Tests:** 50+ tests covering approval gate, audit log immutability, emergency stop enforcement, role-based authorization on every route
 
-### Success Criteria
-- CEO can trigger a "Generate Daily Brief" task
-- The brief appears in the approval queue
-- CEO approves it → it appears on the Command Center dashboard
-- Rejecting a brief → it is discarded, logged, nothing is applied
+**Success criteria:**
+- CEO can log in and see the command dashboard
+- CEO can manually add/update KPIs
+- Approval queue is live and renderable
+- Emergency stop toggle works — sets `system.settings.agent_emergency_stop = true`, verified by test that no task dispatches when flag is true
+- An approval cannot be bypassed — test confirms staged output requires human action to advance
+
+**Duration estimate:** 4–6 days
 
 ---
 
-## Phase 4 — Sales & Customer Acquisition
-**Duration:** 10–14 days  
-**Goal:** The full sales pipeline is operational. The CEO can track leads from discovery to conversion.
+## Phase 3 — AI Agent Workforce
+**Goal:** The agent execution engine is live and running real tasks. Three permission levels are enforced.
 
-**Rationale:** Sales is the highest business priority — it generates revenue. Build it early.
+### What is delivered
 
-### Deliverables
-- [ ] `db/schema/sales.ts` — leads, lead_sources, outreach_messages, proposals, opt_outs, opt_out_tokens
-- [ ] Lead pipeline: NEW → REVIEWING → QUALIFIED → OUTREACH_SENT → REPLIED → FOLLOW_UP → WON / REJECTED / ARCHIVED
-- [ ] Migrate existing `LEAD_TRACKER.csv` data as seed
-- [ ] Migrate existing `FLASH_DELIVERY_DUBAI_LEADS` prospects as leads
-- [ ] AI Skills (ported from V1): `sales.lead.discover`, `sales.lead.qualify`, `sales.lead.score`
-- [ ] AI Skill (ported from V1): `sales.outreach.draft`
-- [ ] Outreach approval policy: proposals/pricing/non-email → `PENDING` (human must approve); standard cold outreach → `NOT_REQUIRED`
-- [ ] Resend email integration: `infrastructure/email/resend.ts`
-- [ ] Opt-out/unsubscribe system: `/api/unsubscribe` route
-- [ ] Outreach sender with `SALES_OUTREACH_TEST_MODE` guard
-- [ ] `/sales/pipeline` — Kanban board
-- [ ] `/sales/leads/:id` — full lead profile with outreach history
-- [ ] `/sales/outreach` — messages awaiting approval
-- [ ] 60+ tests covering lead state machine, outreach approval, opt-out enforcement
+**Agent infrastructure:**
+- Agent definition registry: `domain/agents/definitions/`
+- Agent executor: `domain/agents/executor.ts`
+  - Checks `agent_emergency_stop` flag before every dispatch
+  - Validates permission level before executing
+  - Writes all steps to audit log
+- Anthropic Claude provider: `infrastructure/ai/anthropic.ts`
+- Google Gemini fallback: `infrastructure/ai/gemini.ts`
+- Task queue: queued → running → staged → approved/rejected
+- Three permission level enforcement (non-negotiable):
+  - **AUTONOMOUS** — executes and applies without human review
+  - **POLICY-BOUND** — executes within defined limits, applies if within policy
+  - **CEO-ONLY** — always stages output, never applies without CEO approval record
 
-### Success Criteria
-- CEO can add a new lead, run discovery agent, see qualified lead with draft outreach
-- Outreach draft appears in approval queue — CEO approves → email sends (test mode)
-- Opting out removes an address from future sends, confirmed by test
-- `SALES_OUTREACH_TEST_MODE=true` by default; no live emails until CEO explicitly sets it false
+**Platform modules:**
+- `/agents` dashboard: active task queue, staged outputs, approve/reject UI
+- `/agents/tasks/:id`: full task detail — input, output, audit trail
+- `/agents/definitions`: registry of all defined agent modules
+
+**First live agent: Daily Brief Generator**
+- Input: today's date + summary of yesterday's activity across modules
+- Permission level: POLICY-BOUND (generates; CEO approves whether to publish to Command Center)
+- Output: structured daily brief saved to `command.daily_briefs`
+
+**Tests:** 40+ tests covering executor, permission level enforcement, approval policies, AI provider mock, emergency stop block
+
+**Success criteria:**
+- CEO triggers "Generate Daily Brief" → agent runs → output staged → approval queue shows it
+- CEO approves brief → it appears on Command Center dashboard
+- Rejecting a brief → discarded, logged, nothing applied
+- An agent with CEO-ONLY permission level cannot execute without an approval record — confirmed by test
+- Emergency stop → no new tasks dispatch
+
+**Duration estimate:** 7–10 days
 
 ---
 
-## Phase 5 — Knowledge Base
-**Duration:** 7–10 days  
-**Goal:** All company knowledge is structured, searchable, and maintained in one place.
+## Phase 4 — Business Operations Core
+**Goal:** Sales pipeline, Knowledge Base, and Product Portfolio are operational. The CEO can run DREXONYX's commercial engine from the platform.
 
-### Deliverables
-- [ ] `db/schema/knowledge.ts` — articles, documents, research_items, decisions, processes
-- [ ] Seed from V1 business documents:
+### What is delivered
+
+#### 4A — Sales Pipeline
+**New schema:** `sales` — leads, outreach, proposals, opt_outs, opt_out_tokens
+
+- Lead pipeline: NEW → REVIEWING → QUALIFIED → OUTREACH_DRAFT → OUTREACH_APPROVED → SENT → REPLIED → WON / REJECTED / ARCHIVED
+- Outreach approval gate: ALL outreach requires CEO approval before sending (CEO-ONLY permission)
+- Resend integration: `SALES_OUTREACH_TEST_MODE=true` by default; no live email until CEO explicitly authorizes
+- Opt-out/unsubscribe system: `/api/unsubscribe` route, enforced before every send
+- AI skills (written fresh — not imported from V1):
+  - `sales.lead.discover` — research a lead from public sources (AUTONOMOUS)
+  - `sales.lead.qualify` — assess fit against criteria (AUTONOMOUS)
+  - `sales.lead.score` — 0–100 priority score (AUTONOMOUS)
+  - `sales.outreach.draft` — draft cold outreach message (POLICY-BOUND → staged for CEO approval)
+- Platform modules: `/sales/pipeline` (Kanban), `/sales/leads/:id`, `/sales/outreach` (approval queue)
+- 60+ tests: lead state machine, outreach approval, opt-out enforcement
+
+#### 4B — Knowledge Base
+**New schema:** `knowledge` — articles, documents, research, decisions, processes
+
+- Seed from V1 MDA business documents (manual review — reference only, not automated import):
   - MDA Source of Truth → Knowledge article
   - MDA Demo Production Standard (T1–T13) → Process playbook
   - MDA Company Profile Production Standard → Process playbook
-  - Approved pricing table → Products reference article
-- [ ] AI-assisted article creation agent
-- [ ] Natural language search across articles
-- [ ] `/knowledge` search interface
-- [ ] `/knowledge/articles/:id` — article detail with version history
-- [ ] `/knowledge/decisions` — architecture decisions log (new series from decision #0001)
-- [ ] `/knowledge/processes` — SOPs viewer
+  - CEO-approved pricing table → Products reference article
+- AI-assisted article creation (AUTONOMOUS for drafts, CEO-ONLY for publishing)
+- `/knowledge` search interface, `/knowledge/decisions`, `/knowledge/processes`
 
-### Success Criteria
-- CEO can search "MDA pricing" and find the approved service catalog
-- CEO can search "demo QC" and find the demo production standard
-- A new decision can be recorded in 2 minutes
+#### 4C — Product Portfolio
+**New schema:** `products` — catalog, versions, licenses, customers, support_tickets
 
----
+- Register all 4 initial DREXONYX software products:
+  - CBMS — Commercial Brokerage Management System
+  - RMS — Retail Management System
+  - Auto Workshop Management System
+  - DREXONYX International Trade System
+- For each product: specification, version history, license registry, customer registry, development status
+- Also register MDA website/digital services (if MDA operations continue — CEO to confirm in D10)
+- Register the five demo sites with live Vercel URLs and industry tags
+- `/products` management interface, `/products/catalog`, `/products/demos`
 
-## Phase 6 — Product Portfolio Management
-**Duration:** 5–7 days  
-**Goal:** The service catalog and demo library are managed in the platform.
+**Success criteria for Phase 4:**
+- Lead-to-outreach workflow operational (test mode — no live emails)
+- All 4 software products registered in catalog
+- MDA knowledge seeded and searchable
+- CEO can add a lead, run discovery agent, see qualified lead with draft outreach in approval queue
 
-### Deliverables
-- [ ] `db/schema/products.ts` — service_catalog, pricing_tiers, demos, delivery_standards
-- [ ] Seed MDA service catalog from approved pricing (all CEO-approved prices)
-- [ ] Demo library: register the five live demo sites with metadata
-- [ ] `/products/catalog` — full service catalog with pricing
-- [ ] `/products/demos` — demo library with preview links and industry tags
-- [ ] `/products/standards` — delivery standards per product (QC checklists)
-- [ ] Agent: **Demo Availability Checker** — verifies the five demo URLs are still accessible
-
-### Success Criteria
-- CEO can see the full approved service catalog with correct prices
-- All five demo sites are listed with preview links
-- Clicking a demo opens the live Vercel URL
+**Duration estimate:** 12–16 days
 
 ---
 
-## Phase 7 — Finance & Business Reporting
-**Duration:** 7–10 days  
-**Goal:** The CEO has a clear financial view of the company without leaving the platform.
+## Phase 5 — Expansion
+**Goal:** All command center modules operational. Finance, Marketing, Tasks, and DevOps are live.
 
-**Note:** This is a reporting and tracking layer, not a bookkeeping replacement.
+### What is delivered
 
-### Deliverables
-- [ ] `db/schema/finance.ts` — invoices, payments, expenses, financial_snapshots
-- [ ] Manual invoice creation and tracking
-- [ ] Payment status tracking (integrate Ziina webhook for automatic payment confirmation)
-- [ ] Manual expense entry
-- [ ] `/finance` — P&L summary (current month, YTD)
-- [ ] `/finance/invoices` — invoice list with status
-- [ ] `/finance/expenses` — expense log
-- [ ] AI agent: **Monthly Financial Brief** — summarizes revenue and expenses for the month
-- [ ] 30+ tests covering financial state machine, payment webhook
+#### 5A — Finance & Business Reporting
+**New schema:** `finance` — invoices, payments, expenses, financial_snapshots
 
-### Success Criteria
-- CEO can record a payment and see it in the revenue total
-- Ziina webhook arrival (simulated) correctly marks an invoice as paid
-- Monthly brief agent produces a readable summary
+- Manual invoice creation and tracking
+- Ziina webhook (new credentials): payment confirmation → invoice update
+- Manual expense entry
+- `/finance` — P&L summary (current month, YTD)
+- AI agent: Monthly Financial Brief (POLICY-BOUND)
+- `ZIINA_TEST_MODE=true` default; remains true until CEO authorizes with business/legal clearance
 
----
+#### 5B — Marketing Operations
+**New schema:** `marketing` — campaigns, content_items, publishing_queue, analytics_snapshots
 
-## Phase 8 — Marketing Operations
-**Duration:** 7–10 days  
-**Goal:** Marketing content is planned, produced, reviewed, and published from one place.
+- Content calendar: schedule posts by platform and date
+- Publishing queue: content stages for CEO review before any publish (CEO-ONLY)
+- Facebook organic publishing integration (if approved by CEO — PENDING CEO DECISION D10)
+- AI agent: Social Caption Writer (POLICY-BOUND → staged)
+- AI agent: Content Calendar Planner (AUTONOMOUS)
 
-### Deliverables
-- [ ] `db/schema/marketing.ts` — campaigns, content_items, publishing_queue, analytics_snapshots
-- [ ] Content calendar: schedule posts by platform and date
-- [ ] Publishing queue: content stages for human review before any publish
-- [ ] Facebook publish integration (ported from V1 `lib/skills/facebook-publish.ts`) with HUMAN_GATE
-- [ ] AI agent: **Social Caption Writer** — generates post captions from briefing
-- [ ] AI agent: **Content Calendar Planner** — suggests weekly content themes
-- [ ] `/marketing/calendar` — visual content calendar
-- [ ] `/marketing/queue` — content awaiting approval
+#### 5C — Task Management
+**New schema:** `tasks` — tasks, workflows, workflow_steps, automation_rules
 
-### Success Criteria
-- CEO can brief an agent on a topic, receive a draft caption, approve it, and have it queued for Facebook
-- No post is ever published without CEO approval (HUMAN_GATE confirmed by test)
+- Manual task creation with priority, deadline, owner, domain link
+- Workflow templates: multi-step repeatable processes
+- GitHub Actions cron integration for scheduled platform jobs
+- `/tasks` board, `/tasks/workflows`
+
+#### 5D — DevOps Visibility
+- GitHub API integration (read-only token)
+- Repository registry: all DREXONYX repos with CI status
+- Deployment tracker: Vercel deployments
+- `/devops` project health overview
+
+**Duration estimate:** 14–20 days
 
 ---
 
-## Phase 9 — Task Management & Workflow Orchestration
-**Duration:** 7–10 days  
-**Goal:** All company tasks and recurring workflows are tracked in the platform.
+## Phase 6 — Selective Legacy Cleanup
+**Goal:** Remove approved obsolete V1 resources after verifying they are not needed. No action before this phase.
 
-### Deliverables
-- [ ] `db/schema/tasks.ts` — tasks, workflows, workflow_steps, automation_rules
-- [ ] Manual task creation with priority, deadline, owner, domain link
-- [ ] Workflow templates: multi-step repeatable processes
-- [ ] Automation rules: trigger → condition → action
-- [ ] GitHub Actions cron integration for scheduled platform jobs
-- [ ] `/tasks` — task board (Kanban)
-- [ ] `/tasks/workflows` — workflow template library
-- [ ] `/tasks/automations` — active automation rules
+**Principle:** Each deletion item gets individual CEO approval. Nothing is deleted as a batch.
 
-### Success Criteria
-- CEO can create a task, link it to a lead, assign it a deadline
-- A workflow template can be triggered and tracked step by step
-- An automation rule fires correctly on its schedule
+### What is in scope
+- CEO reviews full cleanup inventory (Master Blueprint, Part VIII)
+- Each deletion approved individually by CEO
+- Specific candidates:
+  - Root-level research dump files (25+) in `drexonyx-v1` → delete after backup confirmation
+  - Old Vercel preview deployments → delete via Vercel dashboard
+  - Unused Neon database branches (V1 dev branches) → delete via Neon dashboard
+  - `android-apk/` debug builds → delete after CEO confirms
+  - `test-projects/` directory → delete after CEO confirms
+  - V1 public site → replace with new public DREXONYX website (if scoped by CEO in Phase 5+)
 
----
+**Gate:** No item is deleted without written CEO sign-off on that specific item.
 
-## Phase 10 — Software Development Operations
-**Duration:** 5–7 days  
-**Goal:** The CEO has visibility into all DREXONYX software project health without leaving the platform.
-
-### Deliverables
-- [ ] GitHub API integration (read-only token) `infrastructure/github/client.ts`
-- [ ] Repository registry: list all DREXONYX repos with current CI status
-- [ ] Deployment tracker: Vercel deployments with status and URL
-- [ ] Technical debt register: manual entries for known issues
-- [ ] `/devops` — project health overview
-- [ ] `/devops/deployments` — recent deployments across all projects
-
-### Success Criteria
-- CEO can see the CI status of `drexonyx-v1` and `drexonyx-platform` on one screen
-- Last deployment of `drexonyx.com` shows the commit, time, and status
-
----
-
-## Phase 11 — Command Center Intelligence (Advanced)
-**Duration:** Ongoing  
-**Goal:** The Command Center becomes proactively intelligent — surfacing insights the CEO did not specifically request.
-
-### Deliverables
-- [ ] AI agent: **Command Center Briefer** — daily brief summarizing all module activity
-- [ ] KPI trend analysis: week-over-week change indicators on all metrics
-- [ ] Smart alerts: anomaly detection (no outreach sent in 7 days, revenue stalled, etc.)
-- [ ] Natural language query interface for the CEO to ask questions about company state
+**Duration estimate:** Ongoing — not time-bounded
 
 ---
 
@@ -285,45 +258,43 @@ The roadmap is sequential per domain but parallel within a phase where possible.
 
 | Milestone | Phase | Key Output |
 |---|---|---|
-| M0 — Live skeleton | Phase 0 | New repo deployed, authentication working |
-| M1 — CEO has a home | Phase 1 | Command dashboard with manual KPIs |
-| M2 — Nothing runs without approval | Phase 2 | Approval gate + audit log live |
-| M3 — First agent works | Phase 3 | Daily brief agent end-to-end |
-| **M4 — First sale possible** | **Phase 4** | **Full sales pipeline + outreach approval** |
-| M5 — All knowledge in one place | Phase 5 | Knowledge base seeded and searchable |
-| M6 — Full product catalog | Phase 6 | Demos and pricing live in platform |
-| M7 — Financial visibility | Phase 7 | Revenue and expense tracking |
-| M8 — Marketing pipeline | Phase 8 | Content staging and social publishing |
-| M9 — All tasks tracked | Phase 9 | Task board and workflow templates |
-| M10 — Devops visibility | Phase 10 | All project health on one screen |
+| M0 — All planning approved | Phase 0 | CEO sign-off on 6 planning documents |
+| M1 — Live foundation | Phase 1 | New repo deployed, authenticated, isolated DB |
+| M2 — Command center live | Phase 2 | CEO home screen, approval queue, emergency stop |
+| M3 — First agent runs | Phase 3 | Daily brief agent end-to-end, permission levels enforced |
+| **M4 — Commercial engine live** | **Phase 4** | **Sales pipeline + Knowledge Base + all 4 products registered** |
+| M5 — Full platform | Phase 5 | Finance, Marketing, Tasks, DevOps modules |
+| M6 — Clean slate | Phase 6 | Legacy resources pruned (CEO-approved per item) |
 
 ---
 
-## Dependencies and Blockers
+## Explicit Out-of-Scope Items
 
-| Item | Blocks | Action Required By |
-|---|---|---|
-| CEO approves architecture + structure documents | Phase 0 start | CEO |
-| CEO confirms repository name | Phase 0 | CEO |
-| CEO confirms Neon can support a second DB (or new project) | Phase 0 | CEO |
-| CEO confirms Vercel can host a second project | Phase 0 | CEO |
-| CEO explicitly approves `SALES_OUTREACH_TEST_MODE=false` | Phase 4 go-live | CEO (after testing) |
-| CEO explicitly approves `ZIINA_TEST_MODE=false` | Phase 7 go-live | CEO (after legal clearance) |
-| Facebook Page Access Token confirmed available | Phase 8 | CEO |
-
----
-
-## What is Explicitly Out of Scope in This Roadmap
-
-| Item | Reason |
+| Item | Why Out of Scope |
 |---|---|
-| Public customer-facing portal | Internal platform only in this roadmap |
-| Android app | Separate product roadmap |
-| Fleet Tracker | Separate product roadmap |
-| Rebuilding V1 video production pipeline | Only if explicitly requested after platform is live |
-| WhatsApp outbound sending | Not approved in V1; not in Phase 1–10 |
-| Multi-tenant (multiple companies) | DREXONYX is single-tenant |
+| Public DREXONYX website rebuild | V1 continues at drexonyx.com during Phases 1–5; rebuild is a Phase 5+ decision |
+| Client-facing customer portal | Internal-only platform |
+| Android native apps | Separate product; separate timeline (PENDING CEO DECISION) |
+| Fleet Tracker | Separate product; not part of new platform (PENDING CEO DECISION) |
+| WhatsApp outbound sending | Not approved; not in Phase 1–5 |
+| Multi-tenancy | DREXONYX is single-tenant |
+| UGC video production pipeline (Higgsfield) | Only if explicitly approved after platform is live |
+| SSB (Social Seller Bot) | V1-only feature; not rebuilt unless CEO requests |
 
 ---
 
-*End of Document 4 — DREXONYX_IMPLEMENTATION_ROADMAP.md*
+## Safety Flags (Always True by Default)
+
+| Flag | Default | Change requires |
+|---|---|---|
+| `SALES_OUTREACH_TEST_MODE` | `true` | Explicit CEO authorization |
+| `ZIINA_TEST_MODE` | `true` | CEO authorization with business/legal clearance |
+| `agent_emergency_stop` | `false` (agents active) | CEO toggle in `/security` |
+
+**All three flags are enforced in code, tested in CI, and cannot be bypassed programmatically.**
+
+---
+
+*Document version: 2.0 — Revised 2026-11-21 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v1.0*  
+*Supersedes: v1.0 (11-phase plan from 2026-11-21)*

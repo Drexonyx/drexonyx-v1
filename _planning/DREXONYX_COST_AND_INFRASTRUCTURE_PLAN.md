@@ -1,9 +1,11 @@
 # DREXONYX — Cost & Infrastructure Plan
 
-**Document type:** Infrastructure Inventory & Cost Forecast — AWAITING CEO APPROVAL  
+**Document version:** 2.0 (revised 2026-11-21)  
+**Previous version:** 1.0 (missing Stripe, Fleet Tracker/Expo, incorrect phase numbering)  
 **Prepared by:** Claude Code  
-**Date:** 2026-11-21  
-**Status:** DRAFT — All cost figures are estimates. Verify with current provider pricing before committing.
+**Status:** DRAFT — AWAITING CEO REVIEW AND APPROVAL  
+**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v1.0  
+**Note:** All cost figures are estimates. Verify with current provider pricing before committing.
 
 ---
 
@@ -131,17 +133,32 @@ The new platform's AI Agent Workforce runs on Claude. Cost depends on which mode
 - **Cost:** Only incurred on successful payments — directly tied to revenue
 - **Additional cost:** $0 fixed; variable per transaction
 
-### 3.4 Higgsfield AI (AI Video Generation)
-- **Role:** Video/image generation for MDA production
-- **Cost:** Pay-per-generation (varies by model and duration)
-- **New platform:** Only integrated when video production module is built (Phase 11+)
-- **Phase 1–10 cost:** $0
+### 3.4 Stripe (Payment Processing)
+- **Role:** V1 had Stripe configured (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` in V1 `.env.example`)
+- **New platform status:** **PENDING CEO DECISION (D5)** — CEO must confirm:
+  - Does a Stripe account exist under DREXONYX?
+  - Is Stripe needed in the new platform, or is Ziina sufficient?
+  - If Stripe is retained: create new Stripe project credentials for new platform
+- **Phase 1–5 cost:** $0 (Stripe charges per-transaction only; no monthly fee)
+
+### 3.5 Expo / EAS (Fleet Tracker Mobile App)
+- **Role:** Fleet Tracker is an Expo/React Native app using `drexonyx.studio` Expo account
+- **New platform status:** **PENDING CEO DECISION (D8)** — Fleet Tracker is a separate product, not part of new platform
+- **EAS Free tier:** 30 builds/month per platform
+- **EAS Production ($99/month):** Needed only if publishing to App Store/Play Store with high volume
+- **Phase 1–5 cost:** $0 (Fleet Tracker paused during platform build, per recommendation)
+
+### 3.6 Higgsfield AI (AI Video Generation)
+- **Role:** Video/image generation (V1 had full integration)
+- **New platform status:** **PENDING CEO DECISION** — Only integrated if video production module is rebuilt
+- **Phase 1–5 cost:** $0
+- **Phase 6+ cost:** Pay-per-generation (varies by model and duration) — only if CEO approves
 
 ---
 
 ## 4. Monthly Cost Summary
 
-### Phase 0–2 (Foundation + Command Center + Security)
+### Phase 1–2 (Foundation + CEO Command Center)
 | Service | Plan | Monthly Cost |
 |---|---|---|
 | GitHub | Free | $0 |
@@ -152,7 +169,7 @@ The new platform's AI Agent Workforce runs on Claude. Cost depends on which mode
 | Anthropic API | ~50 tasks | ~$2–3 |
 | **Total** | | **~$2–3/month** |
 
-### Phase 3–6 (Agents + Sales + Knowledge + Products)
+### Phase 3–4 (AI Workforce + Business Operations)
 | Service | Plan | Monthly Cost |
 |---|---|---|
 | GitHub | Free | $0 |
@@ -163,7 +180,7 @@ The new platform's AI Agent Workforce runs on Claude. Cost depends on which mode
 | Anthropic API | ~200 tasks | ~$5–10 |
 | **Total** | | **~$5–10/month** |
 
-### Phase 7–10 (Full Platform)
+### Phase 5–6 (Expansion + Cleanup)
 | Service | Plan | Monthly Cost |
 |---|---|---|
 | GitHub | Free | $0 |
@@ -204,9 +221,10 @@ The following services are explicitly excluded unless the CEO approves them:
 | Cloudflare Workers (paid) | Edge compute | Free tier sufficient |
 | AWS / GCP / Azure | Cloud infra | Vercel serverless handles all |
 | OpenAI API | AI | Anthropic is primary; Gemini is free fallback |
-| Stripe | Payments | Ziina handles UAE market |
+| Stripe | Payments | PENDING CEO DECISION D5 — Ziina primary for UAE; CEO confirms if Stripe needed |
 | Figma (paid) | Design | Not needed for internal platform |
 | Any analytics SaaS | Analytics | Vercel Analytics (free tier) is sufficient |
+| Expo EAS Production ($99/month) | Mobile builds | PENDING CEO DECISION D8 — only if Fleet Tracker resumes |
 
 ---
 
@@ -277,12 +295,22 @@ The following services are explicitly excluded unless the CEO approves them:
 
 ## 9. CEO Decisions Required on Infrastructure
 
-| Decision | Options | Recommendation | Action |
+See DREXONYX_MASTER_BLUEPRINT.md, Part XI for the complete list of 14 CEO decisions (D1–D14).
+
+Infrastructure-specific decisions:
+
+| Decision ID | Item | Options | Recommendation |
 |---|---|---|---|
-| Neon account for new platform | A) Second free account / B) Upgrade existing to $19/month / C) Same account new schema | **A — second free account** | CEO confirms |
-| Vercel project for new platform | A) Add second project to existing account / B) New account | **A — existing account** | CEO confirms |
-| New platform subdomain | A) `app.drexonyx.com` / B) `platform.drexonyx.com` / C) Deploy to `drexonyx.com` eventually | **A — `app.drexonyx.com` during development** | CEO decides |
-| Cloudflare R2 bucket naming | A) Same bucket, new folder prefix / B) New dedicated bucket | **B — new dedicated bucket** for clean separation | CEO confirms |
+| D1 | Repository name | `drexonyx-platform` / other | `drexonyx-platform` |
+| D2 | Platform subdomain | `app.drexonyx.com` / `platform.drexonyx.com` / other | `app.drexonyx.com` |
+| D3 | Neon database | A) Second free account / B) Upgrade existing to $19/month | **A — second free account** |
+| D4 | Vercel plan | Hobby (free, 1 member) / Pro ($20/month, team) | Hobby until team grows |
+| D5 | Stripe | Confirm if account exists and needed in new platform | PENDING |
+| D6 | Ziina AED 599 payment link | Reuse in new platform / Create new / Retire | PENDING |
+| D7 | Active leads CSV | Manual review and import / Leave as V1 historical | PENDING |
+| D8 | Fleet Tracker / Expo | Continue separately / Pause | PENDING |
+| D9 | Android projects | Continue separately / Pause | PENDING — pause recommended |
+| Infra | Cloudflare R2 bucket | Same bucket new folder / New dedicated bucket | **New dedicated bucket** |
 
 ---
 
@@ -300,4 +328,6 @@ For current Phase 1–4 (1 CEO, 50–200 agent tasks/month): **under $20/month t
 
 ---
 
-*End of Document 5 — DREXONYX_COST_AND_INFRASTRUCTURE_PLAN.md*
+*Document version: 2.0 — Revised 2026-11-21 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v1.0*  
+*Supersedes: v1.0 (2026-11-21, missing Stripe/Expo/Fleet Tracker, incorrect phase numbering)*
