@@ -4,7 +4,7 @@
 **Previous version:** 3.3 (Phase 0 "What is complete" listed Master Blueprint v3.2 and supporting documents v3.2 as the current approved versions; Phase 0 CEO gate listed v3.2 for Master Blueprint approval; Phase 3 emergency-stop enforcement test described running task as halting at next checkpoint — incorrect; did not state idempotency/reconciliation requirement for in-flight operations)  
 **Prepared by:** Claude Code  
 **Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
-**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.3
+**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.4
 
 ---
 
@@ -22,7 +22,7 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
 **Goal:** Deliver complete, coherent planning documents for CEO review. Phase 1 is blocked until the CEO explicitly approves the Master Blueprint and authorizes repository creation.
 
 **What is complete:**
-- Master Blueprint v3.3 (`_planning/DREXONYX_MASTER_BLUEPRINT.md`)
+- Master Blueprint v3.4 (`_planning/DREXONYX_MASTER_BLUEPRINT.md`)
 - All 5 supporting planning documents at v3.3
 - Three-system separation documented (CEO Command Center / Public Website / Commercial Products)
 - Authoritative CEO Decision Register established (D1–D11)
@@ -31,7 +31,7 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
 
 | Gate | Category | Blocks what? |
 |---|---|---|
-| Approve DREXONYX_MASTER_BLUEPRINT.md v3.3 | Strategic | Phase 1 System A — nothing starts without this |
+| Approve DREXONYX_MASTER_BLUEPRINT.md v3.4 | Strategic | Phase 1 System A — nothing starts without this |
 | D1 — Company direction: DREXONYX is an AI-Native Technology Company | **CEO CONFIRMED (2026-11-21)** | No longer a pending gate — confirmed in Master Blueprint Part II and Part XIII |
 | Decide D7 (Neon strategy: second free account vs. upgrade — requires account verification first) | Requires verification | Phase 1 System A — determines database setup |
 | Confirm technology stack direction | Technical | Phase 1 System A — Claude has recommended; CEO confirms or redirects |
@@ -328,5 +328,5 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
 ---
 
 *Document version: 3.4 — Revised 2026-11-22 by Claude Code*  
-*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.3*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.4*  
 *Supersedes: v3.3 (Phase 0 "What is complete" listed Master Blueprint v3.2 and supporting documents v3.2 as the current approved versions; Phase 0 CEO gate listed v3.2 for Master Blueprint approval; Phase 3 emergency-stop enforcement test described running task as halting at next checkpoint — incorrect; did not state idempotency/reconciliation requirement for in-flight operations)*
