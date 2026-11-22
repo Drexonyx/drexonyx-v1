@@ -1,10 +1,10 @@
 # DREXONYX — New Platform Architecture
 
-**Document version:** 3.3 (revised 2026-11-22)  
-**Previous version:** 3.2 (Section 10 listed D1 as PENDING CEO DECISION despite CEO confirmation in Master Blueprint Parts II and XIII; Section 7.2 activation spec lacked programmatic enforcement requirements and required tests for activation rejection and bypass prevention)  
+**Document version:** 3.4 (revised 2026-11-22)  
+**Previous version:** 3.3 (Section 7.2 runtime behavior stated "Running tasks complete their current step and halt before the next" — incorrect; the correct policy is that running agents must not initiate any new external side effect after the stop is observed; in-flight operations may have uncertain outcomes requiring idempotency/reconciliation)  
 **Prepared by:** Claude Code  
 **Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
-**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.3
+**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.4
 
 ---
 
@@ -292,7 +292,9 @@ The boundary: when a POLICY-BOUND action would exceed a policy limit or no match
 
 **Runtime behavior when `agent_emergency_stop = true`:**
 - No new tasks are dispatched regardless of permission level
-- Running tasks complete their current step and halt before the next
+- Running agents that observe the stop must not initiate any new external side effect
+- External operations already in flight may have uncertain outcomes; they must be handled via idempotency keys and reconciliation — the system cannot assume a mid-flight step safely completes or that the operation can always be cancelled
+- Halt events and unresolved in-flight operations are recorded in `audit_events` with timestamp and actor for CEO review
 - The CEO toggles this in `/security`
 - All state changes logged to `audit_events` with timestamp and actor
 
@@ -402,6 +404,6 @@ See DREXONYX_MASTER_BLUEPRINT.md, Part XI for the complete CEO Decision Sheet (D
 
 ---
 
-*Document version: 3.3 — Revised 2026-11-22 by Claude Code*  
-*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.3*  
-*Supersedes: v3.2 (Section 10 listed D1 as PENDING CEO DECISION — D1 is CEO CONFIRMED per Master Blueprint Parts II and XIII; Section 7.2 activation spec lacked programmatic enforcement requirements and required tests for activation rejection and bypass prevention)*
+*Document version: 3.4 — Revised 2026-11-22 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.4*  
+*Supersedes: v3.3 (Section 7.2 runtime behavior stated "Running tasks complete their current step and halt before the next" — corrected: running agents must not initiate new external side effects after stop is observed; in-flight operations may have uncertain outcomes and must be handled via idempotency keys and reconciliation)*
