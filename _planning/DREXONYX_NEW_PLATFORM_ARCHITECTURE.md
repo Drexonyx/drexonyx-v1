@@ -1,10 +1,10 @@
 # DREXONYX — New Platform Architecture
 
-**Document version:** 3.1 (revised 2026-11-21)  
-**Previous version:** 2.0 (tech stack justified by V1 usage; "inherited from V1, proven" language; oversimplified permission model)  
+**Document version:** 3.2 (revised 2026-11-22)  
+**Previous version:** 3.1 (header authority referenced v2.0; duplicate v3.0 footer lines; D4 and D2 listed as Phase 1 requirements when they affect System B and Phase 4 only)  
 **Prepared by:** Claude Code  
 **Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
-**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v2.0
+**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.2
 
 ---
 
@@ -368,25 +368,29 @@ These rules apply to all code, all modules, forever:
 
 ## 10. What Requires CEO Approval Before Implementation Begins
 
-See DREXONYX_MASTER_BLUEPRINT.md, Part XI for the complete CEO Decision Sheet (D1–D11).
+See DREXONYX_MASTER_BLUEPRINT.md, Part XI for the complete CEO Decision Sheet (D1–D11) and Part XII for the full approval requirements.
 
-The minimum approvals required before Phase 1 begins:
+**Required before creating the `drexonyx-platform` repository (Phase 1 — System A):**
 
 | Decision | Item | Status |
 |---|---|---|
 | D1 | Confirm company direction | PENDING CEO DECISION |
-| D2 | MDA sub-brand direction | PENDING CEO DECISION |
-| D4 | Public website strategy | PENDING CEO DECISION |
-| D6 | Stripe account existence | PENDING VERIFICATION |
 | D7 | Neon account plan and strategy | PENDING VERIFICATION |
-| D8 | Resend sender domain status | PENDING VERIFICATION |
+| Technology stack | Approve or redirect Section 5 recommendations | PENDING CEO DECISION |
+
+**Does not block Phase 1 System A work:**
+
+| Decision | Item | Note |
+|---|---|---|
+| D4 | Public website strategy | Blocks System B work only; CEO Command Center (System A) is a separate deployment |
+| D2 | MDA sub-brand direction | No Phase 1–3 component depends on this; needed by Phase 4 (Knowledge Base seeding) |
+| D8 | Resend sender domain status | Phase 4 prerequisite only; not needed until outreach begins |
+| D6 | Stripe account existence | Phase 4+ prerequisite only |
 
 **Technology stack:** The stack listed in Section 5 above is PROPOSED. Claude recommends it based on independent evaluation. CEO may approve it as proposed, modify choices, or request additional information before approving.
 
 ---
 
-*Document version: 3.0 — Revised 2026-11-21 by Claude Code*  
-*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v2.0*  
-*Document version: 3.1 — Revised 2026-11-21 by Claude Code*  
-*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.1*  
-*Supersedes: v3.0 (lacked three-system separation; all 11 modules treated as Phase 1 scope; agent execution defaulted to enabled; all schemas created upfront)*
+*Document version: 3.2 — Revised 2026-11-22 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.2*  
+*Supersedes: v3.1 (header authority incorrectly referenced MASTER_BLUEPRINT.md v2.0; duplicate v3.0 footer lines were present; D4 and D2 listed as Phase 1 prerequisites when they block System B and Phase 4 only)*

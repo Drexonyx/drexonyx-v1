@@ -1,10 +1,10 @@
 # DREXONYX — Cost & Infrastructure Plan
 
-**Document version:** 3.1 (revised 2026-11-21)  
-**Previous version:** 2.0 (provider limits stated as facts without UNVERIFIED labels; "already proven" infrastructure framing)  
+**Document version:** 3.2 (revised 2026-11-22)  
+**Previous version:** 3.1 (header authority referenced v2.0; Section 7 infrastructure diagram showed 12 schemas instead of 10; Section 4 cost tables lacked ILLUSTRATIVE caveat and Neon second-account PENDING VERIFICATION note; Section 8 stated an incorrect total of 18 environment variables spanning all phases without noting phase distribution)  
 **Prepared by:** Claude Code  
 **Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
-**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v2.0  
+**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.2  
 **Note:** All cost figures and plan limits are estimates from public documentation. UNVERIFIED figures must be confirmed against actual account dashboards before committing to any infrastructure strategy.
 
 ---
@@ -177,18 +177,25 @@ The new platform's AI Agent Workforce runs on Claude. Cost depends on which mode
 
 ## 4. Monthly Cost Summary
 
-### Phase 1–2 (Foundation + CEO Command Center)
+**IMPORTANT — ILLUSTRATIVE FIGURES ONLY.** The totals below assume:
+- Neon Option A (second free account) is used — **PENDING VERIFICATION** that a second free Neon account is available and eligible
+- Vercel Hobby plan accommodates one additional project — **PENDING VERIFICATION** against Vercel dashboard
+- All service tiers remain as described — each must be confirmed against actual account dashboards before committing to any infrastructure strategy
+
+These are usage-based estimates for planning purposes only. Do not treat them as a fixed budget or a commitment.
+
+### Phase 1–2 (Foundation + CEO Command Center) — ILLUSTRATIVE
 | Service | Plan | Monthly Cost |
 |---|---|---|
 | GitHub | Free | $0 |
 | Vercel | Hobby | $0 |
-| Neon | Free (second account) | $0 |
+| Neon | Free (second account — PENDING VERIFICATION) | $0 |
 | Cloudflare R2 | Free tier | $0 |
 | Resend | Free tier | $0 |
-| Anthropic API | ~50 tasks | ~$2–3 |
-| **Total** | | **~$2–3/month** |
+| Anthropic API | ~50 tasks | ~$2–3 (ILLUSTRATIVE) |
+| **Total** | | **~$2–3/month (ILLUSTRATIVE)** |
 
-### Phase 3–4 (AI Workforce + Business Operations)
+### Phase 3–4 (AI Workforce + Business Operations) — ILLUSTRATIVE
 | Service | Plan | Monthly Cost |
 |---|---|---|
 | GitHub | Free | $0 |
@@ -196,10 +203,10 @@ The new platform's AI Agent Workforce runs on Claude. Cost depends on which mode
 | Neon | Free | $0 |
 | Cloudflare R2 | Free tier | $0 |
 | Resend | Free tier | $0 |
-| Anthropic API | ~200 tasks | ~$5–10 |
-| **Total** | | **~$5–10/month** |
+| Anthropic API | ~200 tasks | ~$5–10 (ILLUSTRATIVE) |
+| **Total** | | **~$5–10/month (ILLUSTRATIVE)** |
 
-### Phase 5–6 (Expansion + Cleanup)
+### Phase 5–6 (Expansion + Cleanup) — ILLUSTRATIVE
 | Service | Plan | Monthly Cost |
 |---|---|---|
 | GitHub | Free | $0 |
@@ -207,10 +214,10 @@ The new platform's AI Agent Workforce runs on Claude. Cost depends on which mode
 | Neon | Free | $0 |
 | Cloudflare R2 | Free tier | $0 |
 | Resend | Free tier | $0 |
-| Anthropic API | ~500 tasks | ~$10–20 |
-| **Total** | | **~$10–20/month** |
+| Anthropic API | ~500 tasks | ~$10–20 (ILLUSTRATIVE) |
+| **Total** | | **~$10–20/month (ILLUSTRATIVE)** |
 
-**Note:** These are conservative estimates for internal platform use. All costs scale linearly with agent task volume and email volume. The platform is not a customer-facing SaaS generating high traffic.
+**Note:** These are conservative estimates for internal platform use. All costs scale linearly with agent task volume and email volume. The platform is not a customer-facing SaaS generating high traffic. Actual costs depend on account verification results and CEO decisions on infrastructure strategy.
 
 ---
 
@@ -265,7 +272,7 @@ The following services are explicitly excluded unless the CEO approves them:
 │  Neon PostgreSQL │                    │ Cloudflare R2    │
 │  (Free tier)     │                    │ (Object Storage) │
 │  All DB schemas  │                    │  Documents       │
-│  12 schemas      │                    │  Images          │
+│  10 schemas (phases 1–5) │                    │  Images          │
 └──────────────────┘                    │  Demo assets     │
                                         └──────────────────┘
         
@@ -308,7 +315,7 @@ The following services are explicitly excluded unless the CEO approves them:
 | NextAuth | `NEXTAUTH_SECRET`, `NEXTAUTH_URL` | Server-only |
 | Public | `NEXT_PUBLIC_APP_URL` | Public (safe) |
 
-**Total: 18 environment variables.** All set in Vercel project settings — never in source code.
+**Variables are added in phases, not all at initialization.** Phase 1 starts with 7 variables (identity, database, safety flags, public URL). Phase 2 adds `CRON_SECRET`. Phase 3 adds AI provider keys. Phase 4–5 add provider credentials for Resend, Cloudflare R2, Ziina, GitHub, and others as each service is integrated. The full per-phase breakdown is in `DREXONYX_NEW_PROJECT_STRUCTURE.md`, Section 7 and Section 2.A. All variables are set in Vercel project settings — never in source code.
 
 ---
 
@@ -347,6 +354,6 @@ For current Phase 1–4 (1 CEO, 50–200 agent tasks/month): **under $20/month t
 
 ---
 
-*Document version: 3.1 — Revised 2026-11-21 by Claude Code*  
-*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.1*  
-*Supersedes: v3.0 (contained conflicting local decision table D1–D9 that did not match Master Blueprint D1–D11; lacked cost label key distinguishing verified vs unverified claims)*
+*Document version: 3.2 — Revised 2026-11-22 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.2*  
+*Supersedes: v3.1 (header authority referenced v2.0; Section 7 diagram showed 12 schemas instead of 10; Section 4 cost tables lacked ILLUSTRATIVE caveat and Neon PENDING VERIFICATION note; Section 8 stated an incorrect fixed total of 18 environment variables rather than noting the phase-distributed structure)*

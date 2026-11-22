@@ -1,10 +1,10 @@
 # DREXONYX — New Project Structure
 
-**Document version:** 3.1 (revised 2026-11-21)  
-**Previous version:** 1.0 (MDA-agency product framing)  
+**Document version:** 3.2 (revised 2026-11-22)  
+**Previous version:** 3.1 (header authority referenced v2.0; Section 2 directory tree showed all Phase 4–5 modules mixed into the primary structure alongside Phase 1–3 modules; Section 7 env vars included all Phase 4–5 variables in the primary listing)  
 **Prepared by:** Claude Code  
 **Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
-**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v2.0
+**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.2
 
 ---
 
@@ -31,7 +31,9 @@ This repository is built from scratch. Zero V1 code is imported. The structure b
 
 ---
 
-## 2. Top-Level Directory Layout
+## 2. Phase 1–3 Directory Layout
+
+**This section shows only the directories created during Phases 1–3 (CEO Command Center, Security Infrastructure, and AI Agent Workforce).** Phase 4–5 module directories are added when their phase begins — see [Section 2.A](#2a-phase-45-directory-additions) for the full list.
 
 ```
 drexonyx-platform/
@@ -43,108 +45,66 @@ drexonyx-platform/
 │   │   └── migrate.yml          # manual DB migration (MIGRATE confirmation)
 │   └── dependabot.yml
 │
-├── .env.example                 # All env var names. No values. Committed.
+├── .env.example                 # Phase 1–3 variable names. No values. Committed.
 ├── .gitignore
 ├── .npmrc                       # engine-strict=true
 ├── .nvmrc                       # Node version pin
 │
-│   # Next.js Core
+│   # Next.js Core (Phase 1–3 routes only)
 ├── app/
 │   ├── (auth)/
 │   │   └── login/               # Login page
 │   ├── (platform)/              # All authenticated routes
-│   │   ├── layout.tsx           # Platform shell (nav, sidebar)
-│   │   ├── command/             # CEO Command Center
-│   │   ├── agents/              # AI Agent Workforce
-│   │   ├── company/             # Company Management
-│   │   ├── knowledge/           # Knowledge Base
-│   │   ├── products/            # Product Portfolio
-│   │   ├── devops/              # Dev Operations
-│   │   ├── sales/               # Sales & Acquisition
-│   │   ├── marketing/           # Marketing Operations
-│   │   ├── finance/             # Finance & Reporting
-│   │   ├── tasks/               # Task Management
-│   │   └── security/            # Approvals & Security
+│   │   ├── layout.tsx           # Platform shell (nav, sidebar — includes Phase 4–5 nav links as placeholders)
+│   │   ├── command/             # CEO Command Center (Phase 1)
+│   │   ├── agents/              # AI Agent Workforce (Phase 3)
+│   │   └── security/            # Approvals & Security (Phase 2)
 │   ├── api/
-│   │   ├── auth/                # NextAuth handlers
-│   │   ├── command/             # Command Center APIs
-│   │   ├── agents/              # Agent dispatch & status
-│   │   ├── knowledge/           # Knowledge Base APIs
-│   │   ├── sales/               # Sales APIs
-│   │   ├── marketing/           # Marketing APIs
-│   │   ├── finance/             # Finance APIs
-│   │   ├── tasks/               # Task APIs
-│   │   ├── security/            # Approval APIs
-│   │   ├── webhooks/            # External webhooks (Ziina, Higgsfield, etc.)
-│   │   └── internal/            # Cron / internal scheduled jobs
+│   │   ├── auth/                # NextAuth handlers (Phase 1)
+│   │   ├── command/             # Command Center APIs (Phase 1)
+│   │   ├── agents/              # Agent dispatch & status (Phase 3)
+│   │   ├── security/            # Approval APIs (Phase 2)
+│   │   └── internal/            # Cron / internal scheduled jobs (Phase 2+)
 │   ├── layout.tsx               # Root layout
 │   ├── page.tsx                 # Redirect to /command (authenticated) or /login
 │   └── globals.css
 │
 │   # Domain Logic (framework-agnostic TypeScript)
 ├── domain/
-│   ├── command/                 # CEO Command Center business rules
-│   ├── agents/                  # Agent definitions, dispatch, approval policies
+│   ├── command/                 # CEO Command Center business rules (Phase 1)
+│   ├── agents/                  # Agent definitions, dispatch, approval policies (Phase 3)
 │   │   ├── definitions/         # Individual agent modules
 │   │   ├── executor.ts          # Agent task execution engine
 │   │   └── approval.ts          # Approval policy engine
-│   ├── knowledge/               # Knowledge Base rules
-│   ├── products/                # Product catalog, demo, pricing rules
-│   ├── sales/                   # Lead funnel, outreach, opt-out rules
-│   │   ├── skills/              # AI skills: discover, qualify, score, outreach
-│   │   ├── pipeline.ts          # Lead state machine
-│   │   └── outreach.ts          # Outreach approval and dispatch
-│   ├── marketing/               # Campaign and content rules
-│   ├── finance/                 # Revenue tracking, expense rules
-│   ├── tasks/                   # Task state machine, workflow engine
-│   └── security/                # Approval gate rules, audit policy
+│   └── security/                # Approval gate rules, audit policy (Phase 2)
 │
 │   # Service Interfaces (abstractions — no implementations here)
 ├── services/
-│   ├── ai.ts                    # IAIProvider interface
-│   ├── email.ts                 # IEmailService interface
-│   ├── storage.ts               # IStorageService interface
-│   ├── payment.ts               # IPaymentService interface
-│   └── notifications.ts        # INotificationService interface
+│   ├── ai.ts                    # IAIProvider interface (Phase 3)
+│   └── email.ts                 # IEmailService interface (added Phase 4 when outreach begins)
 │
-│   # Infrastructure (concrete implementations)
+│   # Infrastructure (concrete implementations — Phase 1–3 only)
 ├── infrastructure/
-│   ├── ai/
-│   │   ├── anthropic.ts         # Anthropic Claude provider
-│   │   └── gemini.ts            # Google Gemini fallback
-│   ├── email/
-│   │   └── resend.ts            # Resend implementation
-│   ├── storage/
-│   │   └── cloudflare-r2.ts     # R2 implementation
-│   ├── payment/
-│   │   └── ziina.ts             # Ziina implementation (AED)
-│   └── github/
-│       └── client.ts            # GitHub API client (for DevOps module)
+│   └── ai/
+│       ├── anthropic.ts         # Anthropic Claude provider (Phase 3)
+│       └── gemini.ts            # Google Gemini fallback (Phase 3)
 │
-│   # Database
+│   # Database (Phase 1–3 schemas only)
 ├── db/
 │   ├── schema/
-│   │   ├── identity.ts          # users, sessions
-│   │   ├── command.ts           # kpis, alerts, briefs
-│   │   ├── knowledge.ts         # articles, documents, research
-│   │   ├── products.ts          # software catalog, versions, licenses, customers, demos
-│   │   ├── sales.ts             # leads, outreach, proposals
-│   │   ├── marketing.ts         # campaigns, content, publishing
-│   │   ├── finance.ts           # invoices, payments, expenses
-│   │   ├── tasks.ts             # tasks, workflows
-│   │   ├── agents.ts            # agent registry, tasks, outputs
-│   │   └── system.ts            # audit_events, idempotency_keys, settings
+│   │   ├── system.ts            # audit_events, idempotency_keys, settings (Phase 1 — first schema written)
+│   │   ├── identity.ts          # users, sessions (Phase 1)
+│   │   ├── command.ts           # kpis, alerts, briefs (Phase 2)
+│   │   └── agents.ts            # agent registry, tasks, outputs (Phase 3)
 │   ├── migrations/              # Drizzle migration files
 │   └── index.ts                 # DB connection (Neon + Drizzle)
 │
-│   # Shared Components
+│   # Shared Components (Phase 1–3 only)
 ├── components/
 │   ├── ui/                      # Base UI components (buttons, inputs, cards)
 │   ├── platform/                # Platform shell components (nav, sidebar)
 │   ├── command/                 # Command Center components
 │   ├── agents/                  # Agent Workforce components
-│   ├── knowledge/               # Knowledge Base components
-│   ├── sales/                   # Sales components
 │   └── shared/                  # Cross-module shared components
 │
 │   # Shared Utilities
@@ -158,13 +118,6 @@ drexonyx-platform/
 ├── public/
 │   ├── brand/                   # Logo, favicons, brand assets
 │   └── images/                  # Static images
-│
-│   # Knowledge Base Content (static files for initial seed)
-├── knowledge-seed/
-│   ├── products/                # DREXONYX software product specs; MDA service catalog (if MDA continues)
-│   ├── processes/               # SOPs, production standards (from V1 reference material)
-│   ├── decisions/               # Architecture decisions (new series, starts at #0001)
-│   └── research/                # Referenced research (manually curated from V1 reference only)
 │
 │   # Governance Documents
 ├── ARCHITECTURE.md              # Platform architecture + security rules
@@ -181,6 +134,95 @@ drexonyx-platform/
 ├── drizzle.config.ts
 ├── eslint.config.mjs
 └── vitest.config.mts
+```
+
+---
+
+## 2.A Phase 4–5 Directory Additions
+
+**These directories do not exist at Phase 1–3 initialization.** Each is created when its phase begins. This appendix documents the full intended structure for reference during planning only.
+
+### Phase 4 Additions (Business Operations Core)
+
+```
+app/(platform)/
+├── company/                     # Company Management (Phase 4)
+├── knowledge/                   # Knowledge Base (Phase 4B)
+├── products/                    # Product Portfolio (Phase 4C)
+└── sales/                       # Sales & Acquisition (Phase 4A)
+
+app/api/
+├── knowledge/                   # Knowledge Base APIs (Phase 4B)
+├── sales/                       # Sales APIs (Phase 4A)
+└── webhooks/                    # External webhooks — Ziina, etc. (Phase 5A+)
+
+domain/
+├── knowledge/                   # Knowledge Base rules (Phase 4B)
+├── products/                    # Product catalog, demo, pricing rules (Phase 4C)
+└── sales/                       # Lead funnel, outreach, opt-out rules (Phase 4A)
+    ├── skills/                  # AI skills: discover, qualify, score, outreach
+    ├── pipeline.ts              # Lead state machine
+    └── outreach.ts              # Outreach approval and dispatch
+
+services/
+└── email.ts                     # IEmailService interface (Phase 4A — when outreach begins)
+
+infrastructure/
+└── email/
+    └── resend.ts                # Resend implementation (Phase 4A)
+
+db/schema/
+├── knowledge.ts                 # articles, documents, research (Phase 4B)
+├── products.ts                  # software catalog, versions, licenses, customers, demos (Phase 4C)
+└── sales.ts                     # leads, outreach, proposals, opt_outs (Phase 4A)
+
+components/
+├── knowledge/                   # Knowledge Base components (Phase 4B)
+└── sales/                       # Sales components (Phase 4A)
+
+knowledge-seed/                  # Static files for Phase 4B Knowledge Base initial seed
+├── products/                    # DREXONYX software product specs; MDA service catalog (if MDA continues)
+├── processes/                   # SOPs, production standards (from V1 reference material)
+├── decisions/                   # Architecture decisions (new series, starts at #0001)
+└── research/                    # Referenced research (manually curated from V1 reference only)
+```
+
+### Phase 5 Additions (Expansion)
+
+```
+app/(platform)/
+├── devops/                      # Dev Operations (Phase 5D)
+├── finance/                     # Finance & Reporting (Phase 5A)
+├── marketing/                   # Marketing Operations (Phase 5B)
+└── tasks/                       # Task Management (Phase 5C)
+
+app/api/
+├── devops/                      # DevOps APIs (Phase 5D)
+├── finance/                     # Finance APIs (Phase 5A)
+├── marketing/                   # Marketing APIs (Phase 5B)
+└── tasks/                       # Task APIs (Phase 5C)
+
+domain/
+├── finance/                     # Revenue tracking, expense rules (Phase 5A)
+├── marketing/                   # Campaign and content rules (Phase 5B)
+└── tasks/                       # Task state machine, workflow engine (Phase 5C)
+
+services/
+├── payment.ts                   # IPaymentService interface (Phase 5A)
+└── storage.ts                   # IStorageService interface (Phase 5D)
+
+infrastructure/
+├── github/
+│   └── client.ts                # GitHub API client (Phase 5D — DevOps module)
+├── payment/
+│   └── ziina.ts                 # Ziina implementation (Phase 5A)
+└── storage/
+    └── cloudflare-r2.ts         # R2 implementation (Phase 5D)
+
+db/schema/
+├── finance.ts                   # invoices, payments, expenses (Phase 5A)
+├── marketing.ts                 # campaigns, content, publishing (Phase 5B)
+└── tasks.ts                     # tasks, workflows (Phase 5C)
 ```
 
 ---
@@ -282,8 +324,9 @@ await audit.log(...)                                 // system
 
 ## 7. Environment Variable Structure
 
-Follows the same security model as V1:
+Follows the same security model as V1. **This section lists Phase 1–3 variables only.** Phase 4–5 variables are added when their phase begins — see [Section 2.A](#2a-phase-45-directory-additions) for the phase breakdown.
 
+**Phase 1 variables (at repository initialization):**
 ```bash
 # Identity
 NEXTAUTH_SECRET=
@@ -292,47 +335,33 @@ NEXTAUTH_URL=
 # Database
 DATABASE_URL=
 
-# AI Providers
-ANTHROPIC_API_KEY=
-GOOGLE_GEMINI_API_KEY=
-
-# Email
-RESEND_API_KEY=
-RESEND_FROM_EMAIL=
-
-# Storage
-CLOUDFLARE_ACCOUNT_ID=
-CLOUDFLARE_R2_ACCESS_KEY_ID=
-CLOUDFLARE_R2_SECRET_ACCESS_KEY=
-CLOUDFLARE_R2_BUCKET_NAME=
-CLOUDFLARE_R2_PUBLIC_URL=
-
-# Payments
-ZIINA_API_KEY=
-ZIINA_WEBHOOK_SECRET=
-ZIINA_TEST_MODE=true        # Default TRUE. Never change without CEO approval.
-
-# Sales
-SALES_OUTREACH_TEST_MODE=true  # Default TRUE. Never change without CEO approval.
-OUTREACH_TEST_RECIPIENT=        # Test redirect address
-
-# Marketing
-FACEBOOK_PAGE_ACCESS_TOKEN=
-FACEBOOK_PAGE_ID=
-WHATSAPP_VERIFY_TOKEN=
-WHATSAPP_WEBHOOK_SECRET=
-
-# DevOps
-GITHUB_TOKEN=                   # Read-only token for DevOps module
-
-# Cron
-CRON_SECRET=
+# Safety flags (always default true — CEO authorization required to change)
+SALES_OUTREACH_TEST_MODE=true
+ZIINA_TEST_MODE=true
+OUTREACH_TEST_RECIPIENT=        # Test redirect address for outreach in test mode
 
 # Public (safe for browser)
 NEXT_PUBLIC_APP_URL=
 ```
 
+**Phase 2 addition (when cron jobs are set up):**
+```bash
+# Cron
+CRON_SECRET=
+```
+
+**Phase 3 addition (when AI agents go live):**
+```bash
+# AI Providers
+ANTHROPIC_API_KEY=
+GOOGLE_GEMINI_API_KEY=          # Gemini fallback provider
+```
+
+**Phase 4–5 additions:** Resend, Ziina, Cloudflare R2, Facebook, GitHub, and other provider credentials are added in their respective phases. See Section 2.A for the full per-phase breakdown.
+
 **Security rule:** Only `NEXT_PUBLIC_*` variables reach the browser. All others are server-only. Never violate this.
+
+**Safety flag rule:** `SALES_OUTREACH_TEST_MODE` and `ZIINA_TEST_MODE` default to `true`. They must remain `true` until the CEO explicitly authorizes disabling them. Each is a separate CEO action with separate business/legal clearance requirements.
 
 ---
 
@@ -391,6 +420,6 @@ The following are **not in scope** for this repository:
 
 ---
 
-*Document version: 3.1 — Revised 2026-11-21 by Claude Code*  
-*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.1*  
-*Supersedes: v3.0 (lacked three-system scope note; excluded table assumed V1-continues for public website; did not distinguish Phase 1–3 structures from Phase 4–5 future directories)*
+*Document version: 3.2 — Revised 2026-11-22 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.2*  
+*Supersedes: v3.1 (header authority referenced v2.0; Section 2 directory tree showed all Phase 4–5 modules mixed into the primary structure; Section 7 env vars included all Phase 4–5 variables in the primary listing; no Section 2.A appendix for Phase 4–5 additions)*

@@ -1,10 +1,10 @@
 # DREXONYX — Legacy Preservation Plan & Resource Classification
 
-**Document version:** 3.1 (revised 2026-11-21)  
-**Previous version:** 2.0 (auto-classified V1 repo and demo sites as permanent KEEP; auto-retired research files; lacked PENDING VERIFICATION category)  
+**Document version:** 3.2 (revised 2026-11-22)  
+**Previous version:** 3.1 (header authority referenced v2.0; WhatsApp Cloud API incorrectly labeled RETIRE — no CEO retirement decision exists; android-apk/ debug builds incorrectly labeled RETIRE — no CEO retirement decision exists)  
 **Prepared by:** Claude Code  
 **Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
-**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v2.0
+**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.2
 
 ---
 
@@ -151,7 +151,7 @@ Classifying an **account** as KEEP does not classify its projects, data, credent
 | Resource | Classification | Notes |
 |---|---|---|
 | Facebook Graph API access | PENDING CEO DECISION | V1 had Facebook organic publishing. New platform may need it in Marketing Operations (Phase 5). Do not set up until needed. |
-| WhatsApp Cloud API | RETIRE from new platform | V1 had inbound WhatsApp. Not in new platform Phase 1–5 scope. CEO confirms retirement at Phase 6. |
+| WhatsApp Cloud API | PENDING CEO DECISION | V1 had inbound WhatsApp. Not in new platform Phase 1–5 scope. CEO must explicitly confirm retirement before any action. No deletion without that CEO sign-off. |
 | Meta Business Manager access | PENDING CEO DECISION | May be needed for Facebook publishing |
 
 ---
@@ -166,7 +166,7 @@ Classifying an **account** as KEEP does not classify its projects, data, credent
 | Android project — android-project/ | PENDING CEO DECISION | Native Android project |
 | Android project — android-official/ | PENDING CEO DECISION | Official release variant |
 | Android project — android-play/ | PENDING CEO DECISION | Google Play store variant (includes store listing materials) |
-| android-apk/ debug builds | RETIRE (eventually) | Debug APKs; not production releases |
+| android-apk/ debug builds | PENDING CEO DECISION | Debug APKs. CEO must confirm no active test devices depend on these builds before retiring. No deletion without CEO sign-off. |
 | Google Play Developer account | PENDING CEO DECISION | Required if Android apps are published |
 
 **Recommendation:** Pause Fleet Tracker and all Android native development during Phases 1–5. CEO to restart as separate product workstreams when ready.
@@ -294,6 +294,6 @@ Before Phase 1 begins, the CEO confirms:
 
 ---
 
-*Document version: 3.1 — Revised 2026-11-21 by Claude Code*  
-*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.1*  
-*Supersedes: v3.0 (lacked explicit account-vs-project-vs-data distinction; did not state that retaining an account does not retain its contents)*
+*Document version: 3.2 — Revised 2026-11-22 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.2*  
+*Supersedes: v3.1 (header authority referenced v2.0; WhatsApp Cloud API labeled RETIRE without CEO decision; android-apk/ debug builds labeled RETIRE without CEO decision)*

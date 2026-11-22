@@ -1,10 +1,10 @@
 # DREXONYX — Implementation Roadmap
 
-**Document version:** 3.1 (revised 2026-11-21)  
-**Previous version:** 1.0 (11 phases, MDA-agency framing)  
+**Document version:** 3.2 (revised 2026-11-22)  
+**Previous version:** 3.1 (header authority referenced v2.0; D4 listed as blocking Phase 1 System A; Phase 4A outreach classified as CEO-ONLY contradicting the POLICY-BOUND model; agent activation checklist not stated as programmatically enforced)  
 **Prepared by:** Claude Code  
 **Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
-**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v2.0
+**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.2
 
 ---
 
@@ -29,16 +29,17 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
 
 **CEO gates before Phase 1 begins:**
 
-| Gate | Category | Blocking? |
+| Gate | Category | Blocks what? |
 |---|---|---|
-| Approve DREXONYX_MASTER_BLUEPRINT.md v3.1 | Strategic | Yes — nothing starts without this |
-| Confirm D1 (company direction as AI-Native Technology Company) | Strategic | Yes |
-| Decide D4 (public website strategy: Option A, B, or C) | Strategic | Yes — determines V1 resource plan |
-| Decide D7 (Neon strategy: second free account vs. upgrade) | Requires verification | Yes — determines Phase 1 database setup |
-| Decide D8 (Resend sender domain: verify before Phase 4 outreach) | Requires verification | Phase 4 — not blocking Phase 1 |
-| Confirm technology stack direction | Technical | Yes — Claude has recommended; CEO confirms or redirects |
+| Approve DREXONYX_MASTER_BLUEPRINT.md v3.2 | Strategic | Phase 1 System A — nothing starts without this |
+| Confirm D1 (company direction as AI-Native Technology Company) | Strategic | Phase 1 System A |
+| Decide D7 (Neon strategy: second free account vs. upgrade — requires account verification first) | Requires verification | Phase 1 System A — determines database setup |
+| Confirm technology stack direction | Technical | Phase 1 System A — Claude has recommended; CEO confirms or redirects |
+| Decide D4 (public website strategy: Option A, B, or C) | Strategic | **System B work only** — does NOT block CEO Command Center Phase 1 |
+| Decide D2 (MDA sub-brand direction) | Strategic | **Phase 4 (Knowledge Base seeding)** — does NOT block Phase 1–3 |
+| Decide D8 (Resend sender domain: verify before Phase 4 outreach) | Requires verification | **Phase 4 only** — does NOT block Phase 1–3 |
 
-**CEO decisions deferred to Phase 4–6:** D2 (MDA), D3 (product priorities), D5 (lead data), D6 (Stripe), D9 (Fleet Tracker), D10 (Android), D11 (demo sites) — do not delay Phase 1 start for these.
+**CEO decisions deferred to Phase 4–6:** D3 (product priorities), D5 (lead data), D6 (Stripe), D9 (Fleet Tracker), D10 (Android), D11 (demo sites) — do not delay Phase 1 start for these.
 
 **Phase 1 remains blocked until the CEO explicitly states: "Proceed to Phase 1 — create the repository."**
 
@@ -107,6 +108,8 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
 - [ ] Emergency stop tested end-to-end (see success criteria above)
 - [ ] CEO explicitly sets `agent_emergency_stop = false` via `/security` to enable agents
 
+**Activation is enforced programmatically.** The server action that processes this request checks all prerequisites and rejects it if any are unmet. The CEO cannot enable agents by directly writing to the database — the check runs at the application layer.
+
 **Agents remain disabled until every item above is checked.** Phase 3 begins only after CEO enables agents.
 
 **Duration estimate:** 4–6 days
@@ -142,7 +145,13 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
 - Permission level: POLICY-BOUND (generates; CEO approves whether to publish to Command Center)
 - Output: structured daily brief saved to `command.daily_briefs`
 
-**Tests:** 40+ tests covering executor, permission level enforcement, approval policies, AI provider mock, emergency stop block
+**Tests:** 40+ tests covering:
+- **Unauthorized dispatch:** `agent_emergency_stop = true` → dispatch endpoint returns rejection; task record is not created
+- **Policy-limit violation:** POLICY-BOUND task exceeds configured daily limit → task escalated to CEO-ONLY queue; not auto-applied; audit event written
+- **Approval bypass:** CEO-ONLY task without an approval record in `security.approvals` → hard reject at executor; task enters error state; nothing is applied
+- **Emergency-stop enforcement:** flag set to `true` while tasks are queued → no new dispatches; running task halts at next checkpoint and writes halt event to audit log
+- **AI provider mock:** all Anthropic API calls mocked; executor tests do not make real API calls; output schema validation tested independently
+- **Output staging:** AUTONOMOUS output passes content safety → auto-applied; POLICY-BOUND output within policy → applied; outside policy → staged for review; CEO-ONLY → always staged regardless of content
 
 **Success criteria:**
 - CEO triggers "Generate Daily Brief" → agent runs → output staged → approval queue shows it
@@ -163,15 +172,15 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
 #### 4A — Sales Pipeline
 **New schema:** `sales` — leads, outreach, proposals, opt_outs, opt_out_tokens
 
-- Lead pipeline: NEW → REVIEWING → QUALIFIED → OUTREACH_DRAFT → OUTREACH_APPROVED → SENT → REPLIED → WON / REJECTED / ARCHIVED
-- Outreach approval gate: ALL outreach requires CEO approval before sending (CEO-ONLY permission)
-- Resend integration: `SALES_OUTREACH_TEST_MODE=true` by default; no live email until CEO explicitly authorizes
-- Opt-out/unsubscribe system: `/api/unsubscribe` route, enforced before every send
+- Lead pipeline: NEW → REVIEWING → QUALIFIED → OUTREACH_DRAFT → SENT *(POLICY-BOUND path: within policy)* or OUTREACH_PENDING_APPROVAL → OUTREACH_APPROVED → SENT *(CEO-ONLY escalation path: limit exceeded or no policy)* → REPLIED → WON / REJECTED / ARCHIVED
+- Outreach execution model: **POLICY-BOUND** within approved templates, daily volume limits, and opted-in or verified prospect lists. When a POLICY-BOUND dispatch would exceed any policy limit, or when no policy applies, it escalates to **CEO-ONLY**. The outreach draft agent generates the message; execution follows the permission level for that action and policy context.
+- Resend integration: `SALES_OUTREACH_TEST_MODE=true` by default. All outreach is redirected to the test address. No live email is sent until the CEO explicitly disables test mode and confirms outreach policies are set. Disabling test mode is a separate CEO action — it is not part of the Phase 2 agent activation checklist.
+- Opt-out/unsubscribe system: `/api/unsubscribe` route, enforced before every send regardless of permission level
 - AI skills (written fresh — not imported from V1):
   - `sales.lead.discover` — research a lead from public sources (AUTONOMOUS)
   - `sales.lead.qualify` — assess fit against criteria (AUTONOMOUS)
   - `sales.lead.score` — 0–100 priority score (AUTONOMOUS)
-  - `sales.outreach.draft` — draft cold outreach message (POLICY-BOUND → staged for CEO approval)
+  - `sales.outreach.draft` — draft and prepare outreach for dispatch (POLICY-BOUND: executes within approved templates and daily limits; escalates to CEO-ONLY if no policy matches or any limit would be exceeded)
 - Platform modules: `/sales/pipeline` (Kanban), `/sales/leads/:id`, `/sales/outreach` (approval queue)
 - 60+ tests: lead state machine, outreach approval, opt-out enforcement
 
@@ -316,6 +325,6 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
 
 ---
 
-*Document version: 3.1 — Revised 2026-11-21 by Claude Code*  
-*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.1*  
-*Supersedes: v3.0 (agent_emergency_stop incorrectly defaulted to false (active); Phase 0 lacked explicit "approval pending" status; Phase 2 had no agent activation checklist gate; safety flags table showed wrong initial value)*
+*Document version: 3.2 — Revised 2026-11-22 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.2*  
+*Supersedes: v3.1 (header authority referenced v2.0; D4 listed as blocking Phase 1 System A; Phase 4A outreach pipeline showed mandatory CEO-ONLY gate for all outreach, contradicting the POLICY-BOUND model; lead pipeline had no POLICY-BOUND vs CEO-ONLY escalation path distinction)*

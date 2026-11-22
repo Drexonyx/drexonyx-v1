@@ -1,7 +1,7 @@
 # DREXONYX — Master Blueprint
 
-**Document version:** 2.0 (revised 2026-11-21)  
-**Previous version:** 1.0 (contained V1-dependent rationale, over-classified resources, oversimplified permission model, 14 redundant CEO decisions)  
+**Document version:** 3.2 (revised 2026-11-22)  
+**Previous version:** 3.1 (header showed v2.0 instead of v3.1; Part XII listed D4 and D2 as Phase 1 blockers; they affect System B and Phase 4 only; supporting documents referenced v2.0 as authority)  
 **Prepared by:** Claude Code  
 **Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
 **Authority:** This document is the authoritative foundation. All other planning documents derive from it.
@@ -625,30 +625,40 @@ These cannot be resolved until account states are confirmed. Claude will researc
 
 ## PART XII — APPROVAL REQUIREMENTS
 
-Before Phase 1 begins:
+### Before creating the `drexonyx-platform` repository (Phase 1 — System A)
 
-**CEO must decide:**
-- [ ] D1 — Confirm company direction
-- [ ] D2 — MDA sub-brand direction
-- [ ] D4 — Public website strategy
-- [ ] D7 — Neon strategy (after verification)
-- [ ] D8 — Resend strategy (after verification)
+**CEO must decide (blocks Phase 1):**
+- [ ] D1 — Confirm company direction (AI-Native Technology Company)
+- [ ] D7 — Neon account strategy (after account dashboard verification — determines database setup)
+- [ ] Technology stack direction — approve the proposed stack in Section VI or redirect Claude's recommendations
+
+**Does NOT block Phase 1 System A work:**
+
+| Decision | Why it does not block Phase 1 |
+|---|---|
+| D4 — Public website strategy | Affects System B (`drexonyx.com`) only. The CEO Command Center is a separate deployment at `app.drexonyx.com`. Phase 1 creates System A independently of whatever happens to System B. |
+| D2 — MDA sub-brand direction | No Phase 1–3 component depends on this. Required before Phase 4 when the Knowledge Base is seeded with business content. |
+| D8 — Resend sender domain | Phase 4 prerequisite only. Email outreach does not begin until Phase 4. |
+| D6 — Stripe account existence | Phase 4+ prerequisite only. Needed only if Stripe is used in the new platform. |
 
 **Claude will verify and report back:**
-- Neon account current plan details
+- Neon account current plan details (required for D7)
 - Vercel account current plan and project count
-- Resend account plan, usage, and sender domain status
+- Resend account plan, usage, and sender domain status (required for D8, Phase 4)
 - Cloudflare Workers existence
-- Stripe account existence and status
+- Stripe account existence and status (required for D6)
 
-**Before agent execution is enabled (Phase 2 prerequisite — agents start disabled):**
-- [ ] Agent permission levels configured in `/security`
-- [ ] At least one execution policy defined and reviewed
-- [ ] Audit log verified: test actions appear in `audit_events` correctly
-- [ ] Emergency stop mechanism tested end-to-end: toggle true → confirm dispatch blocked; toggle false → confirm dispatch resumes
-- [ ] CEO explicitly sets `agent_emergency_stop = false` to enable agents
+### Before agent execution is enabled (Phase 2 prerequisite — agents start disabled)
 
-**Before any Phase 6 cleanup action:**
+The platform enforces these prerequisites programmatically. The endpoint or server action that allows setting `agent_emergency_stop = false` checks them and rejects the request if any are unmet. The activation checklist is not merely a UI reminder — it is enforced by domain logic.
+
+- [ ] At least one agent permission configuration is recorded in the platform
+- [ ] At least one execution policy is defined and stored
+- [ ] Audit log has verified entries (logging is working end-to-end)
+- [ ] Emergency stop has been test-toggled (audit_events records the test toggle)
+- [ ] CEO explicitly initiates the enable action via `/security` — the platform checks all prerequisites before allowing it
+
+### Before any Phase 6 cleanup action
 - Individual CEO sign-off on each specific deletion
 
 ---
@@ -669,5 +679,6 @@ Before Phase 1 begins:
 
 ---
 
-*Document version: 3.1 — Revised 2026-11-21 by Claude Code*  
-*Supersedes: v2.0 (lacked three-system separation; decision register shared numbering with supporting docs; agent execution incorrectly defaulted to enabled; Phase 0 labeled as implementation-ready)*
+*Document version: 3.2 — Revised 2026-11-22 by Claude Code*  
+*Source of authority: This document is the authoritative foundation.*  
+*Supersedes: v3.1 (document header showed v2.0 instead of v3.1; Part XII listed D4 and D2 as blocking Phase 1 — they block System B and Phase 4 only; supporting documents all referenced DREXONYX_MASTER_BLUEPRINT.md v2.0 as their authority; agent activation checklist was not stated as programmatically enforced)*
