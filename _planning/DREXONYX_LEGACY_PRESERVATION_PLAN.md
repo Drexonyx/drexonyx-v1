@@ -1,7 +1,7 @@
 # DREXONYX — Legacy Preservation Plan & Resource Classification
 
-**Document version:** 3.3 (revised 2026-11-22)  
-**Previous version:** 3.2 (D-ID numbering errors: Section 3.3 cited D3 for Neon account strategy — D3 is product priorities, D7 is Neon; Section 3.8 cited D6 for Ziina MDA payment link — D6 is Stripe, D2 is MDA sub-brand direction; Section 3.8 cited D5 for Stripe — D5 is active lead data, D6 is Stripe; Section 6 cited D7 for lead data review — D7 is Neon strategy, D5 is active lead data; Section 6 cited D5 for Stripe status — D5 is active lead data, D6 is Stripe)  
+**Document version:** 3.4 (revised 2026-11-22)  
+**Previous version:** 3.3 (Section 1 introductory text and Section 2 heading described six classification categories; the actual category table and the Master Blueprint Part VII both define seven categories — PENDING VERIFICATION is the seventh)  
 **Prepared by:** Claude Code  
 **Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
 **Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.3
@@ -10,13 +10,13 @@
 
 ## 1. Purpose
 
-This document classifies every identified DREXONYX asset, external service, and V1 codebase component into one of six categories. It is the operational companion to the Master Blueprint's resource inventory (Part VII).
+This document classifies every identified DREXONYX asset, external service, and V1 codebase component into one of seven categories. It is the operational companion to the Master Blueprint's resource inventory (Part VII).
 
 **No action — no deletion, archival, reconfiguration, or cleanup — may be taken until the CEO reviews and approves Phase 6, with individual sign-off on each item.**
 
 ---
 
-## 2. The Six Classification Categories
+## 2. The Seven Classification Categories
 
 | Category | Meaning | Action timing |
 |---|---|---|
@@ -294,6 +294,6 @@ Before Phase 1 begins, the CEO confirms:
 
 ---
 
-*Document version: 3.3 — Revised 2026-11-22 by Claude Code*  
+*Document version: 3.4 — Revised 2026-11-22 by Claude Code*  
 *Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.3*  
-*Supersedes: v3.2 (D-ID numbering errors: Section 3.3 cited D3 for Neon — D7 is correct; Section 3.8 cited D6 for Ziina MDA payment link — D2 is correct; Section 3.8 cited D5 for Stripe — D6 is correct; Section 6 cited D7 for lead data review — D5 is correct; Section 6 cited D5 for Stripe status — D6 is correct)*
+*Supersedes: v3.3 (Section 1 introductory text and Section 2 heading described six classification categories; the actual category table and the Master Blueprint Part VII both define seven — PENDING VERIFICATION is the seventh)*

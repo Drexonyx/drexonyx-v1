@@ -1,7 +1,7 @@
 # DREXONYX — Cost & Infrastructure Plan
 
-**Document version:** 3.3 (revised 2026-11-22)  
-**Previous version:** 3.2 (D-ID numbering errors: Section 3.4 cited D5 for Stripe — D5 is active lead data, D6 is Stripe; Section 3.5 cited D8 for Fleet Tracker — D8 is Resend sender domain, D9 is Fleet Tracker; Section 6 table Stripe row cited D5 and Fleet Tracker row cited D8 — same errors; Section 7 infrastructure diagram had broken ASCII art for the 10-schemas line; Section 10 "under $20/month total" statement lacked ILLUSTRATIVE caveat)  
+**Document version:** 3.4 (revised 2026-11-22)  
+**Previous version:** 3.3 (Section 10 retained "under $20/month total" as an ILLUSTRATIVE figure with a caveat — the directive requires complete removal of any monthly cost ceiling until account plans, usage, and provider pricing are verified against actual dashboards)  
 **Prepared by:** Claude Code  
 **Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
 **Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.3  
@@ -350,10 +350,10 @@ If DREXONYX grows and the platform serves a team of 5 people with heavy AI agent
 | Active (5 people, 500 tasks/day) | ~$150 | $40 | ~$190/month |
 | Heavy (10 people, 2,000 tasks/day) | ~$600 | $60 | ~$660/month |
 
-For current Phase 1–4 (1 CEO, 50–200 agent tasks/month): estimated **under $20/month total** (ILLUSTRATIVE — based on stated Anthropic pricing and assumes second free Neon account; actual cost depends on verified provider plans — see PENDING VERIFICATION items above).
+**Actual total cost cannot be established until account plans, usage, and provider pricing are verified against actual dashboards.** See PENDING VERIFICATION items throughout this document. The illustrative scenarios in the table above give a sense of scale at higher usage but should not be read as a ceiling or guarantee for any specific usage pattern.
 
 ---
 
-*Document version: 3.3 — Revised 2026-11-22 by Claude Code*  
+*Document version: 3.4 — Revised 2026-11-22 by Claude Code*  
 *Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.3*  
-*Supersedes: v3.2 (D-ID numbering errors: Section 3.4 cited D5 for Stripe — D6 is correct; Section 3.5 cited D8 for Fleet Tracker — D9 is correct; Section 6 table Stripe row cited D5 — D6 is correct; Section 6 table Expo EAS row cited D8 — D9 is correct; Section 7 diagram had broken ASCII art for schemas box; Section 10 cost total lacked ILLUSTRATIVE caveat)*
+*Supersedes: v3.3 (Section 10 retained "under $20/month total" as ILLUSTRATIVE with a caveat — removed entirely; actual total cost cannot be established until account plans, usage, and provider pricing are verified against actual dashboards)*

@@ -1,7 +1,7 @@
 # DREXONYX — Master Blueprint
 
-**Document version:** 3.3 (revised 2026-11-22)  
-**Previous version:** 3.2 (Part XI D1 register still showed "Confirm / modify" despite CEO confirmation documented in Part II and Part XIII; Part XII Phase 1 blockers included D1 as a pending gate despite D1 being CEO CONFIRMED)  
+**Document version:** 3.4 (revised 2026-11-22)  
+**Previous version:** 3.3 (Part V emergency stop description stated running tasks "complete current step and halt" — incorrect; the correct policy is that running agents must not initiate any new external side effect after the stop is observed; in-flight operations may have uncertain outcomes requiring idempotency/reconciliation)  
 **Prepared by:** Claude Code  
 **Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
 **Authority:** This document is the authoritative foundation. All other planning documents derive from it.
@@ -183,7 +183,7 @@ Examples:
 ### Emergency Stop and Recovery
 
 A global flag in `system.settings.agent_emergency_stop`:
-- When `true`: no new tasks dispatch; running tasks complete current step and halt
+- When `true`: no new tasks dispatch; running agents must not initiate any new external side effect after the stop is observed; in-flight external operations may have uncertain outcomes and must be handled via idempotency keys and reconciliation
 - CEO toggles this from `/security` in one action
 - Emergency stop events logged to audit trail with timestamp and actor
 - Recovery: CEO sets flag to `false` and reviews any incomplete tasks
@@ -681,6 +681,6 @@ The platform enforces these prerequisites programmatically. The endpoint or serv
 
 ---
 
-*Document version: 3.3 — Revised 2026-11-22 by Claude Code*  
+*Document version: 3.4 — Revised 2026-11-22 by Claude Code*  
 *Source of authority: This document is the authoritative foundation.*  
-*Supersedes: v3.2 (Part XI D1 register showed "Confirm / modify" despite CEO confirmation in Part II and Part XIII; Part XII Phase 1 blockers included D1 as a pending gate despite D1 being CEO CONFIRMED 2026-11-21)*
+*Supersedes: v3.3 (Part V emergency stop description stated running tasks "complete current step and halt" — corrected: running agents must not initiate new external side effects after stop is observed; in-flight operations require idempotency/reconciliation)*

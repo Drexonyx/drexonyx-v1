@@ -1,7 +1,7 @@
 # DREXONYX — Implementation Roadmap
 
-**Document version:** 3.3 (revised 2026-11-22)  
-**Previous version:** 3.2 (Phase 0 "What is complete" referenced Master Blueprint v3.1 and supporting documents v3.1; Phase 0 CEO gates still listed D1 as a pending gate despite CEO confirmation in Master Blueprint Parts II and XIII; Phase 4C MDA operations reference used D10 — D10 is Android, D2 is MDA sub-brand direction; Phase 5B Facebook publishing incorrectly cited D10; Phase 3 tests did not cover activation rejection or bypass prevention)  
+**Document version:** 3.4 (revised 2026-11-22)  
+**Previous version:** 3.3 (Phase 0 "What is complete" listed Master Blueprint v3.2 and supporting documents v3.2 as the current approved versions; Phase 0 CEO gate listed v3.2 for Master Blueprint approval; Phase 3 emergency-stop enforcement test described running task as halting at next checkpoint — incorrect; did not state idempotency/reconciliation requirement for in-flight operations)  
 **Prepared by:** Claude Code  
 **Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
 **Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.3
@@ -22,8 +22,8 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
 **Goal:** Deliver complete, coherent planning documents for CEO review. Phase 1 is blocked until the CEO explicitly approves the Master Blueprint and authorizes repository creation.
 
 **What is complete:**
-- Master Blueprint v3.2 (`_planning/DREXONYX_MASTER_BLUEPRINT.md`)
-- All 5 supporting planning documents at v3.2
+- Master Blueprint v3.3 (`_planning/DREXONYX_MASTER_BLUEPRINT.md`)
+- All 5 supporting planning documents at v3.3
 - Three-system separation documented (CEO Command Center / Public Website / Commercial Products)
 - Authoritative CEO Decision Register established (D1–D11)
 
@@ -31,7 +31,7 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
 
 | Gate | Category | Blocks what? |
 |---|---|---|
-| Approve DREXONYX_MASTER_BLUEPRINT.md v3.2 | Strategic | Phase 1 System A — nothing starts without this |
+| Approve DREXONYX_MASTER_BLUEPRINT.md v3.3 | Strategic | Phase 1 System A — nothing starts without this |
 | D1 — Company direction: DREXONYX is an AI-Native Technology Company | **CEO CONFIRMED (2026-11-21)** | No longer a pending gate — confirmed in Master Blueprint Part II and Part XIII |
 | Decide D7 (Neon strategy: second free account vs. upgrade — requires account verification first) | Requires verification | Phase 1 System A — determines database setup |
 | Confirm technology stack direction | Technical | Phase 1 System A — Claude has recommended; CEO confirms or redirects |
@@ -149,7 +149,7 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
 - **Unauthorized dispatch:** `agent_emergency_stop = true` → dispatch endpoint returns rejection; task record is not created
 - **Policy-limit violation:** POLICY-BOUND task exceeds configured daily limit → task escalated to CEO-ONLY queue; not auto-applied; audit event written
 - **Approval bypass:** CEO-ONLY task without an approval record in `security.approvals` → hard reject at executor; task enters error state; nothing is applied
-- **Emergency-stop enforcement:** flag set to `true` while tasks are queued → no new dispatches; running task halts at next checkpoint and writes halt event to audit log
+- **Emergency-stop enforcement:** flag set to `true` while tasks are queued → no new dispatches; running agents must not initiate any new external side effect after the stop is observed; in-flight external operations may have uncertain outcomes and must be handled via idempotency keys and reconciliation; halt event written to audit log
 - **AI provider mock:** all Anthropic API calls mocked; executor tests do not make real API calls; output schema validation tested independently
 - **Output staging:** AUTONOMOUS output passes content safety → auto-applied; POLICY-BOUND output within policy → applied; outside policy → staged for review; CEO-ONLY → always staged regardless of content
 - **Activation rejected**: activation server action called with prerequisites unmet → action rejects; `agent_emergency_stop` remains `true`; rejection event written to `audit_events`
@@ -327,6 +327,6 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
 
 ---
 
-*Document version: 3.3 — Revised 2026-11-22 by Claude Code*  
+*Document version: 3.4 — Revised 2026-11-22 by Claude Code*  
 *Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.3*  
-*Supersedes: v3.2 (Phase 0 "What is complete" referenced v3.1 planning documents; Phase 0 CEO gates listed D1 as pending despite CEO confirmation; Phase 4C cited D10 for MDA sub-brand — D2 is correct; Phase 5B cited D10 for Facebook publishing — no D-number applies; Phase 3 tests lacked activation rejection and bypass prevention test cases)*
+*Supersedes: v3.3 (Phase 0 "What is complete" listed Master Blueprint v3.2 and supporting documents v3.2 as the current approved versions; Phase 0 CEO gate listed v3.2 for Master Blueprint approval; Phase 3 emergency-stop enforcement test described running task as halting at next checkpoint — incorrect; did not state idempotency/reconciliation requirement for in-flight operations)*
