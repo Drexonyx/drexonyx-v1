@@ -1,7 +1,7 @@
 # DREXONYX — Master Blueprint
 
-**Document version:** 3.2 (revised 2026-11-22)  
-**Previous version:** 3.1 (header showed v2.0 instead of v3.1; Part XII listed D4 and D2 as Phase 1 blockers; they affect System B and Phase 4 only; supporting documents referenced v2.0 as authority)  
+**Document version:** 3.3 (revised 2026-11-22)  
+**Previous version:** 3.2 (Part XI D1 register still showed "Confirm / modify" despite CEO confirmation documented in Part II and Part XIII; Part XII Phase 1 blockers included D1 as a pending gate despite D1 being CEO CONFIRMED)  
 **Prepared by:** Claude Code  
 **Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
 **Authority:** This document is the authoritative foundation. All other planning documents derive from it.
@@ -587,7 +587,7 @@ Decisions appear on this list because they affect company direction, ownership, 
 
 | # | Decision | Context | Options |
 |---|---|---|---|
-| **D1** | Company direction | Confirm DREXONYX is an AI-Native Technology Company (not primarily an agency) | Confirm / modify |
+| **D1** | Company direction | Confirm DREXONYX is an AI-Native Technology Company (not primarily an agency) | **CEO CONFIRMED (2026-11-21)** — see Part II and Part XIII |
 | **D2** | MDA sub-brand | Continue MDA as DREXONYX sub-brand? Or fully rebrand? This affects product portfolio and Knowledge Base seeding. | Continue MDA / Retire MDA brand / Transform to tech brand |
 | **D3** | Initial product priorities | Which of the 4 software products is built / marketed first? In what sequence? | CEO to rank CBMS / RMS / Auto Workshop / International Trade |
 | **D4** | Public website strategy | V1 stays up while new platform is built (Option A), or new public site built in parallel and switched over (B→C), or other. | Option A / B / C / Other |
@@ -627,8 +627,10 @@ These cannot be resolved until account states are confirmed. Claude will researc
 
 ### Before creating the `drexonyx-platform` repository (Phase 1 — System A)
 
+**CEO decisions already confirmed (do not block Phase 1):**
+- [x] D1 — Company direction confirmed: DREXONYX is an AI-Native Technology Company (CEO CONFIRMED 2026-11-21 — documented in Part II and Part XIII)
+
 **CEO must decide (blocks Phase 1):**
-- [ ] D1 — Confirm company direction (AI-Native Technology Company)
 - [ ] D7 — Neon account strategy (after account dashboard verification — determines database setup)
 - [ ] Technology stack direction — approve the proposed stack in Section VI or redirect Claude's recommendations
 
@@ -679,6 +681,6 @@ The platform enforces these prerequisites programmatically. The endpoint or serv
 
 ---
 
-*Document version: 3.2 — Revised 2026-11-22 by Claude Code*  
+*Document version: 3.3 — Revised 2026-11-22 by Claude Code*  
 *Source of authority: This document is the authoritative foundation.*  
-*Supersedes: v3.1 (document header showed v2.0 instead of v3.1; Part XII listed D4 and D2 as blocking Phase 1 — they block System B and Phase 4 only; supporting documents all referenced DREXONYX_MASTER_BLUEPRINT.md v2.0 as their authority; agent activation checklist was not stated as programmatically enforced)*
+*Supersedes: v3.2 (Part XI D1 register showed "Confirm / modify" despite CEO confirmation in Part II and Part XIII; Part XII Phase 1 blockers included D1 as a pending gate despite D1 being CEO CONFIRMED 2026-11-21)*

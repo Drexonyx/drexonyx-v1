@@ -1,10 +1,10 @@
 # DREXONYX — Cost & Infrastructure Plan
 
-**Document version:** 3.2 (revised 2026-11-22)  
-**Previous version:** 3.1 (header authority referenced v2.0; Section 7 infrastructure diagram showed 12 schemas instead of 10; Section 4 cost tables lacked ILLUSTRATIVE caveat and Neon second-account PENDING VERIFICATION note; Section 8 stated an incorrect total of 18 environment variables spanning all phases without noting phase distribution)  
+**Document version:** 3.3 (revised 2026-11-22)  
+**Previous version:** 3.2 (D-ID numbering errors: Section 3.4 cited D5 for Stripe — D5 is active lead data, D6 is Stripe; Section 3.5 cited D8 for Fleet Tracker — D8 is Resend sender domain, D9 is Fleet Tracker; Section 6 table Stripe row cited D5 and Fleet Tracker row cited D8 — same errors; Section 7 infrastructure diagram had broken ASCII art for the 10-schemas line; Section 10 "under $20/month total" statement lacked ILLUSTRATIVE caveat)  
 **Prepared by:** Claude Code  
 **Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
-**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.2  
+**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.3  
 **Note:** All cost figures and plan limits are estimates from public documentation. UNVERIFIED figures must be confirmed against actual account dashboards before committing to any infrastructure strategy.
 
 ---
@@ -154,7 +154,7 @@ The new platform's AI Agent Workforce runs on Claude. Cost depends on which mode
 
 ### 3.4 Stripe (Payment Processing)
 - **Role:** V1 had Stripe configured (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` in V1 `.env.example`)
-- **New platform status:** **PENDING CEO DECISION (D5)** — CEO must confirm:
+- **New platform status:** **PENDING CEO DECISION (D6)** — CEO must confirm:
   - Does a Stripe account exist under DREXONYX?
   - Is Stripe needed in the new platform, or is Ziina sufficient?
   - If Stripe is retained: create new Stripe project credentials for new platform
@@ -162,7 +162,7 @@ The new platform's AI Agent Workforce runs on Claude. Cost depends on which mode
 
 ### 3.5 Expo / EAS (Fleet Tracker Mobile App)
 - **Role:** Fleet Tracker is an Expo/React Native app using `drexonyx.studio` Expo account
-- **New platform status:** **PENDING CEO DECISION (D8)** — Fleet Tracker is a separate product, not part of new platform
+- **New platform status:** **PENDING CEO DECISION (D9)** — Fleet Tracker is a separate product, not part of new platform
 - **EAS Free tier:** 30 builds/month per platform
 - **EAS Production ($99/month):** Needed only if publishing to App Store/Play Store with high volume
 - **Phase 1–5 cost:** $0 (Fleet Tracker paused during platform build, per recommendation)
@@ -247,10 +247,10 @@ The following services are explicitly excluded unless the CEO approves them:
 | Cloudflare Workers (paid) | Edge compute | Free tier sufficient |
 | AWS / GCP / Azure | Cloud infra | Vercel serverless handles all |
 | OpenAI API | AI | Anthropic is primary; Gemini is free fallback |
-| Stripe | Payments | PENDING CEO DECISION D5 — Ziina primary for UAE; CEO confirms if Stripe needed |
+| Stripe | Payments | PENDING CEO DECISION D6 — Ziina primary for UAE; CEO confirms if Stripe needed |
 | Figma (paid) | Design | Not needed for internal platform |
 | Any analytics SaaS | Analytics | Vercel Analytics (free tier) is sufficient |
-| Expo EAS Production ($99/month) | Mobile builds | PENDING CEO DECISION D8 — only if Fleet Tracker resumes |
+| Expo EAS Production ($99/month) | Mobile builds | PENDING CEO DECISION D9 — only if Fleet Tracker resumes |
 
 ---
 
@@ -272,7 +272,7 @@ The following services are explicitly excluded unless the CEO approves them:
 │  Neon PostgreSQL │                    │ Cloudflare R2    │
 │  (Free tier)     │                    │ (Object Storage) │
 │  All DB schemas  │                    │  Documents       │
-│  10 schemas (phases 1–5) │                    │  Images          │
+│  10 schemas      │                    │  Images          │
 └──────────────────┘                    │  Demo assets     │
                                         └──────────────────┘
         
@@ -350,10 +350,10 @@ If DREXONYX grows and the platform serves a team of 5 people with heavy AI agent
 | Active (5 people, 500 tasks/day) | ~$150 | $40 | ~$190/month |
 | Heavy (10 people, 2,000 tasks/day) | ~$600 | $60 | ~$660/month |
 
-For current Phase 1–4 (1 CEO, 50–200 agent tasks/month): **under $20/month total**.
+For current Phase 1–4 (1 CEO, 50–200 agent tasks/month): estimated **under $20/month total** (ILLUSTRATIVE — based on stated Anthropic pricing and assumes second free Neon account; actual cost depends on verified provider plans — see PENDING VERIFICATION items above).
 
 ---
 
-*Document version: 3.2 — Revised 2026-11-22 by Claude Code*  
-*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.2*  
-*Supersedes: v3.1 (header authority referenced v2.0; Section 7 diagram showed 12 schemas instead of 10; Section 4 cost tables lacked ILLUSTRATIVE caveat and Neon PENDING VERIFICATION note; Section 8 stated an incorrect fixed total of 18 environment variables rather than noting the phase-distributed structure)*
+*Document version: 3.3 — Revised 2026-11-22 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.3*  
+*Supersedes: v3.2 (D-ID numbering errors: Section 3.4 cited D5 for Stripe — D6 is correct; Section 3.5 cited D8 for Fleet Tracker — D9 is correct; Section 6 table Stripe row cited D5 — D6 is correct; Section 6 table Expo EAS row cited D8 — D9 is correct; Section 7 diagram had broken ASCII art for schemas box; Section 10 cost total lacked ILLUSTRATIVE caveat)*

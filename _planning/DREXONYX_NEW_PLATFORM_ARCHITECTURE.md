@@ -1,10 +1,10 @@
 # DREXONYX — New Platform Architecture
 
-**Document version:** 3.2 (revised 2026-11-22)  
-**Previous version:** 3.1 (header authority referenced v2.0; duplicate v3.0 footer lines; D4 and D2 listed as Phase 1 requirements when they affect System B and Phase 4 only)  
+**Document version:** 3.3 (revised 2026-11-22)  
+**Previous version:** 3.2 (Section 10 listed D1 as PENDING CEO DECISION despite CEO confirmation in Master Blueprint Parts II and XIII; Section 7.2 activation spec lacked programmatic enforcement requirements and required tests for activation rejection and bypass prevention)  
 **Prepared by:** Claude Code  
 **Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
-**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.2
+**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.3
 
 ---
 
@@ -279,6 +279,17 @@ The boundary: when a POLICY-BOUND action would exceed a policy limit or no match
 4. Emergency stop tested end-to-end: set true → confirm no dispatch; set false → confirm dispatch resumes
 5. CEO explicitly sets `agent_emergency_stop = false` via `/security` toggle
 
+**Programmatic enforcement requirements (planning specification):**
+- Activation is server-side only. The `/security` toggle calls a server action; no client-trusted state can influence the prerequisite check.
+- The activation server action checks every prerequisite before changing `agent_emergency_stop`. If any prerequisite is unmet, the action rejects and returns the specific unmet condition. The flag does not change. The rejection is written to `audit_events`.
+- There is no application code path — no API route, no server action, no domain function — that sets `agent_emergency_stop = false` without the full prerequisite check running. This is a design requirement for the domain layer.
+- When `agent_emergency_stop = true`, no task record is created for a dispatch attempt. The executor rejects at the first check, before any queue entry is written.
+
+**Required tests for the activation gate (Phase 2 and Phase 3):**
+- **Activation rejected**: activation server action called with one or more prerequisites unmet → action rejects; `agent_emergency_stop` remains `true`; rejection event written to `audit_events`
+- **No bypass path**: all server actions and API routes touching `system.settings.agent_emergency_stop` are enumerated in test; none set it to `false` without the prerequisite check
+- **Dispatch blocked**: with `agent_emergency_stop = true`, any task dispatch call returns rejection; no `agent_tasks` record is created; rejection event written to `audit_events`
+
 **Runtime behavior when `agent_emergency_stop = true`:**
 - No new tasks are dispatched regardless of permission level
 - Running tasks complete their current step and halt before the next
@@ -374,7 +385,7 @@ See DREXONYX_MASTER_BLUEPRINT.md, Part XI for the complete CEO Decision Sheet (D
 
 | Decision | Item | Status |
 |---|---|---|
-| D1 | Confirm company direction | PENDING CEO DECISION |
+| D1 | Confirm company direction | CEO CONFIRMED (2026-11-21) — see Master Blueprint Part II and Part XIII |
 | D7 | Neon account plan and strategy | PENDING VERIFICATION |
 | Technology stack | Approve or redirect Section 5 recommendations | PENDING CEO DECISION |
 
@@ -391,6 +402,6 @@ See DREXONYX_MASTER_BLUEPRINT.md, Part XI for the complete CEO Decision Sheet (D
 
 ---
 
-*Document version: 3.2 — Revised 2026-11-22 by Claude Code*  
-*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.2*  
-*Supersedes: v3.1 (header authority incorrectly referenced MASTER_BLUEPRINT.md v2.0; duplicate v3.0 footer lines were present; D4 and D2 listed as Phase 1 prerequisites when they block System B and Phase 4 only)*
+*Document version: 3.3 — Revised 2026-11-22 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.3*  
+*Supersedes: v3.2 (Section 10 listed D1 as PENDING CEO DECISION — D1 is CEO CONFIRMED per Master Blueprint Parts II and XIII; Section 7.2 activation spec lacked programmatic enforcement requirements and required tests for activation rejection and bypass prevention)*

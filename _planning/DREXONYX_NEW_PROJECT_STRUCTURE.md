@@ -1,10 +1,10 @@
 # DREXONYX — New Project Structure
 
-**Document version:** 3.2 (revised 2026-11-22)  
-**Previous version:** 3.1 (header authority referenced v2.0; Section 2 directory tree showed all Phase 4–5 modules mixed into the primary structure alongside Phase 1–3 modules; Section 7 env vars included all Phase 4–5 variables in the primary listing)  
+**Document version:** 3.3 (revised 2026-11-22)  
+**Previous version:** 3.2 (no content errors found; version-only bump to align with v3.3 correction pass across all six planning documents)  
 **Prepared by:** Claude Code  
 **Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
-**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.2
+**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.3
 
 ---
 
@@ -420,6 +420,6 @@ The following are **not in scope** for this repository:
 
 ---
 
-*Document version: 3.2 — Revised 2026-11-22 by Claude Code*  
-*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.2*  
-*Supersedes: v3.1 (header authority referenced v2.0; Section 2 directory tree showed all Phase 4–5 modules mixed into the primary structure; Section 7 env vars included all Phase 4–5 variables in the primary listing; no Section 2.A appendix for Phase 4–5 additions)*
+*Document version: 3.3 — Revised 2026-11-22 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.3*  
+*Supersedes: v3.2 (no content errors found in v3.2; version-only bump to align with v3.3 correction pass across all six planning documents)*

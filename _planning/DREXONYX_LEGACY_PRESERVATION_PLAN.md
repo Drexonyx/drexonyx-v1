@@ -1,10 +1,10 @@
 # DREXONYX — Legacy Preservation Plan & Resource Classification
 
-**Document version:** 3.2 (revised 2026-11-22)  
-**Previous version:** 3.1 (header authority referenced v2.0; WhatsApp Cloud API incorrectly labeled RETIRE — no CEO retirement decision exists; android-apk/ debug builds incorrectly labeled RETIRE — no CEO retirement decision exists)  
+**Document version:** 3.3 (revised 2026-11-22)  
+**Previous version:** 3.2 (D-ID numbering errors: Section 3.3 cited D3 for Neon account strategy — D3 is product priorities, D7 is Neon; Section 3.8 cited D6 for Ziina MDA payment link — D6 is Stripe, D2 is MDA sub-brand direction; Section 3.8 cited D5 for Stripe — D5 is active lead data, D6 is Stripe; Section 6 cited D7 for lead data review — D7 is Neon strategy, D5 is active lead data; Section 6 cited D5 for Stripe status — D5 is active lead data, D6 is Stripe)  
 **Prepared by:** Claude Code  
 **Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
-**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.2
+**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.3
 
 ---
 
@@ -86,7 +86,7 @@ Classifying an **account** as KEEP does not classify its projects, data, credent
 | V1 Neon branches (dev/preview) | PENDING CEO DECISION | May be useful if V1 investigations are needed. Candidates for deletion once V1 is confirmed retired. |
 | New Neon project (new platform) | (To create in Phase 1) | Completely fresh — isolated from V1 |
 
-**Neon Free Tier Constraint:** 1 project per account. CEO Decision D3 required before Phase 1:
+**Neon Free Tier Constraint:** 1 project per account. CEO Decision D7 required before Phase 1:
 - **Option A (Recommended):** Second free Neon account for new platform
 - **Option B:** Upgrade existing account to Launch ($19/month)
 
@@ -141,8 +141,8 @@ Classifying an **account** as KEEP does not classify its projects, data, credent
 | Resource | Classification | Notes |
 |---|---|---|
 | Ziina account | KEEP BUT RECONFIGURE | Same account; fresh credentials for new platform |
-| Existing Ziina payment link: `https://pay.ziina.com/drexonyx/Md6AyFJ0z?source=app` | PENDING CEO DECISION | AED 599 MDA website offer link. If MDA operations continue, may still be needed. CEO must confirm (Decision D6). |
-| Stripe account | PENDING CEO DECISION | V1 had Stripe (STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET in .env.example). Verify account exists. CEO to decide if Stripe is needed in new platform (Decision D5). |
+| Existing Ziina payment link: `https://pay.ziina.com/drexonyx/Md6AyFJ0z?source=app` | PENDING CEO DECISION | AED 599 MDA website offer link. If MDA operations continue, may still be needed. CEO must confirm (Decision D2 — MDA sub-brand direction). |
+| Stripe account | PENDING CEO DECISION | V1 had Stripe (STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET in .env.example). Verify account exists. CEO to decide if Stripe is needed in new platform (Decision D6). |
 
 ---
 
@@ -288,12 +288,12 @@ Before Phase 1 begins, the CEO confirms:
 - [ ] Neon V1 production database confirmed accessible (no schema changes made)
 - [ ] Cloudflare R2 V1 bucket confirmed intact
 - [ ] Five demo sites confirmed accessible (barbershop, clinic, salon, restaurant, realestate)
-- [ ] `LEAD_TRACKER.csv` and `FLASH_DELIVERY_DUBAI_LEADS` data reviewed — confirm whether active prospects need manual follow-up before new platform is ready (Decision D7)
-- [ ] Stripe account status confirmed (Decision D5)
+- [ ] `LEAD_TRACKER.csv` and `FLASH_DELIVERY_DUBAI_LEADS` data reviewed — confirm whether active prospects need manual follow-up before new platform is ready (Decision D5)
+- [ ] Stripe account status confirmed (Decision D6)
 - [ ] CEO has reviewed this document and approved it
 
 ---
 
-*Document version: 3.2 — Revised 2026-11-22 by Claude Code*  
-*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.2*  
-*Supersedes: v3.1 (header authority referenced v2.0; WhatsApp Cloud API labeled RETIRE without CEO decision; android-apk/ debug builds labeled RETIRE without CEO decision)*
+*Document version: 3.3 — Revised 2026-11-22 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.3*  
+*Supersedes: v3.2 (D-ID numbering errors: Section 3.3 cited D3 for Neon — D7 is correct; Section 3.8 cited D6 for Ziina MDA payment link — D2 is correct; Section 3.8 cited D5 for Stripe — D6 is correct; Section 6 cited D7 for lead data review — D5 is correct; Section 6 cited D5 for Stripe status — D6 is correct)*

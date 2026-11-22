@@ -1,10 +1,10 @@
 # DREXONYX — Implementation Roadmap
 
-**Document version:** 3.2 (revised 2026-11-22)  
-**Previous version:** 3.1 (header authority referenced v2.0; D4 listed as blocking Phase 1 System A; Phase 4A outreach classified as CEO-ONLY contradicting the POLICY-BOUND model; agent activation checklist not stated as programmatically enforced)  
+**Document version:** 3.3 (revised 2026-11-22)  
+**Previous version:** 3.2 (Phase 0 "What is complete" referenced Master Blueprint v3.1 and supporting documents v3.1; Phase 0 CEO gates still listed D1 as a pending gate despite CEO confirmation in Master Blueprint Parts II and XIII; Phase 4C MDA operations reference used D10 — D10 is Android, D2 is MDA sub-brand direction; Phase 5B Facebook publishing incorrectly cited D10; Phase 3 tests did not cover activation rejection or bypass prevention)  
 **Prepared by:** Claude Code  
 **Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
-**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.2
+**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.3
 
 ---
 
@@ -22,8 +22,8 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
 **Goal:** Deliver complete, coherent planning documents for CEO review. Phase 1 is blocked until the CEO explicitly approves the Master Blueprint and authorizes repository creation.
 
 **What is complete:**
-- Master Blueprint v3.1 (`_planning/DREXONYX_MASTER_BLUEPRINT.md`)
-- All 5 supporting planning documents at v3.1
+- Master Blueprint v3.2 (`_planning/DREXONYX_MASTER_BLUEPRINT.md`)
+- All 5 supporting planning documents at v3.2
 - Three-system separation documented (CEO Command Center / Public Website / Commercial Products)
 - Authoritative CEO Decision Register established (D1–D11)
 
@@ -32,7 +32,7 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
 | Gate | Category | Blocks what? |
 |---|---|---|
 | Approve DREXONYX_MASTER_BLUEPRINT.md v3.2 | Strategic | Phase 1 System A — nothing starts without this |
-| Confirm D1 (company direction as AI-Native Technology Company) | Strategic | Phase 1 System A |
+| D1 — Company direction: DREXONYX is an AI-Native Technology Company | **CEO CONFIRMED (2026-11-21)** | No longer a pending gate — confirmed in Master Blueprint Part II and Part XIII |
 | Decide D7 (Neon strategy: second free account vs. upgrade — requires account verification first) | Requires verification | Phase 1 System A — determines database setup |
 | Confirm technology stack direction | Technical | Phase 1 System A — Claude has recommended; CEO confirms or redirects |
 | Decide D4 (public website strategy: Option A, B, or C) | Strategic | **System B work only** — does NOT block CEO Command Center Phase 1 |
@@ -152,6 +152,8 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
 - **Emergency-stop enforcement:** flag set to `true` while tasks are queued → no new dispatches; running task halts at next checkpoint and writes halt event to audit log
 - **AI provider mock:** all Anthropic API calls mocked; executor tests do not make real API calls; output schema validation tested independently
 - **Output staging:** AUTONOMOUS output passes content safety → auto-applied; POLICY-BOUND output within policy → applied; outside policy → staged for review; CEO-ONLY → always staged regardless of content
+- **Activation rejected**: activation server action called with prerequisites unmet → action rejects; `agent_emergency_stop` remains `true`; rejection event written to `audit_events`
+- **No bypass path**: all server actions and API routes touching `system.settings.agent_emergency_stop` enumerated in test; none set it to `false` without the prerequisite check running
 
 **Success criteria:**
 - CEO triggers "Generate Daily Brief" → agent runs → output staged → approval queue shows it
@@ -204,7 +206,7 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
   - Auto Workshop Management System
   - DREXONYX International Trade System
 - For each product: specification, version history, license registry, customer registry, development status
-- Also register MDA website/digital services (if MDA operations continue — CEO to confirm in D10)
+- Also register MDA website/digital services (if MDA operations continue — CEO to confirm in D2 — MDA sub-brand direction)
 - Register the five demo sites with live Vercel URLs and industry tags
 - `/products` management interface, `/products/catalog`, `/products/demos`
 
@@ -238,7 +240,7 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
 
 - Content calendar: schedule posts by platform and date
 - Publishing queue: content stages for CEO review before any publish (CEO-ONLY)
-- Facebook organic publishing integration (if approved by CEO — PENDING CEO DECISION D10)
+- Facebook organic publishing integration (if approved by CEO — PENDING CEO DECISION; not in D1–D11 register, requires explicit Phase 5 CEO approval)
 - AI agent: Social Caption Writer (POLICY-BOUND → staged)
 - AI agent: Content Calendar Planner (AUTONOMOUS)
 
@@ -325,6 +327,6 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
 
 ---
 
-*Document version: 3.2 — Revised 2026-11-22 by Claude Code*  
-*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.2*  
-*Supersedes: v3.1 (header authority referenced v2.0; D4 listed as blocking Phase 1 System A; Phase 4A outreach pipeline showed mandatory CEO-ONLY gate for all outreach, contradicting the POLICY-BOUND model; lead pipeline had no POLICY-BOUND vs CEO-ONLY escalation path distinction)*
+*Document version: 3.3 — Revised 2026-11-22 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.3*  
+*Supersedes: v3.2 (Phase 0 "What is complete" referenced v3.1 planning documents; Phase 0 CEO gates listed D1 as pending despite CEO confirmation; Phase 4C cited D10 for MDA sub-brand — D2 is correct; Phase 5B cited D10 for Facebook publishing — no D-number applies; Phase 3 tests lacked activation rejection and bypass prevention test cases)*
