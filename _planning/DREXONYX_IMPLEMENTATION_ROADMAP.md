@@ -23,7 +23,7 @@ The roadmap follows the 6-phase structure confirmed by the CEO.
 
 **What is complete:**
 - Master Blueprint v3.4 (`_planning/DREXONYX_MASTER_BLUEPRINT.md`)
-- All 5 supporting planning documents at v3.3
+- All 5 supporting planning documents at v3.4
 - Three-system separation documented (CEO Command Center / Public Website / Commercial Products)
 - Authoritative CEO Decision Register established (D1–D11)
 

@@ -4,7 +4,7 @@
 **Previous version:** 3.3 (Section 10 retained "under $20/month total" as an ILLUSTRATIVE figure with a caveat — the directive requires complete removal of any monthly cost ceiling until account plans, usage, and provider pricing are verified against actual dashboards)  
 **Prepared by:** Claude Code  
 **Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
-**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.3  
+**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.4  
 **Note:** All cost figures and plan limits are estimates from public documentation. UNVERIFIED figures must be confirmed against actual account dashboards before committing to any infrastructure strategy.
 
 ---
@@ -355,5 +355,5 @@ If DREXONYX grows and the platform serves a team of 5 people with heavy AI agent
 ---
 
 *Document version: 3.4 — Revised 2026-11-22 by Claude Code*  
-*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.3*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.4*  
 *Supersedes: v3.3 (Section 10 retained "under $20/month total" as ILLUSTRATIVE with a caveat — removed entirely; actual total cost cannot be established until account plans, usage, and provider pricing are verified against actual dashboards)*

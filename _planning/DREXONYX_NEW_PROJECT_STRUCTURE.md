@@ -1,10 +1,10 @@
 # DREXONYX — New Project Structure
 
-**Document version:** 3.3 (revised 2026-11-22)  
-**Previous version:** 3.2 (no content errors found; version-only bump to align with v3.3 correction pass across all six planning documents)  
+**Document version:** 3.4 (revised 2026-11-22)  
+**Previous version:** 3.3 (version alignment only — authority reference updated from DREXONYX_MASTER_BLUEPRINT.md v3.3 to v3.4; no content errors found)  
 **Prepared by:** Claude Code  
 **Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
-**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.3
+**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.4
 
 ---
 
@@ -420,6 +420,6 @@ The following are **not in scope** for this repository:
 
 ---
 
-*Document version: 3.3 — Revised 2026-11-22 by Claude Code*  
-*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.3*  
-*Supersedes: v3.2 (no content errors found in v3.2; version-only bump to align with v3.3 correction pass across all six planning documents)*
+*Document version: 3.4 — Revised 2026-11-22 by Claude Code*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.4*  
+*Supersedes: v3.3 (version alignment only — authority reference updated from DREXONYX_MASTER_BLUEPRINT.md v3.3 to v3.4; no content errors found)*

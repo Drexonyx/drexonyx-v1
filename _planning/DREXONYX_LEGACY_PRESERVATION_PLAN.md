@@ -4,7 +4,7 @@
 **Previous version:** 3.3 (Section 1 introductory text and Section 2 heading described six classification categories; the actual category table and the Master Blueprint Part VII both define seven categories — PENDING VERIFICATION is the seventh)  
 **Prepared by:** Claude Code  
 **Status:** PHASE 0 — DOCUMENTATION COMPLETE, CEO APPROVAL PENDING  
-**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.3
+**Authority:** Derives from DREXONYX_MASTER_BLUEPRINT.md v3.4
 
 ---
 
@@ -295,5 +295,5 @@ Before Phase 1 begins, the CEO confirms:
 ---
 
 *Document version: 3.4 — Revised 2026-11-22 by Claude Code*  
-*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.3*  
+*Source of authority: DREXONYX_MASTER_BLUEPRINT.md v3.4*  
 *Supersedes: v3.3 (Section 1 introductory text and Section 2 heading described six classification categories; the actual category table and the Master Blueprint Part VII both define seven — PENDING VERIFICATION is the seventh)*
